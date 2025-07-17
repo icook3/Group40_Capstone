@@ -1,0 +1,4 @@
+body { background: #111; color: #fff; }
+#hud { font-size: 1.1em; }
+button { font-size: 1em; padding: 6px 12px; border-radius: 4px; border: none; background: #0af; color: #fff; cursor: pointer; }
+button:disabled { background: #555; }
