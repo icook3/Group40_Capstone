@@ -1,3 +1,5 @@
+![ZlowGif](https://github.com/user-attachments/assets/82ad9bf2-1d07-419f-b6dd-87fa9ebbbbb5)
+
 # Zlow: Browser-Based Cycling Simulator Prototype
 
 A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and Bluetooth APIs, with Strava export integration.
@@ -37,3 +39,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - See each JS file for further documentation.
 
 You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
+
+# Surviving on your donations
+[Donations help keep the server up](https://paypal.me/jsimonson2013) :smile:
