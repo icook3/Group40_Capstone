@@ -28,7 +28,7 @@ export function powerToSpeed({
     const df = 3 * a * v * v + b;
     v = v - f / df;
     if (v < 0) v = 0.1; // prevent negative speeds
-  }   
+  }
   return msToKmh(v);
 }
 
@@ -49,8 +49,8 @@ export function initZlowApp({
   const strava = new Strava();
 
   //Avatar and Pacer
-  const rider = new Avatar('rider', '#0af', {x:0, y:1, z:0});
-  const pacer = new Avatar('pacer', '#fa0', {x:1, y:1, z:0}, undefined, true);
+  const rider = new Avatar('rider', '#0af', {x:-0.5, y:1, z:0});
+  const pacer = new Avatar('pacer', '#fa0', {x:0.5, y:1, z:-2}, undefined, true);
 
   //Pacer speed control input
   const pacerSpeedInput = getElement('pacer-speed');
