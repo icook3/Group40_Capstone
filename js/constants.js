@@ -1,7 +1,8 @@
-export class Constants {
-    constructor() {
-
-    }
+/**
+ * Constants class is a singleton that stores various important constants
+ * It also currently store other variables - this is something to change later
+ */
+class Constants {
     // Conversion constants and helpers (DRY)
     KMH_TO_MS = 1000 / 3600;
     MS_TO_KMH = 3600 / 1000;
@@ -25,14 +26,16 @@ export class Constants {
     slope = 0; // road grade (decimal)
     lastTime = Date.now();
     historyStartTime = Date.now();
+    // keyboard mode values - should go in own class for keyboard mode
     keyboardMode = false;
     keyboardSpeed = this.kmhToMs(100);
     keyboardHalfSpeed = this.kmhToMs(50);
+    wKeyDown = false;
+    sKeyDown = false;
+
     riderState = { power: 0, speed: 0 };
     rideHistory = [];
     lastHistorySecond = null;
     pacerStarted = false;
-    wKeyDown = false;
-    sKeyDown = false;
 }
 export const constants = new Constants();

@@ -3,19 +3,18 @@ import { TrainerBluetooth } from './bluetooth.js';
 import { ZlowScene } from './scene.js';
 import { HUD } from './hud.js';
 import { Strava } from './strava.js';
-import { Constants } from './constants.js';
 import { constants } from './constants.js'
 
 // Physics-based power-to-speed conversion
-// Returns speed in m/s for given power (watts) and parameters
+// Returns speed in m/s for given power (watts)
 export function powerToSpeed({
   power  
 } = {}) {
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
-    const a = 0.5 * constants.airDensity * constants.cda;
-    const b = constants.crr * constants.mass * constants.g + constants.mass * constants.g * Math.sin(Math.atan(constants.slope));
+  const a = 0.5 * constants.airDensity * constants.cda;
+  const b = constants.crr * constants.mass * constants.g + constants.mass * constants.g * Math.sin(Math.atan(constants.slope));
   // Use Newton-Raphson to solve for v
   let v = 8; // initial guess (m/s)
   for (let i = 0; i < 20; i++) {
@@ -26,6 +25,8 @@ export function powerToSpeed({
   }   
   return constants.msToKmh(v);
 }
+// define the scene and the hud
+// so they can be used in multiple locations
 let scene;
 let hud;
 // Handles the main loop and adding to the ride history
@@ -51,6 +52,9 @@ function loop({
     requestAnimationFrameFn(loop);
 }
 
+/**
+ * Utility methods to separate out various event listeners from the main method
+ */
 function activatePacer() {
     if (!constants.pacerStarted) {
         scene.activatePacer();
@@ -83,9 +87,11 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame
 } = {}) {
+  // get the needed objects
   const trainer = new TrainerBluetooth();
   const pacerSpeedInput = getElement('pacer-speed');
   scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+  //map the pacer speed input to the pacer speed variable
   pacerSpeedInput.addEventListener('input', () => {
     const val = Number(pacerSpeedInput.value);
     scene.setPacerSpeed(val);
@@ -93,6 +99,8 @@ export function initZlowApp({
   hud = new HUD({ getElement });
   const strava = new Strava();
 
+  // keyboard mode initialization
+  // setup the keyboard mode button
   const keyboardBtn = getElement('keyboard-btn');
   keyboardBtn.addEventListener('click', () => {
     constants.keyboardMode = !constants.keyboardMode;
@@ -113,12 +121,15 @@ export function initZlowApp({
     stopKeyboardMode(e.key.toLowerCase());
   });
 
+
+  // connect button
   const connectBtn = getElement('connect-btn');
   connectBtn.addEventListener('click', async () => {
     const ok = await trainer.connect();
     if (ok) connectBtn.disabled = true;
   });
 
+  // setup the speed when using an actual trainer
   trainer.onData = data => {
   if (!constants.keyboardMode) {
       let speed = 0;
@@ -134,15 +145,16 @@ export function initZlowApp({
     }
   };
 
+  // Strava integration button - Stretch goal
   const stravaBtn = getElement('strava-btn');
   let stravaBtnEnabled = false;
   
   loop();
-
-    getElement('gpx-btn').addEventListener('click', () => {
+  getElement('gpx-btn').addEventListener('click', () => {
       saveTCX();
   });
 
+  // pacer sync - maybe put in Avatar.js?
   const pacerSyncBtn = getElement('pacer-sync-btn');
   pacerSyncBtn.addEventListener('click', () => {
     // Set pacer's z to rider's z
@@ -180,6 +192,9 @@ if (typeof window !== 'undefined') {
   window.initZlowApp = initZlowApp;
 }
 
+/**
+ * Save a TCX file
+ */
 function saveTCX() {
     if (constants.rideHistory.length < 2) {
         alert('Not enough data to export.');
