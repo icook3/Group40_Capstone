@@ -58,11 +58,11 @@ function activatePacer() {
     }
 }
 function setKeyboardModeSpeed(key) {
-    if (key === 'w' && !wKeyDown) {
-        wKeyDown = true;
+    if (key === 'w' && !constants.wKeyDown) {
+        constants.wKeyDown = true;
         constants.riderState.speed = constants.keyboardSpeed;
-    } else if (key === 's' && !sKeyDown) {
-        sKeyDown = true;
+    } else if (key === 's' && !constants.sKeyDown) {
+        constants.sKeyDown = true;
         constants.riderState.speed = constants.keyboardHalfSpeed;
     }
     activatePacer();
@@ -70,11 +70,11 @@ function setKeyboardModeSpeed(key) {
 
 function stopKeyboardMode(key) {
     if (key === 'w') {
-        wKeyDown = false;
-        constants.riderState.speed = sKeyDown ? constants.keyboardHalfSpeed : 0;
+        constants.wKeyDown = false;
+        constants.riderState.speed = constants.sKeyDown ? constants.keyboardHalfSpeed : 0;
     } else if (key === 's') {
-        sKeyDown = false;
-        constants.riderState.speed = wKeyDown ? constants.keyboardSpeed : 0;
+        constants.sKeyDown = false;
+        constants.riderState.speed = constants.wKeyDown ? constants.keyboardSpeed : 0;
     }
 }
 
@@ -102,8 +102,8 @@ export function initZlowApp({
     }
   });
 
-  let wKeyDown = false;
-  let sKeyDown = false;
+  constants.wKeyDown = false;
+  constants.sKeyDown = false;
   document.addEventListener('keydown', (e) => {
     if (!constants.keyboardMode) return;
     setKeyboardModeSpeed(e.key.toLowerCase());

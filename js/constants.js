@@ -32,5 +32,7 @@ export class Constants {
     rideHistory = [];
     lastHistorySecond = null;
     pacerStarted = false;
+    wKeyDown = false;
+    sKeyDown = false;
 }
 export const constants = new Constants();
