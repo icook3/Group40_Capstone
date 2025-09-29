@@ -129,46 +129,8 @@ export function initZlowApp({
   }
   loop();
 
-  getElement('gpx-btn').addEventListener('click', () => {
-    if (constants.rideHistory.length < 2) {
-      alert('Not enough data to export.');
-      return;
-    }
-    const startTime = new Date(constants.rideHistory[0].time);
-    let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
-    tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor((rideHistory[rideHistory.length-1].time - rideHistory[0].time)/1000)}</TotalTimeSeconds>\n        <DistanceMeters>${(rideHistory[rideHistory.length-1].distance*1000).toFixed(1)}<\/DistanceMeters>\n        <Intensity>Active<\/Intensity>\n        <TriggerMethod>Manual<\/TriggerMethod>\n        <Track>\n`;
-    for (let i = 0; i < constants.rideHistory.length; i++) {
-      const pt = constants.rideHistory[i];
-      const t = new Date(pt.time).toISOString();
-      const lat = 33.6 + (pt.distance / (constants.rideHistory[constants.rideHistory.length-1].distance || 1)) * 0.009;
-      const lon = -111.7;
-      tcx += `          <Trackpoint>\n`;
-      tcx += `            <Time>${t}</Time>\n`;
-      tcx += `            <Position><LatitudeDegrees>${lat.toFixed(6)}</LatitudeDegrees><LongitudeDegrees>${lon.toFixed(6)}</LongitudeDegrees></Position>\n`;
-      tcx += `            <DistanceMeters>${(pt.distance*1000).toFixed(1)}</DistanceMeters>\n`;
-      tcx += `            <Cadence>0</Cadence>\n`;
-      tcx += `            <Extensions>\n`;
-      tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
-      tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
-      tcx += `                <ns3:Speed>${constants.kmhToMs(pt.speed).toFixed(3)}</ns3:Speed>\n`;
-      tcx += `              </ns3:TPX>\n`;
-      tcx += `            </Extensions>\n`;
-      tcx += `          </Trackpoint>\n`;
-    }
-    tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
-    const blob = new Blob([tcx], {type: 'application/vnd.garmin.tcx+xml'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'zlow-ride.tcx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    constants.rideHistory = [];
-    constants.historyStartTime = Date.now();
-    constants.lastHistorySecond = null;
+    getElement('gpx-btn').addEventListener('click', () => {
+      saveTCX();
   });
 
   const pacerSyncBtn = getElement('pacer-sync-btn');
@@ -206,4 +168,47 @@ export function initZlowApp({
 // For browser usage
 if (typeof window !== 'undefined') {
   window.initZlowApp = initZlowApp;
+}
+
+function saveTCX() {
+    const constants = new Constants();
+    if (constants.rideHistory.length < 2) {
+        alert('Not enough data to export.');
+        return;
+    }
+    const startTime = new Date(constants.rideHistory[0].time);
+    let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
+    tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor((rideHistory[rideHistory.length - 1].time - rideHistory[0].time) / 1000)}</TotalTimeSeconds>\n        <DistanceMeters>${(rideHistory[rideHistory.length - 1].distance * 1000).toFixed(1)}<\/DistanceMeters>\n        <Intensity>Active<\/Intensity>\n        <TriggerMethod>Manual<\/TriggerMethod>\n        <Track>\n`;
+    for (let i = 0; i < constants.rideHistory.length; i++) {
+        const pt = constants.rideHistory[i];
+        const t = new Date(pt.time).toISOString();
+        const lat = 33.6 + (pt.distance / (constants.rideHistory[constants.rideHistory.length - 1].distance || 1)) * 0.009;
+        const lon = -111.7;
+        tcx += `          <Trackpoint>\n`;
+        tcx += `            <Time>${t}</Time>\n`;
+        tcx += `            <Position><LatitudeDegrees>${lat.toFixed(6)}</LatitudeDegrees><LongitudeDegrees>${lon.toFixed(6)}</LongitudeDegrees></Position>\n`;
+        tcx += `            <DistanceMeters>${(pt.distance * 1000).toFixed(1)}</DistanceMeters>\n`;
+        tcx += `            <Cadence>0</Cadence>\n`;
+        tcx += `            <Extensions>\n`;
+        tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
+        tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
+        tcx += `                <ns3:Speed>${constants.kmhToMs(pt.speed).toFixed(3)}</ns3:Speed>\n`;
+        tcx += `              </ns3:TPX>\n`;
+        tcx += `            </Extensions>\n`;
+        tcx += `          </Trackpoint>\n`;
+    }
+    tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
+    const blob = new Blob([tcx], { type: 'application/vnd.garmin.tcx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'zlow-ride.tcx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    constants.rideHistory = [];
+    constants.historyStartTime = Date.now();
+    constants.lastHistorySecond = null;
 }
