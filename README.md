@@ -17,6 +17,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - `js/scene.js` — Sets up and updates the A-Frame 3D world.
 - `js/hud.js` — Renders the heads-up display overlay.
 - `js/strava.js` — Handles Strava OAuth and activity upload.
+- `js/avatar.js` — Sets up and updates A-Frame 3D avatar.
 - `js/main.js` — App entry, state management, and module coordination.
 
 ## Stretch Goals
