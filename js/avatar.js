@@ -6,8 +6,8 @@ export class Avatar {
         this.rotation = rotation;
         this.isPacer = isPacer;
         this.speed = 0;
-        this.avatarEntity = this.createEntity();
         this.legEntities = [];
+        this.avatarEntity = this.createEntity();
     }
 
     //Creates avatar entity
@@ -82,9 +82,16 @@ export class Avatar {
             this.avatarEntity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
         }
 
+        if (this.isPacer) {
+            this.position.z -= this.speed * dt;
+            this.avatarEntity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
+        }
+
         //Leg Animation
         const now = performance.now() / 1000;
+        //Animate: swing legs back and forth based on speed (max ±35deg at 50km/h
         const maxSwing = 35; //Degrees
+        //Frequency: 1.5 Hz at 30 km/h, scale with speed
         const freq = 0.5 + Math.abs(this.speed) * 0.04; //Hz
         const phase = now * freq * 2 * Math.PI;
         const swing = Math.sin(phase) * Math.min(maxSwing, Math.abs(this.speed) * 0.7);
