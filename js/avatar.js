@@ -86,7 +86,7 @@ export class Avatar {
         //Animate: swing legs back and forth based on speed (max ±35deg at 50km/h
         const maxSwing = 35; //Degrees
         //Frequency: 1.5 Hz at 30 km/h, scale with speed
-        const freq = 0.5 + Math.abs(this.speed) * 0.04; //Hz
+        const freq = 0.5 + Math.abs(this.speed) * 0.12; //Hz
         const phase = now * freq * 2 * Math.PI;
         const swing = Math.sin(phase) * Math.min(maxSwing, Math.abs(this.speed) * 0.7);
         if (this.legEntities.length === 2) {
