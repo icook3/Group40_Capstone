@@ -61,8 +61,4 @@ export class Avatar {
 
         return avatar;
     }
-
-    attachTo(parent) {
-        parent.appendChild(this.avatarEntity);
-    }
 }
