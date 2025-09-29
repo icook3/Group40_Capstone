@@ -50,6 +50,34 @@ function loop({
     }
     requestAnimationFrameFn(loop);
 }
+
+function activatePacer() {
+    if (!constants.pacerStarted) {
+        scene.activatePacer();
+        constants.pacerStarted = true;
+    }
+}
+function setKeyboardModeSpeed(key) {
+    if (key === 'w' && !wKeyDown) {
+        wKeyDown = true;
+        constants.riderState.speed = constants.keyboardSpeed;
+    } else if (key === 's' && !sKeyDown) {
+        sKeyDown = true;
+        constants.riderState.speed = constants.keyboardHalfSpeed;
+    }
+    activatePacer();
+}
+
+function stopKeyboardMode(key) {
+    if (key === 'w') {
+        wKeyDown = false;
+        constants.riderState.speed = sKeyDown ? constants.keyboardHalfSpeed : 0;
+    } else if (key === 's') {
+        sKeyDown = false;
+        constants.riderState.speed = wKeyDown ? constants.keyboardSpeed : 0;
+    }
+}
+
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
@@ -78,33 +106,11 @@ export function initZlowApp({
   let sKeyDown = false;
   document.addEventListener('keydown', (e) => {
     if (!constants.keyboardMode) return;
-    const key = e.key.toLowerCase();
-    if (key === 'w' && !wKeyDown) {
-      wKeyDown = true;
-      constants.riderState.speed = constants.keyboardSpeed;
-        if (!constants.pacerStarted) {
-            scene.activatePacer();
-            constants.pacerStarted = true;
-        }
-    } else if (key === 's' && !sKeyDown) {
-      sKeyDown = true;
-      constants.riderState.speed = constants.keyboardHalfSpeed;
-        if (!constants.constantspacerStarted) {
-            scene.activatePacer();
-            constants.pacerStarted = true;
-        }
-    }
+    setKeyboardModeSpeed(e.key.toLowerCase());
   });
   document.addEventListener('keyup', (e) => {
     if (!constants.keyboardMode) return;
-    const key = e.key.toLowerCase();
-    if (key === 'w') {
-      wKeyDown = false;
-      constants.riderState.speed = sKeyDown ? constants.keyboardHalfSpeed : 0;
-    } else if (key === 's') {
-      sKeyDown = false;
-      constants.riderState.speed = wKeyDown ? constants.keyboardSpeed : 0;
-    }
+    stopKeyboardMode(e.key.toLowerCase());
   });
 
   const connectBtn = getElement('connect-btn');
@@ -120,9 +126,8 @@ export function initZlowApp({
         speed = powerToSpeed({ power: data.power });
       }
       constants.riderState = { ...constants.riderState, power: data.power, speed };
-      if (speed > 0 && !constants.pacerStarted) {
-        scene.activatePacer();
-          constants.pacerStarted = true;
+      if (speed > 0) {
+        activatePacer();
       }
     } else {
       constants.riderState = { ...constants.riderState, power: data.power };
