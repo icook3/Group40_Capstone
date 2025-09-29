@@ -33,3 +33,4 @@ export class Constants {
     lastHistorySecond = null;
     pacerStarted = false;
 }
+export const constants = new Constants();

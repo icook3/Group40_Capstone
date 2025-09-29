@@ -4,13 +4,13 @@ import { ZlowScene } from './scene.js';
 import { HUD } from './hud.js';
 import { Strava } from './strava.js';
 import { Constants } from './constants.js';
+import { constants } from './constants.js'
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts) and parameters
 export function powerToSpeed({
   power  
 } = {}) {
-  const constants = new Constants()
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
@@ -41,7 +41,6 @@ export function initZlowApp({
   });
   const hud = new HUD({ getElement });
   const strava = new Strava();
-  const constants = new Constants();
 
   const keyboardBtn = getElement('keyboard-btn');
   keyboardBtn.addEventListener('click', () => {
@@ -171,7 +170,6 @@ if (typeof window !== 'undefined') {
 }
 
 function saveTCX() {
-    const constants = new Constants();
     if (constants.rideHistory.length < 2) {
         alert('Not enough data to export.');
         return;
@@ -179,7 +177,7 @@ function saveTCX() {
     const startTime = new Date(constants.rideHistory[0].time);
     let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
-    tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor((rideHistory[rideHistory.length - 1].time - rideHistory[0].time) / 1000)}</TotalTimeSeconds>\n        <DistanceMeters>${(rideHistory[rideHistory.length - 1].distance * 1000).toFixed(1)}<\/DistanceMeters>\n        <Intensity>Active<\/Intensity>\n        <TriggerMethod>Manual<\/TriggerMethod>\n        <Track>\n`;
+    tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor((constants.rideHistory[constants.rideHistory.length - 1].time - constants.rideHistory[0].time) / 1000)}</TotalTimeSeconds>\n        <DistanceMeters>${(constants.rideHistory[constants.rideHistory.length - 1].distance * 1000).toFixed(1)}<\/DistanceMeters>\n        <Intensity>Active<\/Intensity>\n        <TriggerMethod>Manual<\/TriggerMethod>\n        <Track>\n`;
     for (let i = 0; i < constants.rideHistory.length; i++) {
         const pt = constants.rideHistory[i];
         const t = new Date(pt.time).toISOString();
