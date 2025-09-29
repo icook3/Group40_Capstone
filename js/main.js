@@ -3,19 +3,19 @@ import { TrainerBluetooth } from './bluetooth.js';
 import { ZlowScene } from './scene.js';
 import { HUD } from './hud.js';
 import { Strava } from './strava.js';
-import * as constants from './constants.js';
+import { Constants } from './constants.js';
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts) and parameters
 export function powerToSpeed({
   power  
 } = {}) {
-
+  const constants = new Constants()
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
-  const a = 0.5 * constants.airDensity * constants.cda;
-  const b = constants.crr * constants.mass * constants.g + constants.mass * constants.g * Math.sin(Math.atan(constants.slope));
+    const a = 0.5 * constants.airDensity * constants.cda;
+    const b = constants.crr * constants.mass * constants.g + constants.mass * constants.g * Math.sin(Math.atan(constants.slope));
   // Use Newton-Raphson to solve for v
   let v = 8; // initial guess (m/s)
   for (let i = 0; i < 20; i++) {
@@ -41,6 +41,7 @@ export function initZlowApp({
   });
   const hud = new HUD({ getElement });
   const strava = new Strava();
+  const constants = new Constants();
 
   const keyboardBtn = getElement('keyboard-btn');
   keyboardBtn.addEventListener('click', () => {
@@ -66,7 +67,7 @@ export function initZlowApp({
     } else if (key === 's' && !sKeyDown) {
       sKeyDown = true;
       constants.riderState.speed = constants.keyboardHalfSpeed;
-        if (!constantspacerStarted) {
+        if (!constants.constantspacerStarted) {
             scene.activatePacer();
             constants.pacerStarted = true;
         }

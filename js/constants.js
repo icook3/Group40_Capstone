@@ -1,9 +1,16 @@
 export class Constants {
+    constructor() {
+
+    }
     // Conversion constants and helpers (DRY)
     KMH_TO_MS = 1000 / 3600;
     MS_TO_KMH = 3600 / 1000;
-    kmhToMs(kmh) { return kmh * KMH_TO_MS; }
-    msToKmh(ms) { return ms * MS_TO_KMH; }
+    kmhToMs(kmh) {
+        return kmh * this.KMH_TO_MS;
+    }
+    msToKmh(ms) {
+        return ms * this.MS_TO_KMH;
+    }
 
     cda = 0.38; // drag area (m^2) - slightly higher for realism
     crr = 0.006; // rolling resistance coefficient - slightly higher for realism
@@ -19,8 +26,8 @@ export class Constants {
     lastTime = Date.now();
     historyStartTime = Date.now();
     keyboardMode = false;
-    keyboardSpeed = kmhToMs(100);
-    keyboardHalfSpeed = kmhToMs(50);
+    keyboardSpeed = this.kmhToMs(100);
+    keyboardHalfSpeed = this.kmhToMs(50);
     riderState = { power: 0, speed: 0 };
     rideHistory = [];
     lastHistorySecond = null;
