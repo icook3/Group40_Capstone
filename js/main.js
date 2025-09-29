@@ -1,26 +1,18 @@
-// Conversion constants and helpers (DRY)
-export const KMH_TO_MS = 1000 / 3600;
-export const MS_TO_KMH = 3600 / 1000;
-export function kmhToMs(kmh) { return kmh * KMH_TO_MS; }
-export function msToKmh(ms) { return ms * MS_TO_KMH; }
-
+import * as constants from './constants.js';
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts) and parameters
+// I am keeping mass and slope here for now - They are not constants (Andrew)
 export function powerToSpeed({
   power,
-  cda = 0.38, // drag area (m^2) - slightly higher for realism
-  crr = 0.006, // rolling resistance coefficient - slightly higher for realism
   mass = 70, // total mass (kg)
-  airDensity = 1.225, // kg/m^3
   slope = 0 // road grade (decimal)
 } = {}) {
-  // Constants
-  const g = 9.8067; // gravity
+
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
-  const a = 0.5 * airDensity * cda;
-  const b = crr * mass * g + mass * g * Math.sin(Math.atan(slope));
+  const a = 0.5 * constants.airDensity * constants.cda;
+  const b = constants.crr * mass * constants.g + mass * constants.g * Math.sin(Math.atan(slope));
   // Use Newton-Raphson to solve for v
   let v = 8; // initial guess (m/s)
   for (let i = 0; i < 20; i++) {
@@ -29,7 +21,7 @@ export function powerToSpeed({
     v = v - f / df;
     if (v < 0) v = 0.1; // prevent negative speeds
   }   
-  return msToKmh(v);
+  return constants.msToKmh(v);
 }
 
 // main.js: App entry point and state management
@@ -61,8 +53,8 @@ export function initZlowApp({
   let lastTime = Date.now();
 
   let keyboardMode = false;
-  let keyboardSpeed = kmhToMs(100);
-  let keyboardHalfSpeed = kmhToMs(50);
+  let keyboardSpeed = constants.kmhToMs(100);
+  let keyboardHalfSpeed = constants.kmhToMs(50);
   const keyboardBtn = getElement('keyboard-btn');
   keyboardBtn.addEventListener('click', () => {
     keyboardMode = !keyboardMode;
@@ -165,7 +157,7 @@ export function initZlowApp({
       tcx += `            <Extensions>\n`;
       tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
       tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
-      tcx += `                <ns3:Speed>${kmhToMs(pt.speed).toFixed(3)}</ns3:Speed>\n`;
+      tcx += `                <ns3:Speed>${constants.kmhToMs(pt.speed).toFixed(3)}</ns3:Speed>\n`;
       tcx += `              </ns3:TPX>\n`;
       tcx += `            </Extensions>\n`;
       tcx += `          </Trackpoint>\n`;
