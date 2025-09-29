@@ -77,14 +77,8 @@ export class Avatar {
     }
 
     update(dt) {
-        if (this.isPacer) {
-            this.position.z -= this.speed * dt;
-            this.avatarEntity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
-        }
-
-        if (this.isPacer) {
-            this.position.z -= this.speed * dt;
-            this.avatarEntity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
+        if (this.speed === 0) {
+            return;
         }
 
         //Leg Animation
