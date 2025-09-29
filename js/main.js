@@ -26,7 +26,30 @@ export function powerToSpeed({
   }   
   return constants.msToKmh(v);
 }
-
+let scene;
+let hud;
+// Handles the main loop and adding to the ride history
+function loop({
+    getElement = (id) => document.getElementById(id),
+    requestAnimationFrameFn = window.requestAnimationFrame
+} = {}) {
+    const now = Date.now();
+    const dt = (now - constants.lastTime) / 1000;
+    constants.lastTime = now;
+    scene.update(constants.riderState.speed || 0, dt);
+    hud.update(constants.riderState, dt);
+    const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
+    if (constants.lastHistorySecond !== thisSecond) {
+        constants.rideHistory.push({
+            time: now,
+            power: constants.riderState.power || 0,
+            speed: constants.riderState.speed || 0,
+            distance: parseFloat(getElement('distance').textContent) || 0
+        });
+        constants.lastHistorySecond = thisSecond;
+    }
+    requestAnimationFrameFn(loop);
+}
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
@@ -34,12 +57,12 @@ export function initZlowApp({
 } = {}) {
   const trainer = new TrainerBluetooth();
   const pacerSpeedInput = getElement('pacer-speed');
-  const scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+  scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
   pacerSpeedInput.addEventListener('input', () => {
     const val = Number(pacerSpeedInput.value);
     scene.setPacerSpeed(val);
   });
-  const hud = new HUD({ getElement });
+  hud = new HUD({ getElement });
   const strava = new Strava();
 
   const keyboardBtn = getElement('keyboard-btn');
@@ -108,24 +131,7 @@ export function initZlowApp({
 
   const stravaBtn = getElement('strava-btn');
   let stravaBtnEnabled = false;
-  function loop() {
-    const now = Date.now();
-    const dt = (now - constants.lastTime) / 1000;
-    constants.lastTime = now;
-    scene.update(constants.riderState.speed || 0, dt);
-    hud.update(constants.riderState, dt);
-    const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
-    if (constants.lastHistorySecond !== thisSecond) {
-      constants.rideHistory.push({
-        time: now,
-        power: constants.riderState.power || 0,
-        speed: constants.riderState.speed || 0,
-        distance: parseFloat(getElement('distance').textContent) || 0
-      });
-      constants.lastHistorySecond = thisSecond;
-    }
-    requestAnimationFrameFn(loop);
-  }
+  
   loop();
 
     getElement('gpx-btn').addEventListener('click', () => {
