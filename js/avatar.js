@@ -4,7 +4,6 @@ export class Avatar {
         this.color = color;
         this.position = position;
         this.rotation = rotation;
-        this.isPacer = isPacer;
         this.speed = 0;
         this.legEntities = [];
         this.avatarEntity = this.createEntity();
@@ -49,7 +48,7 @@ export class Avatar {
         //Bike Frame
         const frame = document.createElement('a-entity');
         frame.setAttribute('geometry', 'primitive: box; width: 1.5; height: 0.05; depth: 0.1');
-        frame.setAttribute('material', 'color: #222');
+        frame.setAttribute('material', 'color: #fff');
         frame.setAttribute('position', '0 0.8 0');
         avatar.appendChild(frame);
 
