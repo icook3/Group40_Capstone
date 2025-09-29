@@ -37,6 +37,7 @@ import { TrainerBluetooth } from './bluetooth.js';
 import { ZlowScene } from './scene.js';
 import { HUD } from './hud.js';
 import { Strava } from './strava.js';
+import { Avatar } from './avatar.js'
 
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
@@ -44,15 +45,23 @@ export function initZlowApp({
   requestAnimationFrameFn = window.requestAnimationFrame
 } = {}) {
   const trainer = new TrainerBluetooth();
-  const pacerSpeedInput = getElement('pacer-speed');
-  const scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
-  pacerSpeedInput.addEventListener('input', () => {
-    const val = Number(pacerSpeedInput.value);
-    scene.setPacerSpeed(val);
-  });
   const hud = new HUD({ getElement });
   const strava = new Strava();
 
+  //Avatar and Pacer
+  const rider = new Avatar('rider', '#0af', {x:0, y:1, z:0});
+  const pacer = new Avatar('pacer', '#fa0', {x:1, y:1, z:0}, undefined, true);
+
+  //Pacer speed control input
+  const pacerSpeedInput = getElement('pacer-speed');
+  const scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+  pacer.setSpeed((Number(pacerSpeedInput.value)));
+  pacerSpeedInput.addEventListener('input', () => {
+      const val = Number(pacerSpeedInput.value);
+      pacer.setSpeed((val));
+  });
+
+  //Rider state and history
   let riderState = { power: 0, speed: 0 };
   let rideHistory = [];
   let historyStartTime = Date.now();
@@ -80,11 +89,11 @@ export function initZlowApp({
     if (key === 'w' && !wKeyDown) {
       wKeyDown = true;
       riderState.speed = keyboardSpeed;
-      if (!pacerStarted) { scene.activatePacer(); pacerStarted = true; }
+      pacerStarted = true;
     } else if (key === 's' && !sKeyDown) {
       sKeyDown = true;
       riderState.speed = keyboardHalfSpeed;
-      if (!pacerStarted) { scene.activatePacer(); pacerStarted = true; }
+      pacerStarted = true;
     }
   });
   document.addEventListener('keyup', (e) => {
@@ -113,7 +122,6 @@ export function initZlowApp({
       }
       riderState = { ...riderState, power: data.power, speed };
       if (speed > 0 && !pacerStarted) {
-        scene.activatePacer();
         pacerStarted = true;
       }
     } else {
@@ -123,11 +131,28 @@ export function initZlowApp({
 
   const stravaBtn = getElement('strava-btn');
   let stravaBtnEnabled = false;
+
+  //Main Loop
   function loop() {
     const now = Date.now();
     const dt = (now - lastTime) / 1000;
     lastTime = now;
     scene.update(riderState.speed || 0, dt);
+
+    //Update Avatar and Pacer
+    rider.setSpeed(riderState.speed);
+    rider.update(dt);
+    if (pacerStarted) {
+        pacer.update(dt);
+        //Update pacer position
+        const riderSpeed = riderState.speed;
+        const pacerSpeed = pacer.speed;
+        const relativeSpeed = pacerSpeed - riderSpeed;
+        const pacerPos = pacer.avatarEntity.getAttribute('position');
+        pacerPos.z -= relativeSpeed * dt;
+        pacer.avatarEntity.setAttribute('position', pacerPos);
+    }
+
     hud.update(riderState, dt);
     const thisSecond = Math.floor((now - historyStartTime) / 1000);
     if (lastHistorySecond !== thisSecond) {
@@ -187,11 +212,12 @@ export function initZlowApp({
 
   const pacerSyncBtn = getElement('pacer-sync-btn');
   pacerSyncBtn.addEventListener('click', () => {
-    // Set pacer's z to rider's z
-    if (scene && scene.avatar && scene.pacer) {
-      const riderPos = scene.avatar.getAttribute('position');
-      scene.pacerPos.z = riderPos.z;
-      scene.pacer.setAttribute('position', `${scene.pacerPos.x} ${scene.pacerPos.y} ${scene.pacerPos.z}`);
+    //Set pacer's z to rider's z
+    if (scene && rider && pacer) {
+      const riderPos = rider.getAttribute('position').split(' ').map(Number);
+      const pacerPos = pacer.getAttribute('position').split(' ').map(Number);
+      pacerPos[2] = riderPos[2];
+      pacer.setAttribute('position', `${pacerPos.join(' ')}`);
     }
   });
 
@@ -201,6 +227,8 @@ export function initZlowApp({
     scene,
     hud,
     strava,
+    avatar,
+    pacer,
     getRiderState: () => riderState,
     getRideHistory: () => rideHistory,
     setRiderState: (state) => { riderState = state; },
