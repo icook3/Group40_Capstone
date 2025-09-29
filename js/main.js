@@ -1,18 +1,21 @@
+// main.js: App entry point and state management
+import { TrainerBluetooth } from './bluetooth.js';
+import { ZlowScene } from './scene.js';
+import { HUD } from './hud.js';
+import { Strava } from './strava.js';
 import * as constants from './constants.js';
+
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts) and parameters
-// I am keeping mass and slope here for now - They are not constants (Andrew)
 export function powerToSpeed({
-  power,
-  mass = 70, // total mass (kg)
-  slope = 0 // road grade (decimal)
+  power  
 } = {}) {
 
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
   const a = 0.5 * constants.airDensity * constants.cda;
-  const b = constants.crr * mass * constants.g + mass * constants.g * Math.sin(Math.atan(slope));
+  const b = constants.crr * constants.mass * constants.g + constants.mass * constants.g * Math.sin(Math.atan(constants.slope));
   // Use Newton-Raphson to solve for v
   let v = 8; // initial guess (m/s)
   for (let i = 0; i < 20; i++) {
@@ -23,12 +26,6 @@ export function powerToSpeed({
   }   
   return constants.msToKmh(v);
 }
-
-// main.js: App entry point and state management
-import { TrainerBluetooth } from './bluetooth.js';
-import { ZlowScene } from './scene.js';
-import { HUD } from './hud.js';
-import { Strava } from './strava.js';
 
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
@@ -45,49 +42,45 @@ export function initZlowApp({
   const hud = new HUD({ getElement });
   const strava = new Strava();
 
-  let riderState = { power: 0, speed: 0 };
-  let rideHistory = [];
-  let historyStartTime = Date.now();
-  let lastHistorySecond = null;
-  let pacerStarted = false;
-  let lastTime = Date.now();
-
-  let keyboardMode = false;
-  let keyboardSpeed = constants.kmhToMs(100);
-  let keyboardHalfSpeed = constants.kmhToMs(50);
   const keyboardBtn = getElement('keyboard-btn');
   keyboardBtn.addEventListener('click', () => {
-    keyboardMode = !keyboardMode;
-    keyboardBtn.textContent = keyboardMode ? 'Keyboard Mode: ON' : 'Keyboard Mode';
-    if (!keyboardMode) {
-      riderState.speed = 0;
+    constants.keyboardMode = !constants.keyboardMode;
+    keyboardBtn.textContent = constants.keyboardMode ? 'Keyboard Mode: ON' : 'Keyboard Mode';
+    if (!constants.keyboardMode) {
+      constants.riderState.speed = 0;
     }
   });
 
   let wKeyDown = false;
   let sKeyDown = false;
   document.addEventListener('keydown', (e) => {
-    if (!keyboardMode) return;
+    if (!constants.keyboardMode) return;
     const key = e.key.toLowerCase();
     if (key === 'w' && !wKeyDown) {
       wKeyDown = true;
-      riderState.speed = keyboardSpeed;
-      if (!pacerStarted) { scene.activatePacer(); pacerStarted = true; }
+      constants.riderState.speed = constants.keyboardSpeed;
+        if (!constants.pacerStarted) {
+            scene.activatePacer();
+            constants.pacerStarted = true;
+        }
     } else if (key === 's' && !sKeyDown) {
       sKeyDown = true;
-      riderState.speed = keyboardHalfSpeed;
-      if (!pacerStarted) { scene.activatePacer(); pacerStarted = true; }
+      constants.riderState.speed = constants.keyboardHalfSpeed;
+        if (!constantspacerStarted) {
+            scene.activatePacer();
+            constants.pacerStarted = true;
+        }
     }
   });
   document.addEventListener('keyup', (e) => {
-    if (!keyboardMode) return;
+    if (!constants.keyboardMode) return;
     const key = e.key.toLowerCase();
     if (key === 'w') {
       wKeyDown = false;
-      riderState.speed = sKeyDown ? keyboardHalfSpeed : 0;
+      constants.riderState.speed = sKeyDown ? constants.keyboardHalfSpeed : 0;
     } else if (key === 's') {
       sKeyDown = false;
-      riderState.speed = wKeyDown ? keyboardSpeed : 0;
+      constants.riderState.speed = wKeyDown ? constants.keyboardSpeed : 0;
     }
   });
 
@@ -98,18 +91,18 @@ export function initZlowApp({
   });
 
   trainer.onData = data => {
-    if (!keyboardMode) {
+  if (!constants.keyboardMode) {
       let speed = 0;
       if (typeof data.power === 'number' && data.power > 0) {
         speed = powerToSpeed({ power: data.power });
       }
-      riderState = { ...riderState, power: data.power, speed };
-      if (speed > 0 && !pacerStarted) {
+      constants.riderState = { ...constants.riderState, power: data.power, speed };
+      if (speed > 0 && !constants.pacerStarted) {
         scene.activatePacer();
-        pacerStarted = true;
+          constants.pacerStarted = true;
       }
     } else {
-      riderState = { ...riderState, power: data.power };
+      constants.riderState = { ...constants.riderState, power: data.power };
     }
   };
 
@@ -117,37 +110,37 @@ export function initZlowApp({
   let stravaBtnEnabled = false;
   function loop() {
     const now = Date.now();
-    const dt = (now - lastTime) / 1000;
-    lastTime = now;
-    scene.update(riderState.speed || 0, dt);
-    hud.update(riderState, dt);
-    const thisSecond = Math.floor((now - historyStartTime) / 1000);
-    if (lastHistorySecond !== thisSecond) {
-      rideHistory.push({
+    const dt = (now - constants.lastTime) / 1000;
+    constants.lastTime = now;
+    scene.update(constants.riderState.speed || 0, dt);
+    hud.update(constants.riderState, dt);
+    const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
+    if (constants.lastHistorySecond !== thisSecond) {
+      constants.rideHistory.push({
         time: now,
-        power: riderState.power || 0,
-        speed: riderState.speed || 0,
+        power: constants.riderState.power || 0,
+        speed: constants.riderState.speed || 0,
         distance: parseFloat(getElement('distance').textContent) || 0
       });
-      lastHistorySecond = thisSecond;
+      constants.lastHistorySecond = thisSecond;
     }
     requestAnimationFrameFn(loop);
   }
   loop();
 
   getElement('gpx-btn').addEventListener('click', () => {
-    if (rideHistory.length < 2) {
+    if (constants.rideHistory.length < 2) {
       alert('Not enough data to export.');
       return;
     }
-    const startTime = new Date(rideHistory[0].time);
+    const startTime = new Date(constants.rideHistory[0].time);
     let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
     tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor((rideHistory[rideHistory.length-1].time - rideHistory[0].time)/1000)}</TotalTimeSeconds>\n        <DistanceMeters>${(rideHistory[rideHistory.length-1].distance*1000).toFixed(1)}<\/DistanceMeters>\n        <Intensity>Active<\/Intensity>\n        <TriggerMethod>Manual<\/TriggerMethod>\n        <Track>\n`;
-    for (let i = 0; i < rideHistory.length; i++) {
-      const pt = rideHistory[i];
+    for (let i = 0; i < constants.rideHistory.length; i++) {
+      const pt = constants.rideHistory[i];
       const t = new Date(pt.time).toISOString();
-      const lat = 33.6 + (pt.distance / (rideHistory[rideHistory.length-1].distance || 1)) * 0.009;
+      const lat = 33.6 + (pt.distance / (constants.rideHistory[constants.rideHistory.length-1].distance || 1)) * 0.009;
       const lon = -111.7;
       tcx += `          <Trackpoint>\n`;
       tcx += `            <Time>${t}</Time>\n`;
@@ -172,9 +165,9 @@ export function initZlowApp({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    rideHistory = [];
-    historyStartTime = Date.now();
-    lastHistorySecond = null;
+    constants.rideHistory = [];
+    constants.historyStartTime = Date.now();
+    constants.lastHistorySecond = null;
   });
 
   const pacerSyncBtn = getElement('pacer-sync-btn');
