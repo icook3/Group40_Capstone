@@ -214,10 +214,10 @@ export function initZlowApp({
   pacerSyncBtn.addEventListener('click', () => {
     //Set pacer's z to rider's z
     if (scene && rider && pacer) {
-      const riderPos = rider.getAttribute('position').split(' ').map(Number);
-      const pacerPos = pacer.getAttribute('position').split(' ').map(Number);
-      pacerPos[2] = riderPos[2];
-      pacer.setAttribute('position', `${pacerPos.join(' ')}`);
+      const riderSyncPos = rider.avatarEntity.getAttribute('position');
+      const pacerSyncPos = pacer.avatarEntity.getAttribute('position');
+      pacerSyncPos.z = riderSyncPos.z;
+      pacer.avatarEntity.setAttribute('position', pacerSyncPos);
     }
   });
 
