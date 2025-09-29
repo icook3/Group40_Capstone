@@ -1,12 +1,16 @@
 export class Avatar {
-    constructor(id, color = '#0af', position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}) {
+    constructor(id, color = '#0af', position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, isPacer = false) {
         this.id = id;
         this.color = color;
         this.position = position;
         this.rotation = rotation;
+        this.isPacer = isPacer;
+        this.speed = 0;
         this.avatarEntity = this.createEntity();
+        this.legEntities = [];
     }
 
+    //Creates avatar entity
     createEntity() {
         const avatar = document.createElement('a-entity');
         avatar.setAttribute('id', this.id);
@@ -40,6 +44,7 @@ export class Avatar {
         leg2.setAttribute('position', '0.09 0.77 -0.09');
         leg2.setAttribute('rotation', '-10 0 -10');
         avatar.appendChild(leg2);
+        this.legEntities = [leg1, leg2];
 
         //Bike Frame
         const frame = document.createElement('a-entity');
@@ -59,6 +64,30 @@ export class Avatar {
         wheel2.setAttribute('position', '-0.55 0.65 0');
         avatar.appendChild(wheel2);
 
+        document.querySelector('a-scene').appendChild(avatar);
         return avatar;
+    }
+
+    //Setter for avatar speed
+    setSpeed(speed) {
+        this.speed = speed;
+    }
+
+    update(dt) {
+        if (this.isPacer) {
+            this.position.z -= this.speed * dt;
+            this.avatarEntity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
+        }
+
+        //Leg Animation
+        const now = performance.now() / 1000;
+        const maxSwing = 35; //Degrees
+        const freq = 0.5 + Math.abs(this.speed) * 0.04; //Hz
+        const phase = now * freq * 2 * Math.PI;
+        const swing = Math.sin(phase) * Math.min(maxSwing, Math.abs(this.speed) * 0.7);
+        if (this.legEntities.length === 2) {
+            this.legEntities[0].setAttribute('rotation', `10 0 ${10 + swing}`);
+            this.legEntities[1].setAttribute('rotation', `-10 0 ${-10 - swing}`);
+        }
     }
 }
