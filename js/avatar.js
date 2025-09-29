@@ -49,7 +49,7 @@ export class Avatar {
         //Bike Frame
         const frame = document.createElement('a-entity');
         frame.setAttribute('geometry', 'primitive: box; width: 1.5; height: 0.05; depth: 0.1');
-        frame.setAttribute('material', 'color: #fff');
+        frame.setAttribute('material', 'color: #222');
         frame.setAttribute('position', '0 0.8 0');
         avatar.appendChild(frame);
 
@@ -60,8 +60,11 @@ export class Avatar {
         wheel1.setAttribute('position', '0.55 0.65 0');
         wheel1.setAttribute('rotation', '90 0 0');
         avatar.appendChild(wheel1);
-        const wheel2 = wheel1.cloneNode();
+        const wheel2 = document.createElement('a-entity');
+        wheel2.setAttribute('geometry', 'primitive: cylinder; radius: 0.22; height: 0.04; segmentsRadial: 32');
+        wheel2.setAttribute('material', 'color: #222');
         wheel2.setAttribute('position', '-0.55 0.65 0');
+        wheel2.setAttribute('rotation', '90 0 0');
         avatar.appendChild(wheel2);
 
         document.querySelector('a-scene').appendChild(avatar);
