@@ -1,14 +1,8 @@
 // scene.js: Sets up and updates the A-Frame 3D world
 export class ZlowScene {
   constructor(pacerSpeedKmh = 20, { getElement = (id) => document.getElementById(id) } = {}) {
-    this.avatar = getElement('avatar');
-    this.pacer = getElement('pacer');
     this.terrain = getElement('terrain');
     this.scene = getElement('scene');
-    this.avatarPos = {x: -0.5, y: 1, z: 0}; // fixed
-    this.pacerPos = {x: 0.5, y: 1, z: -2};
-    this.pacerSpeed = pacerSpeedKmh;
-    this.pacerActive = false; // Only start after rider moves
     this.worldZ = 0; // how far the world has moved
     this.groundTiles = [];
     this.objects = [];
@@ -40,14 +34,7 @@ export class ZlowScene {
     };
     this._initEdgeObjects();
   }
-  // Call this to activate the pacer (from main.js when rider moves)
-  activatePacer() {
-    this.pacerActive = true;
-  }
 
-  setPacerSpeed(kmh) {
-    this.pacerSpeed = kmh;
-  }
   _initEdgeObjects() {
     // Place a dense row of trees/buildings along both edges of the ground (buildings further out)
     // Terrain is width 100, so edges at -50 and 50
@@ -102,88 +89,55 @@ export class ZlowScene {
   }
 
   update(riderSpeed, dt) {
-    // Move world elements toward the rider
-    const dz = riderSpeed * dt;
-    this.worldZ += dz;
-    // Delay dynamic object loading until rider has traveled 10m
-    if (!this.objectsLoaded && this.worldZ >= 10) {
-      this._initObjects();
-      this.objectsLoaded = true;
-    }
-    // Move objects
-    for (let obj of this.objects) {
-      let pos = obj.getAttribute('position');
-      pos.z += dz;
-      // If object is behind the rider, respawn just ahead of the farthest object
-      if (pos.z > 10) {
-        // Find farthest z among all objects
-        let farthestZ = Math.min(...this.objects.map(o => o.getAttribute('position').z));
-        pos.z = farthestZ - 5;
-        // Regenerate x: buildings further out, trees closer
-        const isBuilding = obj.getAttribute('geometry') && obj.getAttribute('geometry').primitive === 'box';
-        let x;
-        if (isBuilding) {
-          x = (Math.random() < 0.5 ? -1 : 1) * (15 + Math.random() * 10); // -15 to -25 or 15 to 25
-        } else {
-          do {
-            x = -20 + Math.random() * 40;
-          } while (x > -4 && x < 4);
-        }
-        pos.x = x;
+      // Move world elements toward the rider
+      const dz = riderSpeed * dt;
+      this.worldZ += dz;
+      // Delay dynamic object loading until rider has traveled 10m
+      if (!this.objectsLoaded && this.worldZ >= 10) {
+          this._initObjects();
+          this.objectsLoaded = true;
       }
-    }
-    // Move and recycle dirt pattern circles to simulate infinite path
-    const dirtPattern = document.getElementById('dirt-pattern');
-    if (dirtPattern) {
-      const children = Array.from(dirtPattern.children);
-      for (let circle of children) {
-        let pos = circle.getAttribute('position');
-        if (typeof pos === 'string') pos = AFRAME.utils.coordinates.parse(pos);
-        pos.z += dz;
-        // If circle is behind the rider, move it far ahead to repeat the pattern
-        if (pos.z > 10) {
-          // Find farthest z among all pattern circles
-          let farthestZ = Math.min(...children.map(c => {
-            let p = c.getAttribute('position');
-            if (typeof p === 'string') p = AFRAME.utils.coordinates.parse(p);
-            return p.z;
-          }));
-          pos.z = farthestZ - 10; // space new patch 10 units ahead
-        }
+      // Move objects
+      for (let obj of this.objects) {
+          let pos = obj.getAttribute('position');
+          pos.z += dz;
+          // If object is behind the rider, respawn just ahead of the farthest object
+          if (pos.z > 10) {
+              // Find farthest z among all objects
+              let farthestZ = Math.min(...this.objects.map(o => o.getAttribute('position').z));
+              pos.z = farthestZ - 5;
+              // Regenerate x: buildings further out, trees closer
+              const isBuilding = obj.getAttribute('geometry') && obj.getAttribute('geometry').primitive === 'box';
+              let x;
+              if (isBuilding) {
+                  x = (Math.random() < 0.5 ? -1 : 1) * (15 + Math.random() * 10); // -15 to -25 or 15 to 25
+              } else {
+                  do {
+                      x = -20 + Math.random() * 40;
+                  } while (x > -4 && x < 4);
+              }
+              pos.x = x;
+          }
       }
-    }
-    // Animate rider legs based on speed (avatar and pacer)
-    const animateLegs = (rider, speed, time) => {
-      // Find leg entities (must match order in index.html)
-      const legs = Array.from(rider.children).filter(e => e.getAttribute && e.getAttribute('geometry') && e.getAttribute('geometry').primitive === 'cylinder' && e.getAttribute('geometry').radius === 0.07);
-      if (legs.length === 2) {
-        // Animate: swing legs back and forth based on speed (max ±35deg at 50km/h)
-        const maxSwing = 35; // degrees
-        // Frequency: 1.5 Hz at 30 km/h, scale with speed
-        const freq = 0.5 + Math.abs(speed) * 0.04; // Hz
-        const phase = time * freq * 2 * Math.PI;
-        const swing = Math.sin(phase) * Math.min(maxSwing, Math.abs(speed) * 0.7);
-        // Rotate along Z axis for pedaling (so legs move forward/back along bike)
-        legs[0].setAttribute('rotation', `10 0 ${10 + swing}`);
-        legs[1].setAttribute('rotation', `-10 0 ${-10 - swing}`);
+      // Move and recycle dirt pattern circles to simulate infinite path
+      const dirtPattern = document.getElementById('dirt-pattern');
+      if (dirtPattern) {
+          const children = Array.from(dirtPattern.children);
+          for (let circle of children) {
+              let pos = circle.getAttribute('position');
+              if (typeof pos === 'string') pos = AFRAME.utils.coordinates.parse(pos);
+              pos.z += dz;
+              // If circle is behind the rider, move it far ahead to repeat the pattern
+              if (pos.z > 10) {
+                  // Find farthest z among all pattern circles
+                  let farthestZ = Math.min(...children.map(c => {
+                      let p = c.getAttribute('position');
+                      if (typeof p === 'string') p = AFRAME.utils.coordinates.parse(p);
+                      return p.z;
+                  }));
+                  pos.z = farthestZ - 10; // space new patch 10 units ahead
+              }
+          }
       }
-    };
-    // Animate avatar legs
-    const now = performance.now() / 1000;
-    animateLegs(this.avatar, riderSpeed * 3.6, now); // m/s to km/h
-    // Animate pacer and move only if active
-    if (this.pacerActive) {
-      animateLegs(this.pacer, this.pacerSpeed * 3.6, now + 1.2); // offset pacer phase
-      // Move pacer relative to world
-      this.pacerPos.z -= (this.pacerSpeed - riderSpeed) * dt;
-      this.pacer.setAttribute('position', `${this.pacerPos.x} ${this.pacerPos.y} ${this.pacerPos.z}`);
-    }
-    // Avatar stays fixed
-    this.avatar.setAttribute('position', `${this.avatarPos.x} ${this.avatarPos.y} ${this.avatarPos.z}`);
-  }
-
-  getPacerDiff() {
-    // Positive if ahead, negative if behind
-    return Math.round((this.avatarPos.z - this.pacerPos.z) * -1);
   }
 }

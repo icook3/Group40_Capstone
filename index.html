@@ -103,36 +103,6 @@
       <!-- Repeat as desired for more pattern -->
     </a-entity>
     <!-- No static buildings or trees: all are generated dynamically in scene.js and will not overlap the center column -->
-    <!-- Player cyclist model -->
-    <a-entity id="avatar" position="-0.5 1 0" rotation="0 90 0">
-      <!-- Body (smaller/cuter) -->
-      <a-entity geometry="primitive: cylinder; radius: 0.16; height: 0.5" material="color: #0af" position="0 1 0"></a-entity>
-      <!-- Head -->
-      <a-entity geometry="primitive: sphere; radius: 0.18" material="color: #0af" position="0 1.35 0"></a-entity>
-      <!-- Legs (small cylinders) -->
-      <a-entity geometry="primitive: cylinder; radius: 0.07; height: 0.45" material="color: #0af" position="-0.09 0.77 0.09" rotation="10 0 10"></a-entity>
-      <a-entity geometry="primitive: cylinder; radius: 0.07; height: 0.45" material="color: #0af" position="0.09 0.77 -0.09" rotation="-10 0 -10"></a-entity>
-      <!-- Bike frame -->
-      <a-entity geometry="primitive: box; width: 1.5; height: 0.05; depth: 0.1" material="color: #fff" position="0 0.8 0"></a-entity>
-      <!-- Wheels (improved) -->
-      <a-entity geometry="primitive: cylinder; radius: 0.22; height: 0.04; segmentsRadial: 32" material="color: #222" position="0.55 0.65 0" rotation="90 0 0"></a-entity>
-      <a-entity geometry="primitive: cylinder; radius: 0.22; height: 0.04; segmentsRadial: 32" material="color: #222" position="-0.55 0.65 0" rotation="90 0 0"></a-entity>
-      </a-entity>
-    <!-- Pacer cyclist model -->
-    <a-entity id="pacer" position="0.5 1 -2" rotation="0 90 0">
-      <!-- Body (smaller/cuter) -->
-      <a-entity geometry="primitive: cylinder; radius: 0.16; height: 0.5" material="color: #fa0" position="0 1 0"></a-entity>
-      <!-- Head -->
-      <a-entity geometry="primitive: sphere; radius: 0.18" material="color: #fa0" position="0 1.35 0"></a-entity>
-      <!-- Legs (small cylinders) -->
-      <a-entity geometry="primitive: cylinder; radius: 0.07; height: 0.45" material="color: #fa0" position="-0.09 0.77 0.09" rotation="10 0 10"></a-entity>
-      <a-entity geometry="primitive: cylinder; radius: 0.07; height: 0.45" material="color: #fa0" position="0.09 0.77 -0.09" rotation="-10 0 -10"></a-entity>
-      <!-- Bike frame -->
-      <a-entity geometry="primitive: box; width: 1.5; height: 0.05; depth: 0.1" material="color: #fff" position="0 0.8 0"></a-entity>
-      <!-- Wheels (improved) -->
-      <a-entity geometry="primitive: cylinder; radius: 0.22; height: 0.04; segmentsRadial: 32" material="color: #222" position="0.55 0.65 0" rotation="90 0 0"></a-entity>
-      <a-entity geometry="primitive: cylinder; radius: 0.22; height: 0.04; segmentsRadial: 32" material="color: #222" position="-0.55 0.65 0" rotation="90 0 0"></a-entity>
-      </a-entity>
     <a-entity camera look-controls position="0 4.5 5"></a-entity>
   </a-scene>
   <script type="module" src="js/main.js"></script>
