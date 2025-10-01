@@ -32,6 +32,8 @@ class Constants {
     keyboardHalfSpeed = this.kmhToMs(50);
     wKeyDown = false;
     sKeyDown = false;
+    let qKeyDown = false;
+    let aKeyDown = false;
 
     riderState = { power: 0, speed: 0 };
     rideHistory = [];

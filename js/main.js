@@ -156,10 +156,9 @@ export function initZlowApp({
   //Power will be displayed in the power span
   //Speed will be calculated from power using powerToSpeed function
   //Power will only work if speed buttons are not pressed
-  let qKeyDown = false;
-  let aKeyDown = false;
+
   document.addEventListener('keydown', (e) => {
-    if (!keyboardMode) return;
+    if (!constants.keyboardMode) return;
     const key = e.key.toLowerCase();
     if (key === 'q' && !qKeyDown) {
       qKeyDown = true;
