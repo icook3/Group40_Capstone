@@ -1,3 +1,4 @@
+import { constants } from './constants.js'
 // Conversion constants and helpers (DRY)
 export const KMH_TO_MS = 1000 / 3600;
 export const MS_TO_KMH = 3600 / 1000;
@@ -11,7 +12,7 @@ export function powerToSpeed({
   cda = 0.38, // drag area (m^2) - slightly higher for realism
   crr = 0.006, // rolling resistance coefficient - slightly higher for realism
   mass = 70, // total mass (kg)
-  airDensity = 1.225, // kg/m^3
+
   slope = 0 // road grade (decimal)
 } = {}) {
   // Constants
@@ -19,7 +20,7 @@ export function powerToSpeed({
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
-  const a = 0.5 * airDensity * cda;
+  const a = 0.5 * constants.airDensity * cda;
   const b = crr * mass * g + mass * g * Math.sin(Math.atan(slope));
   // Use Newton-Raphson to solve for v
   let v = 8; // initial guess (m/s)
@@ -28,7 +29,8 @@ export function powerToSpeed({
     const df = 3 * a * v * v + b;
     v = v - f / df;
     if (v < 0) v = 0.1; // prevent negative speeds
-  }
+    }
+
   return msToKmh(v);
 }
 
@@ -88,11 +90,15 @@ export function initZlowApp({
     const key = e.key.toLowerCase();
     if (key === 'w' && !wKeyDown) {
       wKeyDown = true;
-      riderState.speed = keyboardSpeed;
+        riderState.speed = keyboardSpeed;
+        console.log("Wind resistance=" + constants.windResistance(keyboardSpeed));
+
       pacerStarted = true;
     } else if (key === 's' && !sKeyDown) {
       sKeyDown = true;
-      riderState.speed = keyboardHalfSpeed;
+        riderState.speed = keyboardHalfSpeed;
+        console.log("Wind resistance=" + constants.windResistance(keyboardHalfSpeed));
+
       pacerStarted = true;
     }
   });
