@@ -9,8 +9,8 @@ export function msToKmh(ms) { return ms * MS_TO_KMH; }
 export function powerToSpeed({
   power,
   cda = 0.38, // drag area (m^2) - slightly higher for realism
-  crr = 0.006, // rolling resistance coefficient - slightly higher for realism
-  mass = 70, // total mass (kg)
+    crr = 0.006, // rolling resistance coefficient - slightly higher for realism
+    mass = Number(document.getElementById("rider-weight").getAttribute("value")), // total mass (kg)
   airDensity = 1.225, // kg/m^3
   slope = 0 // road grade (decimal)
 } = {}) {
@@ -18,7 +18,8 @@ export function powerToSpeed({
   const g = 9.8067; // gravity
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
-  // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
+    // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
+    mass = Number(document.getElementById("rider-weight").value);
   const a = 0.5 * airDensity * cda;
   const b = crr * mass * g + mass * g * Math.sin(Math.atan(slope));
   // Use Newton-Raphson to solve for v
@@ -88,11 +89,11 @@ export function initZlowApp({
     const key = e.key.toLowerCase();
     if (key === 'w' && !wKeyDown) {
       wKeyDown = true;
-      riderState.speed = keyboardSpeed;
+        riderState.speed = keyboardSpeed;
       pacerStarted = true;
     } else if (key === 's' && !sKeyDown) {
       sKeyDown = true;
-      riderState.speed = keyboardHalfSpeed;
+        riderState.speed = keyboardHalfSpeed;
       pacerStarted = true;
     }
   });
@@ -101,10 +102,10 @@ export function initZlowApp({
     const key = e.key.toLowerCase();
     if (key === 'w') {
       wKeyDown = false;
-      riderState.speed = sKeyDown ? keyboardHalfSpeed : 0;
+        riderState.speed = sKeyDown ? keyboardHalfSpeed: 0;
     } else if (key === 's') {
-      sKeyDown = false;
-      riderState.speed = wKeyDown ? keyboardSpeed : 0;
+        sKeyDown = false;
+        riderState.speed = wKeyDown ? speed = keyboardHalfSpeed: 0;
     }
   });
 
