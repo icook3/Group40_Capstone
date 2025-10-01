@@ -1,6 +1,6 @@
 /**
  * Constants class is a singleton that stores various important constants
- * It also currently store other variables - this is something to change later
+ * It also currently stores other variables - this is something to change later
  */
 class Constants {
     // Conversion constants and helpers (DRY)

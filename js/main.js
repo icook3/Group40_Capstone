@@ -4,6 +4,8 @@ import { ZlowScene } from './scene.js';
 import { HUD } from './hud.js';
 import { Strava } from './strava.js';
 import { constants } from './constants.js'
+import { Avatar } from './avatar.js'
+
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -29,6 +31,9 @@ export function powerToSpeed({
 // so they can be used in multiple locations
 let scene;
 let hud;
+//Avatar and Pacer
+const rider = new Avatar('rider', '#0af', { x: -0.5, y: 1, z: 0 });
+const pacer = new Avatar('pacer', '#fa0', { x: 0.5, y: 1, z: -2 }, undefined, true);
 // Handles the main loop and adding to the ride history
 function loop({
     getElement = (id) => document.getElementById(id),
@@ -38,6 +43,21 @@ function loop({
     const dt = (now - constants.lastTime) / 1000;
     constants.lastTime = now;
     scene.update(constants.riderState.speed || 0, dt);
+
+    //Update Avatar and Pacer
+    rider.setSpeed(constants.riderState.speed);
+    rider.update(dt);
+    if (constants.pacerStarted) {
+        pacer.update(dt);
+        //Update pacer position
+        const riderSpeed = constants.riderState.speed;
+        const pacerSpeed = pacer.speed;
+        const relativeSpeed = pacerSpeed - riderSpeed;
+        const pacerPos = pacer.avatarEntity.getAttribute('position');
+        pacerPos.z -= relativeSpeed * dt;
+        pacer.avatarEntity.setAttribute('position', pacerPos);
+    }
+
     hud.update(constants.riderState, dt);
     const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
     if (constants.lastHistorySecond !== thisSecond) {
@@ -57,7 +77,7 @@ function loop({
  */
 function activatePacer() {
     if (!constants.pacerStarted) {
-        scene.activatePacer();
+        //scene.activatePacer();
         constants.pacerStarted = true;
     }
 }
@@ -99,8 +119,16 @@ export function initZlowApp({
   hud = new HUD({ getElement });
   const strava = new Strava();
 
-  // keyboard mode initialization
-  // setup the keyboard mode button
+
+
+  //Pacer speed control input
+  pacer.setSpeed((Number(pacerSpeedInput.value)));
+  pacerSpeedInput.addEventListener('input', () => {
+      const val = Number(pacerSpeedInput.value);
+      pacer.setSpeed((val));
+  });
+
+  //Rider state and history
   const keyboardBtn = getElement('keyboard-btn');
   keyboardBtn.addEventListener('click', () => {
     constants.keyboardMode = !constants.keyboardMode;
@@ -148,7 +176,6 @@ export function initZlowApp({
   // Strava integration button - Stretch goal
   const stravaBtn = getElement('strava-btn');
   let stravaBtnEnabled = false;
-  
   loop();
   getElement('gpx-btn').addEventListener('click', () => {
       saveTCX();
@@ -157,11 +184,12 @@ export function initZlowApp({
   // pacer sync - maybe put in Avatar.js?
   const pacerSyncBtn = getElement('pacer-sync-btn');
   pacerSyncBtn.addEventListener('click', () => {
-    // Set pacer's z to rider's z
-    if (scene && scene.avatar && scene.pacer) {
-      const riderPos = scene.avatar.getAttribute('position');
-      scene.pacerPos.z = riderPos.z;
-      scene.pacer.setAttribute('position', `${scene.pacerPos.x} ${scene.pacerPos.y} ${scene.pacerPos.z}`);
+    //Set pacer's z to rider's z
+    if (scene && rider && pacer) {
+      const riderSyncPos = rider.avatarEntity.getAttribute('position');
+      const pacerSyncPos = pacer.avatarEntity.getAttribute('position');
+      pacerSyncPos.z = riderSyncPos.z;
+      pacer.avatarEntity.setAttribute('position', pacerSyncPos);
     }
   });
 
@@ -171,6 +199,7 @@ export function initZlowApp({
     scene,
     hud,
     strava,
+    pacer,
     getRiderState: () => riderState,
     getRideHistory: () => rideHistory,
     setRiderState: (state) => { riderState = state; },
