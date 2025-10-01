@@ -119,8 +119,6 @@ export function initZlowApp({
   hud = new HUD({ getElement });
   const strava = new Strava();
 
-
-
   //Pacer speed control input
   pacer.setSpeed((Number(pacerSpeedInput.value)));
   pacerSpeedInput.addEventListener('input', () => {
