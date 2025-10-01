@@ -108,6 +108,41 @@ export function initZlowApp({
     }
   });
 
+  //Adding Power input for keyboard mode
+  //Q will increase power by 10
+  //A will decrease power by 10
+  //Power will not go below 0
+  //Power will be displayed in the power span
+  //Speed will be calculated from power using powerToSpeed function
+  //Power will only work if speed buttons are not pressed
+  let qKeyDown = false;
+  let aKeyDown = false;
+  document.addEventListener('keydown', (e) => {
+    if (!keyboardMode) return;
+    const key = e.key.toLowerCase();
+    if (key === 'q' && !qKeyDown) {
+      qKeyDown = true;
+      riderState.power = (riderState.power || 0) + 10;
+      pacerStarted = true;
+    }
+    else if (key === 'a' && !aKeyDown) {
+      aKeyDown = true;
+      riderState.power = Math.max((riderState.power || 0) - 10, 0);
+      pacerStarted = true;
+    }
+  });
+  //Unlike with speed, power stays changed when keys are released
+  document.addEventListener('keyup', (e) => {
+    if (!keyboardMode) return;
+    const key = e.key.toLowerCase();
+    if (key === 'q') {
+      qKeyDown = false;
+    } else if (key === 'a') {
+      aKeyDown = false;
+    }
+  });      
+
+
   const connectBtn = getElement('connect-btn');
   connectBtn.addEventListener('click', async () => {
     const ok = await trainer.connect();
