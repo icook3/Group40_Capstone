@@ -11,17 +11,14 @@ export function powerToSpeed({
   power,
   cda = 0.38, // drag area (m^2) - slightly higher for realism
   crr = 0.006, // rolling resistance coefficient - slightly higher for realism
-  mass = 70, // total mass (kg)
-
   slope = 0 // road grade (decimal)
 } = {}) {
   // Constants
-  const g = 9.8067; // gravity
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope))
   const a = 0.5 * constants.airDensity * cda;
-  const b = crr * mass * g + mass * g * Math.sin(Math.atan(slope));
+  const b = crr * constants.mass * constants.g + constants.mass * constants.g * Math.sin(Math.atan(slope));
   // Use Newton-Raphson to solve for v
   let v = 8; // initial guess (m/s)
   for (let i = 0; i < 20; i++) {

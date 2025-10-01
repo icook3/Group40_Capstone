@@ -1,4 +1,7 @@
 class Constants {
+    mass = 70;
+    g = 9.8067; // gravity
+
     bikeWheelRadius = 0.220;
     bikeWheelThickness = 0.04;
     //This is assuming the cross-sectional area is a rectangle matching the wheel
@@ -13,5 +16,9 @@ class Constants {
         let dragCoefficient = (shearStress) / (this.airDensity * velocity * velocity);
         return 0.5 * this.airDensity * velocity * velocity * this.bikeCrossSectionalArea * dragCoefficient;
     };
+
+    coefficientOfFriction = 0.6; //https://www.engineeringtoolbox.com/friction-coefficients-d_778.html Rubber on Dry Asphalt
+    normalForce = mass * g;
+    frictionForce = this.coefficientOfFriction * normalForce;
 }
 export const constants = new Constants();
