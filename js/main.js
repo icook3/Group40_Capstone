@@ -38,7 +38,7 @@ const pacer = new Avatar('pacer', '#fa0', { x: 0.5, y: 1, z: -2 }, undefined, tr
 function loop({
     getElement = (id) => document.getElementById(id),
     requestAnimationFrameFn = window.requestAnimationFrame
-} = {}) {
+} = {}) { 
     const now = Date.now();
     const dt = (now - constants.lastTime) / 1000;
     constants.lastTime = now;
@@ -118,8 +118,6 @@ export function initZlowApp({
   });
   hud = new HUD({ getElement });
   const strava = new Strava();
-
-
 
   //Pacer speed control input
   pacer.setSpeed((Number(pacerSpeedInput.value)));

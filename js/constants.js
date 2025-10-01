@@ -37,5 +37,19 @@ class Constants {
     rideHistory = [];
     lastHistorySecond = null;
     pacerStarted = false;
+    dragCoefficient = 1.0;
+    bikeWheelRadius = 0.220;
+    bikeWheelThickness = 0.04;
+    //This is assuming the cross-sectional area is a rectangle matching the wheel
+    bikeCrossSectionalArea = this.bikeWheelRadius * 2 * this.bikeWheelThickness; //(I am going to assume in m^2. I don't know what units they used for the current implementation)
+    airTemperature = 303; //in Kelvin
+    airViscosity = ((1.458 * Math.pow(10, -6) * Math.pow(this.airTemperature, 3 / 2)) / (this.airTemperature + 110.4)) / this.airDensity; //m^2/s
+    windResistance(velocity) { //m/s
+        return 0.5 * this.airDensity * this.dragCoefficient * velocity * velocity * this.bikeCrossSectionalArea * dragCoefficient;
+    };
+
+    coefficientOfFriction = 0.6; //https://www.engineeringtoolbox.com/friction-coefficients-d_778.html Rubber on Dry Asphalt
+    normalForce = this.mass * this.g;
+    frictionForce = this.coefficientOfFriction * this.normalForce;
 }
 export const constants = new Constants();
