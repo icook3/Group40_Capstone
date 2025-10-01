@@ -18,7 +18,7 @@ class Constants {
     };
 
     coefficientOfFriction = 0.6; //https://www.engineeringtoolbox.com/friction-coefficients-d_778.html Rubber on Dry Asphalt
-    normalForce = mass * g;
-    frictionForce = this.coefficientOfFriction * normalForce;
+    normalForce = this.mass * this.g;
+    frictionForce = this.coefficientOfFriction * this.normalForce;
 }
 export const constants = new Constants();
