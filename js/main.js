@@ -92,6 +92,18 @@ function setKeyboardModeSpeed(key) {
     activatePacer();
 }
 
+function setKeyboardModePower(key) {
+    if (key === 'q' && !constants.qKeyDown) {
+        constants.qKeyDown = true;
+        constants.riderState.power = (constants.riderState.power || 0) + 10;
+    } else if (key === 'a' && !constants.aKeyDown) {
+        constants.aKeyDown = true;
+        constants.riderState.power = Math.max((constants.riderState.power || 0) - 10, 0);
+    }
+    activatePacer();
+}
+
+
 function stopKeyboardMode(key) {
     if (key === 'w') {
         constants.wKeyDown = false;
@@ -99,6 +111,10 @@ function stopKeyboardMode(key) {
     } else if (key === 's') {
         constants.sKeyDown = false;
         constants.riderState.speed = constants.wKeyDown ? constants.keyboardSpeed : 0;
+    } else if (key === 'q') {
+        constants.qKeyDown = false;
+    } else if (key === 'a') {
+        constants.aKeyDown = false;
     }
 }
 
@@ -138,9 +154,16 @@ export function initZlowApp({
 
   constants.wKeyDown = false;
   constants.sKeyDown = false;
+  constants.qKeyDown = false;
+  constants.aKeyDown = false;
   document.addEventListener('keydown', (e) => {
     if (!constants.keyboardMode) return;
-    setKeyboardModeSpeed(e.key.toLowerCase());
+    const key = e.key.toLowerCase();
+    if (key === 'w' || key === 's'){
+      setKeyboardModeSpeed(key);
+    } else if (key === 'q' || key === 'a') {
+      setKeyboardModePower(key);
+    }
   });
   document.addEventListener('keyup', (e) => {
     if (!constants.keyboardMode) return;
@@ -157,17 +180,19 @@ export function initZlowApp({
   //Speed will be calculated from power using powerToSpeed function
   //Power will only work if speed buttons are not pressed
 
+
+
   document.addEventListener('keydown', (e) => {
     if (!constants.keyboardMode) return;
     const key = e.key.toLowerCase();
     if (key === 'q' && !qKeyDown) {
       qKeyDown = true;
-      riderState.power = (riderState.power || 0) + 10;
+      constants.riderState.power = (constants.riderState.power || 0) + 10;
       pacerStarted = true;
     }
     else if (key === 'a' && !aKeyDown) {
       aKeyDown = true;
-      riderState.power = Math.max((riderState.power || 0) - 10, 0);
+      constants.riderState.power = Math.max((constants.riderState.power || 0) - 10, 0);
       pacerStarted = true;
     }
   });
