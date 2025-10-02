@@ -92,6 +92,18 @@ function setKeyboardModeSpeed(key) {
     activatePacer();
 }
 
+function setKeyboardModePower(key) {
+    if (key === 'q' && !constants.qKeyDown) {
+        constants.qKeyDown = true;
+        constants.riderState.power = (constants.riderState.power || 0) + 10;
+    } else if (key === 'a' && !constants.aKeyDown) {
+        constants.aKeyDown = true;
+        constants.riderState.power = Math.max((constants.riderState.power || 0) - 10, 0);
+    }
+    activatePacer();
+}
+
+
 function stopKeyboardMode(key) {
     if (key === 'w') {
         constants.wKeyDown = false;
@@ -99,6 +111,10 @@ function stopKeyboardMode(key) {
     } else if (key === 's') {
         constants.sKeyDown = false;
         constants.riderState.speed = constants.wKeyDown ? constants.keyboardSpeed : 0;
+    } else if (key === 'q') {
+        constants.qKeyDown = false;
+    } else if (key === 'a') {
+        constants.aKeyDown = false;
     }
 }
 
@@ -138,9 +154,16 @@ export function initZlowApp({
 
   constants.wKeyDown = false;
   constants.sKeyDown = false;
+  constants.qKeyDown = false;
+  constants.aKeyDown = false;
   document.addEventListener('keydown', (e) => {
     if (!constants.keyboardMode) return;
-    setKeyboardModeSpeed(e.key.toLowerCase());
+    const key = e.key.toLowerCase();
+    if (key === 'w' || key === 's'){
+      setKeyboardModeSpeed(key);
+    } else if (key === 'q' || key === 'a') {
+      setKeyboardModePower(key);
+    }
   });
   document.addEventListener('keyup', (e) => {
     if (!constants.keyboardMode) return;
@@ -149,6 +172,42 @@ export function initZlowApp({
 
 
   // connect button
+  //Adding Power input for keyboard mode
+  //Q will increase power by 10
+  //A will decrease power by 10
+  //Power will not go below 0
+  //Power will be displayed in the power span
+  //Speed will be calculated from power using powerToSpeed function
+  //Power will only work if speed buttons are not pressed
+
+
+
+  document.addEventListener('keydown', (e) => {
+    if (!constants.keyboardMode) return;
+    const key = e.key.toLowerCase();
+    if (key === 'q' && !qKeyDown) {
+      qKeyDown = true;
+      constants.riderState.power = (constants.riderState.power || 0) + 10;
+      pacerStarted = true;
+    }
+    else if (key === 'a' && !aKeyDown) {
+      aKeyDown = true;
+      constants.riderState.power = Math.max((constants.riderState.power || 0) - 10, 0);
+      pacerStarted = true;
+    }
+  });
+  //Unlike with speed, power stays changed when keys are released
+  document.addEventListener('keyup', (e) => {
+    if (!keyboardMode) return;
+    const key = e.key.toLowerCase();
+    if (key === 'q') {
+      qKeyDown = false;
+    } else if (key === 'a') {
+      aKeyDown = false;
+    }
+  });      
+
+
   const connectBtn = getElement('connect-btn');
   connectBtn.addEventListener('click', async () => {
     const ok = await trainer.connect();
