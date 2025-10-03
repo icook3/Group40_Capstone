@@ -51,5 +51,12 @@ class Constants {
     coefficientOfFriction = 0.6; //https://www.engineeringtoolbox.com/friction-coefficients-d_778.html Rubber on Dry Asphalt
     normalForce = this.mass * this.g;
     frictionForce = this.coefficientOfFriction * this.normalForce;
+
+    // Constants governing scene generation
+    tileSize = 10;
+    gridWidth = 12; // 12 tiles wide (120 units)
+    gridDepth = 80; // 80 tiles deep (800 units)
+    startX = -((this.gridWidth * this.tileSize) / 2) + this.tileSize / 2;
+    startZ = 40; // Start well in front of the camera
 }
 export const constants = new Constants();
