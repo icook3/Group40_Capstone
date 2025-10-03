@@ -41,10 +41,10 @@
       import { constants } from './js/constants.js'
       for (let x = 0; x < constants.gridWidth; x++) {
         for (let z = 0; z < constants.gridDepth; z++) {
-          const color = (x + z) % 2 === 0 ? '#5a7d3a' : '#7c5a3a';
+          const color = (x + z) % 2 === 0 ? constants.color1 : constants.color2;
           const tile = document.createElement('a-entity');
-          tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: 1; depth: ${constants.tileSize}`);
-          tile.setAttribute('material', `color: ${color}; roughness: 0.97; metalness: 0.01`);
+          tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
+          tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
           tile.setAttribute('position', `${constants.startX + x * constants.tileSize} 0 ${constants.startZ - z * constants.tileSize}`);
           tilesEntity.appendChild(tile);
         }

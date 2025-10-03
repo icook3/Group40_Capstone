@@ -54,8 +54,13 @@ class Constants {
 
     // Constants governing scene generation
     tileSize = 10;
+    color1 = '#5a7d3a';
+    color2 = '#7c5a3a';
     gridWidth = 12; // 12 tiles wide (120 units)
     gridDepth = 80; // 80 tiles deep (800 units)
+    height = 1;
+    roughness = 0.97;
+    metalness = 0.01;
     startX = -((this.gridWidth * this.tileSize) / 2) + this.tileSize / 2;
     startZ = 40; // Start well in front of the camera
 }
