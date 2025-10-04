@@ -6,6 +6,7 @@ import { Strava } from "./strava.js";
 import { constants } from "./constants.js";
 import { Avatar } from "./avatar.js";
 import { KeyboardMode } from "./keyboardMode.js";
+import { StandardMode } from "./standardMode.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -64,6 +65,7 @@ export function calculateCoastingSpeed(currentSpeed, dt) {
 let scene;
 let hud;
 let keyboardMode;
+let standardMode;
 //Avatar and Pacer
 const rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
 const pacer = new Avatar(
@@ -140,7 +142,8 @@ export function initZlowApp({
   const trainer = new TrainerBluetooth();
   const pacerSpeedInput = getElement("pacer-speed");
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
-    keyboardMode = new KeyboardMode;
+    keyboardMode = new KeyboardMode();
+    standardMode = new StandardMode();
   //map the pacer speed input to the pacer speed variable
   pacerSpeedInput.addEventListener("input", () => {
     const val = Number(pacerSpeedInput.value);
@@ -182,13 +185,14 @@ export function initZlowApp({
   });
 
   const connectBtn = getElement("connect-btn");
-  connectBtn.addEventListener("click", async () => {
-    const ok = await trainer.connect();
-    if (ok) connectBtn.disabled = true;
+    connectBtn.addEventListener("click", async () => {
+        await standardMode.connectTrainer();
+    //const ok = await standardMode.trainer.connect();
+    //if (ok) connectBtn.disabled = true;
   });
-
+    standardMode.init();
   // setup the speed when using an actual trainer
-  trainer.onData = (data) => {
+  /*trainer.onData = (data) => {
       if (!keyboardMode.keyboardMode) {
       let speed = 0;
       if (typeof data.power === "number" && data.power > 0) {
@@ -205,7 +209,7 @@ export function initZlowApp({
     } else {
       constants.riderState = { ...constants.riderState, power: data.power };
     }
-  };
+  };*/
 
   // Strava integration button - Stretch goal
   const stravaBtn = getElement("strava-btn");
@@ -229,7 +233,6 @@ export function initZlowApp({
 
   // For testing: export some internals
   return {
-    trainer,
     scene,
     hud,
     strava,
