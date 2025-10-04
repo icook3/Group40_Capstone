@@ -36,7 +36,7 @@ class Constants {
   bikeWheelThickness = 0.04;
 
   //This is assuming the cross-sectional area is a rectangle matching the wheel
-  bikeCrossSectionalArea = this.bikeWheelRadius * 2 * this.bikeWheelThickness; //(I am going to assume in m^2. I don't know what units they used for the current implementation)
+  bikeCrossSectionalArea = 0.38;
   airTemperature = 303; //in Kelvin
   airViscosity =
     (1.458 * Math.pow(10, -6) * Math.pow(this.airTemperature, 3 / 2)) /
