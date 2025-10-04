@@ -5,19 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zlow: Browser Cycling Simulator</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body { margin: 0; font-family: sans-serif; background: #111; color: #fff; }
-    #hud { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 16px; border-radius: 8px; z-index: 10; }
-    #connect-btn { margin-bottom: 10px; }
-    #strava-btn { margin-top: 10px; }
-  </style>
+  <link rel="stylesheet" type="text/css" href="style.css?version=1.0">
 </head>
 <body>
   <div id="hud">
     <label for="pacer-speed">Pacer:</label>
-    <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1" style="width:50px;"> km/h
-    <button id="pacer-sync-btn" style="margin-left:8px;">Sync to Pacer</button></br></br>
+    <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+    <button id="pacer-sync-btn">Sync to Pacer</button></br></br>
     <button id="connect-btn">Connect Trainer</button>
     <button id="keyboard-btn">Keyboard Mode</button>
     <div>Power: <span id="power">0</span> W</div>
@@ -27,32 +21,36 @@
     <button id="strava-btn" disabled>Export to Strava</button>
     <button id="gpx-btn">Download TCX</button>
   </div>
+
+  <!-- Generate starting scene -->
   <a-scene id="scene">
     <a-sky color="#87ceeb"></a-sky>
     <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
     <a-entity id="checkerboard-ground">
       <a-entity id="tiles"></a-entity>
     </a-entity>
+
+    <!-- Get values for scene and tilesEntity before using a module to import constants -->
     <script>
-      // Dynamically generate checkerboard tiles for the ground
       const scene = document.currentScript.parentElement;
       const tilesEntity = scene.querySelector('#tiles');
-      const tileSize = 10;
-      const gridWidth = 12; // 12 tiles wide (120 units)
-      const gridDepth = 80; // 80 tiles deep (800 units)
-      const startX = -((gridWidth * tileSize) / 2) + tileSize / 2;
-      const startZ = 40; // Start well in front of the camera
-      for (let x = 0; x < gridWidth; x++) {
-        for (let z = 0; z < gridDepth; z++) {
-          const color = (x + z) % 2 === 0 ? '#5a7d3a' : '#7c5a3a';
+    </script>
+
+    <!-- Use constants to generate checkerboard tiles for ground dynamically -->
+    <script type="module">
+      import { constants } from './js/constants.js'
+      for (let x = 0; x < constants.gridWidth; x++) {
+        for (let z = 0; z < constants.gridDepth; z++) {
+          const color = (x + z) % 2 === 0 ? constants.color1 : constants.color2;
           const tile = document.createElement('a-entity');
-          tile.setAttribute('geometry', `primitive: box; width: ${tileSize}; height: 1; depth: ${tileSize}`);
-          tile.setAttribute('material', `color: ${color}; roughness: 0.97; metalness: 0.01`);
-          tile.setAttribute('position', `${startX + x * tileSize} 0 ${startZ - z * tileSize}`);
+          tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
+          tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
+          tile.setAttribute('position', `${constants.startX + x * constants.tileSize} 0 ${constants.startZ - z * constants.tileSize}`);
           tilesEntity.appendChild(tile);
         }
       }
     </script>
+
     <!-- Static clouds: far off, high, and large for a soft sky effect -->
     <a-entity id="clouds">
       <a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.7; transparent: true" position="-40 22 -120"></a-entity>
