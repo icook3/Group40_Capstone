@@ -124,7 +124,7 @@ function loop({
   requestAnimationFrameFn(loop);
 }
 
-function activatePacer() {
+export function activatePacer() {
     if (!constants.pacerStarted) {
         //scene.activatePacer();
         constants.pacerStarted = true;
@@ -168,10 +168,10 @@ export function initZlowApp({
     }
   });
 
-  constants.wKeyDown = false;
-  constants.sKeyDown = false;
-  constants.qKeyDown = false;
-  constants.aKeyDown = false;
+  keyboardMode.wKeyDown = false;
+    keyboardMode.sKeyDown = false;
+    keyboardMode.qKeyDown = false;
+    keyboardMode.aKeyDown = false;
   document.addEventListener("keydown", (e) => {
       if (!keyboardMode.keyboardMode) return;
       keyboardMode.keyboardInputActive(e.key);

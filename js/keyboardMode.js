@@ -1,11 +1,6 @@
 import { constants } from "./constants.js";
 import { powerToSpeed } from "./main.js";
-function activatePacer() {
-    if (!constants.pacerStarted) {
-        //scene.activatePacer();
-        constants.pacerStarted = true;
-    }
-}
+import { activatePacer } from "./main.js";
 
 export class KeyboardMode {
     keyboardMode = false;
