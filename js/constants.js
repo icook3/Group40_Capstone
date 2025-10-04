@@ -26,6 +26,7 @@ class Constants {
   slope = 0; // road grade (decimal)
   lastTime = Date.now();
   historyStartTime = Date.now();
+
   // keyboard mode values - should go in own class for keyboard mode
   keyboardMode = false;
   keyboardSpeed = this.kmhToMs(100);
@@ -42,6 +43,7 @@ class Constants {
   dragCoefficient = 1.0;
   bikeWheelRadius = 0.22;
   bikeWheelThickness = 0.04;
+
   //This is assuming the cross-sectional area is a rectangle matching the wheel
   bikeCrossSectionalArea = this.bikeWheelRadius * 2 * this.bikeWheelThickness; //(I am going to assume in m^2. I don't know what units they used for the current implementation)
   airTemperature = 303; //in Kelvin
@@ -49,6 +51,7 @@ class Constants {
     (1.458 * Math.pow(10, -6) * Math.pow(this.airTemperature, 3 / 2)) /
     (this.airTemperature + 110.4) /
     this.airDensity; //m^2/s
+    
   windResistance(velocity) {
     //m/s
     return (
