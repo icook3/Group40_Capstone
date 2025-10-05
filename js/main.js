@@ -5,6 +5,8 @@ import { HUD } from "./hud.js";
 import { Strava } from "./strava.js";
 import { constants } from "./constants.js";
 import { Avatar } from "./avatar.js";
+import { KeyboardMode } from "./keyboardMode.js";
+import { StandardMode } from "./standardMode.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -62,6 +64,8 @@ export function calculateCoastingSpeed(currentSpeed, dt) {
 // so they can be used in multiple locations
 let scene;
 let hud;
+let keyboardMode;
+let standardMode;
 //Avatar and Pacer
 const rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
 const pacer = new Avatar(
@@ -84,8 +88,8 @@ function loop({
   const currentPower = constants.riderState.power || 0;
   const currentSpeed = constants.riderState.speed || 0;
 
-  // If using W/S keyboard mode, don't coast (since power is always zero)
-  const isUsingDirectSpeedControl = constants.wKeyDown || constants.sKeyDown;
+    // If using W/S keyboard mode, don't coast (since power is always zero)
+  const isUsingDirectSpeedControl = keyboardMode.wKeyDown || keyboardMode.sKeyDown;
 
   // If rider is not peddaling and their speed is not zero, calculate new speed
   if (currentPower === 0 && currentSpeed > 0 && !isUsingDirectSpeedControl) {
@@ -122,74 +126,11 @@ function loop({
   requestAnimationFrameFn(loop);
 }
 
-/**
- * Utility methods to separate out various event listeners from the main method
- */
-function activatePacer() {
-  if (!constants.pacerStarted) {
-    //scene.activatePacer();
-    constants.pacerStarted = true;
-  }
-}
-function setKeyboardModeSpeed(key) {
-  if (key === "w" && !constants.wKeyDown) {
-    constants.wKeyDown = true;
-    constants.riderState.speed = constants.keyboardSpeed;
-    constants.riderState.power = 0; // Reset power when using speed keys
-  } else if (key === "s" && !constants.sKeyDown) {
-    constants.sKeyDown = true;
-    constants.riderState.speed = constants.keyboardHalfSpeed;
-    constants.riderState.power = 0; // Reset power when using speed keys
-  }
-  activatePacer();
-}
-
-//Adding Power input for keyboard mode
-//Q will increase power by 10
-//A will decrease power by 10
-//Power will not go below 0
-//Power will be displayed in the power span
-//Speed will be calculated from power using powerToSpeed function
-//Power will only work if speed buttons are not pressed
-function setKeyboardModePower(key) {
-  if (key === "q" && !constants.qKeyDown) {
-    constants.qKeyDown = true;
-    constants.riderState.power = (constants.riderState.power || 0) + 10;
-    constants.riderState.speed = powerToSpeed({
-      power: constants.riderState.power,
-    });
-  } else if (key === "a" && !constants.aKeyDown) {
-    constants.aKeyDown = true;
-    constants.riderState.power = Math.max(
-      (constants.riderState.power || 0) - 10,
-      0
-    );
-    // Only handle speed if power is greater than 0, otherwise coasting will kick in
-    if (constants.riderState.power > 0) {
-      constants.riderState.speed = powerToSpeed({
-        power: constants.riderState.power,
-      });
+export function activatePacer() {
+    if (!constants.pacerStarted) {
+        //scene.activatePacer();
+        constants.pacerStarted = true;
     }
-  }
-  activatePacer();
-}
-
-function stopKeyboardMode(key) {
-  if (key === "w") {
-    constants.wKeyDown = false;
-    constants.riderState.speed = constants.sKeyDown
-      ? constants.keyboardHalfSpeed
-      : 0;
-  } else if (key === "s") {
-    constants.sKeyDown = false;
-    constants.riderState.speed = constants.wKeyDown
-      ? constants.keyboardSpeed
-      : 0;
-  } else if (key === "q") {
-    constants.qKeyDown = false;
-  } else if (key === "a") {
-    constants.aKeyDown = false;
-  }
 }
 
 // Exported function to initialize app (for browser and test)
@@ -200,7 +141,9 @@ export function initZlowApp({
   // get the needed objects
   const trainer = new TrainerBluetooth();
   const pacerSpeedInput = getElement("pacer-speed");
-  scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+    scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+    keyboardMode = new KeyboardMode();
+    standardMode = new StandardMode();
   //map the pacer speed input to the pacer speed variable
   pacerSpeedInput.addEventListener("input", () => {
     const val = Number(pacerSpeedInput.value);
@@ -219,42 +162,38 @@ export function initZlowApp({
   //Rider state and history
   const keyboardBtn = getElement("keyboard-btn");
   keyboardBtn.addEventListener("click", () => {
-    constants.keyboardMode = !constants.keyboardMode;
-    keyboardBtn.textContent = constants.keyboardMode
-      ? "Keyboard Mode: ON"
+      keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
+      keyboardBtn.textContent = keyboardMode.keyboardMode
+          ? keyboardMode.keyboardOnText
       : "Keyboard Mode";
-    if (!constants.keyboardMode) {
+      if (!keyboardMode.keyboardMode) {
       constants.riderState.speed = 0;
     }
   });
 
-  constants.wKeyDown = false;
-  constants.sKeyDown = false;
-  constants.qKeyDown = false;
-  constants.aKeyDown = false;
+  keyboardMode.wKeyDown = false;
+    keyboardMode.sKeyDown = false;
+    keyboardMode.qKeyDown = false;
+    keyboardMode.aKeyDown = false;
   document.addEventListener("keydown", (e) => {
-    if (!constants.keyboardMode) return;
-    const key = e.key.toLowerCase();
-    if (key === "w" || key === "s") {
-      setKeyboardModeSpeed(key);
-    } else if (key === "q" || key === "a") {
-      setKeyboardModePower(key);
-    }
+      if (!keyboardMode.keyboardMode) return;
+      keyboardMode.keyboardInputActive(e.key);
   });
   document.addEventListener("keyup", (e) => {
-    if (!constants.keyboardMode) return;
-    stopKeyboardMode(e.key.toLowerCase());
+    if (!keyboardMode.keyboardMode) return;
+    keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
 
   const connectBtn = getElement("connect-btn");
-  connectBtn.addEventListener("click", async () => {
-    const ok = await trainer.connect();
-    if (ok) connectBtn.disabled = true;
+    connectBtn.addEventListener("click", async () => {
+        await standardMode.connectTrainer();
+    //const ok = await standardMode.trainer.connect();
+    //if (ok) connectBtn.disabled = true;
   });
-
+    standardMode.init();
   // setup the speed when using an actual trainer
-  trainer.onData = (data) => {
-    if (!constants.keyboardMode) {
+  /*trainer.onData = (data) => {
+      if (!keyboardMode.keyboardMode) {
       let speed = 0;
       if (typeof data.power === "number" && data.power > 0) {
         speed = powerToSpeed({ power: data.power });
@@ -270,7 +209,7 @@ export function initZlowApp({
     } else {
       constants.riderState = { ...constants.riderState, power: data.power };
     }
-  };
+  };*/
 
   // Strava integration button - Stretch goal
   const stravaBtn = getElement("strava-btn");
@@ -294,7 +233,6 @@ export function initZlowApp({
 
   // For testing: export some internals
   return {
-    trainer,
     scene,
     hud,
     strava,
