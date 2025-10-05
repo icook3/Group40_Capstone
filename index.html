@@ -5,19 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zlow: Browser Cycling Simulator</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <link rel="stylesheet" href="style.css?version=1.0">
-  <style>
-    body { margin: 0; font-family: sans-serif; background: #111; color: #fff; }
-    #hud { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 16px; border-radius: 8px; z-index: 10; }
-    #connect-btn { margin-bottom: 10px; }
-    #strava-btn { margin-top: 10px; }
-  </style>
+  <link rel="stylesheet" type="text/css" href="style.css?version=1.0">
 </head>
 <body>
   <div id="hud">
     <label for="pacer-speed">Pacer:</label>
-    <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1" style="width:50px;"> km/h
-    <button id="pacer-sync-btn" style="margin-left:8px;">Sync to Pacer</button></br></br>
+    <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+    <button id="pacer-sync-btn">Sync to Pacer</button></br></br>
     <button id="connect-btn">Connect Trainer</button>
     <button id="keyboard-btn">Keyboard Mode</button>
     <div>Power: <span id="power">0</span> W</div>
@@ -27,33 +21,69 @@
     <button id="strava-btn" disabled>Export to Strava</button>
     <button id="gpx-btn">Download TCX</button>
   </div>
+
+  <!-- Generate starting scene -->
   <a-scene id="scene">
     <a-sky color="#87ceeb"></a-sky>
     <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
     <a-entity id="checkerboard-ground">
       <a-entity id="tiles"></a-entity>
     </a-entity>
+
+    <!-- Get values for scene and tilesEntity before using a module to import constants -->
     <script>
-      // Dynamically generate checkerboard tiles for the ground
       const scene = document.currentScript.parentElement;
       const tilesEntity = scene.querySelector('#tiles');
-      const tileSize = 10;
-      const gridWidth = 12; // 12 tiles wide (120 units)
-      const gridDepth = 80; // 80 tiles deep (800 units)
-      const startX = -((gridWidth * tileSize) / 2) + tileSize / 2;
-      const startZ = 40; // Start well in front of the camera
-      for (let x = 0; x < gridWidth; x++) {
-        for (let z = 0; z < gridDepth; z++) {
-          const color = (x + z) % 2 === 0 ? '#5a7d3a' : '#7c5a3a';
+    </script>
+
+    <!-- Use constants to generate checkerboard tiles for ground dynamically -->
+    <script type="module">
+      import { constants } from './js/constants.js'
+      for (let x = 0; x < constants.gridWidth; x++) {
+        for (let z = 0; z < constants.gridDepth; z++) {
+          const color = (x + z) % 2 === 0 ? constants.color1 : constants.color2;
           const tile = document.createElement('a-entity');
-          tile.setAttribute('geometry', `primitive: box; width: ${tileSize}; height: 1; depth: ${tileSize}`);
-          tile.setAttribute('material', `color: ${color}; roughness: 0.97; metalness: 0.01`);
-          tile.setAttribute('position', `${startX + x * tileSize} 0 ${startZ - z * tileSize}`);
+          tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
+          tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
+          tile.setAttribute('position', `${constants.startX + x * constants.tileSize} 0 ${constants.startZ - z * constants.tileSize}`);
           tilesEntity.appendChild(tile);
         }
       }
     </script>
-    
+
+    <!-- Static clouds: far off, high, and large for a soft sky effect -->
+    <a-entity id="clouds">
+      <a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.7; transparent: true" position="-40 22 -120"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 5" material="color: #fff; opacity: 0.6; transparent: true" position="-32 23 -110"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 6" material="color: #fff; opacity: 0.65; transparent: true" position="-36 21 -130"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 8" material="color: #fff; opacity: 0.7; transparent: true" position="35 24 -140"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 6" material="color: #fff; opacity: 0.6; transparent: true" position="42 23 -150"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 5" material="color: #fff; opacity: 0.5; transparent: true" position="38 25 -135"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 4" material="color: #fff; opacity: 0.5; transparent: true" position="0 28 -160"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 6" material="color: #fff; opacity: 0.6; transparent: true" position="-10 26 -170"></a-entity>
+      <!-- New large upper left clouds -->
+      <a-entity geometry="primitive: sphere; radius: 18" material="color: #fff; opacity: 0.55; transparent: true" position="-70 22 -60"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 12" material="color: #fff; opacity: 0.5; transparent: true" position="-85 25 -75"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 10" material="color: #fff; opacity: 0.45; transparent: true" position="-60 20 -45"></a-entity>
+      <!-- New large upper right clouds -->
+      <a-entity geometry="primitive: sphere; radius: 17" material="color: #fff; opacity: 0.55; transparent: true" position="70 23 -65"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 13" material="color: #fff; opacity: 0.5; transparent: true" position="85 26 -80"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 11" material="color: #fff; opacity: 0.45; transparent: true" position="60 21 -50"></a-entity>
+
+      <!-- Higher layer: close clouds above -->
+      <a-entity geometry="primitive: sphere; radius: 10" material="color: #fff; opacity: 0.35; transparent: true" position="-25 38 -70"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 8" material="color: #fff; opacity: 0.32; transparent: true" position="25 40 -80"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 12" material="color: #fff; opacity: 0.3; transparent: true" position="0 42 -90"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.28; transparent: true" position="-50 36 -100"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 9" material="color: #fff; opacity: 0.3; transparent: true" position="50 37 -110"></a-entity>
+
+      <!-- Higher layer: far clouds above -->
+      <a-entity geometry="primitive: sphere; radius: 18" material="color: #fff; opacity: 0.18; transparent: true" position="-60 55 -180"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 15" material="color: #fff; opacity: 0.15; transparent: true" position="60 58 -200"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 20" material="color: #fff; opacity: 0.12; transparent: true" position="0 60 -220"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 13" material="color: #fff; opacity: 0.14; transparent: true" position="-80 53 -160"></a-entity>
+      <a-entity geometry="primitive: sphere; radius: 11" material="color: #fff; opacity: 0.13; transparent: true" position="80 54 -170"></a-entity>
+    </a-entity>
     <!-- Center path: dirt look using only color and roughness, sits just above checkerboard -->
     <a-entity geometry="primitive: box; width: 8; height: 1.02; depth: 10000"
               material="color: #bfa97a; roughness: 0.98; metalness: 0.01"
