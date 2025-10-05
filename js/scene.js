@@ -35,13 +35,11 @@ export class ZlowScene {
       return obj;
     };
 
-    this._createCircle = (radius, opacity, x, y, z) => {
+    this._createCircle = (radius, opacity, color, x, y, z) => {
       const circle = document.createElement('a-entity');
       circle.setAttribute('geometry', `primitive: sphere; radius: ${radius}`);
-      circle.setAttribute('material', `color: #fff; opacity: ${opacity}; transparent: true`);
+      circle.setAttribute('material', `color: ${color}; opacity: ${opacity}; transparent: true`);
       circle.setAttribute('position', `${x} ${y} ${z}`);
-
-      //<a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.7; transparent: true" position="-40 22 -120"></a-entity>
       return circle;
     };
     this._initEdgeObjects();
@@ -83,9 +81,7 @@ export class ZlowScene {
   }
 
   // Initiate clouds. Measurement array hardcoded pending further development
-
   _initClouds() {
-    // Radius, opacity, position
     const cloud_dimensions = [
       [7,0.7,-40,22,-120],
       [5,0.6,-32,23,-110],
@@ -114,11 +110,19 @@ export class ZlowScene {
     ]
 
     for (let i = 0; i < cloud_dimensions.length; i++) {
-      let cloud = this._createCircle(cloud_dimensions[i][0], cloud_dimensions[i][1], cloud_dimensions[i][2], cloud_dimensions[i][3], cloud_dimensions[i][4]);
+      let cloud = this._createCircle(cloud_dimensions[i][0], cloud_dimensions[i][1], "#fff", cloud_dimensions[i][2], cloud_dimensions[i][3], cloud_dimensions[i][4]);
       this.scene.appendChild(cloud);
-      this.objects.push(cloud);
     }
   }
+
+  _initPath() {
+    // Center path: dirt look using only color and roughness, sits just above checkerboard
+    // Consider adding a "createBox" helper method
+    const path =  document.createElement('a-entity');
+    path.setAttribute('geometry', `primitive: box; width: 8; height: 1.02; depth: 10000`);
+    path.setAttribute('material', 'color: #bfa97a; roughness: 0.98; metalness: 0.01');
+    path.setAttribute('position', `0 0.52 -3000`);
+}
 
   _spawnObject(z) {
     const isBuilding = Math.random() < 0.5;
