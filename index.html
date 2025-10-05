@@ -36,12 +36,13 @@
       const tilesEntity = scene.querySelector('#tiles');
     </script>
 
+    <!-- Buildings, trees, clouds, and path are generated dynamically in scene.js and will not overlap the center column -->
     <!-- Use constants to generate checkerboard tiles for ground dynamically -->
     <script type="module">
       import { constants } from './js/constants.js'
       for (let x = 0; x < constants.gridWidth; x++) {
         for (let z = 0; z < constants.gridDepth; z++) {
-          const color = (x + z) % 2 === 0 ? constants.color1 : constants.color2;
+          const color = (x + z) % 2 === 0 ? constants.groundColor1 : constants.groundColor2;
           const tile = document.createElement('a-entity');
           tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
           tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
@@ -67,7 +68,7 @@
       <a-entity geometry="primitive: circle; radius: 0.7" material="color: #a0895a; opacity: 0.33" position="2 1.53 -45" rotation="-90 0 0"></a-entity>
       <!-- Repeat as desired for more pattern -->
     </a-entity>
-    <!-- No static buildings or trees: all are generated dynamically in scene.js and will not overlap the center column -->
+    
     <a-entity camera look-controls position="0 4.5 5"></a-entity>
   </a-scene>
   <script type="module" src="js/main.js"></script>

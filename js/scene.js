@@ -35,17 +35,17 @@ export class ZlowScene {
       return obj;
     };
 
-    this._createCloud = (radius, opacity, x, y, z) => {
-      const cloud = document.createElement('a-entity');
-      cloud.setAttribute('geometry', `primitive: sphere; radius: ${radius}`);
-      cloud.setAttribute('material', `color: #fff; opacity: ${opacity}; transparent: true`);
-      cloud.setAttribute('position', `${x} ${y} ${z}`);
+    this._createCircle = (radius, opacity, x, y, z) => {
+      const circle = document.createElement('a-entity');
+      circle.setAttribute('geometry', `primitive: sphere; radius: ${radius}`);
+      circle.setAttribute('material', `color: #fff; opacity: ${opacity}; transparent: true`);
+      circle.setAttribute('position', `${x} ${y} ${z}`);
 
       //<a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.7; transparent: true" position="-40 22 -120"></a-entity>
-      return cloud;
+      return circle;
     };
     this._initEdgeObjects();
-    //this._initClouds();
+    this._initClouds();
   }
 
   _initEdgeObjects() {
@@ -114,7 +114,7 @@ export class ZlowScene {
     ]
 
     for (let i = 0; i < cloud_dimensions.length; i++) {
-      let cloud = this._createCloud(cloud_dimensions[i][0], cloud_dimensions[i][1], cloud_dimensions[i][2], cloud_dimensions[i][3], cloud_dimensions[i][4]);
+      let cloud = this._createCircle(cloud_dimensions[i][0], cloud_dimensions[i][1], cloud_dimensions[i][2], cloud_dimensions[i][3], cloud_dimensions[i][4]);
       this.scene.appendChild(cloud);
       this.objects.push(cloud);
     }
