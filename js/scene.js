@@ -8,6 +8,11 @@ export class ZlowScene {
     this.objects = [];
     this.objectsLoaded = false;
     this.edgeObjects = [];
+    this.trackTextureName = "Track.jpeg";
+    this.grassTextureName = "Grass.jpeg";
+    getElement("track-texture").setAttribute("src", "resources/textures/" + this.trackTextureName);
+    getElement("grass-texture").setAttribute("src", "resources/textures/" + this.grassTextureName);
+
     // Helper functions for DRY object creation
     this._createBuilding = (x, y, z, w, h, d) => {
       const obj = document.createElement('a-entity');
@@ -34,7 +39,8 @@ export class ZlowScene {
     };
     this._initEdgeObjects();
   }
-
+    trackTextureName;
+    grassTextureName;
   _initEdgeObjects() {
     // Place a dense row of trees/buildings along both edges of the ground (buildings further out)
     // Terrain is width 100, so edges at -50 and 50
