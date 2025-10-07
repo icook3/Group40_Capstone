@@ -38,12 +38,13 @@ export class ZlowScene {
     this._createCircle = (radius, opacity, color, x, y, z) => {
       const circle = document.createElement('a-entity');
       circle.setAttribute('geometry', `primitive: sphere; radius: ${radius}`);
-      circle.setAttribute('material', `color: ${color}; opacity: ${opacity}; transparent: true`);
+      circle.setAttribute('material', `color: ${color}; opacity: ${opacity}`);
       circle.setAttribute('position', `${x} ${y} ${z}`);
       return circle;
     };
     this._initEdgeObjects();
     this._initClouds();
+    this._initPath();
   }
 
   _initEdgeObjects() {
@@ -111,6 +112,7 @@ export class ZlowScene {
 
     for (let i = 0; i < cloud_dimensions.length; i++) {
       let cloud = this._createCircle(cloud_dimensions[i][0], cloud_dimensions[i][1], "#fff", cloud_dimensions[i][2], cloud_dimensions[i][3], cloud_dimensions[i][4]);
+      cloud.setAttribute('transparent', 'true');
       this.scene.appendChild(cloud);
     }
   }
@@ -122,7 +124,32 @@ export class ZlowScene {
     path.setAttribute('geometry', `primitive: box; width: 8; height: 1.02; depth: 10000`);
     path.setAttribute('material', 'color: #bfa97a; roughness: 0.98; metalness: 0.01');
     path.setAttribute('position', `0 0.52 -3000`);
-}
+    this.scene.appendChild(path);
+    const dirtPattern_dimensions = [
+      [0.7,0.35,-2,1.53,-10],
+      [0.5,0.28,2,1.53,-15],
+      [0.6,0.32,0,1.53,-20],
+      [0.4,0.25,-1.5,1.53,-25],
+      [0.8,0.30,1.5,1.53,-30],
+      [0.5,0.22,0.5,1.53,-35],
+      [0.6,0.27,-2,1.53,-40],
+      [0.7,0.33,2,1.53,-45]
+    ]
+    //radius opacity color x y z #a0895a
+    // DOES NOT WORK FOR UNCLEAR REASONS
+    const pattern = document.createElement('a-entity');
+    pattern.setAttribute('id', 'dirt-pattern');
+    for (let i = 0; i < dirtPattern_dimensions.length; i++) {
+      let dirtPattern = this._createCircle(dirtPattern_dimensions[i][0], dirtPattern_dimensions[i][1], "#fff", dirtPattern_dimensions[i][2], dirtPattern_dimensions[i][3], dirtPattern_dimensions[i][4]);
+      dirtPattern.setAttribute('rotation', '-90 0 0');
+      dirtPattern.setAttribute('transparent', 'false');
+      
+      //this.scene.appendChild(dirtPattern);
+      //this.objects.push(dirtPattern);
+      pattern.appendChild(dirtPattern);
+    }
+    this.scene.appendChild(pattern);
+  }
 
   _spawnObject(z) {
     const isBuilding = Math.random() < 0.5;
