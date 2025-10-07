@@ -24,6 +24,10 @@
 
   <!-- Generate starting scene -->
   <a-scene id="scene">
+      <a-assets>
+          <img id="track-texture" src="resources/textures/Track.jpeg" />
+          <img id="grass-texture" src="resources/textures/Grass.jpeg" />
+      </a-assets>
     <a-sky color="#87ceeb"></a-sky>
     <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
     <a-entity id="checkerboard-ground">
@@ -33,6 +37,7 @@
     <!-- Get values for scene and tilesEntity before using a module to import constants -->
     <script>
       const scene = document.currentScript.parentElement;
+      // Add as a new thing rather than getting the entity??
       const tilesEntity = scene.querySelector('#tiles');
     </script>
 
@@ -45,17 +50,18 @@
           const color = (x + z) % 2 === 0 ? constants.groundColor1 : constants.groundColor2;
           const tile = document.createElement('a-entity');
           tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
-          tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
+            //tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
+            tile.setAttribute('material', 'src: #grass-texture');
           tile.setAttribute('position', `${constants.startX + x * constants.tileSize} 0 ${constants.startZ - z * constants.tileSize}`);
           tilesEntity.appendChild(tile);
         }
       }
     </script>
+
     <a-entity camera look-controls position="0 4.5 5"></a-entity>
   </a-scene>
   <script type="module" src="js/main.js"></script>
-</a-scene>
-<script>
+  <script>
   window.addEventListener('DOMContentLoaded', () => {
     if (window.initZlowApp) window.initZlowApp();
   });
