@@ -1,7 +1,7 @@
   // Flow:
   // Call spawnAtZ either once or twice depending on randomly generated number
   // spawnAtZ runs pickKind to decide what to spawn
-  // spawnAtZ pushes the entity to items
+  // spawnAtZ pushes the entity to items, which are updated as the rider moves.
 
 import { getPos, setPos } from '../core/util.js';
 import { KINDS, kindsByName } from './kinds/index.js';
@@ -103,7 +103,7 @@ export class ObjectField {
           // Reset position when item is within 10 of rider
           if (pos.z > 10) {
             //pos.z = farthestZ - 5;
-            // Reset z to -45
+            // Reset z to -30, which is about as far as you can see on the track
             pos.z = -30;
           }
           setPos(circle, pos);

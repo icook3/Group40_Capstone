@@ -34,18 +34,17 @@ export class DirtPattern {
 
     for (let i = 0; i < dirtPattern_dimensions.length; i++) {
       const circle = document.createElement('a-entity');
-      circle.setAttribute('geometry', `primitive: sphere; radius: ${dirtPattern_dimensions[i][0]}`);
+      circle.setAttribute('geometry', `primitive: circle; radius: ${dirtPattern_dimensions[i][0]}`);
       circle.setAttribute('material', `color: #a0895a; opacity: ${dirtPattern_dimensions[i][1]}`);
       circle.setAttribute('position', `${dirtPattern_dimensions[i][2]} ${dirtPattern_dimensions[i][3]} ${dirtPattern_dimensions[i][4]}`);
       circle.setAttribute('rotation', `-90 0 0`);
-      console.log(circle);
       path_element.appendChild(circle);
     }
 
     // Add the path into the scene
     sceneEl.appendChild(path_element);
 
-    // Assign to pattern variable to facilitate updating scene
+    // Assign to pattern variable to facilitate updating scene in ObjectField.js
     this.patternEl = document.getElementById("dirt-pattern");
   }
 

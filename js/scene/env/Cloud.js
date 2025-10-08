@@ -43,7 +43,7 @@ export class Cloud {
       clouds.appendChild(circle);
     }
 
-    // Add the path into the scene
+    // Add the clouds into the scene
     sceneEl.appendChild(clouds);
   }
 }
