@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
   Creates the path the rider travels and circular patterns superimposed on the road.
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
@@ -50,3 +51,14 @@ export class DirtPattern {
     return this.patternEl ? Array.from(this.patternEl.children) : [];
   }
 }
+=======
+export class DirtPattern {
+  constructor({ getElement }) {
+    this.patternEl = getElement('dirt-pattern'); // may be null
+  }
+  getChildren() {
+    return this.patternEl ? Array.from(this.patternEl.children) : [];
+  }
+}
+
+>>>>>>> origin/main
