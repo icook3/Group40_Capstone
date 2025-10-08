@@ -1,22 +1,23 @@
-<<<<<<< HEAD
 /*
   Creates the path the rider travels and circular patterns superimposed on the road.
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
+import { constants } from "../../constants.js";
 
 export class DirtPattern {
   
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
+
     // Create a-entity for the path and set ID
     const path_element = document.createElement('a-entity');
-    path_element.setAttribute('id','dirt-pattern')
+    path_element.setAttribute('id','dirt-pattern');
 
     // Create and append track
-    const track = document.createElement('a-entity')
-    track.setAttribute('geometry','primitive: box; width: 8; height: 1.02; depth: 10000')
+    const track = document.createElement('a-entity');
+    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
     track.setAttribute('material', `src: #track-texture; repeat: 1 1250`);
-    track.setAttribute('position', `0 0.52 -3000`);
+    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${constants.pathPositionZ}`);
     path_element.appendChild(track);
 
     // Add circular patterns to path_element
@@ -34,8 +35,10 @@ export class DirtPattern {
     for (let i = 0; i < dirtPattern_dimensions.length; i++) {
       const circle = document.createElement('a-entity');
       circle.setAttribute('geometry', `primitive: sphere; radius: ${dirtPattern_dimensions[i][0]}`);
-      circle.setAttribute('material', `color: #000; opacity: ${dirtPattern_dimensions[i][1]}; transparent: true`);
+      circle.setAttribute('material', `color: #a0895a; opacity: ${dirtPattern_dimensions[i][1]}`);
       circle.setAttribute('position', `${dirtPattern_dimensions[i][2]} ${dirtPattern_dimensions[i][3]} ${dirtPattern_dimensions[i][4]}`);
+      circle.setAttribute('rotation', `-90 0 0`);
+      console.log(circle);
       path_element.appendChild(circle);
     }
 
@@ -51,14 +54,3 @@ export class DirtPattern {
     return this.patternEl ? Array.from(this.patternEl.children) : [];
   }
 }
-=======
-export class DirtPattern {
-  constructor({ getElement }) {
-    this.patternEl = getElement('dirt-pattern'); // may be null
-  }
-  getChildren() {
-    return this.patternEl ? Array.from(this.patternEl.children) : [];
-  }
-}
-
->>>>>>> origin/main

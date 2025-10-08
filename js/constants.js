@@ -80,7 +80,7 @@ class Constants {
     normalForce = this.mass * this.g;
     frictionForce = this.coefficientOfFriction * this.normalForce;
 
-    // Constants governing scene generation
+    // Constants governing terrain generation
     tileSize = 10;
     groundColor1 = '#5a7d3a';
     groundColor2 = '#7c5a3a';
@@ -91,6 +91,16 @@ class Constants {
     metalness = 0.01;
     startX = -((this.gridWidth * this.tileSize) / 2) + this.tileSize / 2;
     startZ = 40; // Start well in front of the camera
+
+    // Constants governing path generation
+  pathWidth = 8;
+  pathHeight = 1.02;
+  pathDepth = 10000;
+  pathPositionX = 0;
+  pathPositionY = 0.52;
+  pathPositionZ = -3000;
+  dirtColor = "#a0895a";
 }
+
 export const constants = new Constants();
 
