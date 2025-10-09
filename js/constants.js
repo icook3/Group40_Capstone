@@ -12,20 +12,7 @@ class Constants {
   msToKmh(ms) {
     return ms * this.MS_TO_KMH;
   }
-  // Conversion constants and helpers (DRY)
-  KMH_TO_MS = 1000 / 3600;
-  MS_TO_KMH = 3600 / 1000;
-  kmhToMs(kmh) {
-    return kmh * this.KMH_TO_MS;
-  }
-  msToKmh(ms) {
-    return ms * this.MS_TO_KMH;
-  }
 
-  cda = 0.38; // drag area (m^2) - slightly higher for realism
-  crr = 0.006; // rolling resistance coefficient - slightly higher for realism
-  airDensity = 1.225; // kg/m^3
-  g = 9.8067; // gravity
   cda = 0.38; // drag area (m^2) - slightly higher for realism
   crr = 0.006; // rolling resistance coefficient - slightly higher for realism
   airDensity = 1.225; // kg/m^3
@@ -33,9 +20,6 @@ class Constants {
 
   // technically not constants, but close enough
   // should still be refactored out of main.js
-  // technically not constants, but close enough
-  // should still be refactored out of main.js
-
   // mass should probabally go in avatar.js, when everything is fully merged
   mass = 70; // total mass (kg)
   slope = 0; // road grade (decimal)
@@ -64,6 +48,7 @@ class Constants {
     (1.458 * Math.pow(10, -6) * Math.pow(this.airTemperature, 3 / 2)) /
     (this.airTemperature + 110.4) /
     this.airDensity; //m^2/s
+
   windResistance(velocity) {
     //m/s
     return (
@@ -76,21 +61,31 @@ class Constants {
     );
   }
 
-    coefficientOfFriction = 0.6; //https://www.engineeringtoolbox.com/friction-coefficients-d_778.html Rubber on Dry Asphalt
-    normalForce = this.mass * this.g;
-    frictionForce = this.coefficientOfFriction * this.normalForce;
+  coefficientOfFriction = 0.6; //https://www.engineeringtoolbox.com/friction-coefficients-d_778.html Rubber on Dry Asphalt
+  normalForce = this.mass * this.g;
+  frictionForce = this.coefficientOfFriction * this.normalForce;
 
-    // Constants governing scene generation
-    tileSize = 10;
-    color1 = '#5a7d3a';
-    color2 = '#7c5a3a';
-    gridWidth = 12; // 12 tiles wide (120 units)
-    gridDepth = 80; // 80 tiles deep (800 units)
-    height = 1;
-    roughness = 0.97;
-    metalness = 0.01;
-    startX = -((this.gridWidth * this.tileSize) / 2) + this.tileSize / 2;
-    startZ = 40; // Start well in front of the camera
+  // Constants governing terrain generation
+  tileSize = 10;
+  // Colors can be refactored out once grid is fully abandoned
+  groundColor1 = '#5a7d3a';
+  groundColor2 = '#7c5a3a';
+  gridWidth = 12; // 12 tiles wide (120 units)
+  gridDepth = 80; // 80 tiles deep (800 units)
+  height = 1;
+  roughness = 0.97;
+  metalness = 0.01;
+  startX = -((this.gridWidth * this.tileSize) / 2) + this.tileSize / 2;
+  startZ = 40; // Start well in front of the camera
+
+  // Constants governing path generation
+  pathWidth = 8;
+  pathHeight = 1.02;
+  pathDepth = 10000;
+  pathPositionX = 0;
+  pathPositionY = 0.52;
+  pathPositionZ = -3000;
+  dirtColor = "#a0895a";
 }
-export const constants = new Constants();
 
+export const constants = new Constants();
