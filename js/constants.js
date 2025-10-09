@@ -21,8 +21,12 @@ class Constants {
   // technically not constants, but close enough
   // should still be refactored out of main.js
 
-  // mass should probabally go in avatar.js, when everything is fully merged
-  mass = 70; // total mass (kg)
+    // mass should probabally go in avatar.js, when everything is fully merged
+  riderMass = 75; // rider mass (kg)
+  bikeMass = 8; // bike mass (kg)
+  get mass() {
+    return this.riderMass + this.bikeMass;
+  }
   slope = 0; // road grade (decimal)
   lastTime = Date.now();
   historyStartTime = Date.now();
