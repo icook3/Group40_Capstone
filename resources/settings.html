@@ -15,10 +15,19 @@
     <div id="hud">
         <label for="pacer-speed">Pacer:</label>
         <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
-        <button id="pacer-sync-btn">Sync to Pacer</button></br></br>
+        </br></br>
         <button id="connect-btn">Connect Trainer</button>
-        <button id="keyboard-btn">Keyboard Mode</button>
-        <a href="../index.html"><button id="settings-btn"><img src="images/gear.PNG" width="20" height="20" /></button></a>
+        <button id="keyboard-btn">Keyboard Mode</button></br>
+        <a href="../index.html"><button id="settings-btn"><img src="images/gear.PNG" width="20" height="20" /></button></a></br></br>
+        <!--This button is for testing purposes only - it clears the session storage-->
+        <button id="clear-btn" onclick="sessionStorage.clear();">Clear settings</button>
     </div>
+    <script type="module" src="../js/settings.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log(window.initSettings);
+            if (window.initSettings) window.initSettings();
+        });
+    </script>
 </body>
 </html>

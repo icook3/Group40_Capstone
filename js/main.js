@@ -67,14 +67,8 @@ let hud;
 let keyboardMode;
 let standardMode;
 //Avatar and Pacer
-const rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
-const pacer = new Avatar(
-  "pacer",
-  "#fa0",
-  { x: 0.5, y: 1, z: -2 },
-  undefined,
-  true
-);
+let rider;
+let pacer;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -112,8 +106,16 @@ function loop({
     pacer.avatarEntity.setAttribute("position", pacerPos);
   }
 
-  hud.update(constants.riderState, dt);
-  const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
+    hud.update(constants.riderState, dt);
+    if (sessionStorage.getItem("isInKeyboardMode") == null) {
+        sessionStorage.setItem("isInKeyboardMode", false);
+    }
+    if (sessionStorage.getItem("isInKeyboardMode") == 'false') {
+        keyboardMode.keyboardMode = false;
+    } else {
+        keyboardMode.keyboardMode = true;
+    }
+    const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
   if (constants.lastHistorySecond !== thisSecond) {
     constants.rideHistory.push({
       time: now,
@@ -140,7 +142,15 @@ export function initZlowApp({
 } = {}) {
   // get the needed objects
   const trainer = new TrainerBluetooth();
-  const pacerSpeedInput = getElement("pacer-speed");
+    const pacerSpeedInput = getElement("pacer-speed");
+    rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
+    pacer = new Avatar(
+        "pacer",
+        "#fa0",
+        { x: 0.5, y: 1, z: -2 },
+        undefined,
+        true
+    );
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
     keyboardMode = new KeyboardMode();
     standardMode = new StandardMode();
@@ -160,7 +170,7 @@ export function initZlowApp({
   });
 
   //Rider state and history
-  const keyboardBtn = getElement("keyboard-btn");
+  /*const keyboardBtn = getElement("keyboard-btn");
   keyboardBtn.addEventListener("click", () => {
       keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
       keyboardBtn.textContent = keyboardMode.keyboardMode
@@ -169,7 +179,7 @@ export function initZlowApp({
       if (!keyboardMode.keyboardMode) {
       constants.riderState.speed = 0;
     }
-  });
+  });*/
 
   keyboardMode.wKeyDown = false;
     keyboardMode.sKeyDown = false;
