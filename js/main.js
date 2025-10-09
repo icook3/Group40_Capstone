@@ -1,6 +1,6 @@
 // main.js: App entry point and state management
 import { TrainerBluetooth } from "./bluetooth.js";
-import { ZlowScene } from "./scene.js";
+import { ZlowScene } from "./scene/index.js";
 import { HUD } from "./hud.js";
 import { Strava } from "./strava.js";
 import { constants } from "./constants.js";

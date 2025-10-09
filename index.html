@@ -39,15 +39,17 @@
     <!-- Get values for scene and tilesEntity before using a module to import constants -->
     <script>
       const scene = document.currentScript.parentElement;
+      // Add as a new thing rather than getting the entity??
       const tilesEntity = scene.querySelector('#tiles');
     </script>
 
+    <!-- Buildings, trees, clouds, and path are generated dynamically in scene.js and will not overlap the center column -->
     <!-- Use constants to generate checkerboard tiles for ground dynamically -->
     <script type="module">
       import { constants } from './js/constants.js'
       for (let x = 0; x < constants.gridWidth; x++) {
         for (let z = 0; z < constants.gridDepth; z++) {
-          const color = (x + z) % 2 === 0 ? constants.color1 : constants.color2;
+          const color = (x + z) % 2 === 0 ? constants.groundColor1 : constants.groundColor2;
           const tile = document.createElement('a-entity');
           tile.setAttribute('geometry', `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
             //tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
@@ -58,54 +60,6 @@
       }
     </script>
 
-    <!-- Static clouds: far off, high, and large for a soft sky effect -->
-    <a-entity id="clouds">
-      <a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.7; transparent: true" position="-40 22 -120"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 5" material="color: #fff; opacity: 0.6; transparent: true" position="-32 23 -110"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 6" material="color: #fff; opacity: 0.65; transparent: true" position="-36 21 -130"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 8" material="color: #fff; opacity: 0.7; transparent: true" position="35 24 -140"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 6" material="color: #fff; opacity: 0.6; transparent: true" position="42 23 -150"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 5" material="color: #fff; opacity: 0.5; transparent: true" position="38 25 -135"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 4" material="color: #fff; opacity: 0.5; transparent: true" position="0 28 -160"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 6" material="color: #fff; opacity: 0.6; transparent: true" position="-10 26 -170"></a-entity>
-      <!-- New large upper left clouds -->
-      <a-entity geometry="primitive: sphere; radius: 18" material="color: #fff; opacity: 0.55; transparent: true" position="-70 22 -60"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 12" material="color: #fff; opacity: 0.5; transparent: true" position="-85 25 -75"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 10" material="color: #fff; opacity: 0.45; transparent: true" position="-60 20 -45"></a-entity>
-      <!-- New large upper right clouds -->
-      <a-entity geometry="primitive: sphere; radius: 17" material="color: #fff; opacity: 0.55; transparent: true" position="70 23 -65"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 13" material="color: #fff; opacity: 0.5; transparent: true" position="85 26 -80"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 11" material="color: #fff; opacity: 0.45; transparent: true" position="60 21 -50"></a-entity>
-
-      <!-- Higher layer: close clouds above -->
-      <a-entity geometry="primitive: sphere; radius: 10" material="color: #fff; opacity: 0.35; transparent: true" position="-25 38 -70"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 8" material="color: #fff; opacity: 0.32; transparent: true" position="25 40 -80"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 12" material="color: #fff; opacity: 0.3; transparent: true" position="0 42 -90"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 7" material="color: #fff; opacity: 0.28; transparent: true" position="-50 36 -100"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 9" material="color: #fff; opacity: 0.3; transparent: true" position="50 37 -110"></a-entity>
-        
-      <!-- Higher layer: far clouds above -->
-      <a-entity geometry="primitive: sphere; radius: 18" material="color: #fff; opacity: 0.18; transparent: true" position="-60 55 -180"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 15" material="color: #fff; opacity: 0.15; transparent: true" position="60 58 -200"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 20" material="color: #fff; opacity: 0.12; transparent: true" position="0 60 -220"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 13" material="color: #fff; opacity: 0.14; transparent: true" position="-80 53 -160"></a-entity>
-      <a-entity geometry="primitive: sphere; radius: 11" material="color: #fff; opacity: 0.13; transparent: true" position="80 54 -170"></a-entity>
-    </a-entity>
-    <!-- Center path: put in dirt pattern entity for now so it moves with the player -->
-    <!-- Add a repeating pattern of slightly darker circles to simulate dirt patches on the path -->
-    <a-entity id="dirt-pattern">
-        <a-entity geometry="primitive: box; width: 8; height: 1.02; depth: 10000" material="src: #track-texture; repeat: 1 1250" position="0 0.52 -3000"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.7" material="color: #a0895a; opacity: 0.35" position="-2 1.53 -10" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.5" material="color: #a0895a; opacity: 0.28" position="2 1.53 -15" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.6" material="color: #a0895a; opacity: 0.32" position="0 1.53 -20" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.4" material="color: #a0895a; opacity: 0.25" position="-1.5 1.53 -25" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.8" material="color: #a0895a; opacity: 0.30" position="1.5 1.53 -30" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.5" material="color: #a0895a; opacity: 0.22" position="0.5 1.53 -35" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.6" material="color: #a0895a; opacity: 0.27" position="-2 1.53 -40" rotation="-90 0 0"></a-entity>
-        <a-entity geometry="primitive: circle; radius: 0.7" material="color: #a0895a; opacity: 0.33" position="2 1.53 -45" rotation="-90 0 0"></a-entity>
-        <!-- Repeat as desired for more pattern -->
-    </a-entity>
-    <!-- No static buildings or trees: all are generated dynamically in scene.js and will not overlap the center column -->
     <a-entity camera look-controls position="0 4.5 5"></a-entity>
   </a-scene>
   <script type="module" src="js/main.js"></script>
