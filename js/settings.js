@@ -2,11 +2,9 @@
 import { KeyboardMode } from './keyboardMode.js';
 import { StandardMode } from './standardMode.js';
 export function initSettings() {
-    console.log("init settings");
     //Keyboard Mode
     const keyboardBtn = document.getElementById("keyboard-btn");
     keyboardBtn.addEventListener("click", () => {
-        console.log("Click keyboard button");
         let inKeyboardMode = sessionStorage.getItem("isInKeyboardMode");
         if (inKeyboardMode == null) {
             inKeyboardMode = false;
@@ -27,7 +25,6 @@ export function initSettings() {
     //Test Mode
     const testModeBtn = document.getElementById("testMode");
     testModeBtn.addEventListener("click", () => {
-        console.log("click testMode Button");
         let inTestMode = sessionStorage.getItem("testMode");
         if (inTestMode == null) {
             inTestMode = false;

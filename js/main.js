@@ -184,7 +184,8 @@ export function initZlowApp({
         scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
         pacerSpeedInput.addEventListener("input", () => {
             const val = Number(pacerSpeedInput.value);
-            scene.setPacerSpeed(val);
+            pacer.setSpeed(val);
+           // scene.setPacerSpeed(val);
         });
 
         pacer.setSpeed(Number(pacerSpeedInput.value));
@@ -196,12 +197,12 @@ export function initZlowApp({
         if (sessionStorage.getItem("PacerSpeed") !== null) {
             const val = Number(sessionStorage.getItem("PacerSpeed"));
             scene = new ZlowScene(val, { getElement });
-            scene.setPacerSpeed(val);
+           // scene.setPacerSpeed(val);
             pacer.setSpeed(val);
         } else {
             const val = 20;
             scene = new ZlowScene(val, { getElement });
-            scene.setPacerSpeed(val);
+            //scene.setPacerSpeed(val);
             pacer.setSpeed(val);
         }
     }

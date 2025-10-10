@@ -8,29 +8,32 @@
   <link rel="stylesheet" type="text/css" href="style.css?version=1.0">
 </head>
 <body>
-  <div id="hud">
-      <span id="pacer" hidden>
-          <label for="pacer-speed">Pacer:</label>
-          <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
-      </span>
-    <button id="pacer-sync-btn">Sync to Pacer</button></br></br>
-    <button id="connect-btn" hidden>Connect Trainer</button>
-    <button id="keyboard-btn" hidden>Keyboard Mode</button>
-    <div>Power: <span id="power">0</span> W</div>
-    <div>Speed: <span id="speed">0</span> km/h</div>
-    <div>Distance: <span id="distance">0.00</span> km</div>
-    <div>Time: <span id="time">00:00</span></div>
-    <div>Calories: <span id = "calories">0</span> kcal</div>
-    <button id = "calories-reset-btn">Reset Calories</button>
-  </br>
-    <span id="weight" hidden>
-        <label for="rider-weight">Weight:</label>
-        <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" style="width:50px;"> kg
-    </span></br>
-    <button id="strava-btn" disabled>Export to Strava</button>
-    <button id="gpx-btn">Download TCX</button>
-    <a href="resources/settings.html"><button id="settings-btn"><img src="resources/images/gear.PNG" width="20" height="20" /></button></a>
-  </div>
+    <div id="hud">
+        <span id="pacer" hidden>
+            <label for="pacer-speed">Pacer:</label>
+            <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+            <br />
+        </span>
+        <button id="pacer-sync-btn">Sync to Pacer</button>
+        <button id="calories-reset-btn">Reset Calories</button>
+        </br></br>
+        <button id="connect-btn" hidden>Connect Trainer</button>
+        <button id="keyboard-btn" hidden>Keyboard Mode</button>
+        <div>Power: <span id="power">0</span> W</div>
+        <div>Speed: <span id="speed">0</span> km/h</div>
+        <div>Distance: <span id="distance">0.00</span> km</div>
+        <div>Time: <span id="time">00:00</span></div>
+        <div>Calories: <span id="calories">0</span> kcal</div>
+        
+        <span id="weight" hidden>
+            </br>
+            <label for="rider-weight">Weight:</label>
+            <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" style="width:50px;"> kg</br>
+        </span>
+        <button id="strava-btn" disabled>Export to Strava</button>
+        <button id="gpx-btn">Download TCX</button>
+        <a href="resources/settings.html"><button id="settings-btn"><img src="resources/images/gear.PNG" width="20" height="20" /></button></a>
+    </div>
 
   <!-- Generate starting scene -->
   <a-scene id="scene">
