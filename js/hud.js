@@ -10,11 +10,11 @@ export class HUD {
     this.calories = getElement("calories");
   }
 
-  update({ power, speed }, dt) {
+  update({ power, speed, calories }, dt) {
     const fields = [
       { el: this.power, val: power, format: (v) => v },
       { el: this.speed, val: speed, format: (v) => v?.toFixed(1) },
-      { el: this.calories, val: this.calories, format: (v) => v?.toFixed(0) },
+      { el: this.calories, val: calories, format: (v) => v?.toFixed(0) },
     ];
     fields.forEach(({ el, val, format }) => {
       if (val !== undefined) el.textContent = format(val);
