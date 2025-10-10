@@ -34,7 +34,7 @@ class Constants {
   qKeyDown = false;
   aKeyDown = false;
 
-  riderState = { power: 0, speed: 0 };
+  riderState = { power: 0, speed: 0, calories: 0 };
   rideHistory = [];
   lastHistorySecond = null;
   pacerStarted = false;
@@ -68,8 +68,8 @@ class Constants {
   // Constants governing terrain generation
   tileSize = 10;
   // Colors can be refactored out once grid is fully abandoned
-  groundColor1 = '#5a7d3a';
-  groundColor2 = '#7c5a3a';
+  groundColor1 = "#5a7d3a";
+  groundColor2 = "#7c5a3a";
   gridWidth = 12; // 12 tiles wide (120 units)
   gridDepth = 80; // 80 tiles deep (800 units)
   height = 1;
