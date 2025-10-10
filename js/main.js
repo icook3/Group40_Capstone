@@ -166,7 +166,7 @@ export function initZlowApp({
     standardMode = new StandardMode();
     if (sessionStorage.getItem("testMode") == 'true') {
         const pacerSpeedInput = getElement("pacer-speed");
-        pacerSpeedInput.removeAttribute("hidden");
+        getElement("pacer").removeAttribute("hidden");
         scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
         pacerSpeedInput.addEventListener("input", () => {
             const val = Number(pacerSpeedInput.value);
