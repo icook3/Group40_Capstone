@@ -22,12 +22,23 @@ export function initSettings() {
             constants.riderState.speed = 0;
         }
     });
+    const testModeBtn = document.getElementById("testMode");
+    testModeBtn.addEventListener("click", () => {
+        console.log("click testMode Button");
+        let inTestMode = sessionStorage.getItem("testMode");
+        if (inTestMode == null) {
+            inTestMode = false;
+        } else if (inTestMode == 'false') {
+            inTestMode = false;
+        } else {
+            inTestMode = true;
+        }
+        inTestMode = !inTestMode;
+        sessionStorage.setItem("testMode", inTestMode);
+        testModeBtn.textContent = inTestMode ? "Test Mode ON" : "Test Mode";
+    });
 }
 
-// used as a way to make it work - I don't know if this is the way it is supposed to work or not
-window.addEventListener('DOMContentLoaded', () => {
-    console.log(initSettings);
-    if (initSettings) {
-        initSettings();
-    }
-});
+if (typeof window !== "undefined") {
+    window.initSettings = initSettings;
+}

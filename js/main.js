@@ -169,17 +169,21 @@ export function initZlowApp({
     pacer.setSpeed(val);
   });
 
-  //Rider state and history
-  /*const keyboardBtn = getElement("keyboard-btn");
-  keyboardBtn.addEventListener("click", () => {
-      keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
-      keyboardBtn.textContent = keyboardMode.keyboardMode
-          ? keyboardMode.keyboardOnText
-      : "Keyboard Mode";
-      if (!keyboardMode.keyboardMode) {
-      constants.riderState.speed = 0;
+    //Rider state and history
+    if (sessionStorage.getItem("testMode") == 'true') {
+        const keyboardBtn = getElement("keyboard-btn");
+        keyboardBtn.removeAttribute("hidden");
+        keyboardBtn.addEventListener("click", () => {
+            keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
+            sessionStorage.setItem("isInKeyboardMode", keyboardMode.keyboardMode);
+            keyboardBtn.textContent = keyboardMode.keyboardMode
+                ? keyboardMode.keyboardOnText
+                : "Keyboard Mode";
+            if (!keyboardMode.keyboardMode) {
+                constants.riderState.speed = 0;
+            }
+        });
     }
-  });*/
 
   keyboardMode.wKeyDown = false;
     keyboardMode.sKeyDown = false;
