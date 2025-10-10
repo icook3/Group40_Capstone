@@ -91,6 +91,11 @@ function loop({
     // If using W/S keyboard mode, don't coast (since power is always zero)
   const isUsingDirectSpeedControl = keyboardMode.wKeyDown || keyboardMode.sKeyDown;
 
+  // Recompute speed from power each frame so mass/slope changes take effect immediately
+  if (currentPower > 0 && !(keyboardMode.wKeyDown || keyboardMode.sKeyDown)) {
+    constants.riderState.speed = powerToSpeed({ power: currentPower });
+  }
+
   // If rider is not peddaling and their speed is not zero, calculate new speed
   if (currentPower === 0 && currentSpeed > 0 && !isUsingDirectSpeedControl) {
     constants.riderState.speed = calculateCoastingSpeed(currentSpeed, dt);
@@ -159,6 +164,30 @@ export function initZlowApp({
     pacer.setSpeed(val);
   });
 
+  // Hook up live mass updates → optional immediate speed recompute
+  const riderWeightEl = getElement("rider-weight");
+  if (riderWeightEl) {
+    const updateMassAndMaybeSpeed = () => {
+      const newMass = Number(riderWeightEl.value);
+      if (!Number.isFinite(newMass)) return;
+      constants.riderMass = newMass;
+
+      const p = constants.riderState.power || 0;
+      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+
+      // Only recompute from power if we're not in direct speed mode and power > 0
+      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+        constants.riderState.speed = powerToSpeed({ power: p });
+      }
+      // If power === 0, coasting uses the new mass automatically on the next frame.
+    };
+
+    // Initialize once and then listen for changes
+    updateMassAndMaybeSpeed();
+    riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
+    riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+  }
+
   //Rider state and history
   const keyboardBtn = getElement("keyboard-btn");
   keyboardBtn.addEventListener("click", () => {
@@ -170,11 +199,10 @@ export function initZlowApp({
       constants.riderState.speed = 0;
     }
   });
-
   keyboardMode.wKeyDown = false;
-    keyboardMode.sKeyDown = false;
-    keyboardMode.qKeyDown = false;
-    keyboardMode.aKeyDown = false;
+  keyboardMode.sKeyDown = false;
+  keyboardMode.qKeyDown = false;
+  keyboardMode.aKeyDown = false;
   document.addEventListener("keydown", (e) => {
       if (!keyboardMode.keyboardMode) return;
       keyboardMode.keyboardInputActive(e.key);
