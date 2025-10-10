@@ -140,9 +140,20 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
-  // get the needed objects
-  const trainer = new TrainerBluetooth();
-    const pacerSpeedInput = getElement("pacer-speed");
+    // get the needed objects
+    if (sessionStorage.getItem("testMode") !== 'true') {
+        const trainer = new TrainerBluetooth();
+    } else {
+        if (sessionStorage.getItem("Trainer") !== null) {
+            try {
+                //HOPEFULLY this works
+                const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
+            } catch {
+                console.log("JSON trainer did not work :(");
+            }
+        }
+    }
+
     rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
     pacer = new Avatar(
         "pacer",
@@ -151,23 +162,44 @@ export function initZlowApp({
         undefined,
         true
     );
-    scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
     keyboardMode = new KeyboardMode();
     standardMode = new StandardMode();
+    if (sessionStorage.getItem("testMode") == 'true') {
+        const pacerSpeedInput = getElement("pacer-speed");
+        pacerSpeedInput.removeAttribute("hidden");
+        scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+        pacerSpeedInput.addEventListener("input", () => {
+            const val = Number(pacerSpeedInput.value);
+            scene.setPacerSpeed(val);
+        });
+
+        pacer.setSpeed(Number(pacerSpeedInput.value));
+        pacerSpeedInput.addEventListener("input", () => {
+            const val = Number(pacerSpeedInput.value);
+            pacer.setSpeed(val);
+        });
+    } else {
+        if (sessionStorage.getItem("PacerSpeed") !== null) {
+            const val = Number(sessionStorage.getItem("PacerSpeed"));
+            scene = new ZlowScene(val, { getElement });
+            scene.setPacerSpeed(val);
+            pacer.setSpeed(val);
+        } else {
+            const val = 20;
+            scene = new ZlowScene(val, { getElement });
+            scene.setPacerSpeed(val);
+            pacer.setSpeed(val);
+        }
+    }
+
+
   //map the pacer speed input to the pacer speed variable
-  pacerSpeedInput.addEventListener("input", () => {
-    const val = Number(pacerSpeedInput.value);
-    scene.setPacerSpeed(val);
-  });
+
   hud = new HUD({ getElement });
   const strava = new Strava();
 
   //Pacer speed control input
-  pacer.setSpeed(Number(pacerSpeedInput.value));
-  pacerSpeedInput.addEventListener("input", () => {
-    const val = Number(pacerSpeedInput.value);
-    pacer.setSpeed(val);
-  });
+
 
     //Rider state and history
     if (sessionStorage.getItem("testMode") == 'true') {

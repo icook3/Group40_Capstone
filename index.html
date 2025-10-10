@@ -9,8 +9,10 @@
 </head>
 <body>
   <div id="hud">
-    <label for="pacer-speed">Pacer:</label>
-    <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+      <span id="pacer" hidden>
+          <label for="pacer-speed">Pacer:</label>
+          <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+      </span>
     <button id="pacer-sync-btn">Sync to Pacer</button></br></br>
     <button id="connect-btn" hidden>Connect Trainer</button>
     <button id="keyboard-btn" hidden>Keyboard Mode</button>

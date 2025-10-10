@@ -50,6 +50,11 @@ export function initSettings() {
         //const ok = await standardMode.trainer.connect();
         //if (ok) connectBtn.disabled = true;
     });
+    const pacerSpeedInput = document.getElementById("pacer-speed");
+    pacerSpeedInput.addEventListener("input", () => {
+        sessionStorage.setItem("PacerSpeed", pacerSpeedInput.value);
+    });
+
 }
 
 if (typeof window !== "undefined") {
