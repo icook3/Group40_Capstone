@@ -197,13 +197,24 @@ export function initZlowApp({
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
-
-  const connectBtn = getElement("connect-btn");
-    connectBtn.addEventListener("click", async () => {
-        await standardMode.connectTrainer();
-    //const ok = await standardMode.trainer.connect();
-    //if (ok) connectBtn.disabled = true;
-  });
+    if (sessionStorage.getItem("testMode") == 'true') {
+        const connectBtn = getElement("connect-btn");
+        connectBtn.removeAttribute("hidden");
+        connectBtn.addEventListener("click", async () => {
+            await standardMode.connectTrainer();
+            //const ok = await standardMode.trainer.connect();
+            //if (ok) connectBtn.disabled = true;
+        });
+    } else {
+        if (sessionStorage.getItem("Trainer") !== null) {
+            try {
+                //HOPEFULLY this works
+                standardMode.setTrainer(JSON.parse(sessionStorage.getItem("Trainer")));
+            } catch {
+                console.log("JSON trainer did not work :(");
+            }
+        }
+    }
     standardMode.init();
   // setup the speed when using an actual trainer
   /*trainer.onData = (data) => {
