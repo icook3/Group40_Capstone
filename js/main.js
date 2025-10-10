@@ -212,8 +212,6 @@ export function initZlowApp({
   const strava = new Strava();
 
   //Pacer speed control input
-
-
     //Rider state and history
     if (sessionStorage.getItem("testMode") == 'true') {
         const keyboardBtn = getElement("keyboard-btn");
