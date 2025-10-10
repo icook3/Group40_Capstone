@@ -230,29 +230,55 @@ export function initZlowApp({
     }
 
 
-  // Hook up live mass updates → optional immediate speed recompute
-  const riderWeightEl = getElement("rider-weight");
-  if (riderWeightEl) {
-    const updateMassAndMaybeSpeed = () => {
-      const newMass = Number(riderWeightEl.value);
-      if (!Number.isFinite(newMass)) return;
-      constants.riderMass = newMass;
+    if (sessionStorage.getItem("testMode") == 'true') {
+        getElement("weight").removeAttribute("hidden");
+        // Hook up live mass updates → optional immediate speed recompute
+        const riderWeightEl = getElement("rider-weight");
+        if (riderWeightEl) {
+            const updateMassAndMaybeSpeed = () => {
+                const newMass = Number(riderWeightEl.value);
+                if (!Number.isFinite(newMass)) return;
+                constants.riderMass = newMass;
 
-      const p = constants.riderState.power || 0;
-      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+                const p = constants.riderState.power || 0;
+                const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
-      // Only recompute from power if we're not in direct speed mode and power > 0
-      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p });
-      }
-      // If power === 0, coasting uses the new mass automatically on the next frame.
-    };
+                // Only recompute from power if we're not in direct speed mode and power > 0
+                if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+                    constants.riderState.speed = powerToSpeed({ power: p });
+                }
+                // If power === 0, coasting uses the new mass automatically on the next frame.
+            };
 
-    // Initialize once and then listen for changes
-    updateMassAndMaybeSpeed();
-    riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
-    riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
-  }
+            // Initialize once and then listen for changes
+            updateMassAndMaybeSpeed();
+            riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
+            riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+        }
+    } else {
+        const updateMassAndMaybeSpeed = () => {
+            let newMass;
+            if (sessionStorage.getItem("weight") == null) {
+                newMass = 70;
+            } else {
+                newMass = Number(sessionStorage.getItem("weight").value);
+            }
+            if (!Number.isFinite(newMass)) return;
+            constants.riderMass = newMass;
+
+            const p = constants.riderState.power || 0;
+            const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+
+            // Only recompute from power if we're not in direct speed mode and power > 0
+            if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+                constants.riderState.speed = powerToSpeed({ power: p });
+            }
+            // If power === 0, coasting uses the new mass automatically on the next frame.
+        };
+
+        // Initialize once
+        updateMassAndMaybeSpeed();
+    }
 
   keyboardMode.wKeyDown = false;
   keyboardMode.sKeyDown = false;
