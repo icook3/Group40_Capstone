@@ -1,9 +1,15 @@
+  // Flow:
+  // Call spawnAtZ either once or twice depending on randomly generated number
+  // spawnAtZ runs pickKind to decide what to spawn
+  // spawnAtZ pushes the entity to items, which are updated as the rider moves.
+
 import { getPos, setPos } from '../core/util.js';
 import { KINDS, kindsByName } from './kinds/index.js';
 
 export class ObjectField {
-  constructor({ sceneEl }) {
+  constructor({ sceneEl, dirtPattern }) {
     this.sceneEl = sceneEl;
+    this.dirtPattern = dirtPattern;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
@@ -13,17 +19,16 @@ export class ObjectField {
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
   }
 
-  setDirtPattern(dirtPattern) {
-    this.dirtPattern = dirtPattern;
-  }
-
   // allow scene to register bands (each with items[] and recyclePolicy)
+  // Not currently used
   attachExternalBands(groups) {
     for (const g of groups) {
       if (!g || !Array.isArray(g.items)) continue;
       this.externalGroups.push(g);
     }
   }
+
+  // Creates an object used in the object field (currently a tree or a building)
   _pickKind() {
     // weighted random pick
     let r = Math.random() * this.totalWeight;
@@ -40,6 +45,7 @@ export class ObjectField {
     this.items.push(entity);
   }
 
+  // Initializes items that move with the rider (buildings and trees)
   init() {
     if (this.initialized) return;
     for (let z = 0; z > -200; z -= 5) {
@@ -61,6 +67,7 @@ export class ObjectField {
     return isBuilding ? kindsByName.building : kindsByName.tree;
   }
 
+  // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(dz) {
     if (!this.initialized || dz === 0) return;
 
@@ -81,19 +88,25 @@ export class ObjectField {
       setPos(obj, pos);
     }
 
+    // Advances the dirt pattern
     if (this.dirtPattern?.patternEl) {
-      if (this.dirtPattern?.patternEl) {
-        const kids = Array.from(this.dirtPattern.patternEl.children);
-        if (kids.length) {
-          const farthestZ = Math.min(...kids.map(c => getPos(c).z));
-          for (const circle of kids) {
-            const pos = getPos(circle);
-            pos.z += dz;
-            if (pos.z > 10) {
-              pos.z = farthestZ - 5;
-            }
-            setPos(circle, pos);
+      const kids = Array.from(this.dirtPattern.patternEl.children);
+      if (kids.length) {
+        // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
+        
+        for (const circle of kids) {
+          const pos = getPos(circle);
+
+          // Update z as item moves closer to rider
+          pos.z += dz;
+          
+          // Reset position when item is within 10 of rider
+          if (pos.z > 10) {
+            //pos.z = farthestZ - 5;
+            // Reset z to -30, which is about as far as you can see on the track
+            pos.z = -30;
           }
+          setPos(circle, pos);
         }
       }
     }

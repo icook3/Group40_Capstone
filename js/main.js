@@ -82,8 +82,22 @@ function loop({
   const currentPower = constants.riderState.power || 0;
   const currentSpeed = constants.riderState.speed || 0;
 
-    // If using W/S keyboard mode, don't coast (since power is always zero)
-  const isUsingDirectSpeedControl = keyboardMode.wKeyDown || keyboardMode.sKeyDown;
+  // Calculate calories burned using the following formula:
+  // calories = (power in watts * delta time (seconds) / 1000)
+  if (currentPower > 0) {
+    const caloriesBurned = (currentPower * dt) / 1000;
+    constants.riderState.calories =
+      (constants.riderState.calories || 0) + caloriesBurned;
+  }
+
+  // If using W/S keyboard mode, don't coast (since power is always zero)
+  const isUsingDirectSpeedControl =
+    keyboardMode.wKeyDown || keyboardMode.sKeyDown;
+
+  // Recompute speed from power each frame so mass/slope changes take effect immediately
+  if (currentPower > 0 && !(keyboardMode.wKeyDown || keyboardMode.sKeyDown)) {
+    constants.riderState.speed = powerToSpeed({ power: currentPower });
+  }
 
   // If rider is not peddaling and their speed is not zero, calculate new speed
   if (currentPower === 0 && currentSpeed > 0 && !isUsingDirectSpeedControl) {
@@ -129,10 +143,10 @@ function loop({
 }
 
 export function activatePacer() {
-    if (!constants.pacerStarted) {
-        //scene.activatePacer();
-        constants.pacerStarted = true;
-    }
+  if (!constants.pacerStarted) {
+    //scene.activatePacer();
+    constants.pacerStarted = true;
+  }
 }
 
 // Exported function to initialize app (for browser and test)
@@ -191,8 +205,6 @@ export function initZlowApp({
             pacer.setSpeed(val);
         }
     }
-
-
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
@@ -217,13 +229,38 @@ export function initZlowApp({
         });
     }
 
+
+  // Hook up live mass updates → optional immediate speed recompute
+  const riderWeightEl = getElement("rider-weight");
+  if (riderWeightEl) {
+    const updateMassAndMaybeSpeed = () => {
+      const newMass = Number(riderWeightEl.value);
+      if (!Number.isFinite(newMass)) return;
+      constants.riderMass = newMass;
+
+      const p = constants.riderState.power || 0;
+      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+
+      // Only recompute from power if we're not in direct speed mode and power > 0
+      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+        constants.riderState.speed = powerToSpeed({ power: p });
+      }
+      // If power === 0, coasting uses the new mass automatically on the next frame.
+    };
+
+    // Initialize once and then listen for changes
+    updateMassAndMaybeSpeed();
+    riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
+    riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+  }
+
   keyboardMode.wKeyDown = false;
-    keyboardMode.sKeyDown = false;
-    keyboardMode.qKeyDown = false;
-    keyboardMode.aKeyDown = false;
+  keyboardMode.sKeyDown = false;
+  keyboardMode.qKeyDown = false;
+  keyboardMode.aKeyDown = false;
   document.addEventListener("keydown", (e) => {
-      if (!keyboardMode.keyboardMode) return;
-      keyboardMode.keyboardInputActive(e.key);
+    if (!keyboardMode.keyboardMode) return;
+    keyboardMode.keyboardInputActive(e.key);
   });
   document.addEventListener("keyup", (e) => {
     if (!keyboardMode.keyboardMode) return;
@@ -286,6 +323,12 @@ export function initZlowApp({
       pacerSyncPos.z = riderSyncPos.z;
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
     }
+  });
+
+  // Calorie reset button
+  const caloriesResetBtn = getElement("calories-reset-btn");
+  caloriesResetBtn.addEventListener("click", () => {
+    constants.riderState.calories = 0;
   });
 
   // For testing: export some internals
