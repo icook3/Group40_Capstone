@@ -88,8 +88,17 @@ function loop({
   const currentPower = constants.riderState.power || 0;
   const currentSpeed = constants.riderState.speed || 0;
 
-    // If using W/S keyboard mode, don't coast (since power is always zero)
-  const isUsingDirectSpeedControl = keyboardMode.wKeyDown || keyboardMode.sKeyDown;
+  // Calculate calories burned using the following formula:
+  // calories = (power in watts * delta time (seconds) / 1000)
+  if (currentPower > 0) {
+    const caloriesBurned = (currentPower * dt) / 1000;
+    constants.riderState.calories =
+      (constants.riderState.calories || 0) + caloriesBurned;
+  }
+
+  // If using W/S keyboard mode, don't coast (since power is always zero)
+  const isUsingDirectSpeedControl =
+    keyboardMode.wKeyDown || keyboardMode.sKeyDown;
 
   // Recompute speed from power each frame so mass/slope changes take effect immediately
   if (currentPower > 0 && !(keyboardMode.wKeyDown || keyboardMode.sKeyDown)) {
@@ -132,10 +141,10 @@ function loop({
 }
 
 export function activatePacer() {
-    if (!constants.pacerStarted) {
-        //scene.activatePacer();
-        constants.pacerStarted = true;
-    }
+  if (!constants.pacerStarted) {
+    //scene.activatePacer();
+    constants.pacerStarted = true;
+  }
 }
 
 // Exported function to initialize app (for browser and test)
@@ -146,9 +155,9 @@ export function initZlowApp({
   // get the needed objects
   const trainer = new TrainerBluetooth();
   const pacerSpeedInput = getElement("pacer-speed");
-    scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
-    keyboardMode = new KeyboardMode();
-    standardMode = new StandardMode();
+  scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+  keyboardMode = new KeyboardMode();
+  standardMode = new StandardMode();
   //map the pacer speed input to the pacer speed variable
   pacerSpeedInput.addEventListener("input", () => {
     const val = Number(pacerSpeedInput.value);
@@ -191,11 +200,11 @@ export function initZlowApp({
   //Rider state and history
   const keyboardBtn = getElement("keyboard-btn");
   keyboardBtn.addEventListener("click", () => {
-      keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
-      keyboardBtn.textContent = keyboardMode.keyboardMode
-          ? keyboardMode.keyboardOnText
+    keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
+    keyboardBtn.textContent = keyboardMode.keyboardMode
+      ? keyboardMode.keyboardOnText
       : "Keyboard Mode";
-      if (!keyboardMode.keyboardMode) {
+    if (!keyboardMode.keyboardMode) {
       constants.riderState.speed = 0;
     }
   });
@@ -204,8 +213,8 @@ export function initZlowApp({
   keyboardMode.qKeyDown = false;
   keyboardMode.aKeyDown = false;
   document.addEventListener("keydown", (e) => {
-      if (!keyboardMode.keyboardMode) return;
-      keyboardMode.keyboardInputActive(e.key);
+    if (!keyboardMode.keyboardMode) return;
+    keyboardMode.keyboardInputActive(e.key);
   });
   document.addEventListener("keyup", (e) => {
     if (!keyboardMode.keyboardMode) return;
@@ -213,12 +222,12 @@ export function initZlowApp({
   });
 
   const connectBtn = getElement("connect-btn");
-    connectBtn.addEventListener("click", async () => {
-        await standardMode.connectTrainer();
+  connectBtn.addEventListener("click", async () => {
+    await standardMode.connectTrainer();
     //const ok = await standardMode.trainer.connect();
     //if (ok) connectBtn.disabled = true;
   });
-    standardMode.init();
+  standardMode.init();
   // setup the speed when using an actual trainer
   /*trainer.onData = (data) => {
       if (!keyboardMode.keyboardMode) {
@@ -257,6 +266,12 @@ export function initZlowApp({
       pacerSyncPos.z = riderSyncPos.z;
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
     }
+  });
+
+  // Calorie reset button
+  const caloriesResetBtn = getElement("calories-reset-btn");
+  caloriesResetBtn.addEventListener("click", () => {
+    constants.riderState.calories = 0;
   });
 
   // For testing: export some internals
