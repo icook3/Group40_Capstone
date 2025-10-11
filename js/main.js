@@ -412,7 +412,7 @@ function updateFavicon() {
 }
 
 updateFavicon();
-darkModeMedia.addEventListener('change', updateFavicon);
+darkMode.addEventListener('change', updateFavicon);
 
 /**
  * Save a TCX file
