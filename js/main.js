@@ -395,6 +395,25 @@ if (typeof window !== "undefined") {
   window.initZlowApp = initZlowApp;
 }
 
+// Switching icons for darkmode
+const darkMode = window.matchMedia('(prefers-color-scheme: dark)');
+
+function updateFavicon() {
+    const favicon = document.querySelector('link[rel="icon"]')
+    if (!favicon) {
+        return;
+    }
+
+    if (darkMode.matches) {
+       favicon.href = '/resources/favicons/ZlowFavicon-dark.svg';
+    } else {
+        favicon.href = '/resources/favicons/ZlowFavicon.svg';
+    }
+}
+
+updateFavicon();
+darkModeMedia.addEventListener('change', updateFavicon);
+
 /**
  * Save a TCX file
  */
