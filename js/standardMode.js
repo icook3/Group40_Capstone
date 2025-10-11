@@ -32,4 +32,8 @@ export class StandardMode {
             }
         };
     }
+    //pass in t as a JSON equivalent of trainer
+    setTrainer(t) {
+        this.trainer = JSON.parse(t);
+    }
 }

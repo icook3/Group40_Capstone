@@ -67,14 +67,8 @@ let hud;
 let keyboardMode;
 let standardMode;
 //Avatar and Pacer
-const rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
-const pacer = new Avatar(
-  "pacer",
-  "#fa0",
-  { x: 0.5, y: 1, z: -2 },
-  undefined,
-  true
-);
+let rider;
+let pacer;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -126,8 +120,16 @@ function loop({
     pacer.avatarEntity.setAttribute("position", pacerPos);
   }
 
-  hud.update(constants.riderState, dt);
-  const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
+    hud.update(constants.riderState, dt);
+    if (sessionStorage.getItem("isInKeyboardMode") == null) {
+        sessionStorage.setItem("isInKeyboardMode", false);
+    }
+    if (sessionStorage.getItem("isInKeyboardMode") == 'false') {
+        keyboardMode.keyboardMode = false;
+    } else {
+        keyboardMode.keyboardMode = true;
+    }
+    const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
   if (constants.lastHistorySecond !== thisSecond) {
     constants.rideHistory.push({
       time: now,
@@ -152,62 +154,131 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
-  // get the needed objects
-  const trainer = new TrainerBluetooth();
-  const pacerSpeedInput = getElement("pacer-speed");
-  scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
-  keyboardMode = new KeyboardMode();
-  standardMode = new StandardMode();
+    // get the needed objects
+    if (sessionStorage.getItem("testMode") !== 'true') {
+        const trainer = new TrainerBluetooth();
+    } else {
+        if (sessionStorage.getItem("Trainer") !== null) {
+            try {
+                //HOPEFULLY this works
+                const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
+            } catch {
+                console.log("JSON trainer did not work :(");
+            }
+        }
+    }
+
+    rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
+    pacer = new Avatar(
+        "pacer",
+        "#fa0",
+        { x: 0.5, y: 1, z: -2 },
+        undefined,
+        true
+    );
+    keyboardMode = new KeyboardMode();
+    standardMode = new StandardMode();
+    if (sessionStorage.getItem("testMode") == 'true') {
+        const pacerSpeedInput = getElement("pacer-speed");
+        getElement("pacer").removeAttribute("hidden");
+        scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
+        pacerSpeedInput.addEventListener("input", () => {
+            const val = Number(pacerSpeedInput.value);
+            pacer.setSpeed(val);
+           // scene.setPacerSpeed(val);
+        });
+
+        pacer.setSpeed(Number(pacerSpeedInput.value));
+        pacerSpeedInput.addEventListener("input", () => {
+            const val = Number(pacerSpeedInput.value);
+            pacer.setSpeed(val);
+        });
+    } else {
+        if (sessionStorage.getItem("PacerSpeed") !== null) {
+            const val = Number(sessionStorage.getItem("PacerSpeed"));
+            scene = new ZlowScene(val, { getElement });
+           // scene.setPacerSpeed(val);
+            pacer.setSpeed(val);
+        } else {
+            const val = 20;
+            scene = new ZlowScene(val, { getElement });
+            //scene.setPacerSpeed(val);
+            pacer.setSpeed(val);
+        }
+    }
   //map the pacer speed input to the pacer speed variable
-  pacerSpeedInput.addEventListener("input", () => {
-    const val = Number(pacerSpeedInput.value);
-    scene.setPacerSpeed(val);
-  });
+
   hud = new HUD({ getElement });
   const strava = new Strava();
 
   //Pacer speed control input
-  pacer.setSpeed(Number(pacerSpeedInput.value));
-  pacerSpeedInput.addEventListener("input", () => {
-    const val = Number(pacerSpeedInput.value);
-    pacer.setSpeed(val);
-  });
-
-  // Hook up live mass updates → optional immediate speed recompute
-  const riderWeightEl = getElement("rider-weight");
-  if (riderWeightEl) {
-    const updateMassAndMaybeSpeed = () => {
-      const newMass = Number(riderWeightEl.value);
-      if (!Number.isFinite(newMass)) return;
-      constants.riderMass = newMass;
-
-      const p = constants.riderState.power || 0;
-      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
-
-      // Only recompute from power if we're not in direct speed mode and power > 0
-      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p });
-      }
-      // If power === 0, coasting uses the new mass automatically on the next frame.
-    };
-
-    // Initialize once and then listen for changes
-    updateMassAndMaybeSpeed();
-    riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
-    riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
-  }
-
-  //Rider state and history
-  const keyboardBtn = getElement("keyboard-btn");
-  keyboardBtn.addEventListener("click", () => {
-    keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
-    keyboardBtn.textContent = keyboardMode.keyboardMode
-      ? keyboardMode.keyboardOnText
-      : "Keyboard Mode";
-    if (!keyboardMode.keyboardMode) {
-      constants.riderState.speed = 0;
+    //Rider state and history
+    if (sessionStorage.getItem("testMode") == 'true') {
+        const keyboardBtn = getElement("keyboard-btn");
+        keyboardBtn.removeAttribute("hidden");
+        keyboardBtn.addEventListener("click", () => {
+            keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
+            sessionStorage.setItem("isInKeyboardMode", keyboardMode.keyboardMode);
+            keyboardBtn.textContent = keyboardMode.keyboardMode
+                ? keyboardMode.keyboardOnText
+                : "Keyboard Mode";
+            if (!keyboardMode.keyboardMode) {
+                constants.riderState.speed = 0;
+            }
+        });
     }
-  });
+
+
+    if (sessionStorage.getItem("testMode") == 'true') {
+        getElement("weight").removeAttribute("hidden");
+        // Hook up live mass updates → optional immediate speed recompute
+        const riderWeightEl = getElement("rider-weight");
+        if (riderWeightEl) {
+            const updateMassAndMaybeSpeed = () => {
+                const newMass = Number(riderWeightEl.value);
+                if (!Number.isFinite(newMass)) return;
+                constants.riderMass = newMass;
+
+                const p = constants.riderState.power || 0;
+                const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+
+                // Only recompute from power if we're not in direct speed mode and power > 0
+                if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+                    constants.riderState.speed = powerToSpeed({ power: p });
+                }
+                // If power === 0, coasting uses the new mass automatically on the next frame.
+            };
+
+            // Initialize once and then listen for changes
+            updateMassAndMaybeSpeed();
+            riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
+            riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+        }
+    } else {
+        const updateMassAndMaybeSpeed = () => {
+            let newMass;
+            if (sessionStorage.getItem("weight") == null) {
+                newMass = 70;
+            } else {
+                newMass = Number(sessionStorage.getItem("weight").value);
+            }
+            if (!Number.isFinite(newMass)) return;
+            constants.riderMass = newMass;
+
+            const p = constants.riderState.power || 0;
+            const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+
+            // Only recompute from power if we're not in direct speed mode and power > 0
+            if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+                constants.riderState.speed = powerToSpeed({ power: p });
+            }
+            // If power === 0, coasting uses the new mass automatically on the next frame.
+        };
+
+        // Initialize once
+        updateMassAndMaybeSpeed();
+    }
+
   keyboardMode.wKeyDown = false;
   keyboardMode.sKeyDown = false;
   keyboardMode.qKeyDown = false;
@@ -220,14 +291,25 @@ export function initZlowApp({
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
-
-  const connectBtn = getElement("connect-btn");
-  connectBtn.addEventListener("click", async () => {
-    await standardMode.connectTrainer();
-    //const ok = await standardMode.trainer.connect();
-    //if (ok) connectBtn.disabled = true;
-  });
-  standardMode.init();
+    if (sessionStorage.getItem("testMode") == 'true') {
+        const connectBtn = getElement("connect-btn");
+        connectBtn.removeAttribute("hidden");
+        connectBtn.addEventListener("click", async () => {
+            await standardMode.connectTrainer();
+            //const ok = await standardMode.trainer.connect();
+            //if (ok) connectBtn.disabled = true;
+        });
+    } else {
+        if (sessionStorage.getItem("Trainer") !== null) {
+            try {
+                //HOPEFULLY this works
+                standardMode.setTrainer(JSON.parse(sessionStorage.getItem("Trainer")));
+            } catch {
+                console.log("JSON trainer did not work :(");
+            }
+        }
+    }
+    standardMode.init();
   // setup the speed when using an actual trainer
   /*trainer.onData = (data) => {
       if (!keyboardMode.keyboardMode) {

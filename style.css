@@ -4,7 +4,22 @@ body {
     background: #111;
     color: #fff;
 }
-
+.settings {
+    height: 98%;
+    margin: 0;
+}
+#settings {
+    display: -webkit-flex;
+    display: flex;
+    font-size: 1.1em;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 16px;
+    border-radius: 8px;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
 #hud{
     font-size: 1.1em;
     position: absolute;
