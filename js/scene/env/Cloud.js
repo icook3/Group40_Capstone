@@ -3,9 +3,36 @@ export class Cloud {
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
 
+    //DOESN'T ARGUE ABOUT FINDING THE GLB BUT DOESN'T APPEAR TO DO ANYTHING EITHER
+
+    // Load gltf cloud model
+    //const cloudAssets = document.createElement('a-assets');
+    //const cloud1 = document.createElement('a-asset-item');
+    //cloud1.setAttribute('id','cloud1');
+    //cloud1.setAttribute('src','resources/images/cloud1.glb');
+    //cloudAssets.appendChild(cloud1);
+    //console.log(cloudAssets)
+           
+
     // Create a-entity for the clouds and set ID
     const clouds = document.createElement('a-entity');
-    clouds.setAttribute('id','clouds')
+    //clouds.setAttribute('id','clouds');
+
+
+
+    //const cloudTest = document.createElement('a-entity')
+
+    clouds.setAttribute('gltf-model','#cloud1');
+    clouds.setAttribute('position','-10 22 -30');
+    
+    //clouds.appendChild(cloudTest);
+    console.log(clouds);
+
+    sceneEl.appendChild(clouds);
+
+    //gltf-model="#Cabin"
+
+
 
     // Create clouds
     const cloud_dimensions = [
@@ -35,15 +62,15 @@ export class Cloud {
       [11,0.13,80,54,-170]
     ]
 
-    for (let i = 0; i < cloud_dimensions.length; i++) {
-      const circle = document.createElement('a-entity');
-      circle.setAttribute('geometry', `primitive: sphere; radius: ${cloud_dimensions[i][0]}`);
-      circle.setAttribute('material', `color: #fff; opacity: ${cloud_dimensions[i][1]}; transparent: true`);
-      circle.setAttribute('position', `${cloud_dimensions[i][2]} ${cloud_dimensions[i][3]} ${cloud_dimensions[i][4]}`);
-      clouds.appendChild(circle);
-    }
+    //for (let i = 0; i < cloud_dimensions.length; i++) {
+      //const circle = document.createElement('a-entity');
+      //circle.setAttribute('geometry', `primitive: sphere; radius: ${cloud_dimensions[i][0]}`);
+      //circle.setAttribute('material', `color: #fff; opacity: ${cloud_dimensions[i][1]}; transparent: true`);
+      //circle.setAttribute('position', `${cloud_dimensions[i][2]} ${cloud_dimensions[i][3]} ${cloud_dimensions[i][4]}`);
+      //clouds.appendChild(circle);
+    //}
 
     // Add the clouds into the scene
-    sceneEl.appendChild(clouds);
+    //sceneEl.appendChild(clouds);
   }
 }
