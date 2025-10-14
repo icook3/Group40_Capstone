@@ -7,6 +7,7 @@ import { constants } from "./constants.js";
 import { Avatar } from "./avatar.js";
 import { KeyboardMode } from "./keyboardMode.js";
 import { StandardMode } from "./standardMode.js";
+import { simulationState } from "./simulationstate.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -75,6 +76,10 @@ function loop({
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
   const now = Date.now();
+  if (simulationState.isPaused) {
+    requestAnimationFrameFn(() => loop({ getElement, requestAnimationFrameFn }));
+    return;
+  }
   const dt = (now - constants.lastTime) / 1000;
   constants.lastTime = now;
 
@@ -278,6 +283,23 @@ export function initZlowApp({
         // Initialize once
         updateMassAndMaybeSpeed();
     }
+
+  const pauseBtn = getElement('pause-btn');
+  pauseBtn.addEventListener('click', () => {
+    simulationState.isPaused = !simulationState.isPaused;
+    pauseBtn.textContent = simulationState.isPaused ? 'Resume' : 'Pause';
+  });
+
+  const stopBtn = getElement('stop-btn');
+  stopBtn.addEventListener('click', () => {
+    simulationState.isPaused = false;
+    constants.rideHistory = [];
+    constants.historyStartTime = Date.now();
+    constants.lastHistorySecond = null;
+    constants.riderState = { power: 0, speed: 0 };
+    pauseBtn.textContent = 'Pause';
+  });
+
 
   keyboardMode.wKeyDown = false;
   keyboardMode.sKeyDown = false;
