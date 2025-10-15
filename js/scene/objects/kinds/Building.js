@@ -8,7 +8,7 @@ function sampleBuildingX() {
 }
 
 export const BuildingKind = {
-  name: 'building',
+    name: 'building',
   spawn(sceneEl, z) {
     const x = sampleBuildingX();
     const building = Math.random() * 3;
@@ -24,12 +24,15 @@ export const BuildingKind = {
     //old behavior
       //obj.setAttribute('geometry', `primitive: box; width: ${w}; height: ${h}; depth: ${d}`);
       if (Math.round(building) == 1) {
+          obj.setAttribute('zlow-building-type', 'house');
           obj.setAttribute('gltf-model', '#house-obj');
           y = 1.5;
       } else if (Math.round(building) == 2) {
+          obj.setAttribute('zlow-building-type', 'tall-building');
           obj.setAttribute('gltf-model', '#tall-building-obj');
           y = 0.5;
       } else {
+          obj.setAttribute('zlow-building-type', 'wide-building');
           obj.setAttribute('gltf-model', '#wide-building-obj');
           y = 0.5;
       }
