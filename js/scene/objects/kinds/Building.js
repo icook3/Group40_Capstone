@@ -33,9 +33,6 @@ export const BuildingKind = {
     obj.setAttribute('scale', size+" "+size+" "+size);
     const gray = Math.floor(128 + Math.random() * 80);
     //obj.setAttribute('material', `color: rgb(${gray},${gray},${gray})`);
-    if (x > 0) {
-        obj.setAttribute('rotation', '0 180 0');
-    }
     setPos(obj, { x, y, z });
     sceneEl.appendChild(obj);
     return obj;

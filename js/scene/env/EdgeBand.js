@@ -23,7 +23,6 @@ export class EdgeBand {
     const pos = getPos(obj);
     pos.x = x;
     setPos(obj, pos);
-
     this.items.push(obj);
   }
 

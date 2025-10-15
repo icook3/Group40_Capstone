@@ -12,6 +12,11 @@ export function setPos(el, pos) {
     el.object3D.position.set(pos.x, pos.y, pos.z);
   } else {
     el.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+    }
+    if (pos.x > 0) {
+      el.setAttribute('rotation', '0 180 0');
+    } else {
+      el.setAttribute('rotation', '0 0 0');
   }
 }
 

@@ -83,12 +83,10 @@ export class ObjectField {
         // resample X per-kind (keeps trees closer than buildings)
         const kind = this._detectKind(obj);
           pos.x = kind.resampleX();
-          if (pos.x > 0) {
-              
-          }
+
       }
 
-      setPos(obj, pos);
+        setPos(obj, pos);
     }
 
     // Advances the dirt pattern
