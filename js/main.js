@@ -288,6 +288,7 @@ export function initZlowApp({
         updateMassAndMaybeSpeed();
     }
 
+  let savedPacerSpeed = pacer.speed;
   const pauseBtn = getElement('pause-btn');
   pauseBtn.addEventListener('click', () => {
     simulationState.isPaused = !simulationState.isPaused;
@@ -295,10 +296,14 @@ export function initZlowApp({
 
     if (simulationState.isPaused) {
       hud.pause();
+      savedPacerSpeed = pacer.speed;
+      pacer.setSpeed(0); // Stop pacer when paused
+      // start countdown
       countdown.start(() => {
         // auto-resume when hits 0
         simulationState.isPaused = false;
         hud.resume();
+        pacer.setSpeed(savedPacerSpeed);
         pauseBtn.textContent = 'Pause';
       });
     } else {
@@ -306,6 +311,7 @@ export function initZlowApp({
       countdown.cancel();
       hud.resume();
       simulationState.isPaused = false;
+      pacer.setSpeed(savedPacerSpeed);
       pauseBtn.textContent = 'Pause';
     }
   });
@@ -320,6 +326,12 @@ export function initZlowApp({
     constants.riderState = { power: 0, speed: 0 };
     hud.resetWorkOut();
     pauseBtn.textContent = 'Pause';
+
+    // Reset pacer
+    pacer.setSpeed(0);
+    const startPos = { x: 0.5, y: 1, z: -2 };
+    pacer.avatarEntity.setAttribute("position", startPos);
+    constants.pacerStarted = false;
   });
 
 
