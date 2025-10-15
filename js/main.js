@@ -294,14 +294,19 @@ export function initZlowApp({
     pauseBtn.textContent = simulationState.isPaused ? 'Resume' : 'Pause';
 
     if (simulationState.isPaused) {
+      hud.pause();
       countdown.start(() => {
         // auto-resume when hits 0
         simulationState.isPaused = false;
+        hud.resume();
         pauseBtn.textContent = 'Pause';
       });
     } else {
       // manual resume
       countdown.cancel();
+      hud.resume();
+      simulationState.isPaused = false;
+      pauseBtn.textContent = 'Pause';
     }
   });
 
@@ -313,6 +318,7 @@ export function initZlowApp({
     constants.historyStartTime = Date.now();
     constants.lastHistorySecond = null;
     constants.riderState = { power: 0, speed: 0 };
+    hud.resetWorkOut();
     pauseBtn.textContent = 'Pause';
   });
 

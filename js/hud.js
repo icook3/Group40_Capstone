@@ -8,6 +8,37 @@ export class HUD {
     this.startTime = null;
     this.totalDistance = 0;
     this.calories = getElement("calories");
+
+    // Added for pausing
+    this.pausedAtMs = null;
+  }
+
+  pause() {
+    if (this.pausedAtMs === null) {
+      this.pausedAtMs = Date.now();
+    }
+  }
+
+  resume() {
+    if (this.pausedAtMs !== null) {
+      const timeDiff = Date.now() - this.pausedAtMs;
+      this.pausedAtMs = null;
+      this.startTime += timeDiff; // Adjust start time to exclude paused duration
+    }
+  }
+
+  resetWorkOut() {
+    this.startTime = Date.now();
+    this.totalDistance = 0;
+    this.totalPausedMs = 0;
+    this.pausedAtMs = null;
+    
+    // Reset HUD
+    if (this.power) this.power.textContent = "0";
+    if (this.speed) this.speed.textContent = "0.0";
+    if (this.distance) this.distance.textContent = "0.00";
+    if (this.time) this.time.textContent = "00:00";
+    if (this.calories) this.calories.textContent = "0";
   }
 
   update({ power, speed, calories }, dt) {
