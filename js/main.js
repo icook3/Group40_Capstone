@@ -8,6 +8,8 @@ import { Avatar } from "./avatar.js";
 import { KeyboardMode } from "./keyboardMode.js";
 import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
+import { PauseCountdown } from './pause_countdown.js';
+
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -173,6 +175,8 @@ export function initZlowApp({
         }
     }
 
+    const countdown = new PauseCountdown({ getElement, limit: 10 });
+
     rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
     pacer = new Avatar(
         "pacer",
@@ -288,11 +292,23 @@ export function initZlowApp({
   pauseBtn.addEventListener('click', () => {
     simulationState.isPaused = !simulationState.isPaused;
     pauseBtn.textContent = simulationState.isPaused ? 'Resume' : 'Pause';
+
+    if (simulationState.isPaused) {
+      countdown.start(() => {
+        // auto-resume when hits 0
+        simulationState.isPaused = false;
+        pauseBtn.textContent = 'Pause';
+      });
+    } else {
+      // manual resume
+      countdown.cancel();
+    }
   });
 
   const stopBtn = getElement('stop-btn');
   stopBtn.addEventListener('click', () => {
     simulationState.isPaused = false;
+    countdown.cancel();
     constants.rideHistory = [];
     constants.historyStartTime = Date.now();
     constants.lastHistorySecond = null;
