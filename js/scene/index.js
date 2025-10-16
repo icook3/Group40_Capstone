@@ -1,8 +1,8 @@
 import { EdgeBand } from './env/EdgeBand.js';            // your near-trail band
-import { EdgeLineBand } from './env/EdgeLineBand.js';    // NEW true edge band
 import { ObjectField } from './objects/ObjectField.js';
 import { DirtPattern } from './env/DirtPattern.js';
 import { Cloud } from './env/Cloud.js';
+import { SceneryManager } from './env/SceneryManager.js';
 
 export class ZlowScene {
   constructor(_, { getElement = id => document.getElementById(id) } = {}) {
@@ -17,7 +17,7 @@ export class ZlowScene {
 
     // Build bands immediately (no delay)
     this.nearBand = new EdgeBand({ sceneEl: this.scene });     // optional attach
-    this.edgeLine = new EdgeLineBand({ sceneEl: this.scene }); // actual edge
+    this.edgeLine = new SceneryManager({ sceneEl: this.scene }); // actual edge
   }
 
   // Not used outside this class

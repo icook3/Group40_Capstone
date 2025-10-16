@@ -1,4 +1,4 @@
-// js/scene/env/EdgeLineBand.js
+// js/scene/env/SceneryBand.js
 import { getPos, setPos } from '../core/util.js';
 import { TreeKind } from '../objects/kinds/Tree.js';
 import { BuildingKind } from '../objects/kinds/Building.js';
@@ -7,7 +7,7 @@ import { BuildingKind } from '../objects/kinds/Building.js';
  * Static "actual edge" band. Builds once across a Z range.
  * No advance(), no recycle. Pure decoration at the terrain edges.
  */
-export class EdgeLineBand {
+export class SceneryBand {
   constructor({
     sceneEl,
     treeX = 50,        // terrain edge for trees
