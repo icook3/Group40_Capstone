@@ -1,6 +1,6 @@
 ﻿export function initMenuSettings() {
     //Keyboard Mode
-    const keyboardBtn = document.getElementById("keyboard-btn");
+    /*const keyboardBtn = document.getElementById("keyboard-btn");
     keyboardBtn.addEventListener("click", () => {
         let inKeyboardMode = sessionStorage.getItem("isInKeyboardMode");
         if (inKeyboardMode == null) {
@@ -18,11 +18,11 @@
         if (!inKeyboardMode) {
             constants.riderState.speed = 0;
         }
-    });
+    });*/
     //Test Mode
     const testModeBtn = document.getElementById("testMode");
     testModeBtn.addEventListener("click", () => {
-        let inTestMode = sessionStorage.getItem("testMode");
+        let inTestMode = localStorage.getItem("testMode");
         if (inTestMode == null) {
             inTestMode = false;
         } else if (inTestMode == 'false') {
@@ -31,8 +31,11 @@
             inTestMode = true;
         }
         inTestMode = !inTestMode;
-        sessionStorage.setItem("testMode", inTestMode);
+        localStorage.setItem("testMode", inTestMode);
         testModeBtn.textContent = inTestMode ? "Test Mode ON" : "Test Mode";
+        if (!inTestMode) {
+            constants.riderState.speed = 0;
+        }
     });
     //Pacer speed input
     const pacerSpeedInput = document.getElementById("pacer-speed");
