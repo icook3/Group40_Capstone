@@ -23,7 +23,8 @@ export class Cloud {
     //const cloudTest = document.createElement('a-entity')
 
     clouds.setAttribute('gltf-model','#cloud1');
-    clouds.setAttribute('position','-10 22 -30');
+    clouds.setAttribute('position','-10 22 -100');
+
     
     //clouds.appendChild(cloudTest);
     console.log(clouds);
