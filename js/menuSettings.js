@@ -1,4 +1,5 @@
-﻿export function initMenuSettings() {
+﻿import { constants } from './constants.js';
+export function initMenuSettings() {
     //Keyboard Mode
     /*const keyboardBtn = document.getElementById("keyboard-btn");
     keyboardBtn.addEventListener("click", () => {
@@ -32,7 +33,7 @@
         }
         inTestMode = !inTestMode;
         localStorage.setItem("testMode", inTestMode);
-        testModeBtn.textContent = inTestMode ? "Test Mode ON" : "Test Mode";
+        testModeBtn.textContent = inTestMode ? "Test Mode: ON" : "Developer Testing Mode";
         if (!inTestMode) {
             constants.riderState.speed = 0;
         }
