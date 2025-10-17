@@ -7,6 +7,9 @@ import { constants } from "./constants.js";
 import { Avatar } from "./avatar.js";
 import { KeyboardMode } from "./keyboardMode.js";
 import { StandardMode } from "./standardMode.js";
+import { simulationState } from "./simulationstate.js";
+import { PauseCountdown } from './pause_countdown.js';
+
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -75,6 +78,10 @@ function loop({
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
   const now = Date.now();
+  if (simulationState.isPaused) {
+    requestAnimationFrameFn(() => loop({ getElement, requestAnimationFrameFn }));
+    return;
+  }
   const dt = (now - constants.lastTime) / 1000;
   constants.lastTime = now;
 
@@ -167,6 +174,8 @@ export function initZlowApp({
             }
         }
     }
+
+    const countdown = new PauseCountdown({ getElement, limit: 10 });
 
     rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
     pacer = new Avatar(
@@ -278,6 +287,53 @@ export function initZlowApp({
         // Initialize once
         updateMassAndMaybeSpeed();
     }
+
+  let savedPacerSpeed = pacer.speed;
+  const pauseBtn = getElement('pause-btn');
+  pauseBtn.addEventListener('click', () => {
+    simulationState.isPaused = !simulationState.isPaused;
+    pauseBtn.textContent = simulationState.isPaused ? 'Resume' : 'Pause';
+
+    if (simulationState.isPaused) {
+      hud.pause();
+      savedPacerSpeed = pacer.speed;
+      pacer.setSpeed(0); // Stop pacer when paused
+      // start countdown
+      countdown.start(() => {
+        // auto-resume when hits 0
+        simulationState.isPaused = false;
+        hud.resume();
+        pacer.setSpeed(savedPacerSpeed);
+        pauseBtn.textContent = 'Pause';
+      });
+    } else {
+      // manual resume
+      countdown.cancel();
+      hud.resume();
+      simulationState.isPaused = false;
+      pacer.setSpeed(savedPacerSpeed);
+      pauseBtn.textContent = 'Pause';
+    }
+  });
+
+  const stopBtn = getElement('stop-btn');
+  stopBtn.addEventListener('click', () => {
+    simulationState.isPaused = false;
+    countdown.cancel();
+    constants.rideHistory = [];
+    constants.historyStartTime = Date.now();
+    constants.lastHistorySecond = null;
+    constants.riderState = { power: 0, speed: 0 };
+    hud.resetWorkOut();
+    pauseBtn.textContent = 'Pause';
+
+    // Reset pacer
+    pacer.setSpeed(0);
+    const startPos = { x: 0.5, y: 1, z: -2 };
+    pacer.avatarEntity.setAttribute("position", startPos);
+    constants.pacerStarted = false;
+  });
+
 
   keyboardMode.wKeyDown = false;
   keyboardMode.sKeyDown = false;

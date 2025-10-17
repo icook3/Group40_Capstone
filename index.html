@@ -18,6 +18,9 @@
         <button id="pacer-sync-btn">Sync to Pacer</button>
         <button id="calories-reset-btn">Reset Calories</button>
         </br></br>
+        <button id="pause-btn">Pause</button>
+        <button id="stop-btn">Stop</button>
+        </br></br>
         <button id="connect-btn" hidden>Connect Trainer</button>
         <button id="keyboard-btn" hidden>Keyboard Mode</button>
         <div>Power: <span id="power">0</span> W</div>
@@ -35,6 +38,13 @@
         <button id="gpx-btn">Download TCX</button>
         <a href="resources/settings.html"><button id="settings-btn"><img src="resources/images/gear.PNG" width="20" height="20" /></button></a>
     </div>
+
+  <!-- Pause overlay -->
+  <div id="pause-overlay" aria-hidden="true">
+    <div class="pause-dialog">
+      Resuming in <span id="pause-countdown">10</span>…
+    </div>
+  </div>
 
   <!-- Generate starting scene -->
   <a-scene id="scene">

@@ -60,3 +60,28 @@ button {
 button:disabled {
     background: #555;
 }
+
+/* ---- Pause overlay ---- */
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  z-index: 9999;
+  pointer-events: none;       /* allow HUD buttons (Resume) to be clickable */
+}
+
+#pause-overlay .pause-dialog {
+  pointer-events: none;       /* dialog shouldn’t capture clicks either */
+  font-family: system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 96px;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+  padding: 20px 30px;
+  border-radius: 16px;
+}
+
