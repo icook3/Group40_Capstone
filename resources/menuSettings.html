@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" class="settings">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zlow: Browser Cycling Simulator</title>
+    <link rel="stylesheet" type="text/css" href="../style.css?version=1.0">
+    <style>
+        body {
+            background-image: url("images/background.png");
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicons/ZlowFavicon.svg">
+</head>
+<body class="settings">
+
+
+    <div class="settings" id="settings">
+        <div>
+            <label for="pacer-speed">Pacer:</label>
+            <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+            </br></br>
+            <span id="weight">
+                <label for="rider-weight">Weight:</label>
+                <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" style="width:50px;"> kg
+            </span>
+            </br></br>
+            <span>
+                <label for="API-key">Strava API key</label>
+                <input id="API-key" type="text" style="width:50px;" disabled />
+            </span>
+            </br></br>
+            </br></br>
+            <!--These buttons are for testing purposes only-->
+            <button id="clear-btn" onclick="sessionStorage.clear();">Clear settings</button>
+            <button id="testMode">Developer Testing Mode</button>
+        </div>
+        <div class="bottomRight">
+            <a href="./mainMenu.html"><button id="settings-btn"><img src="./images/Gear.png" /></button></a>
+        </div>
+    </div>
+    <script type="module" src="../js/menuSettings.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.initMenuSettings) window.initMenuSettings();
+        });
+    </script>
+</body>
+</html>
