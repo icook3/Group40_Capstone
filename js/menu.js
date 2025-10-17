@@ -1,6 +1,4 @@
-﻿import { constants } from './constants.js';
-import { KeyboardMode } from './keyboardMode.js';
-import { StandardMode } from './standardMode.js';
+﻿import { StandardMode } from './standardMode.js';
 export function initSettings() {
 
     let standardMode = new StandardMode();
