@@ -10,10 +10,18 @@
             background-image: url("images/background.png");
         }
     </style>
+    <link rel="icon" type="image/svg+xml" href="/favicons/ZlowFavicon.svg">
 </head>
 <body class="settings">
+
     <div class="settings" id="settings">
+
         <div>
+            <div>
+                <!--logo-->
+                <h1>Welcome to <img src="favicons/ZlowFavicon.svg" alt="Z" width="30" height="30" />low!</h1>
+            </div>
+            </br>
             <label for="pacer-speed">Pacer:</label>
             <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
             </br></br>
@@ -23,8 +31,14 @@
                 <label for="rider-weight">Weight:</label>
                 <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" style="width:50px;"> kg
             </span>
-            <a href="../index.html"><button id="settings-btn"><img src="images/gear.PNG" width="20" height="20" /></button></a></br></br>
-
+            </br></br>
+            <span>
+                <label for="API-key">Strava API key</label>
+                <input id="API-key" type="text" style="width:50px;" disabled/>
+            </span>
+            </br></br>
+            <a href="../index.html"><button id="settings-btn">Start</button></a>
+            </br></br>
             <!--This button is for testing purposes only - it clears the session storage-->
             <button id="clear-btn" onclick="sessionStorage.clear();">Clear settings</button>
             <button id="testMode">Test Mode</button>
@@ -33,7 +47,6 @@
     <script type="module" src="../js/menu.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            console.log(window.initSettings);
             if (window.initSettings) window.initSettings();
         });
     </script>
