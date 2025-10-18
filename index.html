@@ -1,107 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zlow: Browser Cycling Simulator</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css?version=1.0" />
-    <link rel="stylesheet" href="hud.css" />
-
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/resources/favicons/ZlowFavicon.svg"
-    />
-  </head>
-  <body>
-    <div id="hud-top">
-      <div class="hud-section left">
-        <div class="stat-item">
-          <span id="time" class="stat-value">00:00</span>
-        </div>
-      </div>
-
-      <div class="hud-section center">
-        <div class="stats-row">
-          <div class="stat-item">
-            <div class="stat-value-group">
-              <span id="speed" class="stat-value">0</span>
-              <span class="stat-unit">km/h</span>
-            </div>
-          </div>
-
-          <div class="stat-item">
-            <div class="stat-value-group">
-              <span id="power" class="stat-value">0</span>
-              <span class="stat-unit">W</span>
-            </div>
-          </div>
-
-          <div class="stat-item">
-            <div class="stat-value-group">
-              <span id="distance" class="stat-value">0.00</span>
-              <span class="stat-unit">km</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hud-section right">
-        <div class="stat-item">
-          <div class="stat-value-group">
-            <span id="calories" class="stat-value">0</span>
-            <span class="stat-unit">kcal</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="hud-bottom">
-      <div class="control-buttons">
-        <button
-          id="menu-btn"
-          class="hud-btn"
-          onclick="window.location.href='resources/settings.html'"
-        >
-          Main Menu
-        </button>
-        <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
-        <button id="gpx-btn" class="hud-btn">Download TCX</button>
-        <button id="strava-btn" class="hud-btn" disabled>Export Strava</button>
-      </div>
-    </div>
-
-    <!-- Dev hud - hidden by default -->
-    <div id="dev-controls-hud" hidden>
-      <span id="pacer">
-        <label for="pacer-speed">Pacer:</label>
-        <input
-          id="pacer-speed"
-          type="number"
-          min="5"
-          max="60"
-          value="20"
-          step="1"
-        />
-        km/h
-      </span>
-
-      <span id="weight">
-        <label for="rider-weight">Weight:</label>
-        <input
-          id="rider-weight"
-          type="number"
-          min="40"
-          max="150"
-          value="70"
-          step="1"
-        />
-        kg
-      </span>
-
-      <button id="connect-btn">Connect Trainer</button>
-      <button id="calories-reset-btn">Reset Calories</button>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zlow: Browser Cycling Simulator</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css?version=1.0">
+  <link rel="icon" type="image/svg+xml" href="/resources/favicons/ZlowFavicon.svg">
+</head>
+<body>
+    <div id="hud">
+        <span id="pacer" hidden>
+            <label for="pacer-speed">Pacer:</label>
+            <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
+            <br />
+        </span>
+        <button id="pacer-sync-btn">Sync to Pacer</button>
+        <button id="calories-reset-btn">Reset Calories</button>
+        </br></br>
+        <button id="pause-btn">Pause</button>
+        <button id="stop-btn">Stop</button>
+        </br></br>
+        <button id="connect-btn" hidden>Connect Trainer</button>
+        <button id="keyboard-btn" hidden>Keyboard Mode</button>
+        <div>Power: <span id="power">0</span> W</div>
+        <div>Speed: <span id="speed">0</span> km/h</div>
+        <div>Distance: <span id="distance">0.00</span> km</div>
+        <div>Time: <span id="time">00:00</span></div>
+        <div>Calories: <span id="calories">0</span> kcal</div>
+        
+        <span id="weight" hidden>
+            </br>
+            <label for="rider-weight">Weight:</label>
+            <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" style="width:50px;"> kg</br>
+        </span>
+        <button id="strava-btn" disabled>Export to Strava</button>
+        <button id="gpx-btn">Download TCX</button>
+        <a href="resources/mainMenu.html"><button id="settings-btn"><img src="resources/images/Gear.PNG" width="20" height="20" /></button></a>
     </div>
 
     <!-- Pause overlay -->
