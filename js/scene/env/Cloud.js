@@ -3,75 +3,93 @@ export class Cloud {
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
 
-    //DOESN'T ARGUE ABOUT FINDING THE GLB BUT DOESN'T APPEAR TO DO ANYTHING EITHER
-
-    // Load gltf cloud model
-    //const cloudAssets = document.createElement('a-assets');
-    //const cloud1 = document.createElement('a-asset-item');
-    //cloud1.setAttribute('id','cloud1');
-    //cloud1.setAttribute('src','resources/images/cloud1.glb');
-    //cloudAssets.appendChild(cloud1);
-    //console.log(cloudAssets)
-           
+    // BASIC STANDARDS:
+    // Zone 1: z = 0 through -120; y = 20 through 100; x = 190 through -190
+    // Zone 2: z = -121 through -240; y = 20 through 200; x = 400 through -400
+    // Zone 3: z = -141 through -360; y = 30 through 300; x = 345 through -345
+    // A Zone 4 could be included, but one can't spawn very far off the track before the cloud disppears
 
     // Create a-entity for the clouds and set ID
     const clouds = document.createElement('a-entity');
-    //clouds.setAttribute('id','clouds');
+    clouds.setAttribute('id','clouds');
 
+    // Spawn clouds in zones 1-3
+    for (let i = 0; i < 15; i++) {
+      clouds.appendChild(spawnCloud(1));
+    }
 
+    for (let i = 0; i < 10; i++) {
+      clouds.appendChild(spawnCloud(2));
+      clouds.appendChild(spawnCloud(3));
+    }
 
-    //const cloudTest = document.createElement('a-entity')
-
-    clouds.setAttribute('gltf-model','#cloud1');
-    clouds.setAttribute('position','-10 22 -100');
-
-    
-    //clouds.appendChild(cloudTest);
-    console.log(clouds);
-
+    // Add clouds to scene
     sceneEl.appendChild(clouds);
-
-    //gltf-model="#Cabin"
-
-
-
-    // Create clouds
-    const cloud_dimensions = [
-      [7,0.7,-40,22,-120],
-      [5,0.6,-32,23,-110],
-      [6,0.65,-36,21,-130],
-      [8,0.7,35,24,-140],
-      [6,0.6,42,23,-150],
-      [5,0.5,38,25,-135],
-      [4,0.5,0,28,-160],
-      [6,0.6,-10,26,-170],
-      [18,0.55,-70,22,-60],
-      [12,0.5,-85,25,-75],
-      [10,0.45,-60,20,-45],
-      [17,0.55,70,23,-65],
-      [13,0.5,85,26,-80],
-      [11,0.45,60,21,-50],
-      [10,0.35,-25,38,-70],
-      [8,0.32,25,40,-80],
-      [12,0.3,0,42,-90],
-      [7,0.28,-50,36,-100],
-      [9,0.3,50,37,-110],
-      [18,0.18,-60,55,-180],
-      [15,0.15,60,58,-200],
-      [20,0.12,0,60,-220],
-      [13,0.14,-80,53,-160],
-      [11,0.13,80,54,-170]
-    ]
-
-    //for (let i = 0; i < cloud_dimensions.length; i++) {
-      //const circle = document.createElement('a-entity');
-      //circle.setAttribute('geometry', `primitive: sphere; radius: ${cloud_dimensions[i][0]}`);
-      //circle.setAttribute('material', `color: #fff; opacity: ${cloud_dimensions[i][1]}; transparent: true`);
-      //circle.setAttribute('position', `${cloud_dimensions[i][2]} ${cloud_dimensions[i][3]} ${cloud_dimensions[i][4]}`);
-      //clouds.appendChild(circle);
-    //}
-
-    // Add the clouds into the scene
-    //sceneEl.appendChild(clouds);
   }
 }
+
+// Spawn a single cloud based on input provided
+function spawnCloud(zone) {
+  let maxX;
+  let minX;
+  let maxY;
+  let minY;
+  let maxZ;
+  let minZ;
+
+  // Establish minima and maxima for the relevant zone
+  if (zone === 1) {
+    minX = 0;
+    maxX = 190;
+    minY = 20;
+    maxY = 80;
+    minZ = 20;
+    maxZ = 120;
+  }
+  
+  else if (zone === 2) {
+    minX = 0;
+    maxX = 400;
+    minY = 20;
+    maxY = 150;
+    minZ = 121;
+    maxZ = 240;
+  }
+
+  else if (zone === 3) {
+    minX = 0;
+    maxX = 345;
+    minY = 30;
+    maxY = 170;
+    minZ = 141;
+    maxZ = 360;
+  }
+
+  // Get x and determine sign
+  let cloudX;
+  if (getSign()) {
+    cloudX = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+  }
+
+  else {
+    cloudX = -(Math.floor(Math.random() * (maxX - minX + 1)) + minX);
+  }
+
+  // Get y
+  let cloudY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+
+  //Get z and multiply by -1
+  let cloudZ = -(Math.floor(Math.random() * (maxZ - minZ + 1)) + minZ);
+
+  // Create a-entity, set attributes, and return to caller
+  const cloud = document.createElement('a-entity')
+  cloud.setAttribute('gltf-model','#cloud1');
+  cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
+  return cloud;
+}
+
+// Decide whether the number should be positive or negative
+function getSign() {
+    let randomNo = Math.floor(Math.random() * 10);
+    return randomNo % 2 === 0;
+  }
