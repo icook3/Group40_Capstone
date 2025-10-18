@@ -10,31 +10,39 @@
             background-image: url("images/background.png");
         }
     </style>
+    <link rel="icon" type="image/svg+xml" href="./favicons/ZlowFavicon.svg">
 </head>
 <body class="settings">
+
+
     <div class="settings" id="settings">
         <div>
             <label for="pacer-speed">Pacer:</label>
             <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1"> km/h
             </br></br>
-            <button id="connect-btn">Connect Trainer</button>
-            <button id="keyboard-btn">Keyboard Mode</button></br>
             <span id="weight">
                 <label for="rider-weight">Weight:</label>
                 <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" style="width:50px;"> kg
             </span>
-            <a href="../index.html"><button id="settings-btn"><img src="images/gear.PNG" width="20" height="20" /></button></a></br></br>
-
-            <!--This button is for testing purposes only - it clears the session storage-->
+            </br></br>
+            <span>
+                <label for="API-key">Strava API key</label>
+                <input id="API-key" type="text" style="width:50px;" disabled />
+            </span>
+            </br></br>
+            </br></br>
+            <!--These buttons are for testing purposes only-->
             <button id="clear-btn" onclick="sessionStorage.clear();">Clear settings</button>
-            <button id="testMode">Test Mode</button>
+            <button id="testMode">Developer Testing Mode</button>
+        </div>
+        <div class="bottomRight">
+            <a href="./mainMenu.html"><button id="settings-btn"><img src="./images/Gear.png" width="200" height="200" /></button></a>
         </div>
     </div>
-    <script type="module" src="../js/settings.js"></script>
+    <script type="module" src="../js/menuSettings.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            console.log(window.initSettings);
-            if (window.initSettings) window.initSettings();
+            if (window.initMenuSettings) window.initMenuSettings();
         });
     </script>
 </body>

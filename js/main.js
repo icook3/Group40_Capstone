@@ -128,10 +128,10 @@ function loop({
   }
 
     hud.update(constants.riderState, dt);
-    if (sessionStorage.getItem("isInKeyboardMode") == null) {
-        sessionStorage.setItem("isInKeyboardMode", false);
+    if (localStorage.getItem("testMode") == null) {
+        localStorage.setItem("testMode", false);
     }
-    if (sessionStorage.getItem("isInKeyboardMode") == 'false') {
+    if (localStorage.getItem("testMode") == 'false') {
         keyboardMode.keyboardMode = false;
     } else {
         keyboardMode.keyboardMode = true;
@@ -162,7 +162,7 @@ export function initZlowApp({
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
     // get the needed objects
-    if (sessionStorage.getItem("testMode") !== 'true') {
+    if (localStorage.getItem("testMode") !== 'true') {
         const trainer = new TrainerBluetooth();
     } else {
         if (sessionStorage.getItem("Trainer") !== null) {
@@ -170,7 +170,7 @@ export function initZlowApp({
                 //HOPEFULLY this works
                 const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
             } catch {
-                console.log("JSON trainer did not work :(");
+                console.log("JSON trainer did not work. This will need reworking :(");
             }
         }
     }
@@ -187,7 +187,7 @@ export function initZlowApp({
     );
     keyboardMode = new KeyboardMode();
     standardMode = new StandardMode();
-    if (sessionStorage.getItem("testMode") == 'true') {
+    if (localStorage.getItem("testMode") == 'true') {
         const pacerSpeedInput = getElement("pacer-speed");
         getElement("pacer").removeAttribute("hidden");
         scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
@@ -223,22 +223,22 @@ export function initZlowApp({
   //Pacer speed control input
     //Rider state and history
     if (sessionStorage.getItem("testMode") == 'true') {
-        const keyboardBtn = getElement("keyboard-btn");
+        /*const keyboardBtn = getElement("keyboard-btn");
         keyboardBtn.removeAttribute("hidden");
         keyboardBtn.addEventListener("click", () => {
             keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
             sessionStorage.setItem("isInKeyboardMode", keyboardMode.keyboardMode);
             keyboardBtn.textContent = keyboardMode.keyboardMode
                 ? keyboardMode.keyboardOnText
-                : "Keyboard Mode";
+                : "Keyboard Mode";*/
             if (!keyboardMode.keyboardMode) {
                 constants.riderState.speed = 0;
             }
-        });
+        //});
     }
 
 
-    if (sessionStorage.getItem("testMode") == 'true') {
+    if (localStorage.getItem("testMode") == 'true') {
         getElement("weight").removeAttribute("hidden");
         // Hook up live mass updates → optional immediate speed recompute
         const riderWeightEl = getElement("rider-weight");
@@ -347,7 +347,7 @@ export function initZlowApp({
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
-    if (sessionStorage.getItem("testMode") == 'true') {
+    if (localStorage.getItem("testMode") == 'true') {
         const connectBtn = getElement("connect-btn");
         connectBtn.removeAttribute("hidden");
         connectBtn.addEventListener("click", async () => {
@@ -361,7 +361,7 @@ export function initZlowApp({
                 //HOPEFULLY this works
                 standardMode.setTrainer(JSON.parse(sessionStorage.getItem("Trainer")));
             } catch {
-                console.log("JSON trainer did not work :(");
+                console.log("JSON trainer did not work. This will need reworking :(");
             }
         }
     }
