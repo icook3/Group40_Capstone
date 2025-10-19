@@ -30,7 +30,7 @@
 
   padding: 20px 0 10px;
 
-  /* Frosted glass blur effect, can remove if needed */
+  /* Blur effect, can remove if needed */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 
@@ -188,6 +188,7 @@
   font-size: 7em;
   margin: -20px 0;
 }
+
 /* Power unit size */
 .stats-row .stat-item:nth-child(2) .stat-unit {
   font-size: 2em;
@@ -219,9 +220,11 @@
 
   padding: 15px;
   border-radius: 30px;
+
+  width: 180px;
 }
 
-/* Stack text vertically */
+/* Stack buttons vertically */
 .control-buttons {
   display: flex;
   flex-direction: column;
@@ -237,7 +240,6 @@
 
   /* Font style */
   font-family: "Nunito", sans-serif;
-  font-weight: 400;
   font-size: 1em;
   color: rgb(220, 229, 222);
 
@@ -249,8 +251,6 @@
   outline: none;
 
   cursor: pointer;
-
-  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0));
 }
 
 .hud-btn:focus {
@@ -264,10 +264,128 @@
   background: none;
 }
 
-/* Button icon style (used for settings icon) */
-.hud-btn img {
-  vertical-align: middle;
-  filter: brightness(0) saturate(100%) invert(88%) sepia(13%) saturate(716%)
-    hue-rotate(108deg) brightness(95%) contrast(89%)
-    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+/* ========================================
+   Dev hud section
+   ======================================== */
+#dev-controls-panel {
+  position: fixed;
+  bottom: 290px;
+  left: 20px;
+  z-index: 1000;
+
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+
+  width: 180px;
+
+  /* Stack controls vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* "DEV Mode" title */
+#dev-controls-panel::before {
+  content: "DEV Mode";
+  color: rgb(220, 229, 222);
+  font-family: "Fugaz One", sans-serif;
+  font-size: 1em;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* Style for dev items */
+#dev-controls-panel #pacer,
+#dev-controls-panel #weight {
+  color: rgb(220, 229, 222);
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Style for input fields */
+#dev-controls-panel #pacer-speed,
+#dev-controls-panel #rider-weight {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid rgba(220, 229, 222, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  color: rgb(220, 229, 222);
+  border-radius: 8px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95em;
+}
+
+#dev-controls-panel #pacer-speed:focus,
+#dev-controls-panel #rider-weight:focus {
+  outline: none;
+  border-color: rgba(220, 229, 222, 0.6);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Style dev mode buttons */
+#dev-controls-panel #connect-btn,
+#dev-controls-panel #calories-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+
+  /* Dev buttons font */
+  font-family: "Nunito", sans-serif;
+  font-weight: 400;
+  font-size: 1em;
+  color: rgb(220, 229, 222);
+
+  padding: 8px 12px;
+
+  /* Remove default style */
+  background: none;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+}
+
+#dev-controls-panel #connect-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: none;
+}
+
+#dev-controls-panel #connect-btn:focus,
+#dev-controls-panel #calories-reset-btn:focus {
+  outline: none;
+}
+
+/* ========================================
+   Pause overlay style
+   ======================================== */
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#pause-overlay .pause-dialog {
+  pointer-events: none;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 96px;
+  color: rgb(220, 229, 222);
 }

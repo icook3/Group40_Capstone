@@ -60,16 +60,11 @@
     <div id="hud-bottom">
       <div class="control-buttons">
         <button
-          id="settings-btn"
+          id="menu-btn"
           class="hud-btn"
           onclick="window.location.href='resources/settings.html'"
         >
-          <img
-            src="resources/images/gear.PNG"
-            width="20"
-            height="20"
-            alt="Settings"
-          />Settings
+          Main Menu
         </button>
         <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
         <button id="gpx-btn" class="hud-btn">Download TCX</button>
@@ -77,14 +72,37 @@
       </div>
     </div>
 
-    <!-- Hidden elements -->
-    <!-- Hidden elements for JavaScript compatibility -->
-    <span id="pacer" hidden></span>
-    <span id="weight" hidden></span>
-    <input id="pacer-speed" type="hidden" value="20" />
-    <input id="rider-weight" type="hidden" value="70" />
-    <button id="connect-btn" hidden>Connect Trainer</button>
-    <button id="calories-reset-btn" hidden>Reset Calories</button>
+    <!-- Developer mode controls panel - hidden by default -->
+    <div id="dev-controls-panel" hidden>
+      <span id="pacer">
+        <label for="pacer-speed">Pacer:</label>
+        <input
+          id="pacer-speed"
+          type="number"
+          min="5"
+          max="60"
+          value="20"
+          step="1"
+        />
+        km/h
+      </span>
+
+      <span id="weight">
+        <label for="rider-weight">Weight:</label>
+        <input
+          id="rider-weight"
+          type="number"
+          min="40"
+          max="150"
+          value="70"
+          step="1"
+        />
+        kg
+      </span>
+
+      <button id="connect-btn">Connect Trainer</button>
+      <button id="calories-reset-btn">Reset Calories</button>
+    </div>
 
     <!-- Pause overlay -->
     <div id="pause-overlay" aria-hidden="true">
