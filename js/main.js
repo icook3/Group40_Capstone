@@ -115,6 +115,7 @@ function loop({
 
   //Update Avatar and Pacer
   rider.setSpeed(constants.riderState.speed);
+  rider.setPower(constants.riderState.power);
   rider.update(dt);
   if (constants.pacerStarted) {
     pacer.update(dt);
