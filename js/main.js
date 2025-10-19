@@ -8,8 +8,7 @@ import { Avatar } from "./avatar.js";
 import { KeyboardMode } from "./keyboardMode.js";
 import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
-import { PauseCountdown } from './pause_countdown.js';
-
+import { PauseCountdown } from "./pause_countdown.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -79,7 +78,9 @@ function loop({
 } = {}) {
   const now = Date.now();
   if (simulationState.isPaused) {
-    requestAnimationFrameFn(() => loop({ getElement, requestAnimationFrameFn }));
+    requestAnimationFrameFn(() =>
+      loop({ getElement, requestAnimationFrameFn })
+    );
     return;
   }
   const dt = (now - constants.lastTime) / 1000;
@@ -128,10 +129,10 @@ function loop({
   }
 
   hud.update(constants.riderState, dt);
-  if (sessionStorage.getItem("isInKeyboardMode") == null) {
-    sessionStorage.setItem("isInKeyboardMode", false);
+  if (localStorage.getItem("testMode") == null) {
+    localStorage.setItem("testMode", false);
   }
-  if (sessionStorage.getItem("isInKeyboardMode") == "false") {
+  if (localStorage.getItem("testMode") == "false") {
     keyboardMode.keyboardMode = false;
   } else {
     keyboardMode.keyboardMode = true;
@@ -162,7 +163,7 @@ export function initZlowApp({
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
   // get the needed objects
-  if (sessionStorage.getItem("testMode") !== "true") {
+  if (localStorage.getItem("testMode") !== "true") {
     const trainer = new TrainerBluetooth();
   } else {
     if (sessionStorage.getItem("Trainer") !== null) {
@@ -170,16 +171,18 @@ export function initZlowApp({
         //HOPEFULLY this works
         const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
       } catch {
-        console.log("JSON trainer did not work :(");
+        console.log("JSON trainer did not work. This will need reworking :(");
       }
     }
   }
+
+  const countdown = new PauseCountdown({ getElement, limit: 10 });
 
   rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
   pacer = new Avatar("pacer", "#fa0", { x: 0.5, y: 1, z: -2 }, undefined, true);
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
-  if (sessionStorage.getItem("testMode") == "true") {
+  if (localStorage.getItem("testMode") == "true") {
     const pacerSpeedInput = getElement("pacer-speed");
     getElement("pacer").removeAttribute("hidden");
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
@@ -207,6 +210,24 @@ export function initZlowApp({
       pacer.setSpeed(val);
     }
   }
+    pacer.setSpeed(Number(pacerSpeedInput.value));
+    pacerSpeedInput.addEventListener("input", () => {
+      const val = Number(pacerSpeedInput.value);
+      pacer.setSpeed(val);
+    });
+  } else {
+    if (sessionStorage.getItem("PacerSpeed") !== null) {
+      const val = Number(sessionStorage.getItem("PacerSpeed"));
+      scene = new ZlowScene(val, { getElement });
+      // scene.setPacerSpeed(val);
+      pacer.setSpeed(val);
+    } else {
+      const val = 20;
+      scene = new ZlowScene(val, { getElement });
+      //scene.setPacerSpeed(val);
+      pacer.setSpeed(val);
+    }
+  }
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
@@ -215,21 +236,21 @@ export function initZlowApp({
   //Pacer speed control input
   //Rider state and history
   if (sessionStorage.getItem("testMode") == "true") {
-    const keyboardBtn = getElement("keyboard-btn");
-    keyboardBtn.removeAttribute("hidden");
-    keyboardBtn.addEventListener("click", () => {
-      keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
-      sessionStorage.setItem("isInKeyboardMode", keyboardMode.keyboardMode);
-      keyboardBtn.textContent = keyboardMode.keyboardMode
-        ? keyboardMode.keyboardOnText
-        : "Keyboard Mode";
-      if (!keyboardMode.keyboardMode) {
-        constants.riderState.speed = 0;
-      }
-    });
+    /*const keyboardBtn = getElement("keyboard-btn");
+        keyboardBtn.removeAttribute("hidden");
+        keyboardBtn.addEventListener("click", () => {
+            keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
+            sessionStorage.setItem("isInKeyboardMode", keyboardMode.keyboardMode);
+            keyboardBtn.textContent = keyboardMode.keyboardMode
+                ? keyboardMode.keyboardOnText
+                : "Keyboard Mode";*/
+    if (!keyboardMode.keyboardMode) {
+      constants.riderState.speed = 0;
+    }
+    //});
   }
 
-  if (sessionStorage.getItem("testMode") == "true") {
+  if (localStorage.getItem("testMode") == "true") {
     getElement("weight").removeAttribute("hidden");
     // Hook up live mass updates → optional immediate speed recompute
     const riderWeightEl = getElement("rider-weight");
@@ -241,7 +262,15 @@ export function initZlowApp({
 
         const p = constants.riderState.power || 0;
         const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+        const p = constants.riderState.power || 0;
+        const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
+        // Only recompute from power if we're not in direct speed mode and power > 0
+        if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+          constants.riderState.speed = powerToSpeed({ power: p });
+        }
+        // If power === 0, coasting uses the new mass automatically on the next frame.
+      };
         // Only recompute from power if we're not in direct speed mode and power > 0
         if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
           constants.riderState.speed = powerToSpeed({ power: p });
@@ -264,10 +293,33 @@ export function initZlowApp({
       }
       if (!Number.isFinite(newMass)) return;
       constants.riderMass = newMass;
+      // Initialize once and then listen for changes
+      updateMassAndMaybeSpeed();
+      riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
+      riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+    }
+  } else {
+    const updateMassAndMaybeSpeed = () => {
+      let newMass;
+      if (sessionStorage.getItem("weight") == null) {
+        newMass = 70;
+      } else {
+        newMass = Number(sessionStorage.getItem("weight").value);
+      }
+      if (!Number.isFinite(newMass)) return;
+      constants.riderMass = newMass;
 
       const p = constants.riderState.power || 0;
       const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
+      const p = constants.riderState.power || 0;
+      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
+      // Only recompute from power if we're not in direct speed mode and power > 0
+      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
+        constants.riderState.speed = powerToSpeed({ power: p });
+      }
+      // If power === 0, coasting uses the new mass automatically on the next frame.
+    };
       // Only recompute from power if we're not in direct speed mode and power > 0
       if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
         constants.riderState.speed = powerToSpeed({ power: p });
@@ -278,6 +330,52 @@ export function initZlowApp({
     // Initialize once
     updateMassAndMaybeSpeed();
   }
+
+  let savedPacerSpeed = pacer.speed;
+  const pauseBtn = getElement("pause-btn");
+  pauseBtn.addEventListener("click", () => {
+    simulationState.isPaused = !simulationState.isPaused;
+    pauseBtn.textContent = simulationState.isPaused ? "Resume" : "Pause";
+
+    if (simulationState.isPaused) {
+      hud.pause();
+      savedPacerSpeed = pacer.speed;
+      pacer.setSpeed(0); // Stop pacer when paused
+      // start countdown
+      countdown.start(() => {
+        // auto-resume when hits 0
+        simulationState.isPaused = false;
+        hud.resume();
+        pacer.setSpeed(savedPacerSpeed);
+        pauseBtn.textContent = "Pause";
+      });
+    } else {
+      // manual resume
+      countdown.cancel();
+      hud.resume();
+      simulationState.isPaused = false;
+      pacer.setSpeed(savedPacerSpeed);
+      pauseBtn.textContent = "Pause";
+    }
+  });
+
+  const stopBtn = getElement("stop-btn");
+  stopBtn.addEventListener("click", () => {
+    simulationState.isPaused = false;
+    countdown.cancel();
+    constants.rideHistory = [];
+    constants.historyStartTime = Date.now();
+    constants.lastHistorySecond = null;
+    constants.riderState = { power: 0, speed: 0 };
+    hud.resetWorkOut();
+    pauseBtn.textContent = "Pause";
+
+    // Reset pacer
+    pacer.setSpeed(0);
+    const startPos = { x: 0.5, y: 1, z: -2 };
+    pacer.avatarEntity.setAttribute("position", startPos);
+    constants.pacerStarted = false;
+  });
 
   keyboardMode.wKeyDown = false;
   keyboardMode.sKeyDown = false;
@@ -291,7 +389,7 @@ export function initZlowApp({
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
-  if (sessionStorage.getItem("testMode") == "true") {
+  if (localStorage.getItem("testMode") == "true") {
     const connectBtn = getElement("connect-btn");
     connectBtn.removeAttribute("hidden");
     connectBtn.addEventListener("click", async () => {
@@ -305,7 +403,7 @@ export function initZlowApp({
         //HOPEFULLY this works
         standardMode.setTrainer(JSON.parse(sessionStorage.getItem("Trainer")));
       } catch {
-        console.log("JSON trainer did not work :(");
+        console.log("JSON trainer did not work. This will need reworking :(");
       }
     }
   }
@@ -391,8 +489,13 @@ if (typeof window !== "undefined") {
 
 // Switching icons for darkmode
 const darkMode = window.matchMedia("(prefers-color-scheme: dark)");
+const darkMode = window.matchMedia("(prefers-color-scheme: dark)");
 
 function updateFavicon() {
+  const favicon = document.querySelector('link[rel="icon"]');
+  if (!favicon) {
+    return;
+  }
   const favicon = document.querySelector('link[rel="icon"]');
   if (!favicon) {
     return;
@@ -403,9 +506,15 @@ function updateFavicon() {
   } else {
     favicon.href = "/resources/favicons/ZlowFavicon.svg";
   }
+  if (darkMode.matches) {
+    favicon.href = "/resources/favicons/ZlowFavicon-dark.svg";
+  } else {
+    favicon.href = "/resources/favicons/ZlowFavicon.svg";
+  }
 }
 
 updateFavicon();
+darkMode.addEventListener("change", updateFavicon);
 darkMode.addEventListener("change", updateFavicon);
 
 /**
