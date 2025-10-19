@@ -10,6 +10,9 @@ export class Avatar {
         this.power = 0;
         this.avatarEntity = this.createEntity();
 
+        //GLB Model
+        this.personModel = null;
+
         //GLB Bike
         this.bikeModel = null;
         this.frontWheel = null;
@@ -27,6 +30,13 @@ export class Avatar {
         avatar.setAttribute('id', this.id);
         avatar.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
         avatar.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
+
+        const personModel = document.createElement('a-entity');
+        personModel.setAttribute('gltf-model', '#maleGLB');
+        personModel.setAttribute('position', '0 0 0');
+        personModel.setAttribute('rotation', '0 -90 0');
+        personModel.setAttribute('scale', '0.5 0.5 0.5');
+        avatar.appendChild(personModel);
 
         const bikeModel = document.createElement('a-entity');
         bikeModel.setAttribute('gltf-model', '#bikeGLB');
