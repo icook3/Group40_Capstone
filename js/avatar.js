@@ -7,7 +7,15 @@ export class Avatar {
         this.speed = 0;
         this.power = 0;
         this.avatarEntity = this.createEntity();
+
+        //GLB Bike
         this.bikeModel = null;
+        this.frontWheel = null;
+        this.rearWheel = null;
+        this.bikeFrontFrame = null;
+        this.bikeFrame = null;
+        this.bikeGrips = null;
+        this.bikeSeat = null;
     }
 
     //Creates avatar entity
@@ -23,7 +31,19 @@ export class Avatar {
         bikeModel.setAttribute('rotation', '0 -90 0');
         bikeModel.setAttribute('scale', '0.5 0.5 0.5');
         avatar.appendChild(bikeModel);
+
+        //Assign bike and assign bike parts
         this.bikeModel = bikeModel;
+        bikeModel.addEventListener('model-loaded', (e) => {
+            const model = e.detail.model; //Three.js root of GLB
+            this.rearWheel = model.getObjectByName("RearTire");
+            this.frontWheel = model.getObjectByName("FrontTire");
+            this.bikeFrontFrame = model.getObjectByName("FrontFrame");
+            this.bikeFrame = model.getObjectByName("Frame");
+            this.bikeGrips = model.getObjectByName("Grips");
+            this.bikeSeat = model.getObjectByName("Seat")
+        });
+
 
         document.querySelector('a-scene').appendChild(avatar);
         return avatar;
