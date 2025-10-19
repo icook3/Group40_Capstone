@@ -137,6 +137,7 @@ function loop({
   } else {
     keyboardMode.keyboardMode = true;
   }
+
   const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
   if (constants.lastHistorySecond !== thisSecond) {
     constants.rideHistory.push({
@@ -182,9 +183,19 @@ export function initZlowApp({
   pacer = new Avatar("pacer", "#fa0", { x: 0.5, y: 1, z: -2 }, undefined, true);
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
+
+  // Show/hide dev hud based on testMode
+  const devHud = getElement("dev-controls-panel");
+  if (devHud) {
+    if (localStorage.getItem("testMode") == "true") {
+      devHud.removeAttribute("hidden");
+    } else {
+      devHud.setAttribute("hidden", "");
+    }
+  }
+
   if (localStorage.getItem("testMode") == "true") {
     const pacerSpeedInput = getElement("pacer-speed");
-    getElement("pacer").removeAttribute("hidden");
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
@@ -233,7 +244,6 @@ export function initZlowApp({
   }
 
   if (localStorage.getItem("testMode") == "true") {
-    getElement("weight").removeAttribute("hidden");
     // Hook up live mass updates → optional immediate speed recompute
     const riderWeightEl = getElement("rider-weight");
     if (riderWeightEl) {
@@ -342,7 +352,6 @@ export function initZlowApp({
   });
   if (localStorage.getItem("testMode") == "true") {
     const connectBtn = getElement("connect-btn");
-    connectBtn.removeAttribute("hidden");
     connectBtn.addEventListener("click", async () => {
       await standardMode.connectTrainer();
       //const ok = await standardMode.trainer.connect();
