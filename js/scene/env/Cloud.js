@@ -83,7 +83,13 @@ function spawnCloud(zone) {
 
   // Create a-entity, set attributes, and return to caller
   const cloud = document.createElement('a-entity')
-  cloud.setAttribute('gltf-model','#cloud1');
+
+  // Decide what kind of cloud to create and set position -- CURRENTLY AT 2
+  let cloudType = "cloud" + (Math.floor(Math.random() * (2)) + 1);
+  console.log(cloudType)
+
+
+  cloud.setAttribute('gltf-model',`#${cloudType}`);
   cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
   return cloud;
 }
