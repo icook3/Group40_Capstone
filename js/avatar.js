@@ -1,3 +1,5 @@
+import {powerToSpeed} from "./main.js";
+
 export class Avatar {
     constructor(id, color = '#0af', position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, isPacer = false) {
         this.id = id;
@@ -16,6 +18,7 @@ export class Avatar {
         this.bikeFrame = null;
         this.bikeGrips = null;
         this.bikeSeat = null;
+        this.bikePedals = null;
     }
 
     //Creates avatar entity
@@ -42,6 +45,17 @@ export class Avatar {
             this.bikeFrame = model.getObjectByName("Frame");
             this.bikeGrips = model.getObjectByName("Grips");
             this.bikeSeat = model.getObjectByName("Seat")
+            this.bikePedals = model.getObjectByName("Pedals")
+
+            //Assign bike bones
+            model.traverse((child) => {
+                if (child.isSkinnedMesh && child.skeleton) {
+                    const bikeSkeleton = child.skeleton;
+                    this.leftPedalBone = bikeSkeleton.getBoneByName("b_leftPedal");
+                    this.rightPedalBone = bikeSkeleton.getBoneByName("b_rightPedal");
+                    this.pedalCrankBone = bikeSkeleton.getBoneByName("b_pedalcrank");
+                }
+            });
         });
 
 
@@ -64,5 +78,41 @@ export class Avatar {
             return;
         }
 
+        //variables for frequency 1.5 Hz at 30 km/h, scale with speed
+        const baseSpeed = 30; //km/h
+        const baseFreqHz = 1.5; //Hz at 30 km/h
+        const angularSpeedAdjuster = baseFreqHz * 2 * Math.PI;
+
+        //Rotate wheels if loaded
+        if (this.rearWheel && this.frontWheel) {
+            const angularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.37
+            const wheelRotationAmount = angularSpeed * dt;
+            this.rearWheel.rotation.x -= wheelRotationAmount;
+            this.frontWheel.rotation.x -= wheelRotationAmount;
+        }
+
+        //Rotate crank and pedals
+        if (this.leftPedalBone && this.rightPedalBone && this.pedalCrankBone) {
+            if (this.id === "pacer") {
+                //Rotate crank
+                const pacerCrankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
+                const pacerCrankRotationAmount = pacerCrankAngularSpeed * dt;
+                this.pedalCrankBone.rotation.x -= pacerCrankRotationAmount;
+
+                //Rotate pedals
+                this.leftPedalBone.rotation.y = this.pedalCrankBone.rotation.x;
+                this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
+            } else {
+                //Rotate crank
+                const speedKmh = powerToSpeed({power: this.power});
+                const crankAngularSpeed = ((speedKmh * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
+                const crankRotationAmount = crankAngularSpeed * dt;
+                this.pedalCrankBone.rotation.x -= crankRotationAmount;
+
+                //Rotate pedals
+                this.leftPedalBone.rotation.y = this.pedalCrankBone.rotation.x;
+                this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
+            }
+        }
     }
 }
