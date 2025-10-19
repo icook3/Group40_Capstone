@@ -12,6 +12,39 @@ export class Avatar {
 
         //GLB Model
         this.personModel = null;
+        this.personBody = null;
+        //Spine
+        this.spine = null;
+        this.spine1 = null;
+        this.spine2 = null;
+        this.spine3 = null;
+        this.spine4 = null;
+        this.spine5 = null;
+        this.spine6 = null;
+        //Left Side
+        this.leftBreast = null;
+        this.leftShoulder = null;
+        this.leftUpperArm = null;
+        this.leftForearm = null;
+        this.leftHand = null;
+        this.leftPelvis = null;
+        this.leftThigh = null;
+        this.leftShin = null;
+        this.leftFoot = null;
+        this.leftToe = null;
+        this.leftHeel = null;
+        //Right Side
+        this.rightBreast = null;
+        this.rightShoulder = null;
+        this.rightUpperArm = null;
+        this.rightForearm = null;
+        this.rightHand = null;
+        this.rightPelvis = null;
+        this.rightThigh = null;
+        this.rightShin = null;
+        this.rightFoot = null;
+        this.rightToe = null;
+        this.rightHeel = null;
 
         //GLB Bike
         this.bikeModel = null;
@@ -22,6 +55,9 @@ export class Avatar {
         this.bikeGrips = null;
         this.bikeSeat = null;
         this.bikePedals = null;
+        this.leftPedalBone = null;
+        this.rightPedalBone = null;
+        this.pedalCrankBone = null;
     }
 
     //Creates avatar entity
@@ -37,6 +73,52 @@ export class Avatar {
         personModel.setAttribute('rotation', '0 -90 0');
         personModel.setAttribute('scale', '0.5 0.5 0.5');
         avatar.appendChild(personModel);
+
+        //Assign person and person bones
+        this.personModel = personModel;
+        personModel.addEventListener('model-loaded', (e) => {
+            const model = e.detail.model;
+            this.personBody = model.getObjectByName("Body")
+
+            //Assign Bones
+            model.traverse((child) => {
+                if (child.isSkinnedMesh && child.skeleton) {
+                    const personSkeleton = child.skeleton;
+                    //Spine
+                    this.spine = personSkeleton.getBoneByName("spine");
+                    this.spine1 = personSkeleton.getBoneByName("spine.001");
+                    this.spine2 = personSkeleton.getBoneByName("spine.002");
+                    this.spine3 = personSkeleton.getBoneByName("spine.003");
+                    this.spine4 = personSkeleton.getBoneByName("spine.004");
+                    this.spine5 = personSkeleton.getBoneByName("spine.005");
+                    this.spine6 = personSkeleton.getBoneByName("spine.006");
+                    //Left Side
+                    this.leftBreast = personSkeleton.getBoneByName("breast.L");
+                    this.leftShoulder = personSkeleton.getBoneByName("shoulder.L");
+                    this.leftUpperArm = personSkeleton.getBoneByName("upper_arm.L");
+                    this.leftForearm = personSkeleton.getBoneByName("forearm.L");
+                    this.leftHand = personSkeleton.getBoneByName("hand.L");
+                    this.leftPelvis = personSkeleton.getBoneByName("pelvis.L");
+                    this.leftThigh = personSkeleton.getBoneByName("thigh.L");
+                    this.leftShin = personSkeleton.getBoneByName("shin.L");
+                    this.leftFoot = personSkeleton.getBoneByName("foot.L");
+                    this.leftToe = personSkeleton.getBoneByName("toe.L");
+                    this.leftHeel = personSkeleton.getBoneByName("heel.02.L");
+                    //Right Side
+                    this.rightBreast = personSkeleton.getBoneByName("breast.R");
+                    this.rightShoulder = personSkeleton.getBoneByName("shoulder.R");
+                    this.rightUpperArm = personSkeleton.getBoneByName("upper_arm.R");
+                    this.rightForearm = personSkeleton.getBoneByName("forearm.R");
+                    this.rightHand = personSkeleton.getBoneByName("hand.R");
+                    this.rightPelvis = personSkeleton.getBoneByName("pelvis.R");
+                    this.rightThigh = personSkeleton.getBoneByName("thigh.R");
+                    this.rightShin = personSkeleton.getBoneByName("shin.R");
+                    this.rightFoot = personSkeleton.getBoneByName("foot.R");
+                    this.rightToe = personSkeleton.getBoneByName("toe.R");
+                    this.rightHeel = personSkeleton.getBoneByName("heel.02.R");
+                }
+            })
+        });
 
         const bikeModel = document.createElement('a-entity');
         bikeModel.setAttribute('gltf-model', '#bikeGLB');
