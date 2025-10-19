@@ -267,7 +267,7 @@
 /* ========================================
    Dev hud section
    ======================================== */
-#dev-controls-panel {
+#dev-controls-hud {
   position: fixed;
   bottom: 290px;
   left: 20px;
@@ -286,8 +286,12 @@
   gap: 8px;
 }
 
+/* Hide when hidden attribute is on */
+#dev-controls-hud[hidden] {
+  display: none;
+}
 /* "DEV Mode" title */
-#dev-controls-panel::before {
+#dev-controls-hud::before {
   content: "DEV Mode";
   color: rgb(220, 229, 222);
   font-family: "Fugaz One", sans-serif;
@@ -298,8 +302,8 @@
 }
 
 /* Style for dev items */
-#dev-controls-panel #pacer,
-#dev-controls-panel #weight {
+#dev-controls-hud #pacer,
+#dev-controls-hud #weight {
   color: rgb(220, 229, 222);
   font-family: "Nunito", sans-serif;
   font-size: 1em;
@@ -313,8 +317,8 @@
 }
 
 /* Style for input fields */
-#dev-controls-panel #pacer-speed,
-#dev-controls-panel #rider-weight {
+#dev-controls-hud #pacer-speed,
+#dev-controls-hud #rider-weight {
   width: 60px;
   padding: 6px 8px;
   border: 1px solid rgba(220, 229, 222, 0.3);
@@ -325,16 +329,16 @@
   font-size: 0.95em;
 }
 
-#dev-controls-panel #pacer-speed:focus,
-#dev-controls-panel #rider-weight:focus {
+#dev-controls-hud #pacer-speed:focus,
+#dev-controls-hud #rider-weight:focus {
   outline: none;
   border-color: rgba(220, 229, 222, 0.6);
   background: rgba(0, 0, 0, 0.3);
 }
 
 /* Style dev mode buttons */
-#dev-controls-panel #connect-btn,
-#dev-controls-panel #calories-reset-btn {
+#dev-controls-hud #connect-btn,
+#dev-controls-hud #calories-reset-btn {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -357,14 +361,14 @@
   cursor: pointer;
 }
 
-#dev-controls-panel #connect-btn:disabled {
+#dev-controls-hud #connect-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background: none;
 }
 
-#dev-controls-panel #connect-btn:focus,
-#dev-controls-panel #calories-reset-btn:focus {
+#dev-controls-hud #connect-btn:focus,
+#dev-controls-hud #calories-reset-btn:focus {
   outline: none;
 }
 
@@ -386,6 +390,6 @@
   pointer-events: none;
   font-family: "Nunito", sans-serif;
   font-weight: 600;
-  font-size: 96px;
+  font-size: 50px;
   color: rgb(220, 229, 222);
 }

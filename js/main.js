@@ -185,13 +185,20 @@ export function initZlowApp({
   standardMode = new StandardMode();
 
   // Show/hide dev hud based on testMode
-  const devHud = getElement("dev-controls-panel");
+  console.log("testMode value:", localStorage.getItem("testMode"));
+  const devHud = getElement("dev-controls-hud");
+  console.log("devHud element found:", devHud);
+
   if (devHud) {
-    if (localStorage.getItem("testMode") == "true") {
+    if (localStorage.getItem("testMode") === "true") {
+      console.log("Removing hidden attribute");
       devHud.removeAttribute("hidden");
     } else {
+      console.log("Adding hidden attribute");
       devHud.setAttribute("hidden", "");
     }
+  } else {
+    console.log("ERROR: dev-controls-panel element not found!");
   }
 
   if (localStorage.getItem("testMode") == "true") {
