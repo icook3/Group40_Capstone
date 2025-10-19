@@ -1,0 +1,273 @@
+/* ========================================
+   Custom font imports
+   ======================================== */
+@font-face {
+  font-family: "Fugaz One";
+  src: url("../resources/fonts/FugazOne-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("../resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+/* ========================================
+   Top HUD - time [speed - power - distance] calories
+   ======================================== */
+#hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  /* 3-column grid: left (time), center (speed/power/distance), right (calories) */
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+
+  padding: 20px 0 10px;
+
+  /* Frosted glass blur effect, can remove if needed */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  z-index: 1000;
+}
+
+.hud-section {
+  display: flex;
+  align-items: center;
+}
+
+/* ========================================
+   Left section - time
+   ======================================== */
+.hud-section.left {
+  justify-content: flex-start;
+  padding-left: 100px;
+  font-size: 1.5em;
+}
+
+/* Time text style */
+.hud-section.left .stat-value,
+.hud-section.left .stat-label {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Container for time element with icon */
+.hud-section.left .stat-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Time icon to the left of label */
+.hud-section.left .stat-item::before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  background-image: url("../resources/images/time.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ========================================
+   Center section - speed-power-distance
+   ======================================== */
+.hud-section.center {
+  justify-content: center;
+  overflow: visible;
+}
+
+/* ========================================
+   Right section - calories
+   ======================================== */
+.hud-section.right {
+  justify-content: flex-end;
+  padding-right: 100px;
+  font-size: 1.5em;
+}
+
+/* Calories text style */
+.hud-section.right .stat-value,
+.hud-section.right .stat-unit {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Container for calories element with icon */
+.hud-section.right .stat-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Calories icon to the left of text */
+.hud-section.right .stat-item::before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  background-image: url("../resources/images/calories.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ========================================
+   Center section - HUD background shape
+   ======================================== */
+.stats-row {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+
+  /* Gradient background */
+  background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
+  padding: 15px 100px;
+
+  /* Custom SVG shape mask */
+  mask: url("../resources/images/center-hud.svg") no-repeat center / 100% 100%;
+  -webkit-mask: url("../resources/images/center-hud.svg") no-repeat center /
+    100% 100%;
+}
+
+/* Individual container (speed, power, distance) */
+.stat-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Groups values with units */
+.stat-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* ========================================
+   Text style for all top values
+   ======================================== */
+/* Base font */
+#hud-top .stat-label,
+#hud-top .stat-value,
+#hud-top .stat-unit {
+  font-family: "Fugaz One", sans-serif;
+}
+
+/* Speed and distance text colors */
+.stats-row .stat-item:nth-child(1) .stat-label,
+.stats-row .stat-item:nth-child(1) .stat-value,
+.stats-row .stat-item:nth-child(1) .stat-unit,
+.stats-row .stat-item:nth-child(3) .stat-label,
+.stats-row .stat-item:nth-child(3) .stat-value,
+.stats-row .stat-item:nth-child(3) .stat-unit {
+  color: #4d78a9;
+}
+
+/* Power text color */
+.stats-row .stat-item:nth-child(2) .stat-label,
+.stats-row .stat-item:nth-child(2) .stat-value,
+.stats-row .stat-item:nth-child(2) .stat-unit {
+  color: white;
+}
+
+/* Power text size */
+.stats-row .stat-item:nth-child(2) .stat-value {
+  font-size: 7em;
+  margin: -20px 0;
+}
+/* Power unit size */
+.stats-row .stat-item:nth-child(2) .stat-unit {
+  font-size: 2em;
+}
+
+/* Speed/distance value text size */
+.stats-row .stat-item:nth-child(1) .stat-value,
+.stats-row .stat-item:nth-child(3) .stat-value {
+  font-size: 2em;
+}
+
+/* Speed/distance unit text size */
+.stats-row .stat-item:nth-child(1) .stat-unit,
+.stats-row .stat-item:nth-child(3) .stat-unit {
+  font-size: 1em;
+}
+
+/* ========================================
+   Bottom part of HUD
+   ======================================== */
+#hud-bottom {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+
+  /* Background color */
+  background: rgb(53, 72, 79);
+
+  padding: 15px;
+  border-radius: 30px;
+}
+
+/* Stack text vertically */
+.control-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+/* Style for bottom buttons */
+.hud-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+
+  /* Font style */
+  font-family: "Nunito", sans-serif;
+  font-weight: 400;
+  font-size: 1em;
+  color: rgb(220, 229, 222);
+
+  padding: 8px 12px;
+
+  /* Remove default style */
+  background: none;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0));
+}
+
+.hud-btn:focus {
+  outline: none;
+}
+
+/* Style for disabled buttons*/
+.hud-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: none;
+}
+
+/* Button icon style (used for settings icon) */
+.hud-btn img {
+  vertical-align: middle;
+  filter: brightness(0) saturate(100%) invert(88%) sepia(13%) saturate(716%)
+    hue-rotate(108deg) brightness(95%) contrast(89%)
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
