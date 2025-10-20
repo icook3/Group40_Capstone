@@ -12,15 +12,15 @@ export class Avatar {
 
         //GLB Model
         this.personModel = null;
-        this.personBody = null;
+        this.personRig = null;
         //Spine
-        this.spine = null;
-        this.spine1 = null;
-        this.spine2 = null;
-        this.spine3 = null;
-        this.spine4 = null;
-        this.spine5 = null;
-        this.spine6 = null;
+        this.spine = null; //low back
+        this.spine1 = null; //Mid-low back
+        this.spine2 = null; //Mid back
+        this.spine3 = null; //Upper Back
+        this.spine4 = null; //Lower Neck
+        this.spine5 = null; //Upper Neck
+        this.spine6 = null; //Head
         //Left Side
         this.leftBreast = null;
         this.leftShoulder = null;
@@ -67,6 +67,7 @@ export class Avatar {
         avatar.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
         avatar.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
 
+        //Create Person
         const personModel = document.createElement('a-entity');
         personModel.setAttribute('gltf-model', '#maleGLB');
         personModel.setAttribute('position', '0 0 0');
@@ -78,7 +79,7 @@ export class Avatar {
         this.personModel = personModel;
         personModel.addEventListener('model-loaded', (e) => {
             const model = e.detail.model;
-            this.personBody = model.getObjectByName("Body")
+            this.personRig = model.getObjectByName("metalrig")
 
             //Assign Bones
             model.traverse((child) => {
@@ -86,40 +87,43 @@ export class Avatar {
                     const personSkeleton = child.skeleton;
                     //Spine
                     this.spine = personSkeleton.getBoneByName("spine");
-                    this.spine1 = personSkeleton.getBoneByName("spine.001");
-                    this.spine2 = personSkeleton.getBoneByName("spine.002");
-                    this.spine3 = personSkeleton.getBoneByName("spine.003");
-                    this.spine4 = personSkeleton.getBoneByName("spine.004");
-                    this.spine5 = personSkeleton.getBoneByName("spine.005");
-                    this.spine6 = personSkeleton.getBoneByName("spine.006");
+                    this.spine1 = personSkeleton.getBoneByName("spine001");
+                    this.spine2 = personSkeleton.getBoneByName("spine002");
+                    this.spine3 = personSkeleton.getBoneByName("spine003");
+                    this.spine4 = personSkeleton.getBoneByName("spine004");
+                    this.spine5 = personSkeleton.getBoneByName("spine005");
+                    this.spine6 = personSkeleton.getBoneByName("spine006");
                     //Left Side
-                    this.leftBreast = personSkeleton.getBoneByName("breast.L");
-                    this.leftShoulder = personSkeleton.getBoneByName("shoulder.L");
-                    this.leftUpperArm = personSkeleton.getBoneByName("upper_arm.L");
-                    this.leftForearm = personSkeleton.getBoneByName("forearm.L");
-                    this.leftHand = personSkeleton.getBoneByName("hand.L");
-                    this.leftPelvis = personSkeleton.getBoneByName("pelvis.L");
-                    this.leftThigh = personSkeleton.getBoneByName("thigh.L");
-                    this.leftShin = personSkeleton.getBoneByName("shin.L");
-                    this.leftFoot = personSkeleton.getBoneByName("foot.L");
-                    this.leftToe = personSkeleton.getBoneByName("toe.L");
-                    this.leftHeel = personSkeleton.getBoneByName("heel.02.L");
+                    this.leftBreast = personSkeleton.getBoneByName("breastL");
+                    this.leftShoulder = personSkeleton.getBoneByName("shoulderL");
+                    this.leftUpperArm = personSkeleton.getBoneByName("upper_armL");
+                    this.leftForearm = personSkeleton.getBoneByName("forearmL");
+                    this.leftHand = personSkeleton.getBoneByName("handL");
+                    this.leftPelvis = personSkeleton.getBoneByName("pelvisL");
+                    this.leftThigh = personSkeleton.getBoneByName("thighL");
+                    this.leftShin = personSkeleton.getBoneByName("shinL");
+                    this.leftFoot = personSkeleton.getBoneByName("footL");
+                    this.leftToe = personSkeleton.getBoneByName("toeL");
+                    this.leftHeel = personSkeleton.getBoneByName("heel02L");
                     //Right Side
-                    this.rightBreast = personSkeleton.getBoneByName("breast.R");
-                    this.rightShoulder = personSkeleton.getBoneByName("shoulder.R");
-                    this.rightUpperArm = personSkeleton.getBoneByName("upper_arm.R");
-                    this.rightForearm = personSkeleton.getBoneByName("forearm.R");
-                    this.rightHand = personSkeleton.getBoneByName("hand.R");
-                    this.rightPelvis = personSkeleton.getBoneByName("pelvis.R");
-                    this.rightThigh = personSkeleton.getBoneByName("thigh.R");
-                    this.rightShin = personSkeleton.getBoneByName("shin.R");
-                    this.rightFoot = personSkeleton.getBoneByName("foot.R");
-                    this.rightToe = personSkeleton.getBoneByName("toe.R");
-                    this.rightHeel = personSkeleton.getBoneByName("heel.02.R");
+                    this.rightBreast = personSkeleton.getBoneByName("breastR");
+                    this.rightShoulder = personSkeleton.getBoneByName("shoulderR");
+                    this.rightUpperArm = personSkeleton.getBoneByName("upper_armR");
+                    this.rightForearm = personSkeleton.getBoneByName("forearmR");
+                    this.rightHand = personSkeleton.getBoneByName("handR");
+                    this.rightPelvis = personSkeleton.getBoneByName("pelvisR");
+                    this.rightThigh = personSkeleton.getBoneByName("thighR");
+                    this.rightShin = personSkeleton.getBoneByName("shinR");
+                    this.rightFoot = personSkeleton.getBoneByName("footR");
+                    this.rightToe = personSkeleton.getBoneByName("toeR");
+                    this.rightHeel = personSkeleton.getBoneByName("heel02R");
+
+                    this.setInitialPose();
                 }
-            })
+            });
         });
 
+        //Create bike
         const bikeModel = document.createElement('a-entity');
         bikeModel.setAttribute('gltf-model', '#bikeGLB');
         bikeModel.setAttribute('position', '0 0 0');
@@ -153,6 +157,51 @@ export class Avatar {
 
         document.querySelector('a-scene').appendChild(avatar);
         return avatar;
+    }
+
+    setInitialPose () {
+        const pi = Math.PI;
+
+        //Spine
+        this.spine1.rotation.x = pi / 20;
+        this.spine2.rotation.x = 11 * pi / 90;
+        this.spine3.rotation.x = pi / 20;
+        this.spine4.rotation.x = -2 * pi / 15;
+        this.spine5.rotation.x = pi / 60;
+        this.spine6.rotation.x = -pi / 12;
+
+        //Arms
+        this.rightShoulder.rotation.y = pi / 8;
+        this.rightUpperArm.rotation.x = pi / 3;
+        this.rightUpperArm.rotation.y = -pi / 4;
+        this.rightUpperArm.rotation.z = pi / 2;
+        this.rightForearm.rotation.x = 2.1 * pi / 5;
+        this.rightForearm.rotation.z = -pi / 20;
+        this.rightHand.rotation.x = pi / 10;
+        this.rightHand.rotation.y = -pi / 15;
+
+        this.leftShoulder.rotation.y = -pi / 8;
+        this.leftUpperArm.rotation.x = pi / 3;
+        this.leftUpperArm.rotation.y = pi / 4;
+        this.leftUpperArm.rotation.z = -pi / 2;
+        this.leftForearm.rotation.x = 2.1 * pi / 5;
+        this.leftForearm.rotation.z = pi / 20;
+        this.leftHand.rotation.x = pi / 10;
+        this.leftHand.rotation.y = pi / 15;
+
+        //Legs
+        this.rightThigh.rotation.z = pi / 15;
+        this.rightThigh.rotation.x = 3 * pi / 4;
+        this.rightShin.rotation.z = -pi / 20;
+        this.rightShin.rotation.x = pi / 4;
+        this.rightFoot.rotation.x = -pi / 8;
+
+        //Legs
+        this.leftThigh.rotation.z = -pi / 15;
+        this.leftThigh.rotation.x =  pi / 2;
+        this.leftShin.rotation.z = 0;
+        this.leftShin.rotation.x = 13 * pi / 20;
+        this.leftFoot.rotation.x = -pi / 6;
     }
 
     //Setter for avatar speed
