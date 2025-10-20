@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="settings">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zlow: Browser Cycling Simulator</title>
+    <link rel="stylesheet" type="text/css" href="../style.css?version=1.0">
+    <style>
+        body {
+            background-image: url("images/background.png");
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicons/ZlowFavicon.svg">
+</head>
+<body class="settings">
+
+    <div class="settings" id="settings">
+        <div>
+            <div>
+                <!--logo-->
+                <h1>Welcome to <img src="favicons/ZlowFavicon.svg" alt="Z" width="30" height="30" />low!</h1>
+            </div>
+            <button id="connect-btn">Connect Trainer</button>
+            <a href="../index.html"><button id="start-btn">Start</button></a>
+        </div>
+        <div class="bottomRight">
+            <a href="./menuSettings.html"><button id="settings-btn"><img src="./images/Gear.png" width="200" height="200"/></button></a>
+        </div>
+    </div>
+    <script type="module" src="../js/menu.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.initSettings) window.initSettings();
+        });
+    </script>
+</body>
+</html>
