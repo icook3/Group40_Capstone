@@ -192,33 +192,51 @@ export class Avatar {
         //Legs
         this.rightThigh.rotation.z = pi / 15;
         this.rightThigh.rotation.x = 3 * pi / 4;
-        this.rightShin.rotation.z = -pi / 20;
         this.rightShin.rotation.x = pi / 4;
+        this.rightShin.rotation.z = -pi / 20;
         this.rightFoot.rotation.x = -pi / 8;
 
         //Legs
         this.leftThigh.rotation.z = -pi / 15;
         this.leftThigh.rotation.x =  pi / 2;
-        this.leftShin.rotation.z = 0;
         this.leftShin.rotation.x = 13 * pi / 20;
+        this.leftShin.rotation.z = -pi / 90;
         this.leftFoot.rotation.x = -pi / 6;
     }
 
-    //Setter for avatar speed
-    setSpeed(speed) {
-        this.speed = speed;
+    //Helper to interpolate smoothly between A and B
+    cycleInterpolate (a, b, phase) {
+        return a + (1 - Math.cos(phase)) * 0.5 * (b - a);
     }
 
-    //Setter for avatar power
-    setPower(power) {
-        this.power = power;
+    animatePedalingPerson (dt) {
+        const pi = Math.PI;
+
+        // se the crank rotation as the driving phase
+        const crankAngle = this.pedalCrankBone.rotation.x;
+
+        //Base pose angles from setInitialPose()
+        const baseRightThighX = 3 * pi / 4;
+        const baseLeftThighX = pi / 2;
+        const baseRightShinX = pi / 4;
+        const baseLeftShinX = 13 * pi / 20;
+        const baseRightFootX = -pi / 8;
+        const baseLeftFootX = -pi / 6;
+
+        // Right leg transitions between its own base and the *left leg’s* base
+        this.rightThigh.rotation.x = this.cycleInterpolate(baseRightThighX, baseLeftThighX, crankAngle);
+        this.rightShin.rotation.x  = this.cycleInterpolate(baseRightShinX,  baseLeftShinX,  crankAngle);
+        this.rightFoot.rotation.x  = this.cycleInterpolate(baseRightFootX,  baseLeftFootX,  crankAngle);
+
+        // Left leg transitions in opposite phase
+        this.leftThigh.rotation.x = this.cycleInterpolate(baseLeftThighX, baseRightThighX, crankAngle);
+        this.leftShin.rotation.x  = this.cycleInterpolate(baseLeftShinX,  baseRightShinX,  crankAngle);
+        this.leftFoot.rotation.x  = this.cycleInterpolate(baseLeftFootX,  baseRightFootX,  crankAngle);
     }
 
-    update(dt) {
-        if (this.speed === 0) {
-            return;
-        }
 
+
+    animatePedalingBike(dt) {
         //variables for frequency 1.5 Hz at 30 km/h, scale with speed
         const baseSpeed = 30; //km/h
         const baseFreqHz = 1.5; //Hz at 30 km/h
@@ -255,5 +273,23 @@ export class Avatar {
                 this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
             }
         }
+    }
+
+    //Setter for avatar speed
+    setSpeed(speed) {
+        this.speed = speed;
+    }
+
+    //Setter for avatar power
+    setPower(power) {
+        this.power = power;
+    }
+
+    update(dt) {
+        if (this.speed === 0) {
+            return;
+        }
+        this.animatePedalingBike(dt);
+        this.animatePedalingPerson(dt)
     }
 }
