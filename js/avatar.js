@@ -223,15 +223,27 @@ export class Avatar {
         const baseRightFootX = -pi / 8;
         const baseLeftFootX = -pi / 6;
 
-        // Right leg transitions between its own base and the *left leg’s* base
-        this.rightThigh.rotation.x = this.cycleInterpolate(baseRightThighX, baseLeftThighX, crankAngle);
-        this.rightShin.rotation.x  = this.cycleInterpolate(baseRightShinX,  baseLeftShinX,  crankAngle);
-        this.rightFoot.rotation.x  = this.cycleInterpolate(baseRightFootX,  baseLeftFootX,  crankAngle);
+        const thighForwardSwing = 0.1;
+        const shinForwardSwing = 0.3;
+        const footForwardSwing = 0.25;
 
-        // Left leg transitions in opposite phase
-        this.leftThigh.rotation.x = this.cycleInterpolate(baseLeftThighX, baseRightThighX, crankAngle);
-        this.leftShin.rotation.x  = this.cycleInterpolate(baseLeftShinX,  baseRightShinX,  crankAngle);
-        this.leftFoot.rotation.x  = this.cycleInterpolate(baseLeftFootX,  baseRightFootX,  crankAngle);
+        //Right leg transitions between its own base and the left leg’s base
+        this.rightThigh.rotation.x = this.cycleInterpolate(baseRightThighX, baseLeftThighX, crankAngle)
+            + Math.sin(crankAngle + Math.PI) * thighForwardSwing;
+        this.rightShin.rotation.z = this.cycleInterpolate(-10 * pi / 200, pi / 180, crankAngle);
+        this.rightShin.rotation.x  = this.cycleInterpolate(baseRightShinX,  baseLeftShinX,  crankAngle)
+            + Math.sin(crankAngle + Math.PI) * shinForwardSwing;
+        this.rightFoot.rotation.x  = this.cycleInterpolate(baseRightFootX,  baseLeftFootX,  crankAngle)
+            + Math.sin(crankAngle + Math.PI) * footForwardSwing;
+
+        //Left leg transitions in opposite phase
+        this.leftThigh.rotation.x = this.cycleInterpolate(baseLeftThighX, baseRightThighX, crankAngle)
+            + Math.sin(crankAngle) * thighForwardSwing;
+        this.leftShin.rotation.z = this.cycleInterpolate(pi / 200, 12 * pi / 200, crankAngle);
+        this.leftShin.rotation.x  = this.cycleInterpolate(baseLeftShinX,  baseRightShinX,  crankAngle)
+            + Math.sin(crankAngle) * shinForwardSwing;
+        this.leftFoot.rotation.x  = this.cycleInterpolate(baseLeftFootX,  baseRightFootX,  crankAngle)
+            + Math.sin(crankAngle) * footForwardSwing;
     }
 
 
