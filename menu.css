@@ -1,0 +1,19 @@
+.center-item {
+    left: 40%;
+}
+/*
+    Welcome message
+*/
+#welcome-msg {
+    position: fixed;
+    top: 10%;
+    width: 100%;
+}
+/*
+    Start Button
+*/
+#start-btn {
+    position: fixed;
+    top: 50%;
+    font-size:xx-large;
+}
