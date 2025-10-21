@@ -18,10 +18,13 @@
     
     <button id="start-btn" class="stats-row center-item" onclick="window.location.href='../index.html'">Start</button>
 
-
-    <button id="connect-btn">Connect Trainer</button>
-    <button id="settings-btn" onclick="window.location.href='./menuSettings.html'"><img src="./images/Gear.png" width="200" height="200" /></button>
-
+    <div id="menu-bottom">
+        <div class="control-buttons">
+            <button id="connect-btn" class="hud-btn">Connect Trainer</button>
+            <button id="customize-btn" class="hud-btn" disabled>Customize Character</button> <!--TODO-->
+            <button id="settings-btn" class="hud-btn" onclick="window.location.href='./menuSettings.html'">Settings Page</button>
+        </div>
+    </div>
     <script type="module" src="../js/menu.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
