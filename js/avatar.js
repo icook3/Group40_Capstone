@@ -72,7 +72,7 @@ export class Avatar {
         personModel.setAttribute('gltf-model', '#maleGLB');
         personModel.setAttribute('position', '0 0 0');
         personModel.setAttribute('rotation', '0 -90 0');
-        personModel.setAttribute('scale', '0.5 0.5 0.5');
+        personModel.setAttribute('scale', '0.35 0.35 0.35');
         avatar.appendChild(personModel);
 
         //Assign person and person bones
@@ -128,7 +128,7 @@ export class Avatar {
         bikeModel.setAttribute('gltf-model', '#bikeGLB');
         bikeModel.setAttribute('position', '0 0 0');
         bikeModel.setAttribute('rotation', '0 -90 0');
-        bikeModel.setAttribute('scale', '0.5 0.5 0.5');
+        bikeModel.setAttribute('scale', '0.35 0.35 0.35');
         avatar.appendChild(bikeModel);
 
         //Assign bike and assign bike parts
