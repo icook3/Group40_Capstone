@@ -2,30 +2,35 @@ export class Cloud {
 
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
-
+    
     // Zone 1: z = 0 through -120; y = 20 through 100; x = 190 through -190
     // Zone 2: z = -121 through -240; y = 20 through 200; x = 400 through -400
     // Zone 3: z = -141 through -360; y = 30 through 300; x = 345 through -345
     // A Zone 4 could be included, but one can't spawn very far off the track before the cloud disppears at z < -360
 
     // Create a-entity for the clouds and set ID
-    const clouds = document.createElement('a-entity');
-    clouds.setAttribute('id','clouds');
+    this.clouds = document.createElement('a-entity');
+    this.clouds.setAttribute('id','clouds');
 
     // Spawn clouds in zones 1-3
     for (let i = 0; i < 15; i++) {
-      clouds.appendChild(spawnCloud(1));
+      this.clouds.appendChild(spawnCloud(1));
     }
 
     for (let i = 0; i < 10; i++) {
-      clouds.appendChild(spawnCloud(2));
-      clouds.appendChild(spawnCloud(3));
+      this.clouds.appendChild(spawnCloud(2));
+      this.clouds.appendChild(spawnCloud(3));
     }
 
     // Add clouds to scene
-    sceneEl.appendChild(clouds);
+    sceneEl.appendChild(this.clouds);
+
+    // Create an array with all currently spawned cloud objects in it
+    this.cloudArray = Array.from(clouds.children);
   }
 }
+
+//export const getClouds = Array.from(this.clouds);
 
 // Spawn a single cloud based on input provided
 function spawnCloud(zone) {
@@ -96,4 +101,7 @@ function getSign() {
     return randomNo % 2 === 0;
   }
 
-  // Advance clouds according to equation governing percieved speed from the ground
+  // Advance clouds at 10-30 MPH
+  export function advanceClouds() {
+    console.log("HERE");
+  }

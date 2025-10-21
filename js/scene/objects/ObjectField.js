@@ -5,11 +5,13 @@
 
 import { getPos, setPos } from '../core/util.js';
 import { KINDS, kindsByName } from './kinds/index.js';
+import { advanceClouds } from '../env/Cloud.js';
 
 export class ObjectField {
-  constructor({ sceneEl, dirtPattern }) {
+  constructor({ sceneEl, dirtPattern, clouds }) {
     this.sceneEl = sceneEl;
     this.dirtPattern = dirtPattern;
+    this.clouds = clouds;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
@@ -88,6 +90,14 @@ export class ObjectField {
 
       setPos(obj, pos);
     }
+
+    // Advance clouds
+    // CAN SEE THIS
+    //console.log(this.clouds.cloudArray)
+
+    // Calls back to Cloud successfully
+    // YOU NEED TO DEFINE THE SPEED AS A CONST BACK DURING THE CLOUDS SETUP. ALSO DIRECTION
+    console.log(advanceClouds())
 
     // Advances the dirt pattern
     if (this.dirtPattern?.patternEl) {
