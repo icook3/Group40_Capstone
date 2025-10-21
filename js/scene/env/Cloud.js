@@ -6,7 +6,7 @@ export class Cloud {
     // Zone 1: z = 0 through -120; y = 20 through 100; x = 190 through -190
     // Zone 2: z = -121 through -240; y = 20 through 200; x = 400 through -400
     // Zone 3: z = -141 through -360; y = 30 through 300; x = 345 through -345
-    // A Zone 4 could be included, but one can't spawn very far off the track before the cloud disppears
+    // A Zone 4 could be included, but one can't spawn very far off the track before the cloud disppears at z < -360
 
     // Create a-entity for the clouds and set ID
     const clouds = document.createElement('a-entity');
@@ -95,3 +95,5 @@ function getSign() {
     let randomNo = Math.floor(Math.random() * 10);
     return randomNo % 2 === 0;
   }
+
+  // Advance clouds according to equation governing percieved speed from the ground
