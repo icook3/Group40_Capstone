@@ -7,12 +7,13 @@ import { getPos, setPos } from '../core/util.js';
 import { KINDS, kindsByName } from './kinds/index.js';
 
 export class ObjectField {
-  constructor({ sceneEl, dirtPattern }) {
+  constructor({ sceneEl, dirtPattern, policy }) {
     this.sceneEl = sceneEl;
     this.dirtPattern = dirtPattern;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
+    this.policy = policy;
 
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];

@@ -9,15 +9,33 @@ export class ZlowScene {
     this.scene = getElement('scene');
     this.worldZ = 0;
     this.objectsLoaded = false;
-
-    // Generate a new object field, track, and clouds
-    this.dirtPattern = new DirtPattern({ sceneEl: this.scene });
-    this.objectField = new ObjectField({ sceneEl: this.scene, dirtPattern: this.dirtPattern });
-    this.clouds = new Cloud({ sceneEl: this.scene });
+    this.DEBUG_BANDS = false; // set to true to log default policy once
 
     // Build bands immediately (no delay)
     this.nearBand = new EdgeBand({ sceneEl: this.scene });     // optional attach
-    this.edgeLine = new SceneryManager({ sceneEl: this.scene }); // actual edge
+    this.scenery = new SceneryManager({ sceneEl: this.scene }); // actual edge
+
+    // --- Optional one-time debug log ---
+    if (this.DEBUG_BANDS) {
+      const p = this.scenery.defaultPolicy;
+      const { start, end } = p.zRange();
+      console.group("[bands] DefaultPolicy");
+      console.log("zRange", { start, end });
+      console.log("spacing", p.spacing());
+      console.log("density", p.density());
+      console.log("jitterX", p.jitterX());
+      console.log("mix", p.mix());
+      console.groupEnd();
+    }
+
+    // Generate a new object field, track, and clouds
+    this.dirtPattern = new DirtPattern({ sceneEl: this.scene });
+    this.objectField = new ObjectField({
+      sceneEl: this.scene,
+      dirtPattern: this.dirtPattern,
+      policy: this.scenery.defaultPolicy
+    });
+    this.clouds = new Cloud({ sceneEl: this.scene });
   }
 
   // Not used outside this class
@@ -33,5 +51,5 @@ export class ZlowScene {
     }
 
     this.objectField.advance(dz);  // ← the ONLY advancer  
-    }
+  }
 }
