@@ -113,19 +113,26 @@
     </div>
 </div>
 
-<!-- Generate starting scene -->
-<a-scene id="scene">
-    <a-assets>
-        <img id="track-texture" src="resources/textures/Track.jpeg" />
-        <img id="grass-texture" src="resources/textures/Grass.jpeg" />
-        <a-asset-item id="bikeGLB" src="resources/playermodels/bikeV4.glb"></a-asset-item>
-        <a-asset-item id="maleGLB" src="resources/playermodels/maleV5.glb"></a-asset-item>
-        <a-asset-item id="femaleGLB" src="resources/playermodels/femaleV6.glb"></a-asset-item>
-    </a-assets>
-    </a-assets>
-    <a-sky color="#87ceeb"></a-sky>
-    <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
-    <a-entity id="checkerboard-ground">
+    <!-- Generate starting scene -->
+    <a-scene id="scene">
+      <a-assets>
+          <!-- Add textures used to create the track and grass -->
+          <img id="track-texture" src="resources/textures/Track.jpeg" />
+          <img id="grass-texture" src="resources/textures/Grass.jpeg" />
+
+          <!-- Add playermodel assests -->
+          <a-asset-item id="bikeGLB" src="resources/playermodels/bikeV4.glb"></a-asset-item>
+          <a-asset-item id="maleGLB" src="resources/playermodels/maleV5.glb"></a-asset-item>
+          <a-asset-item id="femaleGLB" src="resources/playermodels/femaleV6.glb"></a-asset-item>
+
+          <!-- Add cloud assets -->
+          <a-asset-item id="cloud1" src="resources/models/cloud1.glb"></a-asset-item>
+          <a-asset-item id="cloud2" src="resources/models/cloud2.glb"></a-asset-item>
+          <a-asset-item id="cloud3" src="resources/models/cloud3.glb"></a-asset-item>
+      </a-assets>
+      <a-sky color="#87ceeb"></a-sky>
+      <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
+      <a-entity id="checkerboard-ground">
         <a-entity id="tiles"></a-entity>
     </a-entity>
 

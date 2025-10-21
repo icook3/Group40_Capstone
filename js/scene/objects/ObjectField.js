@@ -71,6 +71,7 @@ export class ObjectField {
   advance(dz) {
     if (!this.initialized || dz === 0) return;
 
+    // Handles all objects currently part of the items array
     for (const obj of this.items) {
       const pos = getPos(obj);
       pos.z += dz;
