@@ -1,4 +1,6 @@
 ﻿import { StandardMode } from "./standardMode.js";
+import { constants } from "./constants.js";
+
 export function initSettings() {
   let standardMode = new StandardMode();
   //Connect Trainer
@@ -10,6 +12,52 @@ export function initSettings() {
     //const ok = await standardMode.trainer.connect();
     //if (ok) connectBtn.disabled = true;
   });
+
+  //Test Mode
+  const testModeBtn = document.getElementById("testMode");
+  testModeBtn.addEventListener("click", () => {
+    let inTestMode = localStorage.getItem("testMode");
+    if (inTestMode == null) {
+      inTestMode = false;
+    } else if (inTestMode == "false") {
+      inTestMode = false;
+    } else {
+      inTestMode = true;
+    }
+    inTestMode = !inTestMode;
+    localStorage.setItem("testMode", inTestMode);
+    testModeBtn.textContent = inTestMode
+      ? "Test Mode: ON"
+      : "Developer Testing Mode";
+    if (!inTestMode) {
+      constants.riderState.speed = 0;
+    }
+  });
+  //Pacer speed input
+  const pacerSpeedInput = document.getElementById("pacer-speed");
+  pacerSpeedInput.addEventListener("input", () => {
+    sessionStorage.setItem("PacerSpeed", pacerSpeedInput.value);
+  });
+  //weight input
+  // Hook up live mass updates → optional immediate speed recompute
+  const riderWeightEl = document.getElementById("rider-weight");
+  if (riderWeightEl) {
+    const updateMassAndMaybeSpeed = () => {
+      const newMass = Number(riderWeightEl.value);
+      if (!Number.isFinite(newMass)) return;
+      sessionStorage.setItem("weight", newMass);
+    };
+
+    // Initialize once and then listen for changes
+    updateMassAndMaybeSpeed();
+    riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
+    riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+  }
+}
+
+export function hideSettings() {
+    let settingsElement = document.getElementById("menu-settings");
+    
 }
 
 if (typeof window !== "undefined") {

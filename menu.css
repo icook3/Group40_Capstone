@@ -46,3 +46,21 @@ button {
     border-radius: 30px;
     width: 250px;
 }
+/*
+    other settings
+*/
+#menu-settings {
+    position: fixed;
+    bottom: 290px;
+    left: 20px;
+    z-index: 1000;
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 300px;
+    /* Stack controls vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
