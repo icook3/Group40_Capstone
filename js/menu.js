@@ -55,11 +55,6 @@ export function initSettings() {
   }
 }
 
-export function hideSettings() {
-    let settingsElement = document.getElementById("menu-settings");
-    
-}
-
 if (typeof window !== "undefined") {
-  window.initSettings = initSettings;
+    window.initSettings = initSettings;
 }

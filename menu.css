@@ -58,8 +58,8 @@ button {
     padding: 15px;
     border-radius: 30px;
     width: 300px;
+    display:none;
     /* Stack controls vertically */
-    display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
