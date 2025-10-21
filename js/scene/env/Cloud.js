@@ -3,7 +3,6 @@ export class Cloud {
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
 
-    // BASIC STANDARDS:
     // Zone 1: z = 0 through -120; y = 20 through 100; x = 190 through -190
     // Zone 2: z = -121 through -240; y = 20 through 200; x = 400 through -400
     // Zone 3: z = -141 through -360; y = 30 through 300; x = 345 through -345
@@ -84,11 +83,8 @@ function spawnCloud(zone) {
   // Create a-entity, set attributes, and return to caller
   const cloud = document.createElement('a-entity')
 
-  // Decide what kind of cloud to create and set position -- CURRENTLY AT 2
-  let cloudType = "cloud" + (Math.floor(Math.random() * (2)) + 1);
-  console.log(cloudType)
-
-
+  // Decide what kind of cloud to create and set position
+  let cloudType = "cloud" + (Math.floor(Math.random() * (3)) + 1);
   cloud.setAttribute('gltf-model',`#${cloudType}`);
   cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
   return cloud;
