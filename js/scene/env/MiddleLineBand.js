@@ -82,7 +82,6 @@ export class MiddleLineBand {
 
         // resample X per-kind (keeps trees closer than buildings)
         const kind = this._detectKind(obj);
-        let x = kind.resampleX();
         pos.x = 2 * kind.resampleX();
       }
       setPos(obj, pos);

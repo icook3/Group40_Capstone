@@ -35,7 +35,7 @@ export class ZlowScene {
       this.objectsLoaded = true;
     }
 
-    this.middleLineBand.advance(0.75*dz);
+    this.middleLineBand.advance(0.5*dz);
     this.objectField.advance(dz);  // ← the ONLY advancer  
     }
 }
