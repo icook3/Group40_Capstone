@@ -228,24 +228,6 @@ export function initZlowApp({
       pacer.setSpeed(val);
     }
   }
-    pacer.setSpeed(Number(pacerSpeedInput.value));
-    pacerSpeedInput.addEventListener("input", () => {
-      const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
-    });
-  } else {
-    if (sessionStorage.getItem("PacerSpeed") !== null) {
-      const val = Number(sessionStorage.getItem("PacerSpeed"));
-      scene = new ZlowScene(val, { getElement });
-      // scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
-    } else {
-      const val = 20;
-      scene = new ZlowScene(val, { getElement });
-      //scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
-    }
-  }
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
@@ -279,15 +261,7 @@ export function initZlowApp({
 
         const p = constants.riderState.power || 0;
         const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
-        const p = constants.riderState.power || 0;
-        const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
-        // Only recompute from power if we're not in direct speed mode and power > 0
-        if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-          constants.riderState.speed = powerToSpeed({ power: p });
-        }
-        // If power === 0, coasting uses the new mass automatically on the next frame.
-      };
         // Only recompute from power if we're not in direct speed mode and power > 0
         if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
           constants.riderState.speed = powerToSpeed({ power: p });
@@ -310,33 +284,10 @@ export function initZlowApp({
       }
       if (!Number.isFinite(newMass)) return;
       constants.riderMass = newMass;
-      // Initialize once and then listen for changes
-      updateMassAndMaybeSpeed();
-      riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
-      riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
-    }
-  } else {
-    const updateMassAndMaybeSpeed = () => {
-      let newMass;
-      if (sessionStorage.getItem("weight") == null) {
-        newMass = 70;
-      } else {
-        newMass = Number(sessionStorage.getItem("weight").value);
-      }
-      if (!Number.isFinite(newMass)) return;
-      constants.riderMass = newMass;
 
       const p = constants.riderState.power || 0;
       const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
-      const p = constants.riderState.power || 0;
-      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
-      // Only recompute from power if we're not in direct speed mode and power > 0
-      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p });
-      }
-      // If power === 0, coasting uses the new mass automatically on the next frame.
-    };
       // Only recompute from power if we're not in direct speed mode and power > 0
       if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
         constants.riderState.speed = powerToSpeed({ power: p });
@@ -464,6 +415,12 @@ export function initZlowApp({
     }
   });
 
+  // Calorie reset button
+  const caloriesResetBtn = getElement("calories-reset-btn");
+  caloriesResetBtn.addEventListener("click", () => {
+    constants.riderState.calories = 0;
+  });
+
   // For testing: export some internals
   return {
     scene,
@@ -505,23 +462,13 @@ if (typeof window !== "undefined") {
 
 // Switching icons for darkmode
 const darkMode = window.matchMedia("(prefers-color-scheme: dark)");
-const darkMode = window.matchMedia("(prefers-color-scheme: dark)");
 
 function updateFavicon() {
   const favicon = document.querySelector('link[rel="icon"]');
   if (!favicon) {
     return;
   }
-  const favicon = document.querySelector('link[rel="icon"]');
-  if (!favicon) {
-    return;
-  }
 
-  if (darkMode.matches) {
-    favicon.href = "/resources/favicons/ZlowFavicon-dark.svg";
-  } else {
-    favicon.href = "/resources/favicons/ZlowFavicon.svg";
-  }
   if (darkMode.matches) {
     favicon.href = "/resources/favicons/ZlowFavicon-dark.svg";
   } else {
@@ -530,7 +477,6 @@ function updateFavicon() {
 }
 
 updateFavicon();
-darkMode.addEventListener("change", updateFavicon);
 darkMode.addEventListener("change", updateFavicon);
 
 /**
@@ -598,3 +544,4 @@ function saveTCX() {
   constants.historyStartTime = Date.now();
   constants.lastHistorySecond = null;
 }
+
