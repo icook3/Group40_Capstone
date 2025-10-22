@@ -4,7 +4,7 @@
   // spawnAtZ pushes the entity to items, which are updated as the rider moves.
 
 import { getPos, setPos } from '../core/util.js';
-import { KINDS, kindsByName } from './kinds/index.js';
+import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
   constructor({ sceneEl, dirtPattern }) {
@@ -56,18 +56,6 @@ export class ObjectField {
     this.initialized = true;
   }
 
-  _detectKind(el) {
-    const name = el.getAttribute('zlow-kind');
-    if (name && kindsByName[name]) return kindsByName[name];
-
-    // Fallback to geometry check (shouldn’t be needed once we set zlow-kind):
-    const geom = el.getAttribute('geometry');
-    const isBuilding = geom && (typeof geom === 'object'
-      ? geom.primitive === 'box'
-      : String(geom).includes('primitive: box'));
-    return isBuilding ? kindsByName.building : kindsByName.tree;
-  }
-
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(dz) {
     if (!this.initialized || dz === 0) return;
@@ -83,7 +71,7 @@ export class ObjectField {
         pos.z = farthestZ - 5;
 
         // resample X per-kind (keeps trees closer than buildings)
-        const kind = this._detectKind(obj);
+        const kind = detectKind(obj);
         pos.x = kind.resampleX();
 
       }
