@@ -21,6 +21,8 @@ const SCENERY_BAND_DEFAULTS = {
 export class SceneryBand {
   constructor({
     sceneEl,
+    policy = null,
+    name = 'band',
     treeX = SCENERY_BAND_DEFAULTS.treeX,
     buildingX = SCENERY_BAND_DEFAULTS.buildingX,
     zStart = SCENERY_BAND_DEFAULTS.zStart,
@@ -30,15 +32,26 @@ export class SceneryBand {
     jitter = SCENERY_BAND_DEFAULTS.jitter
   }) {
     this.sceneEl = sceneEl;
-    this.items = [];
+    this.policy = policy;
+    this.name = name;
+
     this.treeX = treeX;
     this.buildingX = buildingX;
+    this.zStart = zStart;
+    this.zEnd = zEnd;
+    this.step = step;
+    this.buildingChance = buildingChance;
+    this.jitter = jitter;
+
+    this.items = [];
 
     for (const side of [-1, 1]) {
       for (let z = zStart; z > zEnd; z -= step) {
         const isBuilding = Math.random() < buildingChance;
-        const anchorX = side * (isBuilding ? buildingX : treeX);
-
+        const kindName = isBuilding ? 'building' : 'tree';
+        const anchorX = this.policy
+          ? this.policy.xAnchor(kindName, side)                
+          : (isBuilding ? buildingX : treeX) * side;
         const obj = isBuilding
           ? BuildingKind.spawn(this.sceneEl, z)
           : TreeKind.spawn(this.sceneEl, z);
@@ -46,9 +59,12 @@ export class SceneryBand {
         obj.setAttribute('zlow-band', 'edge-line');
         obj.setAttribute('zlow-side', side === 1 ? 'right' : 'left');
         obj.setAttribute('zlow-edge-x', String(anchorX));
+        obj.setAttribute('zlow-band-name', this.name);
+        obj.setAttribute('zlow-kind', kindName);
 
         const pos = getPos(obj);
-        pos.x = anchorX + (Math.random() - 0.5) * jitter; // tiny jitter ±0.5 m
+        const jitterAmp = this.policy ? this.policy.jitterX() : jitter;
+        pos.x = anchorX + (Math.random() * 2 - 1) * jitterAmp;
         setPos(obj, pos);
 
         this.items.push(obj);

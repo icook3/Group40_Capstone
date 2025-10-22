@@ -27,6 +27,7 @@ export class ZlowScene {
       dirtPattern: this.dirtPattern,
       policy: this.scenery.defaultPolicy
     });
+    this.objectField.attachExternalBands(this.scenery.bands);
     this.clouds = new Cloud({ sceneEl: this.scene });
   }
 

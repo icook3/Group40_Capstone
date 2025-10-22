@@ -90,6 +90,37 @@ export class ObjectField {
       setPos(obj, pos);
     }
 
+      for (const band of this.externalGroups) {
+    if (!band?.items?.length) continue;
+    for (const obj of band.items) {
+      const pos = getPos(obj);
+      pos.z += dz;
+
+      if (pos.z > 10) {
+        // recycle within THIS band independently
+        const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
+        pos.z = farthestZ - 5;
+        // keep object in its lane using the band's policy if present
+        const kindName = obj.getAttribute('zlow-kind'); // 'tree' | 'building'
+        if (band.policy && typeof band.policy.xAnchor === 'function' && kindName) {
+          // determine current side from attribute
+          const sideAttr = obj.getAttribute('zlow-side'); // 'left' | 'right'
+          const side = sideAttr === 'left' ? -1 : 1;
+          const anchorX = band.policy.xAnchor(kindName, side);
+          const jitterAmp = typeof band.policy.jitterX === 'function'
+            ? band.policy.jitterX()
+            : 0;
+          pos.x = anchorX + (Math.random() - 0.5) * jitterAmp;
+        } else {
+          // fallback: detect and use kind’s own resample
+          const kind = this._detectKind(obj);
+          pos.x = kind.resampleX();
+        }
+      }
+      setPos(obj, pos);
+    }
+  }
+
     // Advances the dirt pattern
     if (this.dirtPattern?.patternEl) {
       const kids = Array.from(this.dirtPattern.patternEl.children);

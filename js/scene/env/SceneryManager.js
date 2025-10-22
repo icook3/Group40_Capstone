@@ -10,9 +10,8 @@ export class SceneryManager {
     const USE_TEST_CFG = true; // set to true to use test_multiband_cfg
     this.scene = sceneEl;
     this.scenePolicy = new ScenePolicy(USE_TEST_CFG ? test_multiband_cfg : old_default_cfg);
-    this.bands = [
-      new SceneryBand({ sceneEl: this.scene })
-    ];
+    this.bands =this.scenePolicy.bands.map((policy) => 
+      new SceneryBand({ sceneEl: this.scene, policy, name: policy.name }));
   }
 
   get defaultPolicy() {
