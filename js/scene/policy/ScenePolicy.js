@@ -12,6 +12,22 @@ export class ScenePolicy {
     return this.bands[0] || DefaultPolicy;
   }
 
+  // Optional: one-time debug helper for multiple bands
+  logBands() {
+    console.group("[bands] Loaded policies");
+    this.bands.forEach((b, i) => {
+      const { start, end } = b.zRange();
+      console.log(`#${i + 1}: ${b.name}`, {
+        zRange: { start, end },
+        spacing: b.spacing(),
+        density: b.density(),
+        jitterX: b.jitterX(),
+        mix: b.mix()
+      });
+    });
+    console.groupEnd();
+  }  
+
   #makeBandPolicy(band, globals) {
     // read values or fall back to globals (then DefaultPolicy)
     const mix     = band.mix     || DefaultPolicy.mix();

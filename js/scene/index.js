@@ -9,7 +9,7 @@ export class ZlowScene {
     this.scene = getElement('scene');
     this.worldZ = 0;
     this.objectsLoaded = false;
-    this.DEBUG_BANDS = false; // set to true to log default policy once
+    this.DEBUG_BANDS = true; // set to true to log default policy once
 
     // Build bands immediately (no delay)
     this.nearBand = new EdgeBand({ sceneEl: this.scene });     // optional attach
@@ -17,15 +17,7 @@ export class ZlowScene {
 
     // --- Optional one-time debug log ---
     if (this.DEBUG_BANDS) {
-      const p = this.scenery.defaultPolicy;
-      const { start, end } = p.zRange();
-      console.group("[bands] DefaultPolicy");
-      console.log("zRange", { start, end });
-      console.log("spacing", p.spacing());
-      console.log("density", p.density());
-      console.log("jitterX", p.jitterX());
-      console.log("mix", p.mix());
-      console.groupEnd();
+      this.scenery.scenePolicy.logBands();
     }
 
     // Generate a new object field, track, and clouds
