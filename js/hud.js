@@ -32,7 +32,7 @@ export class HUD {
     this.totalDistance = 0;
     this.totalPausedMs = 0;
     this.pausedAtMs = null;
-    
+
     // Reset HUD
     if (this.power) this.power.textContent = "0";
     if (this.speed) this.speed.textContent = "0.0";
