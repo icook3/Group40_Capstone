@@ -43,6 +43,7 @@ export class ObjectField {
     const kind = this._pickKind();
     const entity = kind.spawn(this.sceneEl, z);
     this.items.push(entity);
+    //console.log("Placing object at (" + getPos(entity).x + ", " + getPos(entity).y + ", " + getPos(entity).z + "). This is in ObjectField");
   }
 
   // Initializes items that move with the rider (buildings and trees)

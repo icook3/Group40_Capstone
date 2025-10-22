@@ -58,7 +58,7 @@ export class EdgeLineBand {
         }
         pos.x = anchorX + (Math.random() - 0.5) * 1.0; // tiny jitter ±0.5 m
         setPos(obj, pos);
-
+        //console.log("Placing object at (" + pos.x+", " + pos.y + ", " + pos.z + "). This is in EdgeLineBand");
         this.items.push(obj);
       }
     }
