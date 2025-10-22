@@ -75,7 +75,6 @@ export class MiddleLineBand {
     for (const obj of this.items) {
       const pos = getPos(obj);
       pos.z += dz;
-
       if (pos.z > 10) {
         // recycle in front of farthest
         const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
@@ -83,7 +82,8 @@ export class MiddleLineBand {
 
         // resample X per-kind (keeps trees closer than buildings)
         const kind = this._detectKind(obj);
-        pos.x = 2*kind.resampleX();
+        let x = kind.resampleX();
+        pos.x = 2 * kind.resampleX();
       }
       setPos(obj, pos);
     }

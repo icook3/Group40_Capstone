@@ -45,6 +45,6 @@ export const BuildingKind = {
     return obj;
   },
   resampleX() {
-      return sampleBuildingX;
+      return sampleBuildingX();
   }
 };

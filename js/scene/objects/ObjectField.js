@@ -84,7 +84,7 @@ export class ObjectField {
 
         // resample X per-kind (keeps trees closer than buildings)
         const kind = this._detectKind(obj);
-          pos.x = kind.resampleX();
+        pos.x = kind.resampleX();
 
       }
 
