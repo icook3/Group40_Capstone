@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
+button {
+    font-size: 1em;
+    cursor: pointer;
+}
+.center-item {
+    left: 40%;
+}
+/*
+    Welcome message
+*/
+#welcome-msg {
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    position: fixed;
+    top: 10%;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    left: 36%;
+}
+/*
+    Start Button
+*/
+#start-btn {
+    position: fixed;
+    top: 40%;
+    font-size: xx-large;
+    justify-content: center;
+    overflow: visible;
+}
+#menu-bottom {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 250px;
+}
+/*
+    other settings
+*/
+#menu-settings {
+    position: fixed;
+    bottom: 290px;
+    left: 20px;
+    z-index: 1000;
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 300px;
+    display:none;
+    /* Stack controls vertically */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
