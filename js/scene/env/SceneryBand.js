@@ -65,6 +65,10 @@ export class SceneryBand {
         const pos = getPos(obj);
         const jitterAmp = this.policy ? this.policy.jitterX() : jitter;
         pos.x = anchorX + (Math.random() * 2 - 1) * jitterAmp;
+        if(this.policy) {
+          const sideSign = side;
+          pos.x =this.policy.clampX(kindName, sideSign, pos.x);
+        }
         setPos(obj, pos);
 
         this.items.push(obj);

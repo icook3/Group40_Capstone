@@ -49,6 +49,15 @@ export class ScenePolicy {
       spacing() { return spacing; },
       density() { return density; },
       jitterX() { return jitterX; },
+      // Optional lane clamp to keep jitter within a fixed lateral band
+      clampX(kind, side, xVal) {
+      // laneHalfWidth is per-band or default to 1.5 m if not set
+      const laneHalfWidth = band.laneHalfWidth ?? globals.laneHalfWidth ?? 1.5;
+      const anchor = this.xAnchor(kind, side);
+      const min = anchor - laneHalfWidth;
+      const max = anchor + laneHalfWidth;
+    return Math.max(min, Math.min(max, xVal));
+    },
       zRange() { return { start: zStart, end: zEnd }; }
     };
   }

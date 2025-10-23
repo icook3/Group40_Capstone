@@ -90,7 +90,7 @@ export class ObjectField {
       setPos(obj, pos);
     }
 
-      for (const band of this.externalGroups) {
+    for (const band of this.externalGroups) {
     if (!band?.items?.length) continue;
     for (const obj of band.items) {
       const pos = getPos(obj);
@@ -100,17 +100,25 @@ export class ObjectField {
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
-        // keep object in its lane using the band's policy if present
-        const kindName = obj.getAttribute('zlow-kind'); // 'tree' | 'building'
-        if (band.policy && typeof band.policy.xAnchor === 'function' && kindName) {
-          // determine current side from attribute
+    // Phase 5: re-roll kind by band policy mix (keeps long-run ratios)
+        if (band.policy && typeof band.policy.xAnchor === 'function') {
+          const mix = typeof band.policy.mix === 'function' ? band.policy.mix() : { tree: 0.5, building: 0.5 };
+          const roll = Math.random();
+          const nextIsBuilding = roll < (typeof mix.building === 'number' ? mix.building : 0.5);
+          const kindName = nextIsBuilding ? 'building' : 'tree';
+          obj.setAttribute('zlow-kind', kindName);
+
           const sideAttr = obj.getAttribute('zlow-side'); // 'left' | 'right'
           const side = sideAttr === 'left' ? -1 : 1;
           const anchorX = band.policy.xAnchor(kindName, side);
           const jitterAmp = typeof band.policy.jitterX === 'function'
             ? band.policy.jitterX()
             : 0;
-          pos.x = anchorX + (Math.random() - 0.5) * jitterAmp;
+          let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
+          if (typeof band.policy.clampX === 'function') {
+            newX = band.policy.clampX(kindName, side, newX);
+          }
+          pos.x = newX;            
         } else {
           // fallback: detect and use kind’s own resample
           const kind = this._detectKind(obj);
