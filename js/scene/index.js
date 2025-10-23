@@ -1,4 +1,3 @@
-import { EdgeBand } from './env/EdgeBand.js';            // your near-trail band
 import { ObjectField } from './objects/ObjectField.js';
 import { DirtPattern } from './env/DirtPattern.js';
 import { Cloud } from './env/Cloud.js';
@@ -11,8 +10,6 @@ export class ZlowScene {
     this.objectsLoaded = false;
     this.DEBUG_BANDS = true; // set to true to log default policy once
 
-    // Build bands immediately (no delay)
-    this.nearBand = new EdgeBand({ sceneEl: this.scene });     // optional attach
     this.scenery = new SceneryManager({ sceneEl: this.scene }); // actual edge
 
     // --- Optional one-time debug log ---

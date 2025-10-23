@@ -109,6 +109,10 @@ export class ScenePolicy {
         return (typeof f === 'function') ? f(band.name, z) : (band.zJitter ?? 0);
       },
 
+      isStatic() {
+        return !!band.static;
+      },
+
       // Seeded RNG per band (fallback to Math.random)
       rng(_bandName) {
         if (!band?.seed) return Math.random;

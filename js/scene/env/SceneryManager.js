@@ -1,20 +1,25 @@
-// Wrapper so index.js keeps a single call
-
-import { SceneryBand } from './SceneryBand.js';
+// js/scene/env/SceneryManager.js 
+import cfg from '../policy/test_multiband_cfg.js';
 import { ScenePolicy } from '../policy/ScenePolicy.js';
-import old_default_cfg from '../policy/old_default_cfg.js';
-import test_multiband_cfg from '../policy/test_multiband_cfg.js';
+import { StaticBand } from './StaticBand.js';
+import { SceneryBand } from './SceneryBand.js'; // your dynamic band impl
 
 export class SceneryManager {
   constructor({ sceneEl }) {
-    const USE_TEST_CFG = true; // set to true to use test_multiband_cfg
-    this.scene = sceneEl;
-    this.scenePolicy = new ScenePolicy(USE_TEST_CFG ? test_multiband_cfg : old_default_cfg);
-    this.bands =this.scenePolicy.bands.map((policy) => 
-      new SceneryBand({ sceneEl: this.scene, policy, name: policy.name }));
+    this.sceneEl = sceneEl;
+    this.scenePolicy = new ScenePolicy(cfg);
+    const all = this.scenePolicy.bands;
+
+    // Build static bands
+    this.staticBands = all
+      .filter(b => b.isStatic && b.isStatic())
+      .map(b => new StaticBand({ sceneEl, bandPolicy: b }));
+
+    // Build dynamic bands
+    this.bands = all
+      .filter(b => !b.isStatic || !b.isStatic())
+      .map(b => new SceneryBand({ sceneEl, policy: b, name: b.name }));
   }
 
-  get defaultPolicy() {
-    return this.scenePolicy.defaultPolicy;
-  }
+  get defaultPolicy() { return this.scenePolicy.defaultPolicy; }
 }
