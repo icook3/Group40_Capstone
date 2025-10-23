@@ -3,6 +3,7 @@ import { EdgeLineBand } from './env/EdgeLineBand.js';    // NEW true edge band
 import { ObjectField } from './objects/ObjectField.js';
 import { DirtPattern } from './env/DirtPattern.js';
 import { Cloud } from './env/Cloud.js';
+import { MiddleLineBand } from './env/MiddleLineBand.js';
 
 export class ZlowScene {
   constructor(_, { getElement = id => document.getElementById(id) } = {}) {
@@ -18,6 +19,7 @@ export class ZlowScene {
     // Build bands immediately (no delay)
     this.nearBand = new EdgeBand({ sceneEl: this.scene });     // optional attach
     this.edgeLine = new EdgeLineBand({ sceneEl: this.scene }); // actual edge
+    this.middleLineBand = new MiddleLineBand({sceneEl: this.scene}); // Middle area
   }
 
   // Not used outside this class
@@ -27,11 +29,13 @@ export class ZlowScene {
     const dz = riderSpeed * dt;
     this.worldZ += dz;
 
-    if (!this.objectsLoaded && this.worldZ >= 10) {
+    if (!this.objectsLoaded) {
       this.objectField.init();     // keep the original delayed spawn for field
+      this.middleLineBand.init();
       this.objectsLoaded = true;
     }
 
+    this.middleLineBand.advance(0.5*dz);
     this.objectField.advance(dz);  // ← the ONLY advancer  
     }
 }
