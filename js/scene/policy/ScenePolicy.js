@@ -8,11 +8,9 @@ export class ScenePolicy {
   }
 
   get defaultPolicy() {
-    // Fallback to a DefaultPolicy if something’s off
     return this.bands[0] || DefaultPolicy;
   }
 
-  // Optional: one-time debug helper for multiple bands
   logBands() {
     console.group("[bands] Loaded policies");
     this.bands.forEach((b, i) => {
@@ -26,40 +24,105 @@ export class ScenePolicy {
       });
     });
     console.groupEnd();
-  }  
+  }
+
+  // Used only by ScenePolicy methods themselves (not inside band policy objects)
+  _band(bandName) {
+    return this.cfg?.bands?.find(b => b.name === bandName) || null;
+  }
 
   #makeBandPolicy(band, globals) {
-    // read values or fall back to globals (then DefaultPolicy)
-    const mix     = band.mix     || DefaultPolicy.mix();
-    const x       = band.x       || { tree: DefaultPolicy.xAnchor('tree', 1), building: DefaultPolicy.xAnchor('building', 1) };
-    const spacing = band.spacing ?? globals.spacing ?? DefaultPolicy.spacing();
-    const density = band.density ?? globals.density ?? DefaultPolicy.density();
-    const jitterX = band.jitterX ?? globals.jitterX ?? DefaultPolicy.jitterX();
-    const zStart  = band.zStart  ?? globals.zStart  ?? DefaultPolicy.zRange().start;
-    const zEnd    = band.zEnd    ?? globals.zEnd    ?? DefaultPolicy.zRange().end;
+    // Helpers that accept function or constant values
+    const valOf = (v, ...args) =>
+      (typeof v === 'function') ? v(...args) : v;
 
-    // Return a BandPolicy-like object (pure, no DOM)
+    const or = (...vals) => vals.find(v => v !== undefined && v !== null);
+
+    // Precompute defaults (but don’t call functions here)
+    const defaultMix     = DefaultPolicy.mix();
+    const defaultSpacing = DefaultPolicy.spacing();
+    const defaultDensity = DefaultPolicy.density();
+    const defaultJitterX = DefaultPolicy.jitterX();
+    const defaultZRange  = DefaultPolicy.zRange();
+
+    const x = band.x || {
+      tree: DefaultPolicy.xAnchor('tree', 1),
+      building: DefaultPolicy.xAnchor('building', 1)
+    };
+
     return {
       name: band.name || "band",
-      mix() { return { ...mix }; },
+
+      // May be object or function; always return an object
+      mix(z) {
+        const m = or(valOf(band.mix, z), defaultMix);
+        return typeof m === 'object' ? { ...m } : defaultMix;
+      },
+
       xAnchor(kind, side) {
-        const base = kind === 'building' ? x.building : x.tree;
+        const base = (kind === 'building' ? x.building : x.tree);
         return side * base;
       },
-      spacing() { return spacing; },
-      density() { return density; },
-      jitterX() { return jitterX; },
-      // Optional lane clamp to keep jitter within a fixed lateral band
+
+      spacing(z) {
+        return or(valOf(band.spacing, z), globals.spacing, defaultSpacing);
+      },
+
+      density(z) {
+        return or(valOf(band.density, z), globals.density, defaultDensity);
+      },
+
+      jitterX(z) {
+        return or(valOf(band.jitterX, z), globals.jitterX, defaultJitterX);
+      },
+
+      // Keep objects within a lateral lane
       clampX(kind, side, xVal) {
-      // laneHalfWidth is per-band or default to 1.5 m if not set
-      const laneHalfWidth = band.laneHalfWidth ?? globals.laneHalfWidth ?? 1.5;
-      const anchor = this.xAnchor(kind, side);
-      const min = anchor - laneHalfWidth;
-      const max = anchor + laneHalfWidth;
-    return Math.max(min, Math.min(max, xVal));
-    },
-      zRange() { return { start: zStart, end: zEnd }; }
+        const laneHalfWidth = or(band.laneHalfWidth, globals.laneHalfWidth, 1.5);
+        const anchor = this.xAnchor(kind, side);
+        const min = anchor - laneHalfWidth;
+        const max = anchor + laneHalfWidth;
+        return Math.max(min, Math.min(max, xVal));
+      },
+
+      zRange() {
+        const start = or(band.zStart, globals.zStart, defaultZRange.start);
+        const end   = or(band.zEnd,   globals.zEnd,   defaultZRange.end);
+        return { start, end };
+      },
+
+      // PHASE 7: these accept (bandName, ...) for compatibility, but use the closed-over `band`
+      yOffset(_bandName, kind, z) {
+        const f = band.yOffset;
+        return (typeof f === 'function') ? f(band.name, kind, z) : (band.yOffset ?? 0);
+      },
+
+      scale(_bandName, kind, z) {
+        const f = band.scale;
+        const val = (typeof f === 'function') ? f(band.name, kind, z) : (band.scale ?? 1);
+        if (typeof val === 'number') return { x: val, y: val, z: val };
+        return { x: val?.x ?? 1, y: val?.y ?? 1, z: val?.z ?? 1 };
+      },
+
+      zJitter(_bandName, z) {
+        const f = band.zJitter;
+        return (typeof f === 'function') ? f(band.name, z) : (band.zJitter ?? 0);
+      },
+
+      // Seeded RNG per band (fallback to Math.random)
+      rng(_bandName) {
+        if (!band?.seed) return Math.random;
+        let t = band.seed >>> 0; // mulberry32
+        return function() {
+          t += 0x6D2B79F5;
+          let r = Math.imul(t ^ (t >>> 15), 1 | t);
+          r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+          return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+        };
+      }
     };
   }
 }
+
 export default ScenePolicy;
+
