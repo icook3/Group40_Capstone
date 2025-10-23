@@ -44,17 +44,22 @@ export class SceneryBand {
     this.jitter = jitter;
 
     this.items = [];
-
+      
+    // Phase 6: spacing() + density() from policy (with safe fallbacks)
     for (const side of [-1, 1]) {
-      for (let z = zStart; z > zEnd; z -= step) {
-        const isBuilding = Math.random() < buildingChance;
+      const bandSpacing = this.policy?.spacing?.() ?? step; // spacing per band (fallback to old step)
+      for (let z = zStart; z > zEnd; z -= bandSpacing) {
+        // --- 1) FIRST spawn at this z ---
+        const mix = this.policy?.mix?.() || { tree: 1 - buildingChance, building: buildingChance };
+        const isBuilding = Math.random() < (typeof mix.building === 'number' ? mix.building : 0.5);
         const kindName = isBuilding ? 'building' : 'tree';
+
         const anchorX = this.policy
-          ? this.policy.xAnchor(kindName, side)                
+          ? this.policy.xAnchor(kindName, side)
           : (isBuilding ? buildingX : treeX) * side;
-        const obj = isBuilding
-          ? BuildingKind.spawn(this.sceneEl, z)
-          : TreeKind.spawn(this.sceneEl, z);
+
+        const obj = isBuilding ? BuildingKind.spawn(this.sceneEl, z)
+                              : TreeKind.spawn(this.sceneEl, z);
 
         obj.setAttribute('zlow-band', 'edge-line');
         obj.setAttribute('zlow-side', side === 1 ? 'right' : 'left');
@@ -62,18 +67,56 @@ export class SceneryBand {
         obj.setAttribute('zlow-band-name', this.name);
         obj.setAttribute('zlow-kind', kindName);
 
-        const pos = getPos(obj);
-        const jitterAmp = this.policy ? this.policy.jitterX() : jitter;
-        pos.x = anchorX + (Math.random() * 2 - 1) * jitterAmp;
-        if(this.policy) {
-          const sideSign = side;
-          pos.x =this.policy.clampX(kindName, sideSign, pos.x);
+        {
+          const pos = getPos(obj);
+          const jitterAmp = this.policy?.jitterX?.() ?? jitter;
+          // use centered jitter range [-0.5, 0.5] * amp for consistency
+          let x = anchorX + (Math.random() - 0.5) * jitterAmp;
+          if (this.policy?.clampX) {
+            const sideSign = side;
+            x = this.policy.clampX(kindName, sideSign, x);
+          }
+          pos.x = x;
+          setPos(obj, pos);
         }
-        setPos(obj, pos);
 
         this.items.push(obj);
+
+        // --- 2) Optional second spawn at the same z (per-band density) ---
+        const density = this.policy?.density?.() ?? 0; // default 0 if not defined
+        if (Math.random() < density) {
+          // choose same side or opposite for a bit of variety
+          const secondSide = (Math.random() < 0.5) ? -side : side;
+
+          const mix2 = this.policy?.mix?.() || mix;
+          const isBuilding2 = Math.random() < (typeof mix2.building === 'number' ? mix2.building : 0.5);
+          const kindName2 = isBuilding2 ? 'building' : 'tree';
+
+          const anchorX2 = this.policy
+            ? this.policy.xAnchor(kindName2, secondSide)
+            : (isBuilding2 ? buildingX : treeX) * secondSide;
+
+          const obj2 = isBuilding2 ? BuildingKind.spawn(this.sceneEl, z)
+                                  : TreeKind.spawn(this.sceneEl, z);
+
+          obj2.setAttribute('zlow-band', 'edge-line');
+          obj2.setAttribute('zlow-side', secondSide === 1 ? 'right' : 'left');
+          obj2.setAttribute('zlow-edge-x', String(anchorX2));
+          obj2.setAttribute('zlow-band-name', this.name);
+          obj2.setAttribute('zlow-kind', kindName2);
+
+          const pos2 = getPos(obj2);
+          const jitterAmp2 = this.policy?.jitterX?.() ?? jitter;
+          let x2 = anchorX2 + (Math.random() - 0.5) * jitterAmp2;
+          if (this.policy?.clampX) {
+            x2 = this.policy.clampX(kindName2, secondSide, x2);
+          }
+          pos2.x = x2;
+          setPos(obj2, pos2);
+
+          this.items.push(obj2);
+          }
+        }
       }
     }
   }
-}
-
