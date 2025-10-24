@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zlow: Browser Cycling Simulator</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="icon" type="image/svg+xml" href="resources/favicons/ZlowFavicon.svg">
+    <link rel="stylesheet" href="playerCustomization.css" />
+    <style>
+        body {
+            background-color: grey;
+        }
+    </style>
+</head>
+<body>
+<!-- Avatar -->
+<a-scene id="mainMenuScene" embedded
+         style="width: 33%; height: 100%; background: transparent;">
+    <a-entity camera position="0 1.5 3" look-controls="enabled: false"></a-entity>
+    <a-assets>
+        <a-asset-item id="bikeGLB" src="/resources/playermodels/bikeV4.glb"></a-asset-item>
+        <a-asset-item id="maleGLB" src="/resources/playermodels/maleV5.glb"></a-asset-item>
+        <a-asset-item id="femaleGLB" src="/resources/playermodels/femaleV6.glb"></a-asset-item>
+    </a-assets>
+</a-scene>
+
+<script type="module">
+    import { AvatarCreator } from '/js/avatarCreator.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const scene = document.querySelector('#mainMenuScene');
+        if (!scene) {
+            console.error("Scene not found!");
+            return;
+        }
+
+        //Create the avatar immediately
+        const avatar = new AvatarCreator(
+            "menuAvatar",
+            { x: 0, y: 0, z: -1 },
+            { x: 0, y: 90, z: 0 },
+            (avatarInstance) => {
+                avatarInstance.setMenuPosition();
+                avatarInstance.enableMenuRotation();
+                avatarInstance.startRotationLoop();
+            }
+        );
+    });
+</script>
+
+<!-- Color Picker -->
+
+
+<!-- Bike Color Buttons -->
+
+
+<!-- Person Color Buttons -->
+
+
+<!-- Save Button -->
+<div id = "save">
+    <button id="saveButton" onclick="window.location.href='resources/mainMenu.html'">Save</button>
+</div>
+
+</body>
+</html>
