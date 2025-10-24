@@ -1,5 +1,5 @@
 // js/scene/env/SceneryManager.js 
-import cfg from '../policy/test_multiband_cfg.js';
+import cfg from '../policy/edge_default_cfg.js';
 import { ScenePolicy } from '../policy/ScenePolicy.js';
 import { StaticBand } from './StaticBand.js';
 import { SceneryBand } from './SceneryBand.js'; // your dynamic band impl

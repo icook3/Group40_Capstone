@@ -41,12 +41,12 @@ export class SceneryBand {
 
     this.items = [];
 
-    // PHASE 7: seeded RNG support (falls back to Math.random)
+    // seeded RNG support (falls back to Math.random)
     const rand =
       (typeof this.policy?.rng === 'function' ? this.policy.rng(this.name) : null) ||
       Math.random;
 
-    // Phase 6 (+ Phase 7): spacing(), density(), jitterX(), zJitter(), yOffset(), scale()
+
     for (const side of [-1, 1]) {
       // spacing can be a fn(z) or a constant-like fn()
       const spacingVal = (() => {
