@@ -1,83 +1,131 @@
 // js/scene/policy/edge_default_cfg.js
-// Format mirrors test_multiband_cfg.js (globals + bands array)
+// 5-band setup: far = dense & mostly tall (static); near = trees only (dynamic)
 
 const edge_default_cfg = {
   globals: {
-    // Lane planner (no overlap), identical key names
-    innerStartX: 30,      // center X for the innermost lane (per side)
-    laneGap: 0.6,         // clear space between adjacent lane edges
-    laneHalfWidth: 1.5,   // default half-width if a band omits its own
-    maxX: 85,             // terrain guardrail (for warnings)
+    innerStartX: 30,
+    laneGap: 0.6,
+    laneHalfWidth: 1.4,
+    maxX: 85,
 
-    // Default spawn behavior (used if band omits a value)
+    // defaults (bands override as needed)
     spacing: 6,
-    density: 0.4,
-    jitterX: 0.4,
+    density: 0.3,
+    jitterX: 0.3,
     zStart: 10,
-    zEnd: -220,
+    zEnd: -220
   },
 
   bands: [
-    // EDGE LINE — make this look like old EdgeBand
+    // 0) CLOSEST — Trees only (dynamic)
     {
-      name: "edge",
-      order: 3,               // outermost (planner puts it furthest from center)
-      static: true,           // built once (no per-frame advance)
-      laneHalfWidth: 0.8,     // narrow “strip”
-      // Edge cadence & look:
-      spacing: 5,             // rows every 5 m (EdgeBand)
-      density: 0.0,           // one object per row (no doubles by default)
-      jitterX: 0.0,           // crisp edge (EdgeBand had ~no wiggle)
-      zStart: 10,
-      zEnd: -200,
-      // Nudge buildings outward within the lane to approximate ±65 vs trees at ±50
-      // (Planner sets lane center near ±50; this pushes buildings another ~15 m)
-      kindOffset: { tree: 0, building: 15 },
-      // Subtle presentation tweaks (optional)
-      yOffset: (_band, kind) => (kind === 'building' ? 0.1 : 0),
-      scale:   (_band, kind) => (kind === 'building' ? 1.06 : 1.0),
-      zJitter: () => 0.4,
-      seed: 424242
-    },
-
-    // You can add more bands below (same shape as test_multiband_cfg),
-    // e.g., near/mid/far lanes. Shown here as a light starter set:
-
-    {
-      name: "near",
+      name: "close-trees",
       order: 0,
-      laneHalfWidth: 1.0,
-      spacing: 4.0,
-      density: 0.2,
-      jitterX: 0.3,
-      yOffset: (_b, k) => (k === 'building' ? 0.15 : 0),
-      scale:   (_b, k) => (k === 'building' ? 1.05 : 1.0),
-      zJitter: () => 0.6,
-      seed: 1337
+      static: false,
+      laneHalfWidth: 1.2,
+      spacing: () => 5.6,                       // mildly tight
+      density: () => 0.55 + Math.random()*0.15, // occasional double tree
+      jitterX: () => 0.35 + Math.random()*0.15, // organic
+      mix: () => ({ tree: 1.0, building: 0.0 }),// strictly trees
+      scale: (_b, kind) => (kind === 'tree' ? 0.95 + Math.random()*0.10 : 1.0),
+      yOffset: () => 0,
+      zStart: 10, zEnd: -200,
+      seed: 101
     },
+
+    // 1) NEAR — Mostly trees; some houses; tall is rare (dynamic)
     {
-      name: "mid",
+      name: "near-mix",
       order: 1,
-      laneHalfWidth: 1.5,
-      spacing: 6.0,
-      density: 0.45,
-      jitterX: 0.4,
-      yOffset: (_b, k) => (k === 'building' ? 0.2 : 0),
-      scale:   (_b, k) => (k === 'building' ? 1.08 : 1.0),
-      zJitter: () => 0.8,
-      seed: 202507
+      static: false,
+      laneHalfWidth: 1.3,
+      spacing: () => 5.4 + Math.random()*0.3,
+      density: () => 0.40 + Math.random()*0.15,
+      jitterX: () => 0.30 + Math.random()*0.15,
+      mix: () => ({ tree: 0.75, building: 0.25 }),
+      buildingSubtype: () => {
+        const r = Math.random();
+        if (r < 0.85) return 'house';
+        if (r < 0.999) return 'wide-building';
+        return 'tall-building'; // ~2%
+      },
+      scale: (_b, kind) => (kind === 'building' ? 0.55 + Math.random()*0.10 : 1.0),
+      yOffset: (_b, kind) => (kind === 'building' ? 0.05 : 0),
+      zStart: 10, zEnd: -205,
+      seed: 202
     },
+
+    // 2) MID — balanced; a few more buildings; talls still uncommon (dynamic)
     {
-      name: "far",
+      name: "mid-mix",
       order: 2,
-      laneHalfWidth: 2.0,
-      spacing: 8.0,
-      density: 0.7,
-      jitterX: 0.5,
-      yOffset: (_b, k) => (k === 'building' ? 0.25 : 0),
-      scale:   (_b, k) => (k === 'building' ? 1.12 : 1.0),
-      zJitter: () => 1.0,
-      seed: 987654
+      static: false,
+      laneHalfWidth: 1.5,
+      spacing: () => 5.0 + Math.random()*0.3,
+      density: () => 0.50 + Math.random()*0.20,
+      jitterX: () => 0.28 + Math.random()*0.15,
+      mix: () => ({ tree: 0.55, building: 0.45 }),
+      buildingSubtype: () => {
+        const r = Math.random();
+        if (r < 0.60) return 'house';
+        if (r < 0.88) return 'wide-building';
+        return 'tall-building'; // ~12%
+      },
+      scale: (_b, kind) => (kind === 'building' ? 1.05 + Math.random()*0.15 : 1.0),
+      yOffset: (_b, kind) => (kind === 'building' ? 0.08 : 0),
+      zStart: 10, zEnd: -212,
+      seed: 303
+    },
+
+    // 3) OUTER — building-leaning; bigger & denser; more tall but not dominant (dynamic)
+    {
+      name: "outer-mix",
+      order: 3,
+      static: false,
+      laneHalfWidth: 1.7,
+      spacing: () => 4.6 + Math.random()*0.3,     // denser
+      density: () => 0.60 + Math.random()*0.20,   // more doubles
+      jitterX: () => 0.22 + Math.random()*0.12,   // crisper line
+      mix: () => ({ tree: 0.30, building: 0.70 }),
+      buildingSubtype: () => {
+        const r = Math.random();
+        if (r < 0.40) return 'house';
+        if (r < 0.70) return 'wide-building';
+        return 'tall-building'; // ~30%
+      },
+      scale: (_b, kind) => (kind === 'building' ? 1.12 + Math.random()*0.18 : 1.0),
+      yOffset: (_b, kind) => (kind === 'building' ? 0.10 : 0),
+      zStart: 10, zEnd: -220,
+      seed: 404
+    },
+
+    // 4) FARTHEST — dense skyline; mostly tall buildings; STATIC
+    {
+      name: "far-skyline",
+      order: 4,
+      static: true,
+      laneHalfWidth: 1.9,
+
+      // Make it extremely dense & tight:
+      spacing: () => 0,   
+      density: () => 0.85 + Math.random() * 0.10, // almost every row doubles up
+      jitterX: () => 0.12 + Math.random() * 0.05, // keep crisp but not perfectly uniform
+
+      mix: () => ({ tree: 0.0, building: 1.0 }),  // buildings only
+
+      // ~80% tall, with a bit of variety
+      buildingSubtype: () => {
+        const r = Math.random();
+        if (r < 0.90) return 'tall-building';     // 80% tall
+        if (r > 0.90) return 'wide-building';     // 10%
+      },
+
+      // Slightly larger scale for a skyline feel
+      scale: () => 3.25 + Math.random() * 0.25,
+      yOffset: () => 0.15,
+      zStart: 10,
+      zEnd: -230,
+      seed: 505
     }
   ]
 };

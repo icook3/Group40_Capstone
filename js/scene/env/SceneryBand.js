@@ -143,23 +143,24 @@ export class SceneryBand {
 
         this.items.push(obj);
 
+        const zPlace2 = zPlace + (rand() * 0.8 + 0.2); // small forward push (0.2..1.0 m)
         // --- Optional second spawn at the same z (per-band density) ---
         const density = (() => {
           const f = this.policy?.density;
+
           if (typeof f === 'function') {
-            try { return f(this.name, zPlace) ?? 0; } catch { return f() ?? 0; }
+            try { return f(this.name, zPlace2) ?? 0; } catch { return f() ?? 0; }
           }
           return 0;
         })();
 
         if (rand() < density) {
-          // choose same side or opposite for a bit of variety
-          const secondSide = rand() < 0.5 ? -side : side;
+          const secondSide = -side;
 
           const mix2 = (() => {
             const f = this.policy?.mix;
             if (typeof f === 'function') {
-              try { return f(this.name, zPlace) || {}; } catch { return f() || {}; }
+              try { return f(this.name, zPlace2) || {}; } catch { return f() || {}; }
             }
             return mix;
           })();
@@ -174,8 +175,8 @@ export class SceneryBand {
             : (isBuilding2 ? buildingX : treeX) * secondSide;
 
           const obj2 = isBuilding2
-            ? BuildingKind.spawn(this.sceneEl, zPlace)
-            : TreeKind.spawn(this.sceneEl, zPlace);
+            ? BuildingKind.spawn(this.sceneEl, zPlace2)
+            : TreeKind.spawn(this.sceneEl, zPlace2);
 
           obj2.setAttribute('zlow-band', 'edge-line');
           obj2.setAttribute('zlow-side', secondSide === 1 ? 'right' : 'left');
@@ -188,7 +189,7 @@ export class SceneryBand {
           const jitterAmp2 = (() => {
             const f = this.policy?.jitterX;
             if (typeof f === 'function') {
-              try { return f(this.name, zPlace) ?? jitter; } catch { return f() ?? jitter; }
+              try { return f(this.name, zPlace2) ?? jitter; } catch { return f() ?? jitter; }
             }
             return jitter;
           })();
@@ -202,7 +203,7 @@ export class SceneryBand {
           const yOff2 = (() => {
             const f = this.policy?.yOffset;
             if (typeof f === 'function') {
-              try { return f(this.name, kindName2, zPlace) ?? 0; } catch { return f(kindName2, zPlace) ?? 0; }
+              try { return f(this.name, kindName2, zPlace2) ?? 0; } catch { return f(kindName2, zPlace2) ?? 0; }
             }
             return 0;
           })();
@@ -211,7 +212,7 @@ export class SceneryBand {
             const f = this.policy?.scale;
             let val = 1;
             if (typeof f === 'function') {
-              try { val = f(this.name, kindName2, zPlace); } catch { val = f(kindName2, zPlace); }
+              try { val = f(this.name, kindName2, zPlace2); } catch { val = f(kindName2, zPlace2); }
             } else if (this.policy && 'scale' in this.policy) {
               val = this.policy.scale;
             }
