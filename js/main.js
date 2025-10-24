@@ -545,4 +545,3 @@ function saveTCX() {
   constants.historyStartTime = Date.now();
   constants.lastHistorySecond = null;
 }
-
