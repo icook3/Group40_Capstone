@@ -38,14 +38,20 @@ export class StaticBand {
     setPos(obj, pos);
     obj.setAttribute('scale', `${scale.x} ${scale.y} ${scale.z}`);
     this.items.push(obj);
+
+    // EdgeBand behavior: if a WIDE building, push the next row an extra 5m back
+    const btype = obj.getAttribute('zlow-building-type');
+    const extraBack = (kind === 'building' && btype === 'wide-building') ? 5 : 0;
+    return { extraBack };  
   }
 
   #init() {
     const { start, end } = this.p.zRange();
     const spacing = this.p.spacing();
     for (const side of [-1, 1]) {
-      for (let z = start; z > end; z -= spacing) {
-        this.#spawn(side, z);
+     for (let z = start; z > end; ) {
+       const { extraBack } = this.#spawn(side, z);
+       z -= spacing + (extraBack || 0);
         // edge band usually looks best without doubles; if you want:
         // if ((this.p.density() ?? 0) > Math.random()) this.#spawn(-side, z);
       }
