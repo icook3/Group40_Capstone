@@ -13,6 +13,13 @@ export function setPos(el, pos) {
   } else {
     el.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
   }
+  //if it is on the one side of the track, rotate it
+  //used so we can use backface culling on the models to save resources
+  if (pos.x > 0) {
+    el.setAttribute('rotation', '0 180 0');
+  } else {
+    el.setAttribute('rotation', '0 0 0');
+  }
 }
 
 // Guaranteed off-path sampler

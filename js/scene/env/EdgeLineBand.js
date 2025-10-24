@@ -11,15 +11,15 @@ export class EdgeLineBand {
   constructor({
     sceneEl,
     treeX = 50,        // terrain edge for trees
-    buildingX = 65,    // slightly farther out for buildings
+    buildingX = 57,    // slightly farther out for buildings
     zStart = 10,
     zEnd = -200,
-    step = 5
   }) {
     this.sceneEl = sceneEl;
     this.items = [];
     this.treeX = treeX;
     this.buildingX = buildingX;
+    let step = 5;
 
     for (const side of [-1, 1]) {
       for (let z = zStart; z > zEnd; z -= step) {
@@ -29,18 +29,38 @@ export class EdgeLineBand {
         const obj = isBuilding
           ? BuildingKind.spawn(this.sceneEl, z)
           : TreeKind.spawn(this.sceneEl, z);
-
+          if (isBuilding) {
+              switch (obj.getAttribute('zlow-building-type')) {
+                case 'house':
+                    step = 10;
+                    break;
+                case 'tall-building':
+                    step = 10;
+                    break;
+                case 'wide-building':
+                    step = 15;
+                    break;
+                default:
+                    step = 10;
+                    break;
+            }
+        } else {
+            step = 5;
+        }
         obj.setAttribute('zlow-band', 'edge-line');
         obj.setAttribute('zlow-side', side === 1 ? 'right' : 'left');
         obj.setAttribute('zlow-edge-x', String(anchorX));
 
         const pos = getPos(obj);
+        if (isBuilding && obj.getAttribute('zlow-building-type') == 'wide-building') {
+            pos.z -= 5;
+            z -= 5;
+        }
         pos.x = anchorX + (Math.random() - 0.5) * 1.0; // tiny jitter ±0.5 m
         setPos(obj, pos);
-
+        //console.log("Placing object at (" + pos.x+", " + pos.y + ", " + pos.z + "). This is in EdgeLineBand");
         this.items.push(obj);
       }
     }
   }
 }
-
