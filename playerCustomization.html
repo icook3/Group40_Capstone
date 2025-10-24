@@ -50,17 +50,89 @@
 </script>
 
 <!-- Color Picker -->
+<script>
+    const colorPicker = document.getElementById('colorPicker');
+</script>
 
+<!-- Gender Picker -->
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const genders = ["Male", "Female"];
+        let currentGenderIndex = 0;
 
-<!-- Bike Color Buttons -->
+        const genderLabel = document.getElementById("genderLabel");
+        const leftArrow = document.getElementById("leftArrow");
+        const rightArrow = document.getElementById("rightArrow");
 
+        function updateGenderDisplay() {
+            genderLabel.textContent = genders[currentGenderIndex];
+            // TODO: trigger switching here
+        }
+
+        leftArrow.addEventListener("click", () => {
+            currentGenderIndex = (currentGenderIndex - 1 + genders.length) % genders.length;
+            updateGenderDisplay();
+        });
+
+        rightArrow.addEventListener("click", () => {
+            currentGenderIndex = (currentGenderIndex + 1) % genders.length;
+            updateGenderDisplay();
+        });
+    });
+</script>
 
 <!-- Person Color Buttons -->
+<div id="playerContainer">
+    <h2>Player Customization</h2>
+    <div id="playerControls">
+        <div id="genderSelector">
+            <button class="arrow-btn" id="leftArrow">⮜</button>
+            <span id="genderLabel">Male</span>
+            <button class="arrow-btn" id="rightArrow">⮞</button>
+        </div>
+        <div class="option">
+            <label>Skin<input type="color" class="color-picker" data-mat="Skin" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Shirt<input type="color" class="color-picker" data-mat="Shirt" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Shorts<input type="color" class="color-picker" data-mat="Shorts" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Shoes<input type="color" class="color-picker" data-mat="Shoes" value="#ff0000"></label>
+        </div>
+    </div>
+</div>
 
+<!-- Bike Color Buttons -->
+<div id="bikeContainer">
+    <h2>Bike Customization</h2>
+    <div id="bikeControls">
+        <div class="option">
+            <label>Frame<input type="color" class="color-picker" data-mat="Frame_Mat" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Tires<input type="color" class="color-picker" data-mat="Tire_Mat" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Grip<input type="color" class="color-picker" data-mat="Grip_Mat" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Seat<input type="color" class="color-picker" data-mat="Seat_Mat" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Pedals<input type="color" class="color-picker" data-mat="Pedal_Mat" value="#ff0000"></label>
+        </div>
+        <div class="option">
+            <label>Pedal Crank<input type="color" class="color-picker" data-mat="PedalCrank_Mat" value="#ff0000"></label>
+        </div>
+    </div>
+</div>
 
 <!-- Save Button -->
-<div id = "save">
-    <button id="saveButton" onclick="window.location.href='resources/mainMenu.html'">Save</button>
+<div id = "menu">
+    <button id="menuButton" onclick="window.location.href='resources/mainMenu.html'">Main Menu</button>
 </div>
 
 </body>
