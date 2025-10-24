@@ -1,13 +1,11 @@
-import {powerToSpeed} from "./main.js";
-
-export class Avatar {
-    constructor(id, color = '#0af', position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, isPacer = false) {
+export class AvatarCreator {
+    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
-        this.color = color;
         this.position = position;
         this.rotation = rotation;
-        this.speed = 0;
-        this.power = 0;
+        this.onReady = onReady;
+        this.autoRotate = false;
+        this.rotationSpeed = 0.2;
         this.avatarEntity = this.createEntity();
 
         //GLB Model
@@ -75,6 +73,14 @@ export class Avatar {
         personModel.setAttribute('scale', '0.35 0.35 0.35');
         avatar.appendChild(personModel);
 
+        let personLoaded = false;
+        let bikeLoaded = false;
+        const checkReady = () => {
+            if (personLoaded && bikeLoaded) {
+                if (this.onReady) this.onReady(this);
+            }
+        };
+
         //Assign person and person bones
         this.personModel = personModel;
         personModel.addEventListener('model-loaded', (e) => {
@@ -119,6 +125,8 @@ export class Avatar {
                     this.rightHeel = personSkeleton.getBoneByName("heel02R");
 
                     this.setInitialPose();
+                    personLoaded = true;
+                    checkReady();
                 }
             });
         });
@@ -152,8 +160,10 @@ export class Avatar {
                     this.pedalCrankBone = bikeSkeleton.getBoneByName("b_pedalcrank");
                 }
             });
-        });
 
+            bikeLoaded = true;
+            checkReady();
+        });
 
         document.querySelector('a-scene').appendChild(avatar);
         return avatar;
@@ -199,109 +209,37 @@ export class Avatar {
         //Legs
         this.leftThigh.rotation.z = -pi / 15;
         this.leftThigh.rotation.x =  pi / 2;
-        this.leftShin.rotation.x = 13 * pi / 20;
+        this.leftShin.rotation.x = 12 * pi / 20;
         this.leftShin.rotation.z = -pi / 90;
         this.leftFoot.rotation.x = -pi / 6;
     }
 
-    //Helper to interpolate smoothly between A and B
-    cycleInterpolate (a, b, phase) {
-        return a + (1 - Math.cos(phase)) * 0.5 * (b - a);
+
+    setMenuPosition() {
+        this.avatarEntity.setAttribute('position', `0 0 0`);
+        this.avatarEntity.setAttribute('rotation', `0 180 0`);
+
+        this.setInitialPose();
     }
 
-    animatePedalingPerson (dt) {
-        const pi = Math.PI;
-
-        // se the crank rotation as the driving phase
-        const crankAngle = this.pedalCrankBone.rotation.x;
-
-        //Base pose angles from setInitialPose()
-        const baseRightThighX = 3 * pi / 4;
-        const baseLeftThighX = pi / 2;
-        const baseRightShinX = pi / 4;
-        const baseLeftShinX = 13 * pi / 20;
-        const baseRightFootX = -pi / 8;
-        const baseLeftFootX = -pi / 6;
-
-        const thighForwardSwing = 0.1;
-        const shinForwardSwing = 0.3;
-        const footForwardSwing = 0.25;
-
-        //Right leg transitions between its own base and the left leg’s base
-        this.rightThigh.rotation.x = this.cycleInterpolate(baseRightThighX, baseLeftThighX, crankAngle)
-            + Math.sin(crankAngle + Math.PI) * thighForwardSwing;
-        this.rightShin.rotation.z = this.cycleInterpolate(-10 * pi / 200, pi / 180, crankAngle);
-        this.rightShin.rotation.x  = this.cycleInterpolate(baseRightShinX,  baseLeftShinX,  crankAngle)
-            + Math.sin(crankAngle + Math.PI) * shinForwardSwing;
-        this.rightFoot.rotation.x  = this.cycleInterpolate(baseRightFootX,  baseLeftFootX,  crankAngle)
-            + Math.sin(crankAngle + Math.PI) * footForwardSwing;
-
-        //Left leg transitions in opposite phase
-        this.leftThigh.rotation.x = this.cycleInterpolate(baseLeftThighX, baseRightThighX, crankAngle)
-            + Math.sin(crankAngle) * thighForwardSwing;
-        this.leftShin.rotation.z = this.cycleInterpolate(pi / 200, 12 * pi / 200, crankAngle);
-        this.leftShin.rotation.x  = this.cycleInterpolate(baseLeftShinX,  baseRightShinX,  crankAngle)
-            + Math.sin(crankAngle) * shinForwardSwing;
-        this.leftFoot.rotation.x  = this.cycleInterpolate(baseLeftFootX,  baseRightFootX,  crankAngle)
-            + Math.sin(crankAngle) * footForwardSwing;
+    enableMenuRotation(speed = 0.5) {
+        this.autoRotate = true;
+        this.rotationSpeed = speed;
     }
 
-
-
-    animatePedalingBike(dt) {
-        //variables for frequency 1.5 Hz at 30 km/h, scale with speed
-        const baseSpeed = 30; //km/h
-        const baseFreqHz = 1.5; //Hz at 30 km/h
-        const angularSpeedAdjuster = baseFreqHz * 2 * Math.PI;
-
-        //Rotate wheels if loaded
-        if (this.rearWheel && this.frontWheel) {
-            const angularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.37
-            const wheelRotationAmount = angularSpeed * dt;
-            this.rearWheel.rotation.x -= wheelRotationAmount;
-            this.frontWheel.rotation.x -= wheelRotationAmount;
-        }
-
-        //Rotate crank and pedals
-        if (this.leftPedalBone && this.rightPedalBone && this.pedalCrankBone) {
-            if (this.id === "pacer") {
-                //Rotate crank
-                const pacerCrankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
-                const pacerCrankRotationAmount = pacerCrankAngularSpeed * dt;
-                this.pedalCrankBone.rotation.x -= pacerCrankRotationAmount;
-
-                //Rotate pedals
-                this.leftPedalBone.rotation.y = this.pedalCrankBone.rotation.x;
-                this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
-            } else {
-                //Rotate crank
-                const speedKmh = powerToSpeed({power: this.power});
-                const crankAngularSpeed = ((speedKmh * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
-                const crankRotationAmount = crankAngularSpeed * dt;
-                this.pedalCrankBone.rotation.x -= crankRotationAmount;
-
-                //Rotate pedals
-                this.leftPedalBone.rotation.y = this.pedalCrankBone.rotation.x;
-                this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
+    startRotationLoop() {
+        const rotate = () => {
+            if (this.avatarEntity && this.autoRotate) {
+                const rot = this.avatarEntity.getAttribute('rotation');
+                this.avatarEntity.setAttribute('rotation', {
+                    x: rot.x,
+                    y: rot.y + this.rotationSpeed,
+                    z: rot.z
+                });
             }
-        }
+            requestAnimationFrame(rotate);
+        };
+        rotate();
     }
 
-    //Setter for avatar speed
-    setSpeed(speed) {
-        this.speed = speed;
-    }
-
-    //Setter for avatar power
-    setPower(power) {
-        this.power = power;
-    }
-
-    update(dt) {
-        if (this.speed === 0) {
-            return;
-        }
-        this.animatePedalingBike(dt);
-        this.animatePedalingPerson(dt)
-    }
 }

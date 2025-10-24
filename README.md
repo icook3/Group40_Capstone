@@ -40,7 +40,8 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `Tree.js` — Handles trees along the side of the track
 			- `ObjectField.js` — Handles creating a set of objects at different locations
 		- `index.js` — Sets up and updates the A-Frame 3D world.
-	- `avatar.js` — Sets up and updates A-Frame 3D avatar.
+    - `avatarMovement.js` — Sets up A-Frame 3D avatar.
+	- `avatarMovement.js` — Updates A-Frame 3D avatar.
 	- `bluetooth.js` — Handles Bluetooth device connection and data polling.
 	- `constants.js` — Stores important constants for the program execution
 	- `hud.js` — Renders the heads-up display overlay.
