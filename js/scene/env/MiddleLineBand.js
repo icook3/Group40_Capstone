@@ -1,13 +1,13 @@
-  // Flow:
-  // Call spawnAtZ either once or twice depending on randomly generated number
-  // spawnAtZ runs pickKind to decide what to spawn
-  // spawnAtZ pushes the entity to items, which are updated as the rider moves.
+// Flow:
+// Call spawnAtZ either once or twice depending on randomly generated number
+// spawnAtZ runs pickKind to decide what to spawn
+// spawnAtZ pushes the entity to items, which are updated as the rider moves.
 
-import { getPos, setPos } from '../core/util.js';
-import { KINDS, detectKind } from '../objects/kinds/index.js';
+import { getPos, setPos } from "../core/util.js";
+import { KINDS, detectKind } from "../objects/kinds/index.js";
 
 export class MiddleLineBand {
-    constructor({ sceneEl, dirtPattern }) {
+  constructor({ sceneEl, dirtPattern }) {
     this.sceneEl = sceneEl;
     this.items = [];
     this.initialized = false;
@@ -35,14 +35,16 @@ export class MiddleLineBand {
       r -= this.weights[i];
       if (r <= 0) return KINDS[i];
     }
-    return KINDS[KINDS.length - 1];
+    // temporarily disabling trees until better way to make buildings/trees not clip each other
+    //return KINDS[KINDS.length - 1];
+    return KINDS.find((k) => k.name === "building");
   }
 
   _spawnAtZ(z) {
     const kind = this._pickKind();
     const entity = kind.spawn(this.sceneEl, z);
     let pos = getPos(entity);
-    pos.x=2*pos.x;
+    pos.x = 2 * pos.x;
     setPos(entity, pos);
     this.items.push(entity);
     //console.log("Placing object at (" + getPos(entity).x + ", " + getPos(entity).y + ", " + getPos(entity).z + "). This is in MiddleLineBand");
@@ -68,7 +70,7 @@ export class MiddleLineBand {
       pos.z += dz;
       if (pos.z > 10) {
         // recycle in front of farthest
-        const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
+        const farthestZ = Math.min(...this.items.map((o) => getPos(o).z));
         pos.z = farthestZ - 5;
 
         // resample X per-kind (keeps trees closer than buildings)
