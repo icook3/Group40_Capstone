@@ -8,3 +8,13 @@ js/scene/policy/* merge=ours
 # Avoid case-rename on gear image
 resources/images/Gear.png merge=ours
 resources/images/Gear.PNG merge=ours
+# Keep our env/policy structure; edge is config-driven
+js/scene/env/index.js merge=ours
+js/scene/env/SceneryBand.js merge=ours
+js/scene/env/SceneryManager.js merge=ours
+js/scene/env/StaticBand.js merge=ours
+js/scene/policy/* merge=ours
+
+# Prevent case-rename shenanigans
+resources/images/Gear.png merge=ours
+resources/images/Gear.PNG merge=ours
