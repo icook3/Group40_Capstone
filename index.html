@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zlow: Browser Cycling Simulator</title>
@@ -9,175 +9,227 @@
     <link rel="stylesheet" href="hud.css" />
 
     <link
-            rel="icon"
-            type="image/svg+xml"
-            href="/resources/favicons/ZlowFavicon.svg"
+      rel="icon"
+      type="image/svg+xml"
+      href="/resources/favicons/ZlowFavicon.svg"
     />
-</head>
-<body>
-<div id="hud-top">
-    <div class="hud-section left">
+  </head>
+  <body>
+    <div id="hud-top">
+      <div class="hud-section left">
         <div class="stat-item">
-            <span id="time" class="stat-value">00:00</span>
+          <span id="time" class="stat-value">00:00</span>
         </div>
-    </div>
+      </div>
 
-    <div class="hud-section center">
+      <div class="hud-section center">
         <div class="stats-row">
-            <div class="stat-item">
-                <div class="stat-value-group">
-                    <span id="speed" class="stat-value">0</span>
-                    <span class="stat-unit">km/h</span>
-                </div>
-            </div>
-
-            <div class="stat-item">
-                <div class="stat-value-group">
-                    <span id="power" class="stat-value">0</span>
-                    <span class="stat-unit">W</span>
-                </div>
-            </div>
-
-            <div class="stat-item">
-                <div class="stat-value-group">
-                    <span id="distance" class="stat-value">0.00</span>
-                    <span class="stat-unit">km</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="hud-section right">
-        <div class="stat-item">
+          <div class="stat-item">
             <div class="stat-value-group">
-                <span id="calories" class="stat-value">0</span>
-                <span class="stat-unit">kcal</span>
+              <span id="speed" class="stat-value">0</span>
+              <span class="stat-unit">km/h</span>
             </div>
-        </div>
-    </div>
-</div>
+          </div>
 
-<div id="hud-bottom">
-    <div class="control-buttons">
+          <div class="stat-item">
+            <div class="stat-value-group">
+              <span id="power" class="stat-value">0</span>
+              <span class="stat-unit">W</span>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-value-group">
+              <span id="distance" class="stat-value">0.00</span>
+              <span class="stat-unit">km</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-section right">
+        <div class="stat-item">
+          <div class="stat-value-group">
+            <span id="calories" class="stat-value">0</span>
+            <span class="stat-unit">kcal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="hud-bottom">
+      <div class="control-buttons">
         <button
-                id="menu-btn"
-                class="hud-btn"
-                onclick="window.location.href='resources/mainMenu.html'"
+          id="menu-btn"
+          class="hud-btn"
+          onclick="window.location.href='resources/mainMenu.html'"
         >
-            Main Menu
+          Main Menu
         </button>
         <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
         <button id="gpx-btn" class="hud-btn">Download TCX</button>
         <button id="strava-btn" class="hud-btn" disabled>Export Strava</button>
         <button id="pause-btn" class="hud-btn">Pause</button>
         <button id="stop-btn" class="hud-btn">Stop</button>
+      </div>
     </div>
-</div>
 
-<!-- Dev hud - hidden by default -->
-<div id="dev-controls-hud" hidden>
+    <!-- Dev hud - hidden by default -->
+    <div id="dev-controls-hud" hidden>
       <span id="pacer">
         <label for="pacer-speed">Pacer:</label>
         <input
-                id="pacer-speed"
-                type="number"
-                min="5"
-                max="60"
-                value="20"
-                step="1"
+          id="pacer-speed"
+          type="number"
+          min="5"
+          max="60"
+          value="20"
+          step="1"
         />
         km/h
       </span>
 
-    <span id="weight">
+      <span id="weight">
         <label for="rider-weight">Weight:</label>
         <input
-                id="rider-weight"
-                type="number"
-                min="40"
-                max="150"
-                value="70"
-                step="1"
+          id="rider-weight"
+          type="number"
+          min="40"
+          max="150"
+          value="70"
+          step="1"
         />
         kg
       </span>
 
-    <button id="connect-btn">Connect Trainer</button>
-    <button id="calories-reset-btn">Reset Calories</button>
-</div>
-
-<!-- Pause overlay -->
-<div id="pause-overlay" aria-hidden="true">
-    <div class="pause-dialog">
-        Resuming in <span id="pause-countdown">10</span>…
+      <button id="connect-btn">Connect Trainer</button>
+      <button id="calories-reset-btn">Reset Calories</button>
     </div>
-</div>
+
+    <!-- Pause overlay -->
+    <div id="pause-overlay" aria-hidden="true">
+      <div class="pause-dialog">
+        Resuming in <span id="pause-countdown">10</span>…
+      </div>
+    </div>
 
     <!-- Generate starting scene -->
     <a-scene id="scene">
       <a-assets>
-          <!-- Add textures used to create the track and grass -->
-          <img id="track-texture" src="resources/textures/Track.jpeg" />
-          <img id="grass-texture" src="resources/textures/Grass.jpeg" />
+        <!-- Add textures used to create the track and grass -->
+        <img id="track-texture" src="resources/textures/Track.jpeg" />
+        <img id="grass-texture" src="resources/textures/Grass.jpeg" />
 
-          <!-- Add playermodel assests -->
-          <a-asset-item id="bikeGLB" src="resources/playermodels/bikeV4.glb"></a-asset-item>
-          <a-asset-item id="maleGLB" src="resources/playermodels/maleV5.glb"></a-asset-item>
-          <a-asset-item id="femaleGLB" src="resources/playermodels/femaleV6.glb"></a-asset-item>
+        <!-- Building models -->
+        <a-asset-item
+          id="house-obj"
+          src="resources/models/House.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tall-building-obj"
+          src="resources/models/TallBuilding.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="wide-building-obj"
+          src="resources/models/WideBuilding.glb"
+        ></a-asset-item>
 
-          <!-- Add cloud assets -->
-          <a-asset-item id="cloud1" src="resources/models/cloud1.glb"></a-asset-item>
-          <a-asset-item id="cloud2" src="resources/models/cloud2.glb"></a-asset-item>
-          <a-asset-item id="cloud3" src="resources/models/cloud3.glb"></a-asset-item>
+        <!-- Add playermodel assets -->
+        <a-asset-item
+          id="bikeGLB"
+          src="resources/playermodels/bikeV4.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="maleGLB"
+          src="resources/playermodels/maleV5.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="femaleGLB"
+          src="resources/playermodels/femaleV6.glb"
+        ></a-asset-item>
+
+        <!-- Add cloud assets -->
+        <a-asset-item
+          id="cloud1"
+          src="resources/models/cloud1.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud2"
+          src="resources/models/cloud2.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud3"
+          src="resources/models/cloud3.glb"
+        ></a-asset-item>
+
+        <!-- Add tree assets -->
+        <a-asset-item
+          id="tree1"
+          src="resources/models/tree1.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tree2"
+          src="resources/models/tree2.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tree3"
+          src="resources/models/tree3.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tree-bush1"
+          src="resources/models/bush1.glb"
+        ></a-asset-item>
       </a-assets>
       <a-sky color="#87ceeb"></a-sky>
+
       <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
       <a-entity id="checkerboard-ground">
         <a-entity id="tiles"></a-entity>
-    </a-entity>
+      </a-entity>
 
-    <!-- Get values for scene and tilesEntity before using a module to import constants -->
-    <script>
+      <!-- Get values for scene and tilesEntity before using a module to import constants -->
+      <script>
         const scene = document.currentScript.parentElement;
         // Add as a new thing rather than getting the entity??
         const tilesEntity = scene.querySelector("#tiles");
-    </script>
+      </script>
 
-    <!-- Buildings, trees, clouds, and path are generated dynamically in scene.js and will not overlap the center column -->
-    <!-- Use constants to generate checkerboard tiles for ground dynamically -->
-    <script type="module">
+      <!-- Buildings, trees, clouds, and path are generated dynamically in scene.js and will not overlap the center column -->
+      <!-- Use constants to generate checkerboard tiles for ground dynamically -->
+      <script type="module">
         import { constants } from "./js/constants.js";
         for (let x = 0; x < constants.gridWidth; x++) {
-            for (let z = 0; z < constants.gridDepth; z++) {
-                const color =
-                    (x + z) % 2 === 0
-                        ? constants.groundColor1
-                        : constants.groundColor2;
-                const tile = document.createElement("a-entity");
-                tile.setAttribute(
-                    "geometry",
-                    `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
-                );
-                //tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
-                tile.setAttribute("material", "src: #grass-texture");
-                tile.setAttribute(
-                    "position",
-                    `${constants.startX + x * constants.tileSize} 0 ${
-                        constants.startZ - z * constants.tileSize
-                    }`
-                );
-                tilesEntity.appendChild(tile);
-            }
+          for (let z = 0; z < constants.gridDepth; z++) {
+            const color =
+              (x + z) % 2 === 0
+                ? constants.groundColor1
+                : constants.groundColor2;
+            const tile = document.createElement("a-entity");
+            tile.setAttribute(
+              "geometry",
+              `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
+            );
+            //tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
+            tile.setAttribute("material", "src: #grass-texture");
+            tile.setAttribute(
+              "position",
+              `${constants.startX + x * constants.tileSize} 0 ${
+                constants.startZ - z * constants.tileSize
+              }`
+            );
+            tilesEntity.appendChild(tile);
+          }
         }
-    </script>
+      </script>
 
-    <a-entity camera look-controls position="0 4.5 5"></a-entity>
-</a-scene>
-<script type="module" src="js/main.js"></script>
-<script>
-    window.addEventListener("DOMContentLoaded", () => {
+      <a-entity camera look-controls position="0 4.5 5"></a-entity>
+    </a-scene>
+
+    <script type="module" src="js/main.js"></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
         if (window.initZlowApp) window.initZlowApp();
-    });
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>
