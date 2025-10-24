@@ -6,6 +6,7 @@
 
 import { getPos, setPos } from '../core/util.js';
 import { KINDS, detectKind } from './kinds/index.js';
+import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
   constructor({ sceneEl, dirtPattern, policy }) {
@@ -79,7 +80,7 @@ export class ObjectField {
         if (kind?.resampleX) pos.x = kind.resampleX();
       }
 
-      setPos(obj, pos);
+        setPos(obj, pos);
     }
 
     // ---- Optional external groups (bands) ----
