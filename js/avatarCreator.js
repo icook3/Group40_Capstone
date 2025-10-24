@@ -6,8 +6,10 @@ export class AvatarCreator {
         this.onReady = onReady;
         this.autoRotate = false;
         this.rotationSpeed = 0.2;
-        this.avatarEntity = this.createEntity();
 
+        //GLB Flags
+        this.personLoaded = false;
+        this.bikeLoaded = false;
         //GLB Model
         this.personModel = null;
         this.personRig = null;
@@ -56,6 +58,23 @@ export class AvatarCreator {
         this.leftPedalBone = null;
         this.rightPedalBone = null;
         this.pedalCrankBone = null;
+
+        //Player and bike colors
+        this.playerModel = "male";
+        this.skinColor = "#ffcc99";
+        this.shirtColor = "#0000ff";
+        this.shortsColor = "#ff0000";
+        this.shoesColor = "#000000";
+
+        this.bikeFrameColor = "#ff0000";
+        this.bikeTireColor = "#333333";
+        this.bikeGripColor = "#000000";
+        this.bikeSeatColor = "#222222";
+        this.bikePedalColor = "#555555";
+        this.bikeCrankColor = "#888888";
+
+        this.loadPlayerData();
+        this.avatarEntity = this.createEntity();
     }
 
     //Creates avatar entity
@@ -66,20 +85,26 @@ export class AvatarCreator {
         avatar.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
 
         //Create Person
-        const personModel = document.createElement('a-entity');
-        personModel.setAttribute('gltf-model', '#maleGLB');
-        personModel.setAttribute('position', '0 0 0');
-        personModel.setAttribute('rotation', '0 -90 0');
-        personModel.setAttribute('scale', '0.35 0.35 0.35');
-        avatar.appendChild(personModel);
+        this.createModel(avatar);
+        this.createBikeModel(avatar);
 
-        let personLoaded = false;
-        let bikeLoaded = false;
+        document.querySelector('a-scene').appendChild(avatar);
+        return avatar;
+    }
+
+    createModel (avatarEntity) {
         const checkReady = () => {
-            if (personLoaded && bikeLoaded) {
+            if (this.personLoaded && this.bikeLoaded) {
                 if (this.onReady) this.onReady(this);
             }
         };
+
+        const personModel = document.createElement('a-entity');
+        personModel.setAttribute('gltf-model', `#${this.playerModel}GLB`);
+        personModel.setAttribute('position', '0 0 0');
+        personModel.setAttribute('rotation', '0 -90 0');
+        personModel.setAttribute('scale', '0.35 0.35 0.35');
+        avatarEntity.appendChild(personModel);
 
         //Assign person and person bones
         this.personModel = personModel;
@@ -124,20 +149,64 @@ export class AvatarCreator {
                     this.rightToe = personSkeleton.getBoneByName("toeR");
                     this.rightHeel = personSkeleton.getBoneByName("heel02R");
 
+                    this.applyPlayerColors();
                     this.setInitialPose();
-                    personLoaded = true;
+                    this.personLoaded = true;
                     checkReady();
                 }
             });
         });
+    }
 
-        //Create bike
+    setPlayerModel(model) {
+        this.playerModel = model;
+        if (this.avatarEntity) {
+            //Remove old model
+            if (this.personModel) this.avatarEntity.removeChild(this.personModel);
+            //Add new model
+            this.createModel(model, this.avatarEntity);
+        }
+        this.savePlayerData();
+    }
+
+    setPlayerColors(skin, shirt, shorts, shoes) {
+        this.skinColor = skin;
+        this.shirtColor = shirt;
+        this.shortsColor = shorts;
+        this.shoesColor = shoes;
+
+        this.applyPlayerColors();
+        this.savePlayerData();
+    }
+
+    applyPlayerColors() {
+        if (!this.personModel || !this.personModel.object3D) {
+            return;
+        }
+
+        this.personModel.object3D.traverse((child) => {
+            if (child.isMesh) {
+                if (child.name.includes("Skin")) child.material.color.set(this.skinColor);
+                if (child.name.includes("Shirt")) child.material.color.set(this.shirtColor);
+                if (child.name.includes("Shorts")) child.material.color.set(this.shortsColor);
+                if (child.name.includes("Shoes")) child.material.color.set(this.shoesColor);
+            }
+        });
+    }
+
+    createBikeModel(avatarEntity) {
+        const checkReady = () => {
+            if (this.personLoaded && this.bikeLoaded) {
+                if (this.onReady) this.onReady(this);
+            }
+        };
+
         const bikeModel = document.createElement('a-entity');
         bikeModel.setAttribute('gltf-model', '#bikeGLB');
         bikeModel.setAttribute('position', '0 0 0');
         bikeModel.setAttribute('rotation', '0 -90 0');
         bikeModel.setAttribute('scale', '0.35 0.35 0.35');
-        avatar.appendChild(bikeModel);
+        avatarEntity.appendChild(bikeModel);
 
         //Assign bike and assign bike parts
         this.bikeModel = bikeModel;
@@ -158,15 +227,37 @@ export class AvatarCreator {
                     this.leftPedalBone = bikeSkeleton.getBoneByName("b_leftPedal");
                     this.rightPedalBone = bikeSkeleton.getBoneByName("b_rightPedal");
                     this.pedalCrankBone = bikeSkeleton.getBoneByName("b_pedalcrank");
+
+                    this.applyBikeColors();
+                    this.bikeLoaded = true;
+                    checkReady();
                 }
             });
-
-            bikeLoaded = true;
-            checkReady();
         });
+    }
 
-        document.querySelector('a-scene').appendChild(avatar);
-        return avatar;
+    setBikeColors(frame, tires, grip, seat, pedals, pedalCrank) {
+        this.bikeFrameColor = frame;
+        this.bikeTireColor = tires;
+        this.bikeGripColor = grip;
+        this.bikeSeatColor = seat;
+        this.bikePedalColor = pedals;
+        this.bikeCrankColor = pedalCrank;
+
+        this.applyBikeColors();
+        this.savePlayerData();
+    }
+
+    applyBikeColors () {
+        if (!this.bikeModel || !this.bikeModel.object3D) return;
+
+        const model = this.bikeModel.object3D;
+        model.getObjectByName("Frame_Mat")?.material.color.set(this.bikeFrameColor);
+        model.getObjectByName("Tire_Mat")?.material.color.set(this.bikeTireColor);
+        model.getObjectByName("Grip_Mat")?.material.color.set(this.bikeGripColor);
+        model.getObjectByName("Seat_Mat")?.material.color.set(this.bikeSeatColor);
+        model.getObjectByName("Pedal_Mat")?.material.color.set(this.bikePedalColor);
+        model.getObjectByName("PedalCrank_Mat")?.material.color.set(this.bikeCrankColor);
     }
 
     setInitialPose () {
@@ -242,4 +333,47 @@ export class AvatarCreator {
         rotate();
     }
 
+    savePlayerData() {
+        const data = {
+            model: this.playerModel || "male",
+            colors: {
+                skin: this.skinColor,
+                shirt: this.shirtColor,
+                shorts: this.shortsColor,
+                shoes: this.shoesColor
+            },
+            bikeColors: {
+                frame: this.bikeFrameColor,
+                tires: this.bikeTireColor,
+                grip: this.bikeGripColor,
+                seat: this.bikeSeatColor,
+                pedals: this.bikePedalColor,
+                pedalCrank: this.bikeCrankColor
+            }
+        };
+        localStorage.setItem("playerData", JSON.stringify(data));
+    }
+
+    loadPlayerData() {
+        const data = JSON.parse(localStorage.getItem("playerData"));
+        if (!data) {
+            return;
+        }
+
+        this.playerModel = data.model || this.playerModel;
+
+        const player = data.colors || {};
+        this.skinColor = player.skin || this.skinColor;
+        this.shirtColor = player.shirt || this.shirtColor;
+        this.shortsColor = player.shorts || this.shortsColor;
+        this.shoesColor = player.shoes || this.shoesColor;
+
+        const bike = data.bikeColors || {};
+        this.bikeFrameColor = bike.frame || this.bikeFrameColor;
+        this.bikeTireColor = bike.tires || this.bikeTireColor;
+        this.bikeGripColor = bike.grip || this.bikeGripColor;
+        this.bikeSeatColor = bike.seat || this.bikeSeatColor;
+        this.bikePedalColor = bike.pedals || this.bikePedalColor;
+        this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
+    }
 }
