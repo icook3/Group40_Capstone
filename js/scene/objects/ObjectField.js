@@ -6,7 +6,6 @@
 
 import { getPos, setPos } from '../core/util.js';
 import { KINDS, detectKind } from './kinds/index.js';
-import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
   constructor({ sceneEl, dirtPattern, policy }) {

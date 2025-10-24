@@ -37,11 +37,9 @@ export class ZlowScene {
 
     if (!this.objectsLoaded) {
       this.objectField.init();     // keep the original delayed spawn for field
-      this.middleLineBand.init();
       this.objectsLoaded = true;
     }
 
-    this.middleLineBand.advance(0.5*dz);
     this.objectField.advance(dz);  // ← the ONLY advancer  
   }
 }
