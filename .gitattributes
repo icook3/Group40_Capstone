@@ -1,9 +1,10 @@
-# Keep our versions of these paths; do not accept deletions from main
+# Keep our env & policy structure; we'll port edge config later
+js/scene/env/index.js merge=ours
 js/scene/env/SceneryBand.js merge=ours
 js/scene/env/SceneryManager.js merge=ours
 js/scene/env/StaticBand.js merge=ours
-js/scene/policy/BandPolicy.md merge=ours
-js/scene/policy/DefaultPolicy.js merge=ours
-js/scene/policy/ScenePolicy.js merge=ours
-js/scene/policy/old_default_cfg.js merge=ours
-js/scene/policy/test_multiband_cfg.js merge=ours
+js/scene/policy/* merge=ours
+
+# Avoid case-rename on gear image
+resources/images/Gear.png merge=ours
+resources/images/Gear.PNG merge=ours
