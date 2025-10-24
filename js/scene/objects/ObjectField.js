@@ -5,7 +5,8 @@
 
 import { getPos, setPos } from '../core/util.js';
 import { KINDS, kindsByName } from './kinds/index.js';
-import { advanceClouds } from '../env/Cloud.js';
+import { constants } from "../../constants.js";
+import { spawnCloud } from '../env/Cloud.js';
 
 export class ObjectField {
   constructor({ sceneEl, dirtPattern, clouds }) {
@@ -92,13 +93,42 @@ export class ObjectField {
     }
 
     // Advance clouds
-    // CAN SEE THIS
-    //console.log(this.clouds.cloudArray)
+    // CURRENTLY ADVANCES CLOUDS BUT DOES NOT RESPAWN PROPERLY
+    //this.clouds.cloudArray = advanceClouds(this.clouds.cloudArray);
 
-    // Calls back to Cloud successfully
-    // YOU NEED TO DEFINE THE SPEED AS A CONST BACK DURING THE CLOUDS SETUP. ALSO DIRECTION
-    console.log(advanceClouds())
+    const cloudSpeed = 20;
+    
+    // Move clouds forward by 1 when updateEvery = 1
+    let updateEvery = (1/cloudSpeed) * 1000;
+    
+    if (Date.now() > constants.lastCloud + updateEvery) {
+      //console.log("FROM FIELD",ObjectField.clouds);
+      constants.lastCloud = Date.now();
 
+      if (this.clouds.cloudArray.length) {
+        for (let cloud of this.clouds.cloudArray) {
+          const pos = getPos(cloud);
+          
+          // If the cloud is still in visible range, move it forward
+          if ((pos.z + 1) < -20) {
+            pos.z += 1;
+            setPos(cloud, pos);
+          }
+
+          // Otherwise, remove it from the array and respawn in zone 3
+          else {
+            // WORKS BUT MAYBE JUST RECYCLE THE OLD CLOUD TO AVOID THE DELETE ISSUE
+            this.clouds.clouds.appendChild(spawnCloud(3));
+
+            //DOESN'T WANT TO REMOVE BECAUSE NOT A CHILD OF THAT NODE
+            //this.clouds.clouds.removeChild(cloud);
+            console.log(this.clouds.clouds);
+
+          }
+        }
+      }
+    }
+    
     // Advances the dirt pattern
     if (this.dirtPattern?.patternEl) {
       const kids = Array.from(this.dirtPattern.patternEl.children);

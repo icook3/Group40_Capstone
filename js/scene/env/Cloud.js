@@ -1,3 +1,7 @@
+import { getPos, setPos } from '../core/util.js';
+import { constants } from "../../constants.js";
+import { ObjectField } from "../objects/ObjectField.js";
+
 export class Cloud {
 
   constructor({ sceneEl }) {
@@ -30,10 +34,8 @@ export class Cloud {
   }
 }
 
-//export const getClouds = Array.from(this.clouds);
-
 // Spawn a single cloud based on input provided
-function spawnCloud(zone) {
+export function spawnCloud(zone) {
   let maxX;
   let minX;
   let maxY;
@@ -102,6 +104,37 @@ function getSign() {
   }
 
   // Advance clouds at 10-30 MPH
-  export function advanceClouds() {
-    console.log("HERE");
+  export function advanceClouds(currentClouds) {
+    // dz = speed * time elapsed (in milliseconds)
+    
+    const cloudSpeed = 20;
+
+    // Move clouds forward by 1 when updateEvery = 1
+    let updateEvery = (1/cloudSpeed) * 1000;
+    
+    if (Date.now() > constants.lastCloud + updateEvery) {
+      //console.log("FROM FIELD",ObjectField.clouds);
+      constants.lastCloud = Date.now();
+
+      if (currentClouds.length) {
+        for (const cloud of currentClouds) {
+          const pos = getPos(cloud);
+          
+          // If the cloud is still in visible range, move it forward
+          if ((pos.z + 1) < -20) {
+            pos.z += 1;
+            setPos(cloud, pos);
+          }
+
+          // Otherwise, remove it from the array and respawn in zone 3
+          else {
+            let toDelete = currentClouds.indexOf(cloud);
+            if (toDelete > -1) {
+              currentClouds.splice(toDelete, 1);
+              currentClouds.push(spawnCloud(3));
+            }
+          }
+        }
+      }
+    }
   }

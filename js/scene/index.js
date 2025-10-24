@@ -32,6 +32,6 @@ export class ZlowScene {
       this.objectsLoaded = true;
     }
 
-    this.objectField.advance(dz);  // ← the ONLY advancer  
+    this.objectField.advance(dz);  // ← the ONLY advancer
     }
 }
