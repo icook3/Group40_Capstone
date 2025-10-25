@@ -183,6 +183,7 @@ export function initZlowApp({
 
   rider = new AvatarMovement("rider", { position: { x: -0.5, y: 1, z: 0 } });
   pacer = new AvatarMovement("pacer", { position: { x: 0.5, y: 1, z: -2 } });
+  pacer.creator.setPacerColors();
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
 

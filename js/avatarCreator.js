@@ -387,4 +387,21 @@ export class AvatarCreator {
         this.bikePedalColor = bike.pedals || this.bikePedalColor;
         this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
     }
+
+    setPacerColors() {
+        this.skinColor   = "#c1591a";
+        this.shirtColor  = "#a32c06";
+        this.shortsColor = "#290800";
+        this.shoesColor  = "#4a1600";
+
+        this.bikeFrameColor = "#FF9500"; // orange frame
+        this.bikeTireColor  = "#333333"; // tires stay neutral
+        this.bikeGripColor  = "#FF7F00";
+        this.bikeSeatColor  = "#FF6F00";
+        this.bikePedalColor = "#FF8C00";
+        this.bikeCrankColor = "#FFA500";
+
+        this.applyPlayerColors();
+        this.applyBikeColors();
+    }
 }
