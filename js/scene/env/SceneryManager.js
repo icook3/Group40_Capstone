@@ -1,25 +1,47 @@
-// js/scene/env/SceneryManager.js 
-import cfg from '../policy/test_multiband_cfg.js';
+// js/scene/env/SceneryManager.js
+import cfg from '../policy/edge_default_cfg.js';
 import { ScenePolicy } from '../policy/ScenePolicy.js';
-import { StaticBand } from './StaticBand.js';
-import { SceneryBand } from './SceneryBand.js'; // your dynamic band impl
+import { SceneryBand } from './SceneryBand.js';
 
+/**
+ * SceneryManager builds all scenery bands defined in the ScenePolicy config.
+ * - "static" bands: spawn once and never advance/recycle
+ * - dynamic bands: participate in advance/recycle (if you later add that logic)
+ */
 export class SceneryManager {
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
     this.scenePolicy = new ScenePolicy(cfg);
+
+    // Build all bands from the policy
     const all = this.scenePolicy.bands;
 
-    // Build static bands
-    this.staticBands = all
-      .filter(b => b.isStatic && b.isStatic())
-      .map(b => new StaticBand({ sceneEl, bandPolicy: b }));
+    // Create SceneryBand instances for all of them
+    this.bands = all.map(bandPolicy => {
+      const band = new SceneryBand({
+        sceneEl,
+        policy: bandPolicy,
+        name: bandPolicy.name,
+      });
+      return band;
+    });
 
-    // Build dynamic bands
-    this.bands = all
-      .filter(b => !b.isStatic || !b.isStatic())
-      .map(b => new SceneryBand({ sceneEl, policy: b, name: b.name }));
+    console.debug('[SceneryManager] built bands:',
+      this.bands.map(b => ({
+        name: b.policy?.name,
+        static: !!b.policy?.isStatic(),
+        items: b.items?.length ?? 0
+      }))
+    );
+
+
+    // Separate static and dynamic for convenience (optional)
+    this.staticBands = this.bands.filter(b => b.policy?.isStatic() === true);
+    this.dynamicBands = this.bands.filter(b => !b.policy?.isStatic());
   }
 
-  get defaultPolicy() { return this.scenePolicy.defaultPolicy; }
+  /** Access the global defaults if needed */
+  get defaultPolicy() {
+    return this.scenePolicy.defaultPolicy;
+  }
 }
