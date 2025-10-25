@@ -4,12 +4,16 @@
   // spawnAtZ pushes the entity to items, which are updated as the rider moves.
 
 import { getPos, setPos } from '../core/util.js';
+import { constants } from "../../constants.js";
+import { spawnCloud } from '../env/Cloud.js';
 import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
-  constructor({ sceneEl, dirtPattern, policy }) {
+
+  constructor({ sceneEl, dirtPattern, policy, clouds }) {
     this.sceneEl = sceneEl;
     this.dirtPattern = dirtPattern;
+    this.clouds = clouds;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
@@ -90,7 +94,7 @@ export class ObjectField {
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
-    // Phase 5: re-roll kind by band policy mix (keeps long-run ratios)
+    // re-roll kind by band policy mix (keeps long-run ratios)
         if (band.policy && typeof band.policy.xAnchor === 'function') {
           const mix = typeof band.policy.mix === 'function' ? band.policy.mix() : { tree: 0.5, building: 0.5 };
           const roll = Math.random();
@@ -118,6 +122,29 @@ export class ObjectField {
       setPos(obj, pos);
     }
   }
+
+    // Advance clouds
+    if (Date.now() > constants.lastCloud + constants.updateEvery) {
+      constants.lastCloud = Date.now();
+
+      if (this.clouds.clouds.children.length) {
+        for (let cloud of this.clouds.clouds.children) {
+          const pos = getPos(cloud);
+          
+          // If the cloud is still in visible range, move it forward
+          if ((pos.z + 1) < -20) {
+            pos.z += 1;
+            setPos(cloud, pos);
+          }
+
+          // Otherwise, remove it from the array and respawn in zone 4
+          else {
+            this.clouds.clouds.removeChild(cloud);
+            this.clouds.clouds.appendChild(spawnCloud(4));
+          }
+        }
+      }
+    }
 
     // Advances the dirt pattern
     if (this.dirtPattern?.patternEl) {

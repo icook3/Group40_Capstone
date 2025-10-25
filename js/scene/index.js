@@ -18,14 +18,15 @@ export class ZlowScene {
     }
 
     // Generate a new object field, track, and clouds
-    this.dirtPattern = new DirtPattern({ sceneEl: this.scene });
+    this.dirtPattern = new DirtPattern({ sceneEl: this.scene });        
+    this.clouds = new Cloud({ sceneEl: this.scene });
     this.objectField = new ObjectField({
       sceneEl: this.scene,
       dirtPattern: this.dirtPattern,
-      policy: this.scenery.defaultPolicy
+      policy: this.scenery.defaultPolicy,
+      clouds: this.clouds
     });
     this.objectField.attachExternalBands(this.scenery.bands);
-    this.clouds = new Cloud({ sceneEl: this.scene });
   }
   
   update(riderSpeed = 0, dt = 0) {
