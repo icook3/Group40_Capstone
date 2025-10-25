@@ -1,6 +1,4 @@
-import { getPos, setPos } from '../core/util.js';
 import { constants } from "../../constants.js";
-import { ObjectField } from "../objects/ObjectField.js";
 
 export class Cloud {
 
@@ -10,7 +8,7 @@ export class Cloud {
     // Zone 1: z = 0 through -120; y = 20 through 100; x = 190 through -190
     // Zone 2: z = -121 through -240; y = 20 through 200; x = 400 through -400
     // Zone 3: z = -141 through -360; y = 30 through 300; x = 345 through -345
-    // A Zone 4 could be included, but one can't spawn very far off the track before the cloud disppears at z < -360
+    // Zone 4: Used to spawn clouds in the farther section of Zone 3 as the rider moves
 
     // Create a-entity for the clouds and set ID
     this.clouds = document.createElement('a-entity');
@@ -29,8 +27,9 @@ export class Cloud {
     // Add clouds to scene
     sceneEl.appendChild(this.clouds);
 
-    // Create an array with all currently spawned cloud objects in it
-    this.cloudArray = Array.from(clouds.children);
+    // Determine how fast clouds will move (10 to 30 MPH)
+    constants.cloudSpeed = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
+    constants.updateEvery = (1/constants.cloudSpeed) * 1000;
   }
 }
 
@@ -71,6 +70,15 @@ export function spawnCloud(zone) {
     maxZ = 360;
   }
 
+  else if (zone === 4) {
+    minX = 0;
+    maxX = 345;
+    minY = 30;
+    maxY = 170;
+    minZ = 300;
+    maxZ = 360;
+  }
+
   // Get x and determine sign
   let cloudX;
   if (getSign()) {
@@ -91,9 +99,15 @@ export function spawnCloud(zone) {
   const cloud = document.createElement('a-entity')
 
   // Decide what kind of cloud to create and set position
-  let cloudType = "cloud" + (Math.floor(Math.random() * (3)) + 1);
+  let cloudType = "cloud" + (Math.floor(Math.random() * (constants.totalCloudTypes)) + 1);
   cloud.setAttribute('gltf-model',`#${cloudType}`);
   cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
+
+  // Flip cloud on the y-axis to add more variation based on getSign()
+  if (getSign()) {
+    cloud.setAttribute('rotation', `0 180 0`);
+  }
+
   return cloud;
 }
 
@@ -101,40 +115,4 @@ export function spawnCloud(zone) {
 function getSign() {
     let randomNo = Math.floor(Math.random() * 10);
     return randomNo % 2 === 0;
-  }
-
-  // Advance clouds at 10-30 MPH
-  export function advanceClouds(currentClouds) {
-    // dz = speed * time elapsed (in milliseconds)
-    
-    const cloudSpeed = 20;
-
-    // Move clouds forward by 1 when updateEvery = 1
-    let updateEvery = (1/cloudSpeed) * 1000;
-    
-    if (Date.now() > constants.lastCloud + updateEvery) {
-      //console.log("FROM FIELD",ObjectField.clouds);
-      constants.lastCloud = Date.now();
-
-      if (currentClouds.length) {
-        for (const cloud of currentClouds) {
-          const pos = getPos(cloud);
-          
-          // If the cloud is still in visible range, move it forward
-          if ((pos.z + 1) < -20) {
-            pos.z += 1;
-            setPos(cloud, pos);
-          }
-
-          // Otherwise, remove it from the array and respawn in zone 3
-          else {
-            let toDelete = currentClouds.indexOf(cloud);
-            if (toDelete > -1) {
-              currentClouds.splice(toDelete, 1);
-              currentClouds.push(spawnCloud(3));
-            }
-          }
-        }
-      }
-    }
   }

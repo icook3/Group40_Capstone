@@ -93,20 +93,11 @@ export class ObjectField {
     }
 
     // Advance clouds
-    // CURRENTLY ADVANCES CLOUDS BUT DOES NOT RESPAWN PROPERLY
-    //this.clouds.cloudArray = advanceClouds(this.clouds.cloudArray);
-
-    const cloudSpeed = 20;
-    
-    // Move clouds forward by 1 when updateEvery = 1
-    let updateEvery = (1/cloudSpeed) * 1000;
-    
-    if (Date.now() > constants.lastCloud + updateEvery) {
-      //console.log("FROM FIELD",ObjectField.clouds);
+    if (Date.now() > constants.lastCloud + constants.updateEvery) {
       constants.lastCloud = Date.now();
 
-      if (this.clouds.cloudArray.length) {
-        for (let cloud of this.clouds.cloudArray) {
+      if (this.clouds.clouds.children.length) {
+        for (let cloud of this.clouds.clouds.children) {
           const pos = getPos(cloud);
           
           // If the cloud is still in visible range, move it forward
@@ -115,25 +106,19 @@ export class ObjectField {
             setPos(cloud, pos);
           }
 
-          // Otherwise, remove it from the array and respawn in zone 3
+          // Otherwise, remove it from the array and respawn in zone 4
           else {
-            // WORKS BUT MAYBE JUST RECYCLE THE OLD CLOUD TO AVOID THE DELETE ISSUE
-            this.clouds.clouds.appendChild(spawnCloud(3));
-
-            //DOESN'T WANT TO REMOVE BECAUSE NOT A CHILD OF THAT NODE
-            //this.clouds.clouds.removeChild(cloud);
-            console.log(this.clouds.clouds);
-
+            this.clouds.clouds.removeChild(cloud);
+            this.clouds.clouds.appendChild(spawnCloud(4));
           }
         }
       }
     }
     
-    // Advances the dirt pattern
+    // Advance dirt pattern
     if (this.dirtPattern?.patternEl) {
       const kids = Array.from(this.dirtPattern.patternEl.children);
       if (kids.length) {
-        // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
         
         for (const circle of kids) {
           const pos = getPos(circle);
@@ -143,7 +128,7 @@ export class ObjectField {
           
           // Reset position when item is within 10 of rider
           if (pos.z > 10) {
-            //pos.z = farthestZ - 5;
+
             // Reset z to -30, which is about as far as you can see on the track
             pos.z = -30;
           }

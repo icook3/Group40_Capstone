@@ -94,6 +94,9 @@ class Constants {
 
   // Constants governing cloud speed
   lastCloud = Date.now();
+  cloudSpeed = 0;
+  updateEvery = 0;
+  totalCloudTypes = 3;
 }
 
 export const constants = new Constants();
