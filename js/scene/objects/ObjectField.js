@@ -104,11 +104,12 @@ export class ObjectField {
         }
       }
     }
-    
-    // Advance dirt pattern
+
+    // Advances the dirt pattern
     if (this.dirtPattern?.patternEl) {
       const kids = Array.from(this.dirtPattern.patternEl.children);
       if (kids.length) {
+        // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
         
         for (const circle of kids) {
           const pos = getPos(circle);
@@ -118,7 +119,7 @@ export class ObjectField {
           
           // Reset position when item is within 10 of rider
           if (pos.z > 10) {
-
+            //pos.z = farthestZ - 5;
             // Reset z to -30, which is about as far as you can see on the track
             pos.z = -30;
           }
