@@ -3,15 +3,14 @@ import { getPos, setPos } from '../core/util.js';
 import { TreeKind } from '../objects/kinds/Tree.js';
 import { BuildingKind } from '../objects/kinds/Building.js';
 
-/** Tweakable settings for this band (single source of truth in this file). */
 const SCENERY_BAND_DEFAULTS = {
-  treeX: 50,          // X position for trees at terrain edge (m)
-  buildingX: 65,      // X position for buildings (slightly farther out) (m)
-  zStart: 10,         // Start Z (closest to rider) (m)
-  zEnd: -200,         // End Z (farthest away) (m)
-  step: 5,            // Z spacing between items (m)
-  buildingChance: 0.5,// Probability an item is a building (0..1)
-  jitter: 0.5         // ±X jitter so the line looks organic (m)
+  treeX: 50,
+  buildingX: 65,
+  zStart: 10,
+  zEnd: -200,
+  step: 5,
+  buildingChance: 0.5,
+  jitter: 0.5
 };
 
 export class SceneryBand {
@@ -41,14 +40,11 @@ export class SceneryBand {
 
     this.items = [];
 
-    // seeded RNG support (falls back to Math.random)
     const rand =
       (typeof this.policy?.rng === 'function' ? this.policy.rng(this.name) : null) ||
       Math.random;
 
-
     for (const side of [-1, 1]) {
-      // spacing can be a fn(z) or a constant-like fn()
       const spacingVal = (() => {
         const f = this.policy?.spacing;
         if (typeof f === 'function') {
@@ -58,7 +54,6 @@ export class SceneryBand {
       })();
 
       for (let z = zStart; z > zEnd; z -= spacingVal) {
-        // ---- Compute Z placement with optional zJitter ----
         const zJ = (() => {
           const f = this.policy?.zJitter;
           if (typeof f === 'function') {
@@ -66,9 +61,8 @@ export class SceneryBand {
           }
           return 0;
         })();
-        const zPlace = z + ((rand() * 2) - 1) * zJ; // centered jitter in [-zJ, +zJ]
+        const zPlace = z + ((rand() * 2) - 1) * zJ;
 
-        // --- FIRST spawn at this z (with per-band mix) ---
         const mix = (() => {
           const f = this.policy?.mix;
           if (typeof f === 'function') {
@@ -95,68 +89,47 @@ export class SceneryBand {
         obj.setAttribute('zlow-band-name', this.name);
         obj.setAttribute('zlow-kind', kindName);
 
-        {
-          const pos = getPos(obj);
-
-          // jitterX can be fn(z) or constant; use centered range [-0.5,0.5]*amp (your convention)
-          const jitterAmp = (() => {
-            const f = this.policy?.jitterX;
-            if (typeof f === 'function') {
-              try { return f(this.name, zPlace) ?? jitter; } catch { return f() ?? jitter; }
-            }
-            return jitter;
-          })();
-
-          let x = anchorX + (rand() - 0.5) * jitterAmp;
-
-          if (typeof this.policy?.clampX === 'function') {
-            const sideSign = side;
-            x = this.policy.clampX(kindName, sideSign, x);
+        const pos = getPos(obj);
+        const jitterAmp = (() => {
+          const f = this.policy?.jitterX;
+          if (typeof f === 'function') {
+            try { return f(this.name, zPlace) ?? jitter; } catch { return f() ?? jitter; }
           }
+          return jitter;
+        })();
+        let x = anchorX + (rand() - 0.5) * jitterAmp;
 
-          // PHASE 7: yOffset & scale (safe defaults)
-          const yOff = (() => {
-            const f = this.policy?.yOffset;
-            if (typeof f === 'function') {
-              try { return f(this.name, kindName, zPlace) ?? 0; } catch { return f(kindName, zPlace) ?? 0; }
-            }
-            return 0;
-          })();
-
-          const scl = (() => {
-            const f = this.policy?.scale;
-            let val = 1;
-            if (typeof f === 'function') {
-              try { val = f(this.name, kindName, zPlace); } catch { val = f(kindName, zPlace); }
-            } else if (this.policy && 'scale' in this.policy) {
-              val = this.policy.scale;
-            }
-            if (typeof val === 'number') return { x: val, y: val, z: val };
-            return { x: val?.x ?? 1, y: val?.y ?? 1, z: val?.z ?? 1 };
-          })();
-
-          pos.x = x;
-          pos.y = (pos.y ?? 0) + yOff;
-          setPos(obj, pos);
-          obj.setAttribute('scale', `${scl.x} ${scl.y} ${scl.z}`);
+        if (typeof this.policy?.clampX === 'function') {
+          const sideSign = side;
+          x = this.policy.clampX(kindName, sideSign, x);
         }
+
+        // yOffset still applied, but no scaling at all
+        const yOff = (() => {
+          const f = this.policy?.yOffset;
+          if (typeof f === 'function') {
+            try { return f(this.name, kindName, zPlace) ?? 0; } catch { return f(kindName, zPlace) ?? 0; }
+          }
+          return 0;
+        })();
+
+        pos.x = x;
+        pos.y = (pos.y ?? 0) + yOff;
+        setPos(obj, pos);
 
         this.items.push(obj);
 
-        const zPlace2 = zPlace + (rand() * 0.8 + 0.2); // small forward push (0.2..1.0 m)
-        // --- Optional second spawn at the same z (per-band density) ---
+        // second spawn (density)
+        const zPlace2 = zPlace + (rand() * 0.8 + 0.2);
         const density = (() => {
           const f = this.policy?.density;
-
           if (typeof f === 'function') {
             try { return f(this.name, zPlace2) ?? 0; } catch { return f() ?? 0; }
           }
           return 0;
         })();
-
         if (rand() < density) {
           const secondSide = -side;
-
           const mix2 = (() => {
             const f = this.policy?.mix;
             if (typeof f === 'function') {
@@ -164,7 +137,6 @@ export class SceneryBand {
             }
             return mix;
           })();
-
           const buildingP2 =
             typeof mix2.building === 'number' ? mix2.building : buildingChance;
           const isBuilding2 = rand() < buildingP2;
@@ -185,7 +157,6 @@ export class SceneryBand {
           obj2.setAttribute('zlow-kind', kindName2);
 
           const pos2 = getPos(obj2);
-
           const jitterAmp2 = (() => {
             const f = this.policy?.jitterX;
             if (typeof f === 'function') {
@@ -193,13 +164,11 @@ export class SceneryBand {
             }
             return jitter;
           })();
-
           let x2 = anchorX2 + (rand() - 0.5) * jitterAmp2;
           if (typeof this.policy?.clampX === 'function') {
             x2 = this.policy.clampX(kindName2, secondSide, x2);
           }
 
-          // PHASE 7: yOffset & scale for the second spawn as well
           const yOff2 = (() => {
             const f = this.policy?.yOffset;
             if (typeof f === 'function') {
@@ -208,22 +177,9 @@ export class SceneryBand {
             return 0;
           })();
 
-          const scl2 = (() => {
-            const f = this.policy?.scale;
-            let val = 1;
-            if (typeof f === 'function') {
-              try { val = f(this.name, kindName2, zPlace2); } catch { val = f(kindName2, zPlace2); }
-            } else if (this.policy && 'scale' in this.policy) {
-              val = this.policy.scale;
-            }
-            if (typeof val === 'number') return { x: val, y: val, z: val };
-            return { x: val?.x ?? 1, y: val?.y ?? 1, z: val?.z ?? 1 };
-          })();
-
           pos2.x = x2;
           pos2.y = (pos2.y ?? 0) + yOff2;
           setPos(obj2, pos2);
-          obj2.setAttribute('scale', `${scl2.x} ${scl2.y} ${scl2.z}`);
 
           this.items.push(obj2);
         }
@@ -231,4 +187,5 @@ export class SceneryBand {
     }
   }
 }
+
 

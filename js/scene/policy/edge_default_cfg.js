@@ -39,7 +39,7 @@ const edge_default_cfg = {
       order: 1,
       static: false,
       laneHalfWidth: 1.3,
-      spacing: () => 5.4 + Math.random()*0.3,
+      spacing: () => 15.4 + Math.random()*0.3,
       density: () => 0.40 + Math.random()*0.15,
       jitterX: () => 0.30 + Math.random()*0.15,
       mix: () => ({ tree: 0.75, building: 0.25 }),
@@ -61,7 +61,7 @@ const edge_default_cfg = {
       order: 2,
       static: false,
       laneHalfWidth: 1.5,
-      spacing: () => 5.0 + Math.random()*0.3,
+      spacing: () => 15.0 + Math.random()*0.3,
       density: () => 0.50 + Math.random()*0.20,
       jitterX: () => 0.28 + Math.random()*0.15,
       mix: () => ({ tree: 0.55, building: 0.45 }),
@@ -82,8 +82,8 @@ const edge_default_cfg = {
       name: "outer-mix",
       order: 3,
       static: false,
-      laneHalfWidth: 1.7,
-      spacing: () => 4.6 + Math.random()*0.3,     // denser
+      laneHalfWidth: 1.2,
+      spacing: () => 54.6 + Math.random()*0.3,     // denser
       density: () => 0.60 + Math.random()*0.20,   // more doubles
       jitterX: () => 0.22 + Math.random()*0.12,   // crisper line
       mix: () => ({ tree: 0.30, building: 0.70 }),
@@ -107,7 +107,7 @@ const edge_default_cfg = {
       laneHalfWidth: 1.9,
 
       // Make it extremely dense & tight:
-      spacing: () => 0,   
+      spacing: () => 5,   
       density: () => 0.85 + Math.random() * 0.10, // almost every row doubles up
       jitterX: () => 0.12 + Math.random() * 0.05, // keep crisp but not perfectly uniform
 
