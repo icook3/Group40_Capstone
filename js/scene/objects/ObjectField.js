@@ -85,6 +85,7 @@ export class ObjectField {
     }
 
     for (const band of this.externalGroups) {
+    if (band?.policy?.isStatic()) continue;
     if (!band?.items?.length) continue;
     for (const obj of band.items) {
       const pos = getPos(obj);
