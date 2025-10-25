@@ -4,7 +4,8 @@ import { ZlowScene } from "./scene/index.js";
 import { HUD } from "./hud.js";
 import { Strava } from "./strava.js";
 import { constants } from "./constants.js";
-import { Avatar } from "./avatar.js";
+import { AvatarCreator } from "./avatarCreator.js";
+import { AvatarMovement } from "./avatarMovement.js";
 import { KeyboardMode } from "./keyboardMode.js";
 import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
@@ -180,8 +181,9 @@ export function initZlowApp({
 
   const countdown = new PauseCountdown({ getElement, limit: 10 });
 
-  rider = new Avatar("rider", "#0af", { x: -0.5, y: 1, z: 0 });
-  pacer = new Avatar("pacer", "#fa0", { x: 0.5, y: 1, z: -2 }, undefined, true);
+  rider = new AvatarMovement("rider", { position: { x: -0.5, y: 1, z: 0 } });
+  pacer = new AvatarMovement("pacer", { position: { x: 0.5, y: 1, z: -2 } });
+  pacer.creator.setPacerColors();
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
 
@@ -404,7 +406,6 @@ export function initZlowApp({
     saveTCX();
   });
 
-  // pacer sync - maybe put in Avatar.js?
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {
     //Set pacer's z to rider's z

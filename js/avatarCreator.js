@@ -1,15 +1,15 @@
-import {powerToSpeed} from "./main.js";
-
-export class Avatar {
-    constructor(id, color = '#0af', position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, isPacer = false) {
+export class AvatarCreator {
+    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
-        this.color = color;
         this.position = position;
         this.rotation = rotation;
-        this.speed = 0;
-        this.power = 0;
-        this.avatarEntity = this.createEntity();
+        this.onReady = onReady;
+        this.autoRotate = false;
+        this.rotationSpeed = 0.2;
 
+        //GLB Flags
+        this.personLoaded = false;
+        this.bikeLoaded = false;
         //GLB Model
         this.personModel = null;
         this.personRig = null;
@@ -58,6 +58,23 @@ export class Avatar {
         this.leftPedalBone = null;
         this.rightPedalBone = null;
         this.pedalCrankBone = null;
+
+        //Player and bike colors
+        this.playerModel = "male";
+        this.skinColor = "#ff5500";
+        this.shirtColor = "#ff0000";
+        this.shortsColor = "#000000";
+        this.shoesColor = "#000000";
+
+        this.bikeFrameColor = "#ff5500";
+        this.bikeTireColor = "#333333";
+        this.bikeGripColor = "#000000";
+        this.bikeSeatColor = "#222222";
+        this.bikePedalColor = "#555555";
+        this.bikeCrankColor = "#888888";
+
+        this.loadPlayerData();
+        this.avatarEntity = this.createEntity();
     }
 
     //Creates avatar entity
@@ -68,12 +85,26 @@ export class Avatar {
         avatar.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
 
         //Create Person
+        this.createPlayerModel(avatar);
+        this.createBikeModel(avatar);
+
+        document.querySelector('a-scene').appendChild(avatar);
+        return avatar;
+    }
+
+    createPlayerModel (avatarEntity) {
+        const checkReady = () => {
+            if (this.personLoaded && this.bikeLoaded) {
+                if (this.onReady) this.onReady(this);
+            }
+        };
+
         const personModel = document.createElement('a-entity');
-        personModel.setAttribute('gltf-model', '#maleGLB');
+        personModel.setAttribute('gltf-model', `#${this.playerModel}GLB`);
         personModel.setAttribute('position', '0 0 0');
         personModel.setAttribute('rotation', '0 -90 0');
         personModel.setAttribute('scale', '0.35 0.35 0.35');
-        avatar.appendChild(personModel);
+        avatarEntity.appendChild(personModel);
 
         //Assign person and person bones
         this.personModel = personModel;
@@ -118,23 +149,71 @@ export class Avatar {
                     this.rightToe = personSkeleton.getBoneByName("toeR");
                     this.rightHeel = personSkeleton.getBoneByName("heel02R");
 
+                    this.applyPlayerColors();
                     this.setInitialPose();
+                    this.personLoaded = true;
+                    checkReady();
                 }
             });
         });
+    }
 
-        //Create bike
+    setPlayerModel(model) {
+        this.playerModel = model;
+        if (this.avatarEntity) {
+            //Remove old model
+            if (this.personModel) {
+                this.avatarEntity.removeChild(this.personModel);
+            }
+            //Add new model
+            this.createPlayerModel(this.avatarEntity);
+        }
+        this.savePlayerData();
+    }
+
+    setPlayerColors(skin, shirt, shorts, shoes) {
+        this.skinColor = skin;
+        this.shirtColor = shirt;
+        this.shortsColor = shorts;
+        this.shoesColor = shoes;
+
+        this.applyPlayerColors();
+        this.savePlayerData();
+    }
+
+    applyPlayerColors() {
+        if (!this.personModel || !this.personModel.object3D) {
+            return;
+        }
+
+        this.personModel.object3D.traverse((child) => {
+            if (child.isMesh && child.material) {
+                if (child.material.name.includes("Skin")) child.material.color.set(this.skinColor);
+                if (child.material.name.includes("Shirt")) child.material.color.set(this.shirtColor);
+                if (child.material.name.includes("Shorts")) child.material.color.set(this.shortsColor);
+                if (child.material.name.includes("Shoes")) child.material.color.set(this.shoesColor);
+            }
+        });
+    }
+
+    createBikeModel(avatarEntity) {
+        const checkReady = () => {
+            if (this.personLoaded && this.bikeLoaded) {
+                if (this.onReady) this.onReady(this);
+            }
+        };
+
         const bikeModel = document.createElement('a-entity');
         bikeModel.setAttribute('gltf-model', '#bikeGLB');
         bikeModel.setAttribute('position', '0 0 0');
         bikeModel.setAttribute('rotation', '0 -90 0');
         bikeModel.setAttribute('scale', '0.35 0.35 0.35');
-        avatar.appendChild(bikeModel);
+        avatarEntity.appendChild(bikeModel);
 
         //Assign bike and assign bike parts
         this.bikeModel = bikeModel;
         bikeModel.addEventListener('model-loaded', (e) => {
-            const model = e.detail.model; //Three.js root of GLB
+            const model = e.detail.model;
             this.rearWheel = model.getObjectByName("RearTire");
             this.frontWheel = model.getObjectByName("FrontTire");
             this.bikeFrontFrame = model.getObjectByName("FrontFrame");
@@ -150,13 +229,42 @@ export class Avatar {
                     this.leftPedalBone = bikeSkeleton.getBoneByName("b_leftPedal");
                     this.rightPedalBone = bikeSkeleton.getBoneByName("b_rightPedal");
                     this.pedalCrankBone = bikeSkeleton.getBoneByName("b_pedalcrank");
+
+                    this.applyBikeColors();
+                    this.bikeLoaded = true;
+                    checkReady();
                 }
             });
         });
+    }
 
+    setBikeColors(frame, tires, grip, seat, pedals, pedalCrank) {
+        this.bikeFrameColor = frame;
+        this.bikeTireColor = tires;
+        this.bikeGripColor = grip;
+        this.bikeSeatColor = seat;
+        this.bikePedalColor = pedals;
+        this.bikeCrankColor = pedalCrank;
 
-        document.querySelector('a-scene').appendChild(avatar);
-        return avatar;
+        this.applyBikeColors();
+        this.savePlayerData();
+    }
+
+    applyBikeColors () {
+        if (!this.bikeModel || !this.bikeModel.object3D) {
+            return;
+        }
+
+        this.bikeModel.object3D.traverse((child) => {
+            if (child.isMesh && child.material) {
+                if (child.material.name.includes("Frame_Mat")) child.material.color.set(this.bikeFrameColor);
+                if (child.material.name.includes("Tire_Mat")) child.material.color.set(this.bikeTireColor);
+                if (child.material.name.includes("Grip_Mat")) child.material.color.set(this.bikeGripColor);
+                if (child.material.name.includes("Seat_Mat")) child.material.color.set(this.bikeSeatColor);
+                if (child.material.name.includes("Pedal_Mat")) child.material.color.set(this.bikePedalColor);
+                if (child.material.name.includes("PedalCrank_Mat")) child.material.color.set(this.bikeCrankColor);
+            }
+        });
     }
 
     setInitialPose () {
@@ -199,109 +307,101 @@ export class Avatar {
         //Legs
         this.leftThigh.rotation.z = -pi / 15;
         this.leftThigh.rotation.x =  pi / 2;
-        this.leftShin.rotation.x = 13 * pi / 20;
+        this.leftShin.rotation.x = 12 * pi / 20;
         this.leftShin.rotation.z = -pi / 90;
         this.leftFoot.rotation.x = -pi / 6;
     }
 
-    //Helper to interpolate smoothly between A and B
-    cycleInterpolate (a, b, phase) {
-        return a + (1 - Math.cos(phase)) * 0.5 * (b - a);
+
+    setMenuPosition() {
+        this.avatarEntity.setAttribute('position', `0 0 0`);
+        this.avatarEntity.setAttribute('rotation', `0 180 0`);
+
+        this.setInitialPose();
     }
 
-    animatePedalingPerson (dt) {
-        const pi = Math.PI;
-
-        // se the crank rotation as the driving phase
-        const crankAngle = this.pedalCrankBone.rotation.x;
-
-        //Base pose angles from setInitialPose()
-        const baseRightThighX = 3 * pi / 4;
-        const baseLeftThighX = pi / 2;
-        const baseRightShinX = pi / 4;
-        const baseLeftShinX = 13 * pi / 20;
-        const baseRightFootX = -pi / 8;
-        const baseLeftFootX = -pi / 6;
-
-        const thighForwardSwing = 0.1;
-        const shinForwardSwing = 0.3;
-        const footForwardSwing = 0.25;
-
-        //Right leg transitions between its own base and the left leg’s base
-        this.rightThigh.rotation.x = this.cycleInterpolate(baseRightThighX, baseLeftThighX, crankAngle)
-            + Math.sin(crankAngle + Math.PI) * thighForwardSwing;
-        this.rightShin.rotation.z = this.cycleInterpolate(-10 * pi / 200, pi / 180, crankAngle);
-        this.rightShin.rotation.x  = this.cycleInterpolate(baseRightShinX,  baseLeftShinX,  crankAngle)
-            + Math.sin(crankAngle + Math.PI) * shinForwardSwing;
-        this.rightFoot.rotation.x  = this.cycleInterpolate(baseRightFootX,  baseLeftFootX,  crankAngle)
-            + Math.sin(crankAngle + Math.PI) * footForwardSwing;
-
-        //Left leg transitions in opposite phase
-        this.leftThigh.rotation.x = this.cycleInterpolate(baseLeftThighX, baseRightThighX, crankAngle)
-            + Math.sin(crankAngle) * thighForwardSwing;
-        this.leftShin.rotation.z = this.cycleInterpolate(pi / 200, 12 * pi / 200, crankAngle);
-        this.leftShin.rotation.x  = this.cycleInterpolate(baseLeftShinX,  baseRightShinX,  crankAngle)
-            + Math.sin(crankAngle) * shinForwardSwing;
-        this.leftFoot.rotation.x  = this.cycleInterpolate(baseLeftFootX,  baseRightFootX,  crankAngle)
-            + Math.sin(crankAngle) * footForwardSwing;
+    enableMenuRotation(speed = 0.5) {
+        this.autoRotate = true;
+        this.rotationSpeed = speed;
     }
 
+    startRotationLoop() {
+        if (this._rotationLoopRunning) return;
+        this._rotationLoopRunning = true;
 
-
-    animatePedalingBike(dt) {
-        //variables for frequency 1.5 Hz at 30 km/h, scale with speed
-        const baseSpeed = 30; //km/h
-        const baseFreqHz = 1.5; //Hz at 30 km/h
-        const angularSpeedAdjuster = baseFreqHz * 2 * Math.PI;
-
-        //Rotate wheels if loaded
-        if (this.rearWheel && this.frontWheel) {
-            const angularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.37
-            const wheelRotationAmount = angularSpeed * dt;
-            this.rearWheel.rotation.x -= wheelRotationAmount;
-            this.frontWheel.rotation.x -= wheelRotationAmount;
-        }
-
-        //Rotate crank and pedals
-        if (this.leftPedalBone && this.rightPedalBone && this.pedalCrankBone) {
-            if (this.id === "pacer") {
-                //Rotate crank
-                const pacerCrankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
-                const pacerCrankRotationAmount = pacerCrankAngularSpeed * dt;
-                this.pedalCrankBone.rotation.x -= pacerCrankRotationAmount;
-
-                //Rotate pedals
-                this.leftPedalBone.rotation.y = this.pedalCrankBone.rotation.x;
-                this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
-            } else {
-                //Rotate crank
-                const speedKmh = powerToSpeed({power: this.power});
-                const crankAngularSpeed = ((speedKmh * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
-                const crankRotationAmount = crankAngularSpeed * dt;
-                this.pedalCrankBone.rotation.x -= crankRotationAmount;
-
-                //Rotate pedals
-                this.leftPedalBone.rotation.y = this.pedalCrankBone.rotation.x;
-                this.rightPedalBone.rotation.y = -this.pedalCrankBone.rotation.x;
+        const rotate = () => {
+            if (this.avatarEntity && this.autoRotate) {
+                const rot = this.avatarEntity.getAttribute('rotation');
+                this.avatarEntity.setAttribute('rotation', {
+                    x: rot.x,
+                    y: rot.y + this.rotationSpeed,
+                    z: rot.z
+                });
             }
-        }
+            requestAnimationFrame(rotate);
+        };
+        rotate();
     }
 
-    //Setter for avatar speed
-    setSpeed(speed) {
-        this.speed = speed;
+    savePlayerData() {
+        const data = {
+            model: this.playerModel || "male",
+            colors: {
+                skin: this.skinColor,
+                shirt: this.shirtColor,
+                shorts: this.shortsColor,
+                shoes: this.shoesColor
+            },
+            bikeColors: {
+                frame: this.bikeFrameColor,
+                tires: this.bikeTireColor,
+                grip: this.bikeGripColor,
+                seat: this.bikeSeatColor,
+                pedals: this.bikePedalColor,
+                pedalCrank: this.bikeCrankColor
+            }
+        };
+
+        localStorage.setItem("playerData", JSON.stringify(data));
     }
 
-    //Setter for avatar power
-    setPower(power) {
-        this.power = power;
-    }
-
-    update(dt) {
-        if (this.speed === 0) {
+    loadPlayerData() {
+        const data = JSON.parse(localStorage.getItem("playerData"));
+        if (!data) {
             return;
         }
-        this.animatePedalingBike(dt);
-        this.animatePedalingPerson(dt)
+
+        this.playerModel = data.model || this.playerModel;
+
+        const player = data.colors || {};
+        this.skinColor = player.skin || this.skinColor;
+        this.shirtColor = player.shirt || this.shirtColor;
+        this.shortsColor = player.shorts || this.shortsColor;
+        this.shoesColor = player.shoes || this.shoesColor;
+
+        const bike = data.bikeColors || {};
+        this.bikeFrameColor = bike.frame || this.bikeFrameColor;
+        this.bikeTireColor = bike.tires || this.bikeTireColor;
+        this.bikeGripColor = bike.grip || this.bikeGripColor;
+        this.bikeSeatColor = bike.seat || this.bikeSeatColor;
+        this.bikePedalColor = bike.pedals || this.bikePedalColor;
+        this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
+    }
+
+    setPacerColors() {
+        this.skinColor   = "#c1591a";
+        this.shirtColor  = "#a32c06";
+        this.shortsColor = "#290800";
+        this.shoesColor  = "#4a1600";
+
+        this.bikeFrameColor = "#FF9500"; // orange frame
+        this.bikeTireColor  = "#333333"; // tires stay neutral
+        this.bikeGripColor  = "#FF7F00";
+        this.bikeSeatColor  = "#FF6F00";
+        this.bikePedalColor = "#FF8C00";
+        this.bikeCrankColor = "#FFA500";
+
+        this.applyPlayerColors();
+        this.applyBikeColors();
     }
 }
