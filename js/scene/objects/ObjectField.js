@@ -4,9 +4,9 @@
   // spawnAtZ pushes the entity to items, which are updated as the rider moves.
 
 import { getPos, setPos } from '../core/util.js';
-import { KINDS, kindsByName } from './kinds/index.js';
 import { constants } from "../../constants.js";
 import { spawnCloud } from '../env/Cloud.js';
+import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
   constructor({ sceneEl, dirtPattern, clouds }) {
@@ -46,6 +46,7 @@ export class ObjectField {
     const kind = this._pickKind();
     const entity = kind.spawn(this.sceneEl, z);
     this.items.push(entity);
+    //console.log("Placing object at (" + getPos(entity).x + ", " + getPos(entity).y + ", " + getPos(entity).z + "). This is in ObjectField");
   }
 
   // Initializes items that move with the rider (buildings and trees)
@@ -56,18 +57,6 @@ export class ObjectField {
       if (Math.random() < 0.7) this._spawnAtZ(z); // original density
     }
     this.initialized = true;
-  }
-
-  _detectKind(el) {
-    const name = el.getAttribute('zlow-kind');
-    if (name && kindsByName[name]) return kindsByName[name];
-
-    // Fallback to geometry check (shouldn’t be needed once we set zlow-kind):
-    const geom = el.getAttribute('geometry');
-    const isBuilding = geom && (typeof geom === 'object'
-      ? geom.primitive === 'box'
-      : String(geom).includes('primitive: box'));
-    return isBuilding ? kindsByName.building : kindsByName.tree;
   }
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
@@ -85,11 +74,12 @@ export class ObjectField {
         pos.z = farthestZ - 5;
 
         // resample X per-kind (keeps trees closer than buildings)
-        const kind = this._detectKind(obj);
+        const kind = detectKind(obj);
         pos.x = kind.resampleX();
+
       }
 
-      setPos(obj, pos);
+        setPos(obj, pos);
     }
 
     // Advance clouds

@@ -14,12 +14,15 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Structure
 - `resources` — Contains various resources
 	- `favicons` — Stores the program favicon
+	- `fonts` — Stores a number fonts used for HUD elements and the main menu
 	- `images` — Contains a number of important images for different pages
+	- `models` — Stores various 3D models
 	- `textures` — Stores image textures
-	- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to settings
-	- `menuSettings.html` — Contains settings page for changing more general settings
+	- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings
 - `index.html` — Loads A-Frame scene and UI.
-- `style.css` — Handles various CSS styles for the program
+- `style.css` — Handles general CSS styles for the program
+- `hud.css` — Handles CSS styles for the modern HUD
+- `menu.css` — Handles CSS styles for the main menu
 - `js` — Contains JavaScript code
 	- `scene` - Handles scene generation
 		- `core` — core utilities for scene generation
@@ -37,13 +40,14 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `Tree.js` — Handles trees along the side of the track
 			- `ObjectField.js` — Handles creating a set of objects at different locations
 		- `index.js` — Sets up and updates the A-Frame 3D world.
-	- `avatar.js` — Sets up and updates A-Frame 3D avatar.
+    - `avatarMovement.js` — Sets up A-Frame 3D avatar.
+	- `avatarMovement.js` — Updates A-Frame 3D avatar.
 	- `bluetooth.js` — Handles Bluetooth device connection and data polling.
+	- `constants.js` — Stores important constants for the program execution
 	- `hud.js` — Renders the heads-up display overlay.
 	- `keyboardMode.js` — Handles keyboard mode functionalities and variables
 	- `main.js` — Main app entry point
 	- `menu.js` — Handles event listeners on the main menu
-	- `menuSettings.js` — Handles event listeners on the settings page
 	- `pause_countdown.js` — Handles the countdown when the simulation is paused
 	- `simulationstate.js` — Handles tracking the state of the simulation
 	- `standardMode.js` — Handles standard mode functionalities and variables
@@ -59,9 +63,10 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Quick Start
 1. Open `resources/mainMenu.html` in a modern browser (Chrome/Edge recommended).
 2. Click "Connect Trainer" to pair with your smart trainer.
-3. Click "Start" to start the simulation.
-4. Start pedaling to see your avatar move and HUD update.
-5. After your ride, export to Strava.
+3. If needed, click "Settings", and customize any needed settings in the new popup menu.
+4. Click "Start" to start the simulation.
+5. Start pedaling to see your avatar move and HUD update.
+6. After your ride, export to Strava.
 
 ---
 

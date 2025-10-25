@@ -116,16 +116,72 @@
     <!-- Generate starting scene -->
     <a-scene id="scene">
       <a-assets>
-          <!-- Add textures used to create the track and grass -->
-          <img id="track-texture" src="resources/textures/Track.jpeg" />
-          <img id="grass-texture" src="resources/textures/Grass.jpeg" />
-          
-          <!-- Add cloud assets -->
-          <a-asset-item id="cloud1" src="resources/models/cloud1.glb"></a-asset-item>
-          <a-asset-item id="cloud2" src="resources/models/cloud2.glb"></a-asset-item>
-          <a-asset-item id="cloud3" src="resources/models/cloud3.glb"></a-asset-item>
+        <!-- Add textures used to create the track and grass -->
+        <img id="track-texture" src="resources/textures/Track.jpeg" />
+        <img id="grass-texture" src="resources/textures/Grass.jpeg" />
+
+        <!-- Building models -->
+        <a-asset-item
+          id="house-obj"
+          src="resources/models/House.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tall-building-obj"
+          src="resources/models/TallBuilding.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="wide-building-obj"
+          src="resources/models/WideBuilding.glb"
+        ></a-asset-item>
+
+        <!-- Add playermodel assets -->
+        <a-asset-item
+          id="bikeGLB"
+          src="resources/playermodels/bikeV4.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="maleGLB"
+          src="resources/playermodels/maleV5.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="femaleGLB"
+          src="resources/playermodels/femaleV6.glb"
+        ></a-asset-item>
+
+        <!-- Add cloud assets -->
+        <a-asset-item
+          id="cloud1"
+          src="resources/models/cloud1.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud2"
+          src="resources/models/cloud2.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud3"
+          src="resources/models/cloud3.glb"
+        ></a-asset-item>
+
+        <!-- Add tree assets -->
+        <a-asset-item
+          id="tree1"
+          src="resources/models/tree1.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tree2"
+          src="resources/models/tree2.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tree3"
+          src="resources/models/tree3.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tree-bush1"
+          src="resources/models/bush1.glb"
+        ></a-asset-item>
       </a-assets>
       <a-sky color="#87ceeb"></a-sky>
+
       <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
       <a-entity id="checkerboard-ground">
         <a-entity id="tiles"></a-entity>
@@ -168,6 +224,7 @@
 
       <a-entity camera look-controls position="0 4.5 5"></a-entity>
     </a-scene>
+
     <script type="module" src="js/main.js"></script>
     <script>
       window.addEventListener("DOMContentLoaded", () => {
