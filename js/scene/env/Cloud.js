@@ -1,34 +1,40 @@
+import { constants } from "../../constants.js";
+
 export class Cloud {
 
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
-
+    
     // Zone 1: z = 0 through -120; y = 20 through 100; x = 190 through -190
     // Zone 2: z = -121 through -240; y = 20 through 200; x = 400 through -400
     // Zone 3: z = -141 through -360; y = 30 through 300; x = 345 through -345
-    // A Zone 4 could be included, but one can't spawn very far off the track before the cloud disppears at z < -360
+    // Zone 4: Used to spawn clouds in the farther section of Zone 3 as the rider moves
 
     // Create a-entity for the clouds and set ID
-    const clouds = document.createElement('a-entity');
-    clouds.setAttribute('id','clouds');
+    this.clouds = document.createElement('a-entity');
+    this.clouds.setAttribute('id','clouds');
 
     // Spawn clouds in zones 1-3
     for (let i = 0; i < 15; i++) {
-      clouds.appendChild(spawnCloud(1));
+      this.clouds.appendChild(spawnCloud(1));
     }
 
     for (let i = 0; i < 10; i++) {
-      clouds.appendChild(spawnCloud(2));
-      clouds.appendChild(spawnCloud(3));
+      this.clouds.appendChild(spawnCloud(2));
+      this.clouds.appendChild(spawnCloud(3));
     }
 
     // Add clouds to scene
-    sceneEl.appendChild(clouds);
+    sceneEl.appendChild(this.clouds);
+
+    // Determine how fast clouds will move (10 to 30 MPH)
+    constants.cloudSpeed = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
+    constants.updateEvery = (1/constants.cloudSpeed) * 1000;
   }
 }
 
 // Spawn a single cloud based on input provided
-function spawnCloud(zone) {
+export function spawnCloud(zone) {
   let maxX;
   let minX;
   let maxY;
@@ -64,6 +70,15 @@ function spawnCloud(zone) {
     maxZ = 360;
   }
 
+  else if (zone === 4) {
+    minX = 0;
+    maxX = 345;
+    minY = 30;
+    maxY = 170;
+    minZ = 300;
+    maxZ = 360;
+  }
+
   // Get x and determine sign
   let cloudX;
   if (getSign()) {
@@ -84,9 +99,15 @@ function spawnCloud(zone) {
   const cloud = document.createElement('a-entity')
 
   // Decide what kind of cloud to create and set position
-  let cloudType = "cloud" + (Math.floor(Math.random() * (3)) + 1);
+  let cloudType = "cloud" + (Math.floor(Math.random() * (constants.totalCloudTypes)) + 1);
   cloud.setAttribute('gltf-model',`#${cloudType}`);
   cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
+
+  // Flip cloud on the y-axis to add more variation based on getSign()
+  if (getSign()) {
+    cloud.setAttribute('rotation', `0 180 0`);
+  }
+
   return cloud;
 }
 
@@ -95,5 +116,3 @@ function getSign() {
     let randomNo = Math.floor(Math.random() * 10);
     return randomNo % 2 === 0;
   }
-
-  // Advance clouds according to equation governing percieved speed from the ground
