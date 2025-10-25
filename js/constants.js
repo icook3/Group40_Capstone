@@ -91,6 +91,12 @@ class Constants {
   pathPositionY = 0.52;
   pathPositionZ = -3000;
   dirtColor = "#a0895a";
+
+  // Constants governing cloud speed
+  lastCloud = Date.now();
+  cloudSpeed = 0;
+  updateEvery = 0;
+  totalCloudTypes = 3;
 }
 
 export const constants = new Constants();

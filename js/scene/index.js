@@ -18,7 +18,8 @@ export class ZlowScene {
       dirtPattern: this.dirtPattern,
     });
     this.clouds = new Cloud({ sceneEl: this.scene });
-
+    this.objectField = new ObjectField({ sceneEl: this.scene, dirtPattern: this.dirtPattern, clouds: this.clouds });
+    
     // Build bands immediately (no delay)
     this.nearBand = new EdgeBand({ sceneEl: this.scene }); // optional attach
     this.edgeLine = new EdgeLineBand({ sceneEl: this.scene }); // actual edge

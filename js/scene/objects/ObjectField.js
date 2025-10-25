@@ -4,12 +4,15 @@
   // spawnAtZ pushes the entity to items, which are updated as the rider moves.
 
 import { getPos, setPos } from '../core/util.js';
+import { constants } from "../../constants.js";
+import { spawnCloud } from '../env/Cloud.js';
 import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
-  constructor({ sceneEl, dirtPattern }) {
+  constructor({ sceneEl, dirtPattern, clouds }) {
     this.sceneEl = sceneEl;
     this.dirtPattern = dirtPattern;
+    this.clouds = clouds;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
@@ -77,6 +80,29 @@ export class ObjectField {
       }
 
         setPos(obj, pos);
+    }
+
+    // Advance clouds
+    if (Date.now() > constants.lastCloud + constants.updateEvery) {
+      constants.lastCloud = Date.now();
+
+      if (this.clouds.clouds.children.length) {
+        for (let cloud of this.clouds.clouds.children) {
+          const pos = getPos(cloud);
+          
+          // If the cloud is still in visible range, move it forward
+          if ((pos.z + 1) < -20) {
+            pos.z += 1;
+            setPos(cloud, pos);
+          }
+
+          // Otherwise, remove it from the array and respawn in zone 4
+          else {
+            this.clouds.clouds.removeChild(cloud);
+            this.clouds.clouds.appendChild(spawnCloud(4));
+          }
+        }
+      }
     }
 
     // Advances the dirt pattern
