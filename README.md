@@ -31,14 +31,17 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `env` — Handles the overall environment
 			- `Cloud.js` — Handles creating the clouds above the scene
 			- `DirtPattern.js` — Handles creating the track and the dirt pattern on it
-			- `EdgeBand.js` — Handles the objects on the side of the track
-			- `EdgeLineBand.js` — Handles the objects far away from the track
+				'SceneryBand.js' — Handles creating the bands and object placement within
+			- `SceneryManager.js` — Loads the config files from /policy
 		- `objects` — Handles various 3D objects
 			- `kinds` — Stores representations of different 3D objects along the side of the track
 				- `Building.js` — Handles various buildings along the side of the track
 				- `index.js` — Contains various utilities for handling different kinds of elements
 				- `Tree.js` — Handles trees along the side of the track
 			- `ObjectField.js` — Handles creating a set of objects at different locations
+			'policy' — Contains the config and policies for banding
+				'BandPolicy.md' — Contains policies for banding
+				'SceneryPolicy.js' — Handles turning the config file into a policy
 		- `index.js` — Sets up and updates the A-Frame 3D world.
     - `avatarMovement.js` — Sets up A-Frame 3D avatar.
 	- `avatarMovement.js` — Updates A-Frame 3D avatar.

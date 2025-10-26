@@ -9,13 +9,15 @@ import { spawnCloud } from '../env/Cloud.js';
 import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
-  constructor({ sceneEl, dirtPattern, clouds }) {
+
+  constructor({ sceneEl, dirtPattern, policy, clouds }) {
     this.sceneEl = sceneEl;
     this.dirtPattern = dirtPattern;
     this.clouds = clouds;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
+    this.policy = policy;
 
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
@@ -81,6 +83,46 @@ export class ObjectField {
 
         setPos(obj, pos);
     }
+
+    for (const band of this.externalGroups) {
+    if (band?.policy?.isStatic()) continue;
+    if (!band?.items?.length) continue;
+    for (const obj of band.items) {
+      const pos = getPos(obj);
+      pos.z += dz;
+
+      if (pos.z > 10) {
+        // recycle within THIS band independently
+        const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
+        pos.z = farthestZ - 5;
+    // re-roll kind by band policy mix (keeps long-run ratios)
+        if (band.policy && typeof band.policy.xAnchor === 'function') {
+          const mix = typeof band.policy.mix === 'function' ? band.policy.mix() : { tree: 0.5, building: 0.5 };
+          const roll = Math.random();
+          const nextIsBuilding = roll < (typeof mix.building === 'number' ? mix.building : 0.5);
+          const kindName = nextIsBuilding ? 'building' : 'tree';
+          obj.setAttribute('zlow-kind', kindName);
+
+          const sideAttr = obj.getAttribute('zlow-side'); // 'left' | 'right'
+          const side = sideAttr === 'left' ? -1 : 1;
+          const anchorX = band.policy.xAnchor(kindName, side);
+          const jitterAmp = typeof band.policy.jitterX === 'function'
+            ? band.policy.jitterX()
+            : 0;
+          let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
+          if (typeof band.policy.clampX === 'function') {
+            newX = band.policy.clampX(kindName, side, newX);
+          }
+          pos.x = newX;            
+        } else {
+          // fallback: detect and use kind’s own resample
+          const kind = this._detectKind(obj);
+          pos.x = kind.resampleX();
+        }
+      }
+      setPos(obj, pos);
+    }
+  }
 
     // Advance clouds
     if (Date.now() > constants.lastCloud + constants.updateEvery) {
