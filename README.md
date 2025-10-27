@@ -17,12 +17,15 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `fonts` — Stores a number fonts used for HUD elements and the main menu
 	- `images` — Contains a number of important images for different pages
 	- `models` — Stores various 3D models
+	- `playermodels` — Stores the models for the player and the bike
 	- `textures` — Stores image textures
 	- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings
 - `index.html` — Loads A-Frame scene and UI.
+- `playerCustomization.html` — Screen for customizing the player
 - `style.css` — Handles general CSS styles for the program
 - `hud.css` — Handles CSS styles for the modern HUD
 - `menu.css` — Handles CSS styles for the main menu
+- `playerCustomization.css` — Handles CSS styles for the player customization screen
 - `js` — Contains JavaScript code
 	- `scene` - Handles scene generation
 		- `core` — core utilities for scene generation
@@ -31,7 +34,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `env` — Handles the overall environment
 			- `Cloud.js` — Handles creating the clouds above the scene
 			- `DirtPattern.js` — Handles creating the track and the dirt pattern on it
-				'SceneryBand.js' — Handles creating the bands and object placement within
+			— `SceneryBand.js` — Handles creating the bands and object placement within
 			- `SceneryManager.js` — Loads the config files from /policy
 		- `objects` — Handles various 3D objects
 			- `kinds` — Stores representations of different 3D objects along the side of the track
@@ -39,11 +42,11 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `index.js` — Contains various utilities for handling different kinds of elements
 				- `Tree.js` — Handles trees along the side of the track
 			- `ObjectField.js` — Handles creating a set of objects at different locations
-			'policy' — Contains the config and policies for banding
-				'BandPolicy.md' — Contains policies for banding
-				'SceneryPolicy.js' — Handles turning the config file into a policy
+			— `policy` — Contains the config and policies for banding
+				— `BandPolicy.md` — Contains policies for banding
+				— `SceneryPolicy.js` — Handles turning the config file into a policy
 		- `index.js` — Sets up and updates the A-Frame 3D world.
-    - `avatarMovement.js` — Sets up A-Frame 3D avatar.
+    - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 	- `avatarMovement.js` — Updates A-Frame 3D avatar.
 	- `bluetooth.js` — Handles Bluetooth device connection and data polling.
 	- `constants.js` — Stores important constants for the program execution
@@ -76,6 +79,11 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Development Notes
 - Modular ES6 code, no build step required.
 - See each JS file for further documentation.
+
+- To add additional unit options, 
+	- for speed, change AvatarMovement.setSpeed, Constants, HUD.update, loop (main.js), initZlowApp (main.js), and mainMenu.html
+	- for weight, change Constants, initZlowApp (main.js), and mainMenu.html
+	- changing units of power is not implemented currently
 
 You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
 
