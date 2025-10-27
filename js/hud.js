@@ -47,7 +47,6 @@ export class HUD {
       { el: this.power, val: power, format: (v) => v },
       {
           el: this.speed, val: speed, format: (v) => {
-              v?.toFixed(1);
               switch (sessionStorage.getItem("SpeedUnit")) {
                   case "mph":
                       v = constants.kmhToMph(v);
@@ -55,18 +54,21 @@ export class HUD {
                   default:
                       break;
               }
+              return v?.toFixed(1);
+              //console.log("formatting speed: " + speed + ". v=" + v);
+              
           }
       },
       { el: this.calories, val: calories, format: (v) => v?.toFixed(0) },
     ];
     fields.forEach(({ el, val, format }) => {
-      if (val !== undefined) el.textContent = format(val);
+        if (val !== undefined) el.textContent = format(val);
     });
     if (speed !== undefined) {
       this.totalDistance += (speed * dt) / 3600; // km
       switch (sessionStorage.getItem("SpeedUnit")) {
           case "mph":
-              this.distance.textContent = constants.kmToMi(this.totalDistance.toFixed(2));
+              this.distance.textContent = constants.kmToMi(this.totalDistance).toFixed(2);
               break;
           default:
               this.distance.textContent = this.totalDistance.toFixed(2);

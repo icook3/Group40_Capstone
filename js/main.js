@@ -129,7 +129,6 @@ function loop({
     pacerPos.z -= relativeSpeed * dt;
     pacer.avatarEntity.setAttribute("position", pacerPos);
   }
-
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {
     localStorage.setItem("testMode", false);
