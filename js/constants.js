@@ -116,6 +116,12 @@ class Constants {
   lbToKg(lb) {
       return lb / 2.205;
   }
+  kmToMi(km) {
+      return km / 1.609;
+  }
+  miToKm(mi) {
+      return mi * 1.609;
+  }
 }
 
 export const constants = new Constants();

@@ -141,12 +141,29 @@ function loop({
   }
 
   const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
+
+  //set up values to push
+  let pushTime=now;
+  let pushPower = constants.riderState.power || 0;
+  let pushSpeed;
+  let pushDistance
+  switch(sessionStorage.getItem("SpeedUnit")) {
+      case "mph":
+          pushSpeed = constants.mphToKmh(constants.riderState.speed) || 0;
+          pushDistance = constants.miToKm(parseFloat(getElement("distance").textContent)) || 0;
+          break;
+      default:
+          pushSpeed = constants.riderState.speed || 0;
+          pushDistance = parseFloat(getElement("distance").textContent) || 0;
+          break;
+  }
+
   if (constants.lastHistorySecond !== thisSecond) {
     constants.rideHistory.push({
-      time: now,
-      power: constants.riderState.power || 0,
-      speed: constants.riderState.speed || 0,
-      distance: parseFloat(getElement("distance").textContent) || 0,
+      time: pushTime,
+      power: pushPower,
+      speed: pushSpeed,
+      distance: pushDistance,
     });
     constants.lastHistorySecond = thisSecond;
   }
@@ -281,7 +298,14 @@ export function initZlowApp({
       const updateMassAndMaybeSpeed = () => {
         const newMass = Number(riderWeightEl.value);
         if (!Number.isFinite(newMass)) return;
-        constants.riderMass = newMass;
+        switch(sessionStorage.getItem("WeightUnit")) {
+            case "lb":
+                constants.riderMass = constants.lbToKg(newMass);
+                break;
+            default:
+                constants.riderMass = newMass;
+                break;
+        }
 
         const p = constants.riderState.power || 0;
         const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
