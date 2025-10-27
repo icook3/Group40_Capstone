@@ -218,8 +218,8 @@ export function initZlowApp({
 
   const countdown = new PauseCountdown({ getElement, limit: 10 });
 
-  rider = new AvatarMovement("rider", { position: { x: -0.5, y: 1, z: 0 } });
-  pacer = new AvatarMovement("pacer", { position: { x: 0.5, y: 1, z: -2 } });
+  rider = new AvatarMovement("rider", { position: { x: -0.5, y: 1, z: 0 }, isPacer: false });
+  pacer = new AvatarMovement("pacer", { position: { x: 0.5, y: 1, z: -2 }, isPacer: true });
   pacer.creator.setPacerColors();
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
