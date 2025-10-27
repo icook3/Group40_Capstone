@@ -159,12 +159,33 @@ export function activatePacer() {
     constants.pacerStarted = true;
   }
 }
-
+function setUnits(storageVal, className) {
+    let elements = document.getElementsByClassName(className);
+    if (storageVal == null) {
+        return;
+    }
+    for (let i = 0; i < elements.length; i++) {
+        elements.item(i).innerHTML = storageVal;
+    }
+}
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+  // set up units properly
+  setUnits(sessionStorage.getItem("SpeedUnit"),"speed-unit");
+  setUnits(sessionStorage.getItem("WeightUnit"), "weight-unit");
+  //setUnits(sessionStorage.getItem("PowerUnit"),"power-unit");
+  // distance is more complicated
+  switch (sessionStorage.getItem("SpeedUnit")) {
+      case "mph":
+          setUnits("mi", "distance-unit");
+          break;
+      default:
+          setUnits("km", "distance-unit");
+  }
+  
   // get the needed objects
   if (localStorage.getItem("testMode") !== "true") {
     const trainer = new TrainerBluetooth();
