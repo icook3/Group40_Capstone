@@ -53,6 +53,40 @@ export function initSettings() {
     riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
     riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
   }
+
+  // units input
+  // speed
+  const speedUnitInput = document.getElementById("unitInputSpeed");
+  if (speedUnitInput) {
+      speedUnitInput.addEventListener("input", () => {
+          sessionStorage.setItem("SpeedUnit", speedUnitInput.value);
+          let elements = document.getElementsByClassName("speedUnit");
+          for (let i = 0; i < elements.length; i++) {
+              elements.item(i).innerHTML = speedUnitInput.value;
+          }
+      });
+  }
+  // weight
+  const weightUnitInput = document.getElementById("unitInputWeight");
+  if (weightUnitInput) {
+      weightUnitInput.addEventListener("input", () => {
+          sessionStorage.setItem("WeightUnit", weightUnitInput.value);
+          let elements = document.getElementsByClassName("weightUnit");
+          for (let i = 0; i < elements.length; i++) {
+              elements.item(i).innerHTML = weightUnitInput.value;
+          }
+      });
+  }
+  // power
+  //uncomment the following code if alternate units for power are implemented
+  /*
+  const powerUnitInput = document.getElementById("unitInputPower");
+  if (powerUnitInput) {
+      powerUnitInput.addEventListener("input", () => {
+          sessionStorage.setItem("PowerUnit", powerUnitInput.value);
+      });
+  }
+  */
 }
 
 if (typeof window !== "undefined") {

@@ -97,6 +97,31 @@ class Constants {
   cloudSpeed = 0;
   updateEvery = 0;
   totalCloudTypes = 3;
+
+  // unit conversions
+  // internally, always convert to and from km/h, kg, and W
+  // call these to convert units to and from
+  // I used google.com's unit converter
+  // mph
+  kmhToMph(kmh) {
+      return kmh / 1.609;
+  }
+  mphToKmh(mph) {
+      return mph * 1.609;
+  }
+  // lb
+  kgToLb(kg) {
+      return kg * 2.205;
+  }
+  lbToKg(lb) {
+      return lb / 2.205;
+  }
+  kmToMi(km) {
+      return km / 1.609;
+  }
+  miToKm(mi) {
+      return mi * 1.609;
+  }
 }
 
 export const constants = new Constants();
