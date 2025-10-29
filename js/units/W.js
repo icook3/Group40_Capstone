@@ -1,4 +1,4 @@
-export class kmh {
+export class W {
     name="W";
     convertTo(val) {
         return val;

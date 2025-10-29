@@ -6,11 +6,11 @@ import { kg } from "./kg.js";
 import { lb } from "./lb.js";
 import { W } from "./W.js";
 
-export class Units {
-    speedUnit;
-    distanceUnit;
-    powerUnit;
-    weightUnit;
+class Units {
+    speedUnit = new kmh();
+    distanceUnit = new km();
+    powerUnit = new W();
+    weightUnit = new kg();
     setUnits() {
         //speed
         switch(sessionStorage.getItem("SpeedUnit")) {
@@ -50,3 +50,4 @@ export class Units {
         }
     }
 }
+export let units = new Units();
