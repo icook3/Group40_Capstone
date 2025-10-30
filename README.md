@@ -14,7 +14,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Structure
 - `resources` — Contains various resources
 	- `favicons` — Stores the program favicon
-	- `fonts` — Stores a number fonts used for HUD elements and the main menu
+	- `fonts` — Stores fonts used for HUD elements and the main menu
 	- `images` — Contains a number of important images for different pages
 	- `models` — Stores various 3D models
 	- `playermodels` — Stores the models for the player and the bike
@@ -22,6 +22,9 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings
 - `index.html` — Loads A-Frame scene and UI.
 - `playerCustomization.html` — Screen for customizing the player
+- `strava.html` — Screen for connecting Zlow and Strava
+- `strava-redirect.html` — Handles redirect from Strava
+- `strava.css` — Handles CSS styles for the strava connection menu
 - `style.css` — Handles general CSS styles for the program
 - `hud.css` — Handles CSS styles for the modern HUD
 - `menu.css` — Handles CSS styles for the main menu

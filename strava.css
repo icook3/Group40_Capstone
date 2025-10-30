@@ -1,0 +1,115 @@
+@font-face {
+    font-family: "Fugaz One";
+    src: url("resources/fonts/FugazOne-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Nunito";
+    src: url("resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px black;
+    color: white;
+    font-size: 3em;
+    font-family: "Fugaz One", sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: "Nunito", sans-serif;
+}
+
+#mainContainer {
+    background: rgb(53, 72, 79);
+    border-radius: 30px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 350px;
+}
+
+#entryContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    font-size: large;
+}
+
+label {
+    margin-top: 10px;
+    color: rgb(220, 229, 222);
+    font-family: "Fugaz One", sans-serif;
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1em;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
+    cursor: pointer;
+    width: 90%;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: linear-gradient(to bottom, rgba(200, 142, 148, 0.99) 0%, #8faca1 100%);
+}
+
+#howToDetails {
+    width: 100%;
+    overflow: hidden;
+}
+
+#howToDetails summary {
+    cursor: pointer;
+    font-family: "Fugaz One", sans-serif;
+    color: rgb(220, 229, 222);
+    font-size: 1.1em;
+}
+
+#howToContainer ol {
+    color: rgb(220, 229, 222);
+    font-size: 1em;
+    line-height: 1.5;
+}
+
+a {
+    color: #ffb3ba;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+code {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 4px;
+    border-radius: 5px;
+}

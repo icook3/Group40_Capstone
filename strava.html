@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava Menu</title>
+    <link rel="icon" type="image/svg+xml" href="resources/favicons/ZlowFavicon.svg">
+    <link rel="stylesheet" href="strava.css"/>
+    <style>
+        body {
+            background-image: url("resources/images/background.png");
+        }
+    </style>
+</head>
+<body>
+    <h1>Connect to Strava</h1>
+
+    <div id="mainContainer">
+        <!-- Entries -->
+        <div id="entryContainer">
+            <label for="clientId">Client ID</label>
+            <input type="text" id="clientId" placeholder="Enter your Strava Client ID" />
+
+            <label for="clientSecret">Client Secret</label>
+            <input type="password" id="clientSecret" placeholder="Enter your Strava Client Secret" />
+
+            <button id="connectBtn">Login with Strava</button>
+        </div>
+
+        <!-- How to -->
+        <details id="howToDetails">
+            <summary>How to get your Client ID and Secret</summary>
+            <div id="howToContainer">
+                <ol>
+                    <li>Go to <a href="https://www.strava.com/settings/api" target="_blank">Strava API Settings</a></li>
+                    <li>Create an Application</li>
+                    <li>Copy your <strong>Client ID</strong> and <strong>Client Secret</strong></li>
+                    <li>Set your "Authorization Callback Domain" to <code>localhost</code></li>
+                </ol>
+            </div>
+        </details>
+    </div>
+
+</body>
+</html>
