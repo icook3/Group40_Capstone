@@ -48,7 +48,7 @@ export class HUD {
       { 
         el: this.power, val: power, format: (v) => {
           v = units.powerUnit.convertTo(v);
-          return v;
+          return v.toFixed(0);
         } 
       },
       {

@@ -181,8 +181,7 @@ export function initZlowApp({
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
   // set up units properly
-  units.setUnits;
-  console.log(units.speedUnit);
+  units.setUnits();
   setUnits(units.speedUnit.name,"speed-unit");
   setUnits(units.weightUnit.name, "weight-unit");
   //setUnits(units.powerUnit.name,"power-unit");
@@ -283,14 +282,7 @@ export function initZlowApp({
       const updateMassAndMaybeSpeed = () => {
         const newMass = Number(riderWeightEl.value);
         if (!Number.isFinite(newMass)) return;
-        switch(sessionStorage.getItem("WeightUnit")) {
-            case "lb":
-                constants.riderMass = constants.lbToKg(newMass);
-                break;
-            default:
-                constants.riderMass = newMass;
-                break;
-        }
+        constants.riderMass = units.weightUnit.convertFrom(newMass);
 
         const p = constants.riderState.power || 0;
         const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;

@@ -42,10 +42,10 @@ class Units {
         //weight
         switch(sessionStorage.getItem("WeightUnit")) {
             case "lb":
-                this.powerUnit = new lb();
+                this.weightUnit = new lb();
                 break;
             default:
-                this.powerUnit=new kg();
+                this.weightUnit=new kg();
                 break;
         }
     }
