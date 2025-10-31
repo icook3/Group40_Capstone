@@ -92,6 +92,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `lb.js` — Handles unit conversions for Pounds
 			- `mi.js` — Handles unit conversions for Miles
 			- `mph.js` — Handles unit conversions for Miles per Hour
+			- `units.md` — Documentation on different units
 			- `W.js` — Handles unit conversions for Watts - the default power unit
 	    - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 		- `avatarMovement.js` — Updates A-Frame 3D avatar.
@@ -126,8 +127,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Development Notes
 - Modular ES6 code, no build step required.
 - See each JS file for further documentation.
-
-- To add additional unit options, add a new class for the units, with an attribute name, and methods convertTo(val) and convertFrom(val), that is in the folder src/js/units. See the other classes there for examples of what it should look like. Then, edit the files src/js/units/index.js and src/html/mainMenu.html to add the new units to the menu and the program
 
 You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
 
