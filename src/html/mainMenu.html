@@ -5,22 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <link rel="stylesheet" href="../hud.css" />
-    <link rel="stylesheet" href="../menu.css" />
+    <link rel="stylesheet" href="../css/hud.css" />
+    <link rel="stylesheet" href="../css/menu.css" />
     <style>
         body {
-            background-image: url("images/background.png");
+            background-image: url("../../resources/images/background.png");
         }
     </style>
-    <link rel="icon" type="image/svg+xml" href="/favicons/ZlowFavicon.svg">
+    <link rel="icon" type="image/svg+xml" href="../../resources/favicons/ZlowFavicon.svg">
 </head>
 <body>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script type="module" src="../js/menu.js"></script>
 
-    <h1 id="welcome-msg" class="center-item">Welcome to <img src="favicons/ZlowFavicon.svg" alt="Z" width="30" height="30" />low!</h1>
+    <h1 id="welcome-msg" class="center-item">Welcome to <img src="../../resources/favicons/ZlowFavicon.svg" alt="Z" width="30" height="30" />low!</h1>
 
-    <button id="start-btn" class="stats-row center-item" onclick="window.location.href='../index.html'">Start</button>
+    <button id="start-btn" class="stats-row center-item" onclick="window.location.href='./zlow.html'">Start</button>
 
     <div id="menu-settings">
         <span id="pacer" class="hud-btn">
@@ -83,7 +83,7 @@
 
     <div id="customize">
         <div class="control-buttons">
-            <button id="customize-btn" class="hud-btn" onclick="window.location.href='../playerCustomization.html'">Customize Character</button>
+            <button id="customize-btn" class="hud-btn" onclick="window.location.href='./playerCustomization.html'">Customize Character</button>
         </div>
     </div>
 
@@ -92,9 +92,9 @@
              style="width: 300px; height: 600px; background: transparent;">
         <a-entity camera position="0 1.5 3" look-controls="enabled: false"></a-entity>
         <a-assets>
-            <a-asset-item id="bikeGLB" src="../resources/playermodels/bikeV4.glb"></a-asset-item>
-            <a-asset-item id="maleGLB" src="../resources/playermodels/maleV5.glb"></a-asset-item>
-            <a-asset-item id="femaleGLB" src="../resources/playermodels/femaleV6.glb"></a-asset-item>
+            <a-asset-item id="bikeGLB" src="../../resources/models/playermodels/bikeV4.glb"></a-asset-item>
+            <a-asset-item id="maleGLB" src="../../resources/models/playermodels/maleV5.glb"></a-asset-item>
+            <a-asset-item id="femaleGLB" src="../../resources/models/playermodels/femaleV6.glb"></a-asset-item>
         </a-assets>
     </a-scene>
 
