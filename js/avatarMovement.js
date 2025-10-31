@@ -1,6 +1,7 @@
 import {powerToSpeed} from "./main.js";
 import { AvatarCreator } from "./avatarCreator.js";
 import { constants } from "./constants.js";
+import { units } from "./units/index.js";
 export class AvatarMovement {
     constructor(id, options = {}) {
         this.creator = new AvatarCreator(id, options.position);
@@ -96,14 +97,7 @@ export class AvatarMovement {
     //Setter for avatar speed
     setSpeed(speed) {
         if (this.isPacer) {
-            switch (sessionStorage.getItem("SpeedUnit")) {
-                case "mph":
-                    this.speed = constants.mphToKmh(speed);
-                    break;
-                default:
-                    this.speed = speed;
-                    break;
-            }
+            this.speed = units.speedUnit.convertFrom(speed);
         } else {
             this.speed = speed;
         }

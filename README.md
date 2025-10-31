@@ -42,10 +42,19 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `index.js` — Contains various utilities for handling different kinds of elements
 				- `Tree.js` — Handles trees along the side of the track
 			- `ObjectField.js` — Handles creating a set of objects at different locations
-			— `policy` — Contains the config and policies for banding
-				— `BandPolicy.md` — Contains policies for banding
-				— `SceneryPolicy.js` — Handles turning the config file into a policy
+			- `policy` — Contains the config and policies for banding
+				- `BandPolicy.md` — Contains policies for banding
+				- `SceneryPolicy.js` — Handles turning the config file into a policy
 		- `index.js` — Sets up and updates the A-Frame 3D world.
+	- `units` — Handles various units and unit conversions
+		- `index.js` — Sets up units, and provides references to the currently used unit conversions
+		- `kg.js` — Handles unit conversions for Kilograms - the default weight unit
+		- `km.js` — Handles unit conversions for Kilometers - the default distance unit
+		- `kmh.js` — Handles unit conversions for Kilometers per Hour - the default speed unit
+		- `lb.js` — Handles unit conversions for Pounds
+		- `mi.js` — Handles unit conversions for Miles
+		- `mph.js` — Handles unit conversions for Miles per Hour
+		- `W.js` — Handles unit conversions for Watts - the default power unit
     - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 	- `avatarMovement.js` — Updates A-Frame 3D avatar.
 	- `bluetooth.js` — Handles Bluetooth device connection and data polling.
@@ -80,10 +89,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - Modular ES6 code, no build step required.
 - See each JS file for further documentation.
 
-- To add additional unit options, 
-	- for speed, change AvatarMovement.setSpeed, Constants, HUD.update, loop (main.js), initZlowApp (main.js), and mainMenu.html
-	- for weight, change Constants, initZlowApp (main.js), and mainMenu.html
-	- changing units of power is not implemented currently
+- To add additional unit options, add a new class for the units, with an attribute name, and methods convertTo(val) and convertFrom(val), that is in the folder units. See the other classes there for examples of what it should look like. Then, edit the files js/units/index.js and resources/mainMenu.html to add the new units to the menu and the program
 
 You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
 
