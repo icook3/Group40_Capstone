@@ -25,16 +25,7 @@ button {
     z-index: 1000;
     left: 36%;
 }
-/*
-    Start Button
-*/
-#start-btn {
-    position: fixed;
-    top: 40%;
-    font-size: xx-large;
-    justify-content: center;
-    overflow: visible;
-}
+
 #menu-bottom {
     position: fixed;
     bottom: 20px;
@@ -91,3 +82,88 @@ a-scene {
     background-color: transparent !important;
     pointer-events: none;
 }
+/* 1) Put the pill look on the wrapper */
+.split-btn {
+  position: fixed;            /* keep your menu placement */
+  top: 40%;
+  /* left: 40%;  // only if you're not using .center-item to place it */
+  display: inline-flex;
+  align-items: center;
+  gap: 0;                     /* no gap between halves */
+  padding: 0;                 /* pill is sized by inner buttons */
+  border-radius: 9999px;      /* full pill */
+  overflow: hidden;
+  background: linear-gradient(90deg, #ffb5b5, #b7f1df); /* your pink→green vibe */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  z-index: 1000;
+  white-space: nowrap;        /* prevent "Start (Fre" clipping */
+}
+
+/* 2) Make inner buttons transparent so the gradient shows through */
+.split-btn .main,
+.split-btn .toggle {
+  background: transparent;
+  color: #223138;             /* dark text over light gradient; use #fff if you prefer */
+  border: none;
+  font-size: xx-large;
+  line-height: 1.15;
+  padding: 12px 22px;
+  cursor: pointer;
+}
+
+/* 3) Visual divider for the arrow half */
+.split-btn .toggle {
+  width: 44px;
+  font-size: 1.1rem;
+  border-left: 1px solid rgba(0,0,0,0.15);
+}
+
+/* 4) Hover/focus polish */
+.split-btn .main:hover,
+.split-btn .toggle:hover {
+  background: rgba(255,255,255,0.12);
+}
+.split-btn .main:focus,
+.split-btn .toggle:focus {
+  outline: 2px solid rgba(0,0,0,0.25);
+  outline-offset: 2px;
+}
+
+/* 5) Dropdown menu sits above the pill and matches your theme */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: rgb(53,72,79);
+  color: #fff;
+  min-width: 260px;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  z-index: 2000;
+}
+.dropdown-content.show { display: block; }
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.dropdown-item:hover { background: rgba(255,255,255,0.08); }
+
+/* 6) Neutralize the old per-element layout on the child button */
+#start-btn {
+  position: static;           /* was fixed; let the wrapper control position */
+  top: auto;
+  font-size: xx-large;        /* keep size */
+  justify-content: center;
+  overflow: visible;
+}
+

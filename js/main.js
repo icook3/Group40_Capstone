@@ -189,6 +189,10 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+
+  const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
+  console.log("Selected workout:", selectedWorkout);
+  
   // set up units properly
   setUnits(sessionStorage.getItem("SpeedUnit"),"speed-unit");
   setUnits(sessionStorage.getItem("WeightUnit"), "weight-unit");

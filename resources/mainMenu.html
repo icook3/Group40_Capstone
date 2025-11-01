@@ -20,7 +20,22 @@
 
     <h1 id="welcome-msg" class="center-item">Welcome to <img src="favicons/ZlowFavicon.svg" alt="Z" width="30" height="30" />low!</h1>
 
-    <button id="start-btn" class="stats-row center-item" onclick="window.location.href='../index.html'">Start</button>
+<!-- Split Start button -->
+<div id="start-split" class="split-btn stats-row center-item">
+  <button id="start-btn" class="main" type="button">Start</button>
+  <button id="start-toggle" class="toggle" type="button"
+          aria-haspopup="true" aria-expanded="false" aria-controls="start-menu">▾</button>
+
+  <div id="start-menu" class="dropdown-content" role="menu">
+    <button class="dropdown-item" data-workout="free">Free Ride</button>
+    <button class="dropdown-item" data-workout="ramp">Ramp Test</button>
+    <button class="dropdown-item" data-workout="ftp20">FTP Test (20-min)</button>
+  </div>
+</div>
+
+<!-- at the bottom of the body -->
+<script defer src="../js/mainMenu.js"></script>
+
 
     <div id="menu-settings">
         <span id="pacer" class="hud-btn">
