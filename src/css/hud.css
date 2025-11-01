@@ -3,14 +3,14 @@
    ======================================== */
 @font-face {
   font-family: "Fugaz One";
-  src: url("../resources/fonts/FugazOne-Regular.ttf") format("truetype");
+  src: url("../../resources/fonts/FugazOne-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Nunito";
-  src: url("../resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
+  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
 }
@@ -71,7 +71,7 @@
   content: "";
   width: 40px;
   height: 40px;
-  background-image: url("../resources/images/time.svg");
+  background-image: url("../../resources/images/time.svg");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -114,7 +114,7 @@
   content: "";
   width: 40px;
   height: 40px;
-  background-image: url("../resources/images/calories.svg");
+  background-image: url("../../resources/images/calories.svg");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -134,8 +134,8 @@
   padding: 15px 100px;
 
   /* Custom SVG shape mask */
-  mask: url("../resources/images/center-hud.svg") no-repeat center / 100% 100%;
-  -webkit-mask: url("../resources/images/center-hud.svg") no-repeat center /
+  mask: url("../../resources/images/center-hud.svg") no-repeat center / 100% 100%;
+  -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
     100% 100%;
 }
 
