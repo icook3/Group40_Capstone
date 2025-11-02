@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <link rel="icon" type="image/svg+xml" href="resources/favicons/ZlowFavicon.svg">
-    <link rel="stylesheet" href="playerCustomization.css" />
+    <link rel="icon" type="image/svg+xml" href="../../resources/favicons/ZlowFavicon.svg">
+    <link rel="stylesheet" href="../css/playerCustomization.css" />
     <style>
         body {
             background-color: grey;
@@ -19,13 +19,13 @@
          style="width: 33%; height: 100%; background: transparent;">
     <a-entity camera position="0 1.5 3" look-controls="enabled: false"></a-entity>
     <a-assets>
-        <a-asset-item id="bikeGLB" src="/resources/playermodels/bikeV4.glb"></a-asset-item>
-        <a-asset-item id="maleGLB" src="/resources/playermodels/maleV5.glb"></a-asset-item>
-        <a-asset-item id="femaleGLB" src="/resources/playermodels/femaleV6.glb"></a-asset-item>
+        <a-asset-item id="bikeGLB" src="../../resources/models/playermodels/bikeV4.glb"></a-asset-item>
+        <a-asset-item id="maleGLB" src="../../resources/models/playermodels/maleV5.glb"></a-asset-item>
+        <a-asset-item id="femaleGLB" src="../../resources/models/playermodels/femaleV6.glb"></a-asset-item>
     </a-assets>
 </a-scene>
 <script type="module">
-    import { AvatarCreator } from '/js/avatarCreator.js';
+    import { AvatarCreator } from '../js/avatarCreator.js';
 
     window.addEventListener('DOMContentLoaded', () => {
         const scene = document.querySelector('#mainMenuScene');
@@ -280,7 +280,7 @@
 
 <!-- Save Button -->
 <div id = "menu">
-    <button id="menuButton" onclick="window.location.href='resources/mainMenu.html'">Main Menu</button>
+    <button id="menuButton" onclick="window.location.href='./mainMenu.html'">Main Menu</button>
 </div>
 
 </body>

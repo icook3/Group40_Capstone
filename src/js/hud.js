@@ -1,5 +1,6 @@
 // hud.js: Handles the heads-up display overlay
 import { constants } from "./constants.js"
+import { units } from "./units/index.js";
 export class HUD {
   constructor({ getElement = (id) => document.getElementById(id) } = {}) {
     this.power = getElement("power");
@@ -44,19 +45,17 @@ export class HUD {
 
   update({ power, speed, calories }, dt) {
     const fields = [
-      { el: this.power, val: power, format: (v) => v },
+      { 
+        el: this.power, val: power, format: (v) => {
+          v = units.powerUnit.convertTo(v);
+          return v.toFixed(0);
+        } 
+      },
       {
           el: this.speed, val: speed, format: (v) => {
-              switch (sessionStorage.getItem("SpeedUnit")) {
-                  case "mph":
-                      v = constants.kmhToMph(v);
-                      break;
-                  default:
-                      break;
-              }
+              v = units.speedUnit.convertTo(v);
               return v?.toFixed(1);
               //console.log("formatting speed: " + speed + ". v=" + v);
-              
           }
       },
       { el: this.calories, val: calories, format: (v) => v?.toFixed(0) },
@@ -66,13 +65,7 @@ export class HUD {
     });
     if (speed !== undefined) {
       this.totalDistance += (speed * dt) / 3600; // km
-      switch (sessionStorage.getItem("SpeedUnit")) {
-          case "mph":
-              this.distance.textContent = constants.kmToMi(this.totalDistance).toFixed(2);
-              break;
-          default:
-              this.distance.textContent = this.totalDistance.toFixed(2);
-      }
+      this.distance.textContent = units.distanceUnit.convertTo(this.totalDistance).toFixed(2);
     }
     if (!this.startTime) this.startTime = Date.now();
     const elapsed = Math.floor((Date.now() - this.startTime) / 1000);

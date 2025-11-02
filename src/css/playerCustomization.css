@@ -1,13 +1,13 @@
 @font-face {
     font-family: "Fugaz One";
-    src: url("/resources/fonts/FugazOne-Regular.ttf") format("truetype");
+    src: url("../../resources/fonts/FugazOne-Regular.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: "Nunito";
-    src: url("/resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
+    src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
     font-weight: 100 900;
     font-style: normal;
 }
@@ -29,8 +29,8 @@ a-scene {
     align-items: center;
     background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
     padding: 15px 100px;
-    mask: url("/resources/images/center-hud.svg") no-repeat center / 100% 100%;
-    -webkit-mask: url("/resources/images/center-hud.svg") no-repeat center /
+    mask: url("../../resources/images/center-hud.svg") no-repeat center / 100% 100%;
+    -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
     100% 100%;
     bottom: 2%;
     right: 2%;
