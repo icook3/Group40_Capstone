@@ -10,6 +10,7 @@ import { KeyboardMode } from "./keyboardMode.js";
 import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
+import { units } from "./units/index.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -144,18 +145,8 @@ function loop({
   //set up values to push
   let pushTime=now;
   let pushPower = constants.riderState.power || 0;
-  let pushSpeed;
-  let pushDistance
-  switch(sessionStorage.getItem("SpeedUnit")) {
-      case "mph":
-          pushSpeed = constants.mphToKmh(constants.riderState.speed) || 0;
-          pushDistance = constants.miToKm(parseFloat(getElement("distance").textContent)) || 0;
-          break;
-      default:
-          pushSpeed = constants.riderState.speed || 0;
-          pushDistance = parseFloat(getElement("distance").textContent) || 0;
-          break;
-  }
+  let pushSpeed = units.speedUnit.convertFrom(constants.riderState.speed) || 0;
+  let pushDistance = units.distanceUnit.convertFrom(parseFloat(getElement("distance").textContent)) || 0;
 
   if (constants.lastHistorySecond !== thisSecond) {
     constants.rideHistory.push({
@@ -194,18 +185,12 @@ export function initZlowApp({
   console.log("Selected workout:", selectedWorkout);
   
   // set up units properly
-  setUnits(sessionStorage.getItem("SpeedUnit"),"speed-unit");
-  setUnits(sessionStorage.getItem("WeightUnit"), "weight-unit");
-  //setUnits(sessionStorage.getItem("PowerUnit"),"power-unit");
-  // distance is more complicated
-  switch (sessionStorage.getItem("SpeedUnit")) {
-      case "mph":
-          setUnits("mi", "distance-unit");
-          break;
-      default:
-          setUnits("km", "distance-unit");
-  }
-  
+  units.setUnits();
+  setUnits(units.speedUnit.name,"speed-unit");
+  setUnits(units.weightUnit.name, "weight-unit");
+  //setUnits(units.powerUnit.name,"power-unit");
+  setUnits(units.distanceUnit.name, "distance-unit");
+
   // get the needed objects
   if (localStorage.getItem("testMode") !== "true") {
     const trainer = new TrainerBluetooth();
@@ -301,14 +286,7 @@ export function initZlowApp({
       const updateMassAndMaybeSpeed = () => {
         const newMass = Number(riderWeightEl.value);
         if (!Number.isFinite(newMass)) return;
-        switch(sessionStorage.getItem("WeightUnit")) {
-            case "lb":
-                constants.riderMass = constants.lbToKg(newMass);
-                break;
-            default:
-                constants.riderMass = newMass;
-                break;
-        }
+        constants.riderMass = units.weightUnit.convertFrom(newMass);
 
         const p = constants.riderState.power || 0;
         const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
