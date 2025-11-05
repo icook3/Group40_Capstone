@@ -4,7 +4,7 @@
 */
 import { constants } from "../../constants.js";
 
-export class DirtPattern {
+export class Track {
   
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
