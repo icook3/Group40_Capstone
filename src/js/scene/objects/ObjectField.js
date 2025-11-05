@@ -10,9 +10,9 @@ import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
 
-  constructor({ sceneEl, dirtPattern, policy, clouds }) {
+  constructor({ sceneEl, track, policy, clouds }) {
     this.sceneEl = sceneEl;
-    this.dirtPattern = dirtPattern;
+    this.track = track;
     this.clouds = clouds;
     this.items = [];
     this.initialized = false;
@@ -148,8 +148,8 @@ export class ObjectField {
     }
 
     // Advances the dirt pattern
-    if (this.dirtPattern?.patternEl) {
-      const kids = Array.from(this.dirtPattern.patternEl.children);
+    if (this.track?.patternEl) {
+      const kids = Array.from(this.track.patternEl.children);
       if (kids.length) {
         // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
         
