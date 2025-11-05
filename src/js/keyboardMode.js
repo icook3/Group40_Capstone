@@ -55,7 +55,6 @@ export class KeyboardMode {
     activatePacer();
   }
 
-  //r resets camera - testing purposes
   keyboardInputActive(k) {
     var key = k.toLowerCase();
     if (key === "w" || key === "s") {
