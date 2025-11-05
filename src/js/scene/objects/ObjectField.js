@@ -12,7 +12,7 @@ export class ObjectField {
 
   constructor({ sceneEl, dirtPattern, policy, clouds }) {
     this.sceneEl = sceneEl;
-    this.dirtPattern = dirtPattern;
+    //this.dirtPattern = dirtPattern;
     this.clouds = clouds;
     this.items = [];
     this.initialized = false;
@@ -62,6 +62,7 @@ export class ObjectField {
   }
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
+  // NOTE: WorldZ is incremented in index.js
   advance(dz) {
     if (!this.initialized || dz === 0) return;
 
@@ -147,27 +148,28 @@ export class ObjectField {
       }
     }
 
+    // Pull while working on track options
     // Advances the dirt pattern
-    if (this.dirtPattern?.patternEl) {
-      const kids = Array.from(this.dirtPattern.patternEl.children);
-      if (kids.length) {
+    //if (this.dirtPattern?.patternEl) {
+     // const kids = Array.from(this.dirtPattern.patternEl.children);
+      //if (kids.length) {
         // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
         
-        for (const circle of kids) {
-          const pos = getPos(circle);
+        //for (const circle of kids) {
+          //const pos = getPos(circle);
 
           // Update z as item moves closer to rider
-          pos.z += dz;
+          //pos.z += dz;
           
           // Reset position when item is within 10 of rider
-          if (pos.z > 10) {
+         // if (pos.z > 10) {
             //pos.z = farthestZ - 5;
             // Reset z to -30, which is about as far as you can see on the track
-            pos.z = -30;
-          }
-          setPos(circle, pos);
-        }
-      }
-    }
+           // pos.z = -30;
+         // }
+          //setPos(circle, pos);
+        //}
+     // }
+    //}
   }
 }

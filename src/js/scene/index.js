@@ -1,6 +1,7 @@
 import { ObjectField } from './objects/ObjectField.js';
-import { DirtPattern } from './env/DirtPattern.js';
+//import { DirtPattern } from './env/DirtPattern.js';
 import { Cloud } from './env/Cloud.js';
+import { Track } from './env/Track.js';
 import { SceneryManager } from './env/SceneryManager.js';
 
 export class ZlowScene {
@@ -18,14 +19,17 @@ export class ZlowScene {
     }
 
     // Generate a new object field, track, and clouds
-    this.dirtPattern = new DirtPattern({ sceneEl: this.scene });        
+    //this.dirtPattern = new DirtPattern({ sceneEl: this.scene });        
     this.clouds = new Cloud({ sceneEl: this.scene });
+    this.track = new Track({ sceneEl: this.scene });
     this.objectField = new ObjectField({
       sceneEl: this.scene,
-      dirtPattern: this.dirtPattern,
+      //dirtPattern: this.dirtPattern,
       policy: this.scenery.defaultPolicy,
-      clouds: this.clouds
+      clouds: this.clouds,
+      track: this.track
     });
+
     this.objectField.attachExternalBands(this.scenery.bands);
   }
   
