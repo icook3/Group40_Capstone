@@ -22,8 +22,8 @@ class Constants {
   // should still be refactored out of main.js
 
   // mass should probabally go in avatar.js, when everything is fully merged
-  riderMass = 75; // rider mass (kg)
-  bikeMass = 12; // bike mass (kg)
+  riderMass = 65; // rider mass (kg)
+  bikeMass = 8; // bike mass (kg)
   get mass() {
     return this.riderMass + this.bikeMass;
   }

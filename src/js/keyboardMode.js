@@ -36,21 +36,12 @@ export class KeyboardMode {
     if (key === "q" && !this.qKeyDown) {
       this.qKeyDown = true;
       constants.riderState.power = (constants.riderState.power || 0) + 10;
-      constants.riderState.speed = powerToSpeed({
-        power: constants.riderState.power,
-      });
     } else if (key === "a" && !this.aKeyDown) {
       this.aKeyDown = true;
       constants.riderState.power = Math.max(
         (constants.riderState.power || 0) - 10,
         0
       );
-      // Only handle speed if power is greater than 0, otherwise coasting will kick in
-      if (constants.riderState.power > 0) {
-        constants.riderState.speed = powerToSpeed({
-          power: constants.riderState.power,
-        });
-      }
     }
     activatePacer();
   }
