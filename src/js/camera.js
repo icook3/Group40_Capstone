@@ -18,3 +18,15 @@ export function setCameraRotation(rot) {
 export function zoomCamera(zoom) {
     camera.setAttribute("zoom", zoom);
 }
+export function setFoV(fov) {
+    camera.setAttribute("fov",fov);
+}
+
+
+export function defaultCamera() {
+    setCameraRotation({x: 0, y: 0, z: 0});
+    setCameraPosition({x: 0, y: 4.5, z: 5});
+    zoomCamera(1);
+    setFoV(80);
+    console.log("Setting camera to default");
+}

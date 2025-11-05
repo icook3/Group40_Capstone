@@ -1,6 +1,7 @@
 import { constants } from "./constants.js";
 import { powerToSpeed } from "./main.js";
 import { activatePacer } from "./main.js";
+import { defaultCamera } from "./camera.js";
 
 export class KeyboardMode {
   keyboardMode = false;
@@ -55,12 +56,15 @@ export class KeyboardMode {
     activatePacer();
   }
 
+  //r resets camera - testing purposes
   keyboardInputActive(k) {
     var key = k.toLowerCase();
     if (key === "w" || key === "s") {
       this.setKeyboardModeSpeed(key);
     } else if (key === "q" || key === "a") {
       this.setKeyboardModePower(key);
+    } else if (key==="r") {
+      defaultCamera();
     }
   }
 
