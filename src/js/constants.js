@@ -62,7 +62,7 @@ class Constants {
       this.dragCoefficient *
       velocity *
       velocity *
-      this.bikeCrossSectionalArea
+      this.cda
     );
   }
 
