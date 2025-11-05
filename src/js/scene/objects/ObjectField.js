@@ -12,7 +12,7 @@ export class ObjectField {
 
   constructor({ sceneEl, dirtPattern, policy, clouds }) {
     this.sceneEl = sceneEl;
-    //this.dirtPattern = dirtPattern;
+    this.dirtPattern = dirtPattern;
     this.clouds = clouds;
     this.items = [];
     this.initialized = false;
