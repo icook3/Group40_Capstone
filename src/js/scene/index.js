@@ -1,5 +1,5 @@
 import { ObjectField } from './objects/ObjectField.js';
-import { DirtPattern } from './env/DirtPattern.js';
+import { DirtPattern } from './env/Dirt Pattern.js';
 import { Cloud } from './env/Cloud.js';
 import { SceneryManager } from './env/SceneryManager.js';
 

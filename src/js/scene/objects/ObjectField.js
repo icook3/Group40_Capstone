@@ -54,10 +54,10 @@ export class ObjectField {
   // Initializes items that move with the rider (buildings and trees)
   init() {
     if (this.initialized) return;
-    for (let z = 0; z > -200; z -= 5) {
-      this._spawnAtZ(z);
-      if (Math.random() < 0.7) this._spawnAtZ(z); // original density
-    }
+    //for (let z = 0; z > -200; z -= 5) {
+     // this._spawnAtZ(z);
+      //if (Math.random() < 0.7) this._spawnAtZ(z); // original density
+    //}
     this.initialized = true;
   }
 
@@ -147,27 +147,28 @@ export class ObjectField {
       }
     }
 
+    // Pull while working on track potion
     // Advances the dirt pattern
-    if (this.dirtPattern?.patternEl) {
-      const kids = Array.from(this.dirtPattern.patternEl.children);
-      if (kids.length) {
+    //if (this.dirtPattern?.patternEl) {
+     // const kids = Array.from(this.dirtPattern.patternEl.children);
+      //if (kids.length) {
         // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
         
-        for (const circle of kids) {
-          const pos = getPos(circle);
+        //for (const circle of kids) {
+          //const pos = getPos(circle);
 
           // Update z as item moves closer to rider
-          pos.z += dz;
+          //pos.z += dz;
           
           // Reset position when item is within 10 of rider
-          if (pos.z > 10) {
+         // if (pos.z > 10) {
             //pos.z = farthestZ - 5;
             // Reset z to -30, which is about as far as you can see on the track
-            pos.z = -30;
-          }
-          setPos(circle, pos);
-        }
-      }
-    }
+           // pos.z = -30;
+         // }
+          //setPos(circle, pos);
+        //}
+     // }
+    //}
   }
 }
