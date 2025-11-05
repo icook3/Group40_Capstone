@@ -82,70 +82,80 @@ a-scene {
     background-color: transparent !important;
     pointer-events: none;
 }
-/* 1) Put the pill look on the wrapper */
+
+
+/* PILL WRAPPER */
 .split-btn {
-  position: fixed;            /* keep your menu placement */
+  position: fixed;
   top: 40%;
-  /* left: 40%;  // only if you're not using .center-item to place it */
+  left: 50%;
+  transform: translateX(-50%) scale(1.4);
   display: inline-flex;
   align-items: center;
-  gap: 0;                     /* no gap between halves */
-  padding: 0;                 /* pill is sized by inner buttons */
-  border-radius: 9999px;      /* full pill */
-  overflow: hidden;
-  background: linear-gradient(90deg, #ffb5b5, #b7f1df); /* your pink→green vibe */
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  border-radius: 9999px;
+  overflow: visible;                 /* dropdown not clipped */
+  background: linear-gradient(90deg, #ffb5b5, #b7f1df);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
   z-index: 1000;
-  white-space: nowrap;        /* prevent "Start (Fre" clipping */
+  white-space: nowrap;
+  max-width: 90vw;
+  isolation: isolate;
+
+  /* NEW: make it the positioning anchor for the dropdown */
+  position: fixed;                   /* already fixed, but ensure it's a positioned ancestor */
 }
 
-/* 2) Make inner buttons transparent so the gradient shows through */
-.split-btn .main,
-.split-btn .toggle {
+/* MAIN HALF */
+.split-btn .main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1 auto;
   background: transparent;
-  color: #223138;             /* dark text over light gradient; use #fff if you prefer */
+  color: #223138;
   border: none;
-  font-size: xx-large;
-  line-height: 1.15;
-  padding: 12px 22px;
+  font-size: 1rem;
+  line-height: 1.2;
+  padding: 16px 26px;
+  cursor: pointer;
+  text-align: center;                /* extra safety for centering text */
+}
+
+/* TOGGLE HALF — keep the arrow visible and centered */
+.split-btn .toggle {
+  display: flex;                     /* center the ▾ glyph */
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #223138;
+  border: none;
+  font-size: 1rem;
+  width: 48px;
+  min-width: 48px;                   /* don’t collapse */
+  border-left: 1px solid rgba(0,0,0,0.15);
   cursor: pointer;
 }
-
-/* 3) Visual divider for the arrow half */
-.split-btn .toggle {
-  width: 44px;
-  font-size: 1.1rem;
-  border-left: 1px solid rgba(0,0,0,0.15);
-}
-
-/* 4) Hover/focus polish */
-.split-btn .main:hover,
-.split-btn .toggle:hover {
-  background: rgba(255,255,255,0.12);
-}
-.split-btn .main:focus,
-.split-btn .toggle:focus {
-  outline: 2px solid rgba(0,0,0,0.25);
-  outline-offset: 2px;
-}
-
-/* 5) Dropdown menu sits above the pill and matches your theme */
+/* Keep your existing blocks; add these if missing */
 .dropdown-content {
+  /* JS sets position/left/top; we only ensure visibility */
   display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
   background: rgb(53,72,79);
   color: #fff;
-  min-width: 260px;
   border-radius: 12px;
   padding: 6px;
   box-shadow: 0 10px 24px rgba(0,0,0,0.35);
-  z-index: 2000;
+  pointer-events: auto;
+  z-index: 9999;
+
+  /* Debug visibility */
+  visibility: visible;
+  opacity: 1;
+  border: 2px solid #00e5ff; /* TEMP: remove after verifying */
 }
 .dropdown-content.show { display: block; }
 
 .dropdown-item {
+  display: block;        /* ensure they occupy height */
   width: 100%;
   text-align: left;
   background: transparent;
@@ -156,14 +166,10 @@ a-scene {
   border-radius: 8px;
   cursor: pointer;
 }
-.dropdown-item:hover { background: rgba(255,255,255,0.08); }
 
-/* 6) Neutralize the old per-element layout on the child button */
-#start-btn {
-  position: static;           /* was fixed; let the wrapper control position */
-  top: auto;
-  font-size: xx-large;        /* keep size */
-  justify-content: center;
-  overflow: visible;
-}
+
+
+
+
+
 

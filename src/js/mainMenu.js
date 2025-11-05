@@ -1,64 +1,83 @@
-// js/mainMenu.js — handles Start / dropdown on the menu page only
+// src/js/mainMenu.js — minimal, robust split button logic
 
-// js/mainMenu.js — handles Start / dropdown on the menu page only
-
-(function mainMenuBoot() {
+(function () {
   const ready = (fn) =>
     document.readyState === "loading"
       ? document.addEventListener("DOMContentLoaded", fn, { once: true })
       : fn();
 
   ready(() => {
-    const startBtn  = document.getElementById('start-btn');
-    const toggleBtn = document.getElementById('start-toggle');
-    const menuEl    = document.getElementById('start-menu');
-    const splitRoot = document.getElementById('start-split');
+    const startBtn  = document.getElementById("start-btn");
+    const toggleBtn = document.getElementById("start-toggle");
+    const menuEl    = document.getElementById("start-menu");
+    const splitRoot = document.getElementById("start-split");
 
     if (!startBtn || !toggleBtn || !menuEl || !splitRoot) {
-      console.warn('[mainMenu] Missing menu elements.');
+      console.warn("[mainMenu] Missing elements", { startBtn, toggleBtn, menuEl, splitRoot });
       return;
     }
 
-    // Label reflects last selection
-    let selected = sessionStorage.getItem('SelectedWorkout') || 'free';
     const labelFor = (id) =>
-      id === 'ramp'  ? 'Start (Ramp Test)' :
-      id === 'ftp20' ? 'Start (FTP 20-min)' :
-                       'Start (Free Ride)';
+      id === "ramp"  ? "Start (Ramp Test)" :
+      id === "ftp20" ? "Start (FTP 20-min)" :
+                       "Start (Free Ride)";
+
+    // Restore label
+    let selected = sessionStorage.getItem("SelectedWorkout") || "free";
     startBtn.textContent = labelFor(selected);
 
-    // Start action
-    startBtn.addEventListener('click', () => {
-      sessionStorage.setItem('SelectedWorkout', selected);
-      window.location.href = '../index.html';
-    });
-
-    // Open/close dropdown
-    toggleBtn.addEventListener('click', (e) => {
+    // --- Toggle open/close ---------------------------------------------------
+    toggleBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      menuEl.classList.toggle('show');
-      toggleBtn.setAttribute('aria-expanded', menuEl.classList.contains('show'));
-    });
+      const isOpen = menuEl.classList.toggle("show");
+      toggleBtn.setAttribute("aria-expanded", String(isOpen));
+      console.log("[mainMenu] toggle", { isOpen });
 
-    // Pick an item
-    menuEl.addEventListener('click', (e) => {
-      const item = e.target.closest('.dropdown-item');
-      if (!item) return;
-      selected = item.dataset.workout;
-      startBtn.textContent = labelFor(selected);
-      sessionStorage.setItem('SelectedWorkout', selected);
-      menuEl.classList.remove('show');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-    });
-
-    // Click outside closes
-    document.addEventListener('click', (e) => {
-      if (!splitRoot.contains(e.target)) {
-        menuEl.classList.remove('show');
-        toggleBtn.setAttribute('aria-expanded', 'false');
+      if (isOpen) {
+        const rect = splitRoot.getBoundingClientRect();
+        // Pin to viewport so parent scale() doesn't matter
+        menuEl.style.position = "fixed";
+        menuEl.style.left = `${Math.round(rect.left)}px`;
+        menuEl.style.top  = `${Math.round(rect.bottom) + 8}px`;
+        menuEl.style.minWidth = `${Math.round(rect.width)}px`;
+        menuEl.style.zIndex = "9999";
+        menuEl.style.visibility = "visible";
+        menuEl.style.opacity = "1";
+        console.log("[mainMenu] menu rect", menuEl.getBoundingClientRect());
       }
     });
+
+    // --- Pick an item --------------------------------------------------------
+    menuEl.addEventListener("click", (e) => {
+      const item = e.target.closest(".dropdown-item");
+      if (!item) return;
+      selected = item.dataset.workout;
+      sessionStorage.setItem("SelectedWorkout", selected);
+      startBtn.textContent = labelFor(selected);
+      menuEl.classList.remove("show");
+      toggleBtn.setAttribute("aria-expanded", "false");
+      console.log("[mainMenu] selected", selected);
+    });
+
+    // --- Close on outside click ---------------------------------------------
+    document.addEventListener("click", (e) => {
+      if (!splitRoot.contains(e.target)) {
+        menuEl.classList.remove("show");
+        toggleBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    // --- Start ---------------------------------------------------------------
+    startBtn.addEventListener("click", () => {
+      sessionStorage.setItem("SelectedWorkout", selected);
+      const ps = document.getElementById("pacer-speed");
+      if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
+      window.location.href = "../html/zlow.html";
+    });
+
+    console.log("[mainMenu] ready");
   });
 })();
+
 
 
