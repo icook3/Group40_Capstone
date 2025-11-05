@@ -13,17 +13,18 @@ class Constants {
     return ms * this.MS_TO_KMH;
   }
 
-  cda = 0.6; // drag area (m^2) - slightly higher for realism
-  crr = 0.006; // rolling resistance coefficient - slightly higher for realism
+  cda = 0.45; // drag area (m^2) - slightly higher for realism
+  crr = 0.004; // rolling resistance coefficient - slightly higher for realism
   airDensity = 1.225; // kg/m^3
   g = 9.8067; // gravity
+  coastingFactor = 2.2; //for more realistic coasting
 
   // technically not constants, but close enough
   // should still be refactored out of main.js
 
   // mass should probabally go in avatar.js, when everything is fully merged
-  riderMass = 65; // rider mass (kg)
-  bikeMass = 8; // bike mass (kg)
+  riderMass = 58; // rider mass (kg)
+  bikeMass = 7; // bike mass (kg)
   get mass() {
     return this.riderMass + this.bikeMass;
   }

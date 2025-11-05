@@ -49,7 +49,8 @@ export function calculateCoastingSpeed(currentSpeed, dt) {
   const rollingResistanceForce = constants.crr * constants.mass * constants.g;
 
   // Calculate total resistance force
-  const totalForce = airDragForce + rollingResistanceForce;
+  const totalForce =
+    (airDragForce + rollingResistanceForce) * constants.coastingFactor;
 
   // Calculate deceleration using acceleration = force / mass
   const deceleration = totalForce / constants.mass;
