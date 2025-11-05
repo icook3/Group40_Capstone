@@ -54,10 +54,10 @@ export class ObjectField {
   // Initializes items that move with the rider (buildings and trees)
   init() {
     if (this.initialized) return;
-    for (let z = 0; z > -200; z -= 5) {
-      this._spawnAtZ(z);
-      if (Math.random() < 0.7) this._spawnAtZ(z); // original density
-    }
+    //for (let z = 0; z > -200; z -= 5) {
+     // this._spawnAtZ(z);
+      //if (Math.random() < 0.7) this._spawnAtZ(z); // original density
+    //}
     this.initialized = true;
   }
 

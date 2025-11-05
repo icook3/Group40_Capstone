@@ -66,7 +66,7 @@ const cfg = {
       laneHalfWidth: 1.6,
       spacing: 7.5,
       zExclusion: 7.5,
-      density: 0.10,
+      density: 0.010,
       jitterX: 0.35,
       zJitter: () => 0.8,
       mix: () => ({ building: 0.0 }) // trees only
@@ -80,7 +80,7 @@ const cfg = {
       laneHalfWidth: 1.5,
       spacing: 7.0,
       zExclusion: 7.0,
-      density: 0.18,
+      density: 0.018,
       jitterX: 0.35,
       zJitter: () => 0.8,
       mix: () => ({ building: 0.30 }),
