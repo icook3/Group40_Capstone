@@ -104,6 +104,7 @@ export class AvatarCreator {
         personModel.setAttribute('position', '0 0 0');
         personModel.setAttribute('rotation', '0 -90 0');
         personModel.setAttribute('scale', '0.35 0.35 0.35');
+        personModel.setAttribute('no-cull', ''); // Fixes avatar partially disappearing
         avatarEntity.appendChild(personModel);
 
         //Assign person and person bones

@@ -95,6 +95,15 @@ export function calculateAccelerationSpeed(currentSpeed, currentPower, dt) {
   return constants.msToKmh(finalSpeed_ms);
 }
 
+// Prevent meshes from disappearing due to frustum culling
+AFRAME.registerComponent('no-cull', {
+    init() {
+        this.el.addEventListener('model-loaded', () => {
+            this.el.object3D.traverse(obj => obj.frustumCulled = false);
+        });
+    },
+});
+
 // define the scene and the hud
 // so they can be used in multiple locations
 let scene;
