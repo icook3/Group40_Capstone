@@ -150,7 +150,6 @@ a-scene {
   /* Debug visibility */
   visibility: visible;
   opacity: 1;
-  border: 2px solid #00e5ff; /* TEMP: remove after verifying */
 }
 .dropdown-content.show { display: block; }
 
