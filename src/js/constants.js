@@ -71,6 +71,8 @@ class Constants {
   frictionForce = this.coefficientOfFriction * this.normalForce;
 
   // Constants governing terrain generation
+  worldZ = 0;
+
   tileSize = 10;
   // Colors can be refactored out once grid is fully abandoned
   groundColor1 = "#5a7d3a";

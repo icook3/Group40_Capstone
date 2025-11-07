@@ -2,11 +2,11 @@ import { ObjectField } from './objects/ObjectField.js';
 import { Track } from './env/Track.js';
 import { Cloud } from './env/Cloud.js';
 import { SceneryManager } from './env/SceneryManager.js';
+import { constants } from '../constants.js';
 
 export class ZlowScene {
   constructor(_, { getElement = (id) => document.getElementById(id) } = {}) {
     this.scene = getElement("scene");
-    this.worldZ = 0;
     this.objectsLoaded = false;
     this.DEBUG_BANDS = true; // set to true to log default policy once
 
@@ -31,7 +31,7 @@ export class ZlowScene {
   
   update(riderSpeed = 0, dt = 0) {
     const dz = riderSpeed * dt;
-    this.worldZ += dz;
+    constants.worldZ += dz;
 
     if (!this.objectsLoaded) {
       this.objectField.init(); // keep the original delayed spawn for field
