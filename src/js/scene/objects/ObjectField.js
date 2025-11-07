@@ -7,11 +7,13 @@ import { getPos, setPos } from '../core/util.js';
 import { constants } from "../../constants.js";
 import { spawnCloud } from '../env/Cloud.js';
 import { KINDS, detectKind } from './kinds/index.js';
+import { ZlowScene } from '../index.js';
 
 export class ObjectField {
 
   constructor({ sceneEl, track, policy, clouds }) {
     this.sceneEl = sceneEl;
+    this.zlowScene = ZlowScene;
     this.track = track;
     this.clouds = clouds;
     this.items = [];
@@ -59,6 +61,14 @@ export class ObjectField {
       //if (Math.random() < 0.7) this._spawnAtZ(z); // original density
     //}
     this.initialized = true;
+
+    const check = this.sceneEl.getAttribute('worldZ')
+    //for (const item in check){console.log(item)}
+    
+    console.log(check)
+
+
+    //console.log("WorldZ: " + this.sceneEl.children.innerHTML)
   }
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
@@ -95,7 +105,8 @@ export class ObjectField {
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
-    // re-roll kind by band policy mix (keeps long-run ratios)
+        
+        // re-roll kind by band policy mix (keeps long-run ratios)
         if (band.policy && typeof band.policy.xAnchor === 'function') {
           const mix = typeof band.policy.mix === 'function' ? band.policy.mix() : { tree: 0.5, building: 0.5 };
           const roll = Math.random();
@@ -123,6 +134,11 @@ export class ObjectField {
       setPos(obj, pos);
     }
   }
+  
+  // Is finding distance properly
+  // on second thoughts do I care?
+  //console.log("Distance: " + document.getElementById('distance').innerHTML)
+  console.log(constants.worldZ)
 
     // Advance clouds
     if (Date.now() > constants.lastCloud + constants.updateEvery) {
@@ -143,29 +159,6 @@ export class ObjectField {
             this.clouds.clouds.removeChild(cloud);
             this.clouds.clouds.appendChild(spawnCloud(4));
           }
-        }
-      }
-    }
-
-    // Advances the dirt pattern
-    if (this.track?.patternEl) {
-      const kids = Array.from(this.track.patternEl.children);
-      if (kids.length) {
-        // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
-        
-        for (const circle of kids) {
-          const pos = getPos(circle);
-
-          // Update z as item moves closer to rider
-          pos.z += dz;
-          
-          // Reset position when item is within 10 of rider
-          if (pos.z > 10) {
-            //pos.z = farthestZ - 5;
-            // Reset z to -30, which is about as far as you can see on the track
-            pos.z = -30;
-          }
-          setPos(circle, pos);
         }
       }
     }
