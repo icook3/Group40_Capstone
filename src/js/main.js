@@ -172,7 +172,7 @@ function loop({
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
-    pacer.avatarEntity.setAttribute("position", pacerPos);
+    pacer.setPosition(pacerPos);
   }
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {
