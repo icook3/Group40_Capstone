@@ -124,4 +124,8 @@ export class AvatarMovement {
         if (typeof val === 'string') val = AFRAME.utils.coordinates.parse(val);
         this.avatarEntity.setAttribute('position', `${pos.x} ${val.y} ${pos.z}`);
     }
+
+    setRotation(rot) {
+        this.avatarEntity.setAttribute('rotation',`${rot.x} ${rot.y} ${rot.z}`);
+    }
 }
