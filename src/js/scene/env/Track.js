@@ -13,15 +13,20 @@ export class Track {
 
     // Create a-entity for the path and set ID
     const path_element = document.createElement('a-entity');
-    path_element.setAttribute('id','dirt-pattern');
+    path_element.setAttribute('id','track');
+    this.path_element = path_element;
+    sceneEl.appendChild(path_element);
+  }
 
+  straightPiece(spawnZ) {
     // Create and append track
     const track = document.createElement('a-entity');
-    //track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    //track.setAttribute('material', `src: #track-texture; repeat: 1 1250`);
-    //track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${constants.pathPositionZ}`);
-    //path_element.appendChild(track);
+    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
 
-    // Add circular patterns to path_element
+    // Repeat does not work as intended
+    track.setAttribute('material', `src: #track-texture; repeat: 0 0`);
+    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
+    this.path_element.appendChild(track);
   }
+
 }

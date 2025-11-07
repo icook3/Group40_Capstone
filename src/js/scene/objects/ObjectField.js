@@ -7,19 +7,28 @@ import { getPos, setPos } from '../core/util.js';
 import { constants } from "../../constants.js";
 import { spawnCloud } from '../env/Cloud.js';
 import { KINDS, detectKind } from './kinds/index.js';
-import { ZlowScene } from '../index.js';
 
 export class ObjectField {
 
   constructor({ sceneEl, track, policy, clouds }) {
     this.sceneEl = sceneEl;
-    this.zlowScene = ZlowScene;
     this.track = track;
     this.clouds = clouds;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
     this.policy = policy;
+
+    // Stores immediate past, current, and upcoming template pieces
+    // BETTER IDEA: STORE FUNCTION NAMES AND CALL THE RELATED FUNCTION INSTEAD OF STORING WHOLE TEMPLATE PIECES IN ARRAY
+    this.path_element = document.getElementById('track');
+    this.templatePieces = [];
+
+    // Add a straight piece for initial testing
+    this.track.straightPiece(0);
+    this.track.straightPiece(-59);
+    //console.log(this.path_element)
+
 
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
@@ -61,14 +70,6 @@ export class ObjectField {
       //if (Math.random() < 0.7) this._spawnAtZ(z); // original density
     //}
     this.initialized = true;
-
-    const check = this.sceneEl.getAttribute('worldZ')
-    //for (const item in check){console.log(item)}
-    
-    console.log(check)
-
-
-    //console.log("WorldZ: " + this.sceneEl.children.innerHTML)
   }
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
@@ -134,11 +135,29 @@ export class ObjectField {
       setPos(obj, pos);
     }
   }
+
+  // Advance track
+  for (let segment of this.path_element.children) {
+    const pos = getPos(segment);
+    pos.z += dz;
+    //console.log(pos)
+    setPos(segment, pos);
+  }
+
+  // Spawn new track section if the rider has traveled 30 units
+  if (constants.worldZ > constants.trackLastUpdate + 30) {
+    constants.trackLastUpdate = constants.worldZ;
+    this.track.straightPiece(-59);
+    
+    // Remove first child
+    this.path_element.removeChild(this.path_element.children[0]);
+    //console.log(this.path_element.children.length)
+  }
   
   // Is finding distance properly
   // on second thoughts do I care?
   //console.log("Distance: " + document.getElementById('distance').innerHTML)
-  console.log(constants.worldZ)
+  //console.log(constants.worldZ)
 
     // Advance clouds
     if (Date.now() > constants.lastCloud + constants.updateEvery) {
