@@ -107,6 +107,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `simulationstate.js` — Handles tracking the state of the simulation.
 		- `standardMode.js` — Handles standard mode functionalities and variables.
 		- `strava.js` — Handles Strava OAuth and activity upload.
+		- `workoutChoice` — Handles the dropdown menu for choosing workouts
 
 ## Stretch Goals
 - Local/cloud session storage
