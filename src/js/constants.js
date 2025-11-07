@@ -73,6 +73,7 @@ class Constants {
 
   // Constants governing terrain generation
   worldZ = 0;
+  trackLastUpdate = 0;
 
   tileSize = 10;
   // Colors can be refactored out once grid is fully abandoned
@@ -89,10 +90,10 @@ class Constants {
   // Constants governing path generation
   pathWidth = 8;
   pathHeight = 1.02;
-  pathDepth = 10000;
+  pathDepth = 60;
   pathPositionX = 0;
-  pathPositionY = 0.52;
-  pathPositionZ = -3000;
+  pathPositionY = 0;
+  pathPositionZ = 0;
   dirtColor = "#a0895a";
 
   // Constants governing cloud speed
