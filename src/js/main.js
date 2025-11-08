@@ -12,6 +12,8 @@ import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
 
+import { WorkoutStorage } from "./workoutStorage.js";
+
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -96,12 +98,12 @@ export function calculateAccelerationSpeed(currentSpeed, currentPower, dt) {
 }
 
 // Prevent meshes from disappearing due to frustum culling
-AFRAME.registerComponent('no-cull', {
-    init() {
-        this.el.addEventListener('model-loaded', () => {
-            this.el.object3D.traverse(obj => obj.frustumCulled = false);
-        });
-    },
+AFRAME.registerComponent("no-cull", {
+  init() {
+    this.el.addEventListener("model-loaded", () => {
+      this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
+    });
+  },
 });
 
 // define the scene and the hud
@@ -227,10 +229,9 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
-
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
   console.log("Selected workout:", selectedWorkout);
-  
+
   // set up units properly
   units.setUnits();
   setUnits(units.speedUnit.name, "speed-unit");
