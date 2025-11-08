@@ -69,8 +69,8 @@ export class WorkoutSummary {
       const existingRecord = records[recordKey];
 
       if (isNewRecord) {
-        // displays the thropy icon for new personal records
-        return `<strong>${currentValue}${unit}</strong> <img src="../../resources/images/trophy.svg" alt="trophy" style="width: 32px; height: 32px; vertical-align: middle; margin-left: 4px;">`;
+        // displays new personal records with special formatting
+        return `<span class="new-record">${currentValue}${unit}</span>`;
       } else if (existingRecord) {
         let displayValue = existingRecord.value;
 

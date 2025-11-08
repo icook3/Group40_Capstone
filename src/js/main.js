@@ -437,6 +437,16 @@ export function initZlowApp({
     }
   });
 
+  document.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "summary-export-tcx") {
+      saveTCX();
+    }
+
+    if (e.target && e.target.id === "summary-export-strava") {
+      // TODO: Strava export (stretch goal)
+    }
+  });
+
   /*const stopBtn = getElement("stop-btn");
   stopBtn.addEventListener("click", () => {
     simulationState.isPaused = false;
@@ -546,12 +556,9 @@ export function initZlowApp({
   };*/
 
   // Strava integration button - Stretch goal
-  const stravaBtn = getElement("strava-btn");
+
   let stravaBtnEnabled = false;
   loop();
-  getElement("gpx-btn").addEventListener("click", () => {
-    saveTCX();
-  });
 
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {

@@ -272,6 +272,14 @@
   border-radius: 8px;
 }
 
+.new-record {
+  background-color: rgb(53, 72, 79);
+  color: rgb(220, 229, 222);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
 @media (max-width: 600px) {
   #workout-summary-container,
   #stop-confirmation-container {
