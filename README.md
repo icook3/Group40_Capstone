@@ -60,8 +60,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `html` — Stores HTML source code
 		- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings
 		- `playerCustomization.html` — Screen for customizing the player
-        - `strava.html` — Screen for connecting to strava
-        - `strava-redirect.html` — Handles redirect from Strava
 		- `zlow.html` — Loads A-Frame scene and UI.
 	- `js` — Contains JavaScript code
 		- `scene` - Handles scene generation

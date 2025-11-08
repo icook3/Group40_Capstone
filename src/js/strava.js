@@ -1,61 +1,69 @@
 // strava.js: Handles Strava OAuth and activity upload
 export class Strava {
-  constructor({ clientId = 'YOUR_STRAVA_CLIENT_ID', clientSecret = 'YOUR_STRAVA_CLIENT_SECRET', redirectUri = (typeof window !== 'undefined' ? window.location.origin + '/zlow/' : ''), accessToken = null } = {}) {
-    this.clientId = clientId;
-    this.clientSecret = clientSecret;
-    this.redirectUri = redirectUri;
-    this.accessToken = accessToken;
-    this.STRAVA_BASE_URL = 'https://www.strava.com';
-    this.STRAVA_TOKEN_URL = this.STRAVA_BASE_URL + '/oauth/token';
-    this.STRAVA_ACTIVITIES_URL = this.STRAVA_BASE_URL + '/api/v3/activities';
-  }
+    constructor() {
+        this.accessToken = null;
+        this.STRAVA_ACTIVITIES_URL = "https://www.strava.com/api/v3/activities";
+    }
 
-  async authenticatePopup() {
-    const url = `${this.STRAVA_BASE_URL}/oauth/authorize?client_id=${this.clientId}&response_type=code&redirect_uri=${encodeURIComponent(this.redirectUri)}&approval_prompt=auto&scope=activity:write`;
-    return new Promise((resolve, reject) => {
-      const popup = window.open(url, 'strava_oauth', 'width=600,height=700');
-      if (!popup) return reject('Popup blocked');
-      function handleMessage(event) {
-        if (event.origin !== window.location.origin) return;
-        if (event.data && event.data.stravaCode) {
-          window.removeEventListener('message', handleMessage);
-          popup.close();
-          resolve(event.data.stravaCode);
-        }
-      }
-      window.addEventListener('message', handleMessage);
-    });
-  }
+    // Begin OAuth
+    startOAuth(clientId, backendCallbackUrl) {
+        const url = `https://www.strava.com/oauth/authorize` +
+            `?client_id=${clientId}` +
+            `&response_type=code` +
+            `&redirect_uri=${encodeURIComponent(backendCallbackUrl)}` +
+            `&scope=activity:write`;
 
-  async exchangeToken(code) {
-    // This requires a backend proxy for security in production
-    const res = await fetch(this.STRAVA_TOKEN_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `client_id=${this.clientId}&client_secret=${this.clientSecret}&code=${code}&grant_type=authorization_code`
-    });
-    const data = await res.json();
-    this.accessToken = data.access_token;
-  }
+        window.location.href = url;
+    }
 
-  async uploadActivity({name, description, distance, duration, avgPower, isTrainer}) {
-    if (!this.accessToken) throw new Error('Not authenticated');
-    const res = await fetch(this.STRAVA_ACTIVITIES_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name,
-        description,
-        distance: distance * 1000, // meters
-        moving_time: duration, // seconds
-        type: 'VirtualRide',
-        trainer: 1,
-        average_watts: avgPower
-      })
-    });
-    return await res.json();
+    // Parse token hash when user returns from backend
+    static loadFromRedirect() {
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+
+        const accessToken = hash.get("access_token");
+        const refreshToken = hash.get("refresh_token");
+        const expiresAt = hash.get("expires_at");
+        const athleteId = hash.get("athlete_id");
+
+        if (!accessToken) return null;
+
+        // Save to local storage
+        localStorage.setItem("strava_access_token", accessToken);
+        localStorage.setItem("strava_refresh_token", refreshToken);
+        localStorage.setItem("strava_expires_at", expiresAt);
+        localStorage.setItem("strava_athlete_id", athleteId);
+
+        // Remove hash for security
+        history.replaceState(null, "", window.location.pathname);
+
+        return accessToken;
+    }
+
+    // Use stored token
+    loadToken() {
+        this.accessToken = localStorage.getItem("strava_access_token");
+        return this.accessToken;
+    }
+
+    // Upload workout to Strava
+    async uploadActivity({name, description, distance, duration, avgPower, isTrainer}) {
+        if (!this.accessToken) throw new Error("Not authenticated");
+        const res = await fetch(this.STRAVA_ACTIVITIES_URL, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${this.accessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                distance: distance * 1000,
+                moving_time: duration,
+                type: "VirtualRide",
+                trainer: 1,
+                average_watts: avgPower
+              })
+        });
+        return await res.json();
   }
 }
