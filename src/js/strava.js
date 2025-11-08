@@ -46,7 +46,7 @@ export class Strava {
     }
 
     // Upload workout to Strava
-    async uploadActivity({name, description, distance, duration, avgPower, isTrainer}) {
+    async uploadActivity({name, description, distance, duration, avgPower}) {
         if (!this.accessToken) throw new Error("Not authenticated");
         const res = await fetch(this.STRAVA_ACTIVITIES_URL, {
             method: "POST",
