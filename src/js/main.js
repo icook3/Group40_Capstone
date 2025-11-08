@@ -443,7 +443,7 @@ export function initZlowApp({
     }
 
     if (e.target && e.target.id === "summary-export-strava") {
-      await exportToStrava()
+      await exportToStrava();
     }
   });
 
@@ -655,7 +655,7 @@ export function getWorkoutSummary() {
 
 // Disable exporting if Strava is not connected
 function updateStravaButtonState() {
-    const btn = document.getElementById("strava-btn");
+    const btn = document.getElementById("summary-export-strava");
     if (!btn) return;
 
     const strava = new Strava();
