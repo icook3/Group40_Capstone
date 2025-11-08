@@ -68,7 +68,14 @@
         </button>
         <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
         <button id="gpx-btn" class="hud-btn">Download TCX</button>
-        <button id="strava-btn" class="hud-btn" disabled>Export Strava</button>
+
+        <!--    Export to Strava      -->
+        <button id="strava-btn" class="hud-btn" disabled>Export to Strava</button>
+        <script type="module">
+            import { exportToStrava } from "../js/main.js";
+            document.getElementById("strava-btn").onclick = exportToStrava;
+        </script>
+
         <button id="pause-btn" class="hud-btn">Pause</button>
         <button id="stop-btn" class="hud-btn">Stop</button>
       </div>

@@ -420,9 +420,6 @@ export function initZlowApp({
     }
   };*/
 
-  // Strava integration button - Stretch goal
-  const stravaBtn = getElement("strava-btn");
-  let stravaBtnEnabled = false;
   loop();
   getElement("gpx-btn").addEventListener("click", () => {
     saveTCX();
@@ -502,6 +499,49 @@ function updateFavicon() {
 
 updateFavicon();
 darkMode.addEventListener("change", updateFavicon);
+
+// Gets workout summary
+export function getWorkoutSummary() {
+    const history = constants.rideHistory;
+    if (!history || history.length < 2) return null;
+
+    const startTime = history[0].time;
+    const endTime = history[history.length - 1].time;
+
+    const duration = Math.floor((endTime - startTime) / 1000);
+    const distanceKm = history[history.length - 1].distance;
+    const avgPower = history.reduce((sum, p) => sum + p.power, 0) / history.length;
+
+    return {
+        name: "Zlow Ride",
+        description: "Workout synced from Zlow Cycling",
+        distance: distanceKm,     // km to m Strava converter happens inside upload
+        duration: duration,
+        avgPower: Math.round(avgPower),
+    };
+}
+
+export async function exportToStrava() {
+    const strava = new Strava();
+    strava.loadToken();
+
+    const clientId = "INPUT CLIENT ID"; // TODO: replace clientId with Zlow's Strava App Registration
+    const backendCallback = "https://your-backend.com/oauth/callback"; // TODO: replace backendCallback with Zlow's backend callback
+
+    if (!Strava.isConnected() || strava.isTokenExpired()) {
+        strava.startOAuth(clientId, backendCallback);
+        return;
+    }
+
+    const workout = getWorkoutSummary();
+    if (!workout) {
+        alert("No workout data yet. Ride first!");
+        return;
+    }
+
+    await strava.uploadActivity(workout);
+    alert("Exported to Strava");
+}
 
 /**
  * Save a TCX file
