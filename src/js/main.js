@@ -12,6 +12,9 @@ import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
 
+import { WorkoutStorage } from "./workoutStorage.js";
+import { WorkoutSession } from "./workoutSession.js";
+import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -49,7 +52,8 @@ export function calculateCoastingSpeed(currentSpeed, dt) {
   const rollingResistanceForce = constants.crr * constants.mass * constants.g;
 
   // Calculate total resistance force
-  const totalForce = airDragForce + rollingResistanceForce;
+  const totalForce =
+    (airDragForce + rollingResistanceForce) * constants.coastingFactor;
 
   // Calculate deceleration using acceleration = force / mass
   const deceleration = totalForce / constants.mass;
@@ -64,6 +68,45 @@ export function calculateCoastingSpeed(currentSpeed, dt) {
   return constants.msToKmh(finalSpeed_ms);
 }
 
+// Calculates acceleration to make speed increases gradual and more realistic
+export function calculateAccelerationSpeed(currentSpeed, currentPower, dt) {
+  // convert km to m (for standard physics equations)
+  const v_ms = constants.kmhToMs(currentSpeed);
+
+  // this prevents division by zero
+  const v_for_calc = Math.max(v_ms, 0.1);
+
+  // Calculates driving force from power: F = P / v
+  const drivingForce = currentPower / v_for_calc;
+
+  // calculates forces against cyclist
+  const airDragForce = constants.windResistance(v_ms);
+  const rollingResistanceForce = constants.crr * constants.mass * constants.g;
+
+  // total force = forward force - resistance forces
+  const netForce = drivingForce - airDragForce - rollingResistanceForce;
+
+  // calculates acceleration using F = ma aka a = F/m
+  const acceleration = netForce / constants.mass;
+
+  // apply acceleration/delta time
+  const v_new_ms = v_ms + acceleration * dt;
+
+  // avoid going backwards (negative speed)
+  const finalSpeed_ms = Math.max(0, v_new_ms);
+
+  return constants.msToKmh(finalSpeed_ms);
+}
+
+// Prevent meshes from disappearing due to frustum culling
+AFRAME.registerComponent("no-cull", {
+  init() {
+    this.el.addEventListener("model-loaded", () => {
+      this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
+    });
+  },
+});
+
 // define the scene and the hud
 // so they can be used in multiple locations
 let scene;
@@ -73,6 +116,9 @@ let standardMode;
 //Avatar and Pacer
 let rider;
 let pacer;
+// workout session
+let workoutStorage;
+let workoutSession;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -104,9 +150,13 @@ function loop({
   const isUsingDirectSpeedControl =
     keyboardMode.wKeyDown || keyboardMode.sKeyDown;
 
-  // Recompute speed from power each frame so mass/slope changes take effect immediately
+  // calculates speed based on acceleration and power
   if (currentPower > 0 && !(keyboardMode.wKeyDown || keyboardMode.sKeyDown)) {
-    constants.riderState.speed = powerToSpeed({ power: currentPower });
+    constants.riderState.speed = calculateAccelerationSpeed(
+      currentSpeed,
+      currentPower,
+      dt
+    );
   }
 
   // If rider is not peddaling and their speed is not zero, calculate new speed
@@ -115,6 +165,16 @@ function loop({
   }
 
   scene.update(constants.riderState.speed || 0, dt);
+
+  //update workout session with current values
+  if (workoutSession.isWorkoutActive()) {
+    workoutSession.update({
+      speed: constants.riderState.speed || 0,
+      power: constants.riderState.power || 0,
+      distance: hud.totalDistance,
+      calories: constants.riderState.calories || 0,
+    });
+  }
 
   //Update Avatar and Pacer
   rider.setSpeed(constants.riderState.speed);
@@ -128,7 +188,7 @@ function loop({
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
-    pacer.avatarEntity.setAttribute("position", pacerPos);
+    pacer.setPosition(pacerPos);
   }
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {
@@ -143,10 +203,13 @@ function loop({
   const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
 
   //set up values to push
-  let pushTime=now;
+  let pushTime = now;
   let pushPower = constants.riderState.power || 0;
   let pushSpeed = units.speedUnit.convertFrom(constants.riderState.speed) || 0;
-  let pushDistance = units.distanceUnit.convertFrom(parseFloat(getElement("distance").textContent)) || 0;
+  let pushDistance =
+    units.distanceUnit.convertFrom(
+      parseFloat(getElement("distance").textContent)
+    ) || 0;
 
   if (constants.lastHistorySecond !== thisSecond) {
     constants.rideHistory.push({
@@ -167,25 +230,41 @@ export function activatePacer() {
   }
 }
 function setUnits(storageVal, className) {
-    let elements = document.getElementsByClassName(className);
-    if (storageVal == null) {
-        return;
-    }
-    for (let i = 0; i < elements.length; i++) {
-        elements.item(i).innerHTML = storageVal;
-    }
+  let elements = document.getElementsByClassName(className);
+  if (storageVal == null) {
+    return;
+  }
+  for (let i = 0; i < elements.length; i++) {
+    elements.item(i).innerHTML = storageVal;
+  }
 }
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+  const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
+  console.log("Selected workout:", selectedWorkout);
+
   // set up units properly
   units.setUnits();
-  setUnits(units.speedUnit.name,"speed-unit");
+  setUnits(units.speedUnit.name, "speed-unit");
   setUnits(units.weightUnit.name, "weight-unit");
   //setUnits(units.powerUnit.name,"power-unit");
   setUnits(units.distanceUnit.name, "distance-unit");
+
+  // start tracking current workout stats
+  workoutStorage = new WorkoutStorage();
+  workoutSession = new WorkoutSession();
+
+  const workoutSummary = new WorkoutSummary({
+    workoutStorage,
+    onClose: () => {
+      console.log("Summary was closed");
+    },
+  });
+
+  workoutSession.start();
 
   // get the needed objects
   if (localStorage.getItem("testMode") !== "true") {
@@ -203,8 +282,14 @@ export function initZlowApp({
 
   const countdown = new PauseCountdown({ getElement, limit: 10 });
 
-  rider = new AvatarMovement("rider", { position: { x: -0.5, y: 1, z: 0 }, isPacer: false });
-  pacer = new AvatarMovement("pacer", { position: { x: 0.5, y: 1, z: -2 }, isPacer: true });
+  rider = new AvatarMovement("rider", {
+    position: { x: -0.5, y: 1, z: 0 },
+    isPacer: false,
+  });
+  pacer = new AvatarMovement("pacer", {
+    position: { x: 0.5, y: 1, z: -2 },
+    isPacer: true,
+  });
   pacer.creator.setPacerColors();
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
@@ -352,7 +437,17 @@ export function initZlowApp({
     }
   });
 
-  const stopBtn = getElement("stop-btn");
+  document.addEventListener("click", (e) => {
+    if (e.target && e.target.id === "summary-export-tcx") {
+      saveTCX();
+    }
+
+    if (e.target && e.target.id === "summary-export-strava") {
+      // TODO: Strava export (stretch goal)
+    }
+  });
+
+  /*const stopBtn = getElement("stop-btn");
   stopBtn.addEventListener("click", () => {
     simulationState.isPaused = false;
     countdown.cancel();
@@ -368,6 +463,46 @@ export function initZlowApp({
     const startPos = { x: 0.5, y: 1, z: -2 };
     pacer.avatarEntity.setAttribute("position", startPos);
     constants.pacerStarted = false;
+  });*/
+  const stopBtn = getElement("stop-btn");
+  stopBtn.addEventListener("click", () => {
+    // Show confirmation dialog
+    showStopConfirmation(
+      // On Confirm - end workout and show summary
+      () => {
+        // End the session and get final stats
+        const finalStats = workoutSession.end();
+
+        // Save workout and check for records
+        const { newRecords, streak } = workoutStorage.saveWorkout(finalStats);
+
+        // Show the summary!
+        workoutSummary.show(finalStats, newRecords, streak);
+
+        // Reset everything
+        simulationState.isPaused = false;
+        countdown.cancel();
+        constants.rideHistory = [];
+        constants.historyStartTime = Date.now();
+        constants.lastHistorySecond = null;
+        constants.riderState = { power: 0, speed: 0 };
+        hud.resetWorkOut();
+        pauseBtn.textContent = "Pause";
+
+        // Reset pacer
+        pacer.setSpeed(0);
+        const startPos = { x: 0.5, y: 1, z: -2 };
+        pacer.avatarEntity.setAttribute("position", startPos);
+        constants.pacerStarted = false;
+
+        // Start a new session for next workout
+        workoutSession.start();
+      },
+      // On Cancel
+      () => {
+        console.log("❌ Stop cancelled - continuing workout");
+      }
+    );
   });
 
   keyboardMode.wKeyDown = false;
@@ -421,9 +556,6 @@ export function initZlowApp({
   };*/
 
   loop();
-  getElement("gpx-btn").addEventListener("click", () => {
-    saveTCX();
-  });
 
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {
