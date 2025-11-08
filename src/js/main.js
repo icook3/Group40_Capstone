@@ -13,6 +13,7 @@ import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
 
 import { WorkoutStorage } from "./workoutStorage.js";
+import { WorkoutSession } from "./workoutSession.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -115,6 +116,9 @@ let standardMode;
 //Avatar and Pacer
 let rider;
 let pacer;
+// workout session
+let workoutStorage;
+let workoutSession;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -161,6 +165,16 @@ function loop({
   }
 
   scene.update(constants.riderState.speed || 0, dt);
+
+  //update workout session with current values
+  if (workoutSession.isWorkoutActive()) {
+    workoutSession.update({
+      speed: constants.riderState.speed || 0,
+      power: constants.riderState.power || 0,
+      distance: hud.totalDistance,
+      calories: constants.riderState.calories || 0,
+    });
+  }
 
   //Update Avatar and Pacer
   rider.setSpeed(constants.riderState.speed);
@@ -238,6 +252,12 @@ export function initZlowApp({
   setUnits(units.weightUnit.name, "weight-unit");
   //setUnits(units.powerUnit.name,"power-unit");
   setUnits(units.distanceUnit.name, "distance-unit");
+
+  // start tracking current workout stats
+  workoutStorage = new WorkoutStorage();
+  workoutSession = new WorkoutSession();
+
+  workoutSession.start();
 
   // get the needed objects
   if (localStorage.getItem("testMode") !== "true") {
