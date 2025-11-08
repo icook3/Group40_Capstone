@@ -437,13 +437,13 @@ export function initZlowApp({
     }
   });
 
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", async (e) => {
     if (e.target && e.target.id === "summary-export-tcx") {
       saveTCX();
     }
 
     if (e.target && e.target.id === "summary-export-strava") {
-      // TODO: Strava export (stretch goal)
+      await exportToStrava()
     }
   });
 
