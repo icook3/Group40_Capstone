@@ -1,5 +1,6 @@
 ﻿import { StandardMode } from "./standardMode.js";
 import { constants } from "./constants.js";
+import {Strava} from "./strava.js";
 
 export function initSettings() {
   let standardMode = new StandardMode();
@@ -87,6 +88,31 @@ export function initSettings() {
       });
   }
   */
+
+
+
+    const strava = new Strava();
+    Strava.loadFromRedirect();
+    strava.loadToken();
+
+    function connectStrava() {
+        const clientId = "INPUT CLIENT ID"; // TODO: replace clientId with Zlow's Strava App Registration
+        const backendCallback = "https://YOUR-BACKEND.com/oauth/callback"; // TODO: replace backendCallback with Zlow's backend callback
+
+        strava.startOAuth(clientId, backendCallback);
+    }
+
+    const stravaBtn = document.getElementById("connect-strava-btn");
+    if (stravaBtn) {
+        if (Strava.isConnected() && !strava.isTokenExpired()) {
+            stravaBtn.textContent = "Strava Connected";
+            stravaBtn.disabled = true;
+        } else {
+            stravaBtn.textContent = "Connect Strava";
+            stravaBtn.disabled = false;
+            stravaBtn.addEventListener("click", connectStrava);
+        }
+    }
 }
 
 if (typeof window !== "undefined") {

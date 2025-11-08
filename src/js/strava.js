@@ -1,3 +1,5 @@
+import { generateTCXFile } from "./main.js";
+
 // strava.js: Handles Strava OAuth and activity upload
 export class Strava {
     constructor() {
@@ -59,30 +61,45 @@ export class Strava {
         return now >= this.expiresAt;
     }
 
-    // Upload workout to Strava
-    async uploadActivity({name, description, distance, duration, avgPower}) {
+    // Upload workout to Strava (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
+    async uploadActivity({name, description}) {
+        this.loadToken();
         if (!this.accessToken || this.isTokenExpired()) {
-            throw new Error("Strava session expired — please reconnect Strava.");
+            alert("Strava session expired — please reconnect Strava.");
+            return;
         }
 
-        const res = await fetch(this.STRAVA_ACTIVITIES_URL, {
+        const file = generateTCXFile();
+        if (!file) {
+            alert("Not enough workout data yet — ride first!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file, "zlow-ride.tcx");
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("trainer", "1");
+        formData.append("commute", "0");
+        formData.append("data_type", "tcx");
+        formData.append("external_id", "zlow-" + Date.now());
+
+        const res = await fetch("https://www.strava.com/api/v3/uploads", {
             method: "POST",
-            headers: {
-                Authorization: `Bearer ${this.accessToken}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name,
-                description,
-                distance: distance * 1000,
-                moving_time: duration,
-                type: "VirtualRide",
-                trainer: 1,
-                average_watts: avgPower
-              })
+            headers: { Authorization: `Bearer ${this.accessToken}` },
+            body: formData,
         });
-        return await res.json();
-  }
+
+        const json = await res.json();
+        console.log("UPLOAD RESPONSE:", json);
+
+        if (json.error || json.errors) {
+            alert("Upload failed:\n" + JSON.stringify(json, null, 2));
+            return;
+        }
+
+        alert("Upload sent! It may take 10–30 seconds to appear in Strava.");
+    }
 
     // Checks if user has been connected to Strava
     static isConnected() {
