@@ -44,7 +44,38 @@
                    step="1" />
             <span class="weightUnit"> kg</span>
         </span>
-        <button id="strava-btn" class="hud-btn" onclick="window.location.href='strava.html'">Strava Settings</button>
+
+        <!--    Strava Connection    -->
+        <button id="strava-btn" class="hud-btn" onclick="connectStrava()">Connect Strava</button>
+        <script type="module">
+            import {Strava} from "./strava.js";
+
+            const strava = new Strava();
+
+            Strava.loadFromRedirect();
+
+            strava.loadToken();
+
+            function connectStrava() {
+                const clientId = "INPUT CLIENT ID"; // TODO: replace clientId with Zlow's Strava App Registration
+                const backendCallback = "https://your-backend.com/oauth/callback"; // TODO: replace backendCallback with Zlow's backend callback
+
+                strava.startOAuth(clientId, backendCallback);
+            }
+
+            const stravaBtn = document.getElementById("strava-btn");
+            if (Strava.isConnected()) {
+                stravaBtn.textContent = "Strava Connected ✅";
+                stravaBtn.disabled = true;
+            } else {
+                stravaBtn.textContent = "Connect Strava";
+                stravaBtn.disabled = false;
+            }
+
+            window.connectStrava = connectStrava;
+        </script>
+
+
         <span id="unitsSpeed" class="hud-btn">
             <label for="unitsSpeed">Units for speed: </label>
             <select name="unitsSpeed" id="unitInputSpeed">

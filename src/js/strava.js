@@ -2,7 +2,8 @@
 export class Strava {
     constructor() {
         this.accessToken = null;
-        this.STRAVA_ACTIVITIES_URL = "https://www.strava.com/api/v3/activities";
+        this.STRAVA_BASE_URL = "https://www.strava.com";
+        this.STRAVA_ACTIVITIES_URL = this.STRAVA_BASE_URL + "/api/v3/activities";
     }
 
     // Begin OAuth
@@ -66,4 +67,9 @@ export class Strava {
         });
         return await res.json();
   }
+
+    // Checks if user has been connected to Strava
+    static isConnected() {
+        return !!localStorage.getItem("strava_access_token");
+    }
 }
