@@ -109,7 +109,7 @@ export function initSettings() {
             stravaBtn.disabled = true;
         } else {
             stravaBtn.textContent = "Connect Strava";
-            stravaBtn.disabled = false;
+            stravaBtn.disabled = true; // TODO: Set to false once Strava app is made
             stravaBtn.addEventListener("click", connectStrava);
         }
     }
