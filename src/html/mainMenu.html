@@ -46,9 +46,9 @@
         </span>
 
         <!--    Strava Connection    -->
-        <button id="strava-btn" class="hud-btn" onclick="connectStrava()">Connect Strava</button>
+        <button id="strava-btn" class="hud-btn" onclick="connectStrava()" disabled="disabled">Connect Strava</button>
         <script type="module">
-            import {Strava} from "./strava.js";
+            import {Strava} from "../js/strava.js";
 
             const strava = new Strava();
 
@@ -64,8 +64,8 @@
             }
 
             const stravaBtn = document.getElementById("strava-btn");
-            if (Strava.isConnected()) {
-                stravaBtn.textContent = "Strava Connected ✅";
+            if (Strava.isConnected() && !strava.isTokenExpired()) {
+                stravaBtn.textContent = "Strava Connected";
                 stravaBtn.disabled = true;
             } else {
                 stravaBtn.textContent = "Connect Strava";

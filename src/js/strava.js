@@ -2,7 +2,11 @@
 export class Strava {
     constructor() {
         this.accessToken = null;
+        this.refreshToken = null;
+        this.expiresAt = null;
+
         this.STRAVA_BASE_URL = "https://www.strava.com";
+        this.STRAVA_TOKEN_URL = this.STRAVA_BASE_URL + "/oauth/token";
         this.STRAVA_ACTIVITIES_URL = this.STRAVA_BASE_URL + "/api/v3/activities";
     }
 
@@ -43,12 +47,24 @@ export class Strava {
     // Use stored token
     loadToken() {
         this.accessToken = localStorage.getItem("strava_access_token");
-        return this.accessToken;
+        this.refreshToken = localStorage.getItem("strava_refresh_token");
+        this.expiresAt = Number(localStorage.getItem("strava_expires_at"));
+    }
+
+    // Check if token is expired
+    isTokenExpired() {
+        if (!this.expiresAt) return true;
+
+        const now = Math.floor(Date.now() / 1000);
+        return now >= this.expiresAt;
     }
 
     // Upload workout to Strava
     async uploadActivity({name, description, distance, duration, avgPower}) {
-        if (!this.accessToken) throw new Error("Not authenticated");
+        if (!this.accessToken || this.isTokenExpired()) {
+            throw new Error("Strava session expired — please reconnect Strava.");
+        }
+
         const res = await fetch(this.STRAVA_ACTIVITIES_URL, {
             method: "POST",
             headers: {
