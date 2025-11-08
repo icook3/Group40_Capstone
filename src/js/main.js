@@ -14,7 +14,7 @@ import { units } from "./units/index.js";
 
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
-
+import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -257,6 +257,13 @@ export function initZlowApp({
   workoutStorage = new WorkoutStorage();
   workoutSession = new WorkoutSession();
 
+  const workoutSummary = new WorkoutSummary({
+    workoutStorage,
+    onClose: () => {
+      console.log("Summary was closed");
+    },
+  });
+
   workoutSession.start();
 
   // get the needed objects
@@ -430,7 +437,7 @@ export function initZlowApp({
     }
   });
 
-  const stopBtn = getElement("stop-btn");
+  /*const stopBtn = getElement("stop-btn");
   stopBtn.addEventListener("click", () => {
     simulationState.isPaused = false;
     countdown.cancel();
@@ -446,6 +453,46 @@ export function initZlowApp({
     const startPos = { x: 0.5, y: 1, z: -2 };
     pacer.avatarEntity.setAttribute("position", startPos);
     constants.pacerStarted = false;
+  });*/
+  const stopBtn = getElement("stop-btn");
+  stopBtn.addEventListener("click", () => {
+    // Show confirmation dialog
+    showStopConfirmation(
+      // On Confirm - end workout and show summary
+      () => {
+        // End the session and get final stats
+        const finalStats = workoutSession.end();
+
+        // Save workout and check for records
+        const { newRecords, streak } = workoutStorage.saveWorkout(finalStats);
+
+        // Show the summary!
+        workoutSummary.show(finalStats, newRecords, streak);
+
+        // Reset everything
+        simulationState.isPaused = false;
+        countdown.cancel();
+        constants.rideHistory = [];
+        constants.historyStartTime = Date.now();
+        constants.lastHistorySecond = null;
+        constants.riderState = { power: 0, speed: 0 };
+        hud.resetWorkOut();
+        pauseBtn.textContent = "Pause";
+
+        // Reset pacer
+        pacer.setSpeed(0);
+        const startPos = { x: 0.5, y: 1, z: -2 };
+        pacer.avatarEntity.setAttribute("position", startPos);
+        constants.pacerStarted = false;
+
+        // Start a new session for next workout
+        workoutSession.start();
+      },
+      // On Cancel
+      () => {
+        console.log("❌ Stop cancelled - continuing workout");
+      }
+    );
   });
 
   keyboardMode.wKeyDown = false;
