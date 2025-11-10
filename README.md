@@ -54,9 +54,11 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `css` — Stores CSS source code.
 		- `hud.css` — Handles CSS styles for the modern HUD.
 		- `menu.css` — Handles CSS styles for the main menu.
+		- `peerToPeer.css` — Handles CSS styles for the peer-to-peer menu
 		- `playerCustomization.css` — Handles CSS styles for the player customization screen.
 		- `style.css` — Handles general CSS styles for the program.
 	- `html` — Stores HTML source code.
+		- `connectToPeers.html` — Screen for connecting via the peer-to-peer network
 		- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings.
 		- `playerCustomization.html` — Screen for customizing the player.
 		- `zlow.html` — Loads A-Frame scene and UI.
