@@ -13,6 +13,23 @@ export function initSettings() {
     //if (ok) connectBtn.disabled = true;
   });
 
+  const peerBtn = document.getElementById("peer-btn");
+  peerBtn.addEventListener("click", () => {
+      let peerHosting = sessionStorage.getItem("peerToPeer");
+      if (peerHosting==null) {
+        peerHosting = false;
+      } else if (peerHosting == "false") {
+        peerHosting = false;
+      } else {
+        peerHosting = true;
+      }
+      peerHosting = !peerHosting;
+      sessionStorage.setItem("peerToPeer",peerHosting);
+      peerBtn.textContent = peerHosting
+        ? "Host peer-to-peer: ON"
+        : "Host peer-to-peer";
+  });
+
   //Test Mode
   const testModeBtn = document.getElementById("testMode");
   testModeBtn.addEventListener("click", () => {
