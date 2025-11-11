@@ -78,37 +78,32 @@
         <span class="speedUnit">km/h</span>
       </span>
 
-      <span id="weight" class="hud-btn">
-        <label for="rider-weight">Weight:</label>
-        <input
-          id="rider-weight"
-          type="number"
-          min="40"
-          max="150"
-          value="70"
-          step="1"
-        />
-        <span class="weightUnit"> kg</span>
-      </span>
-      <span id="API-key" class="hud-btn">
-        <label for="API-key">Strava API key</label>
-        <input id="API-key" type="text" style="width: 50px" disabled />
-      </span>
-      <span id="unitsSpeed" class="hud-btn">
-        <label for="unitsSpeed">Units for speed: </label>
-        <select name="unitsSpeed" id="unitInputSpeed">
-          <option value="km/h">km/h</option>
-          <option value="mph">mph</option>
-        </select>
-      </span>
-      <span id="unitsWeight" class="hud-btn">
-        <label for="unitsWeight">Units for weight: </label>
-        <select name="unitsWeight" id="unitInputWeight">
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-        </select>
-      </span>
-      <!-- Delete this comment if you want to add alternate options for power input 
+        <span id="weight" class="hud-btn">
+            <label for="rider-weight">Weight:</label>
+            <input id="rider-weight"
+                   type="number"
+                   min="40"
+                   max="150"
+                   value="70"
+                   step="1" />
+            <span class="weightUnit"> kg</span>
+        </span>
+        <button id="connect-strava-btn" class="hud-btn" disabled>Connect Strava</button>
+        <span id="unitsSpeed" class="hud-btn">
+            <label for="unitsSpeed">Units for speed: </label>
+            <select name="unitsSpeed" id="unitInputSpeed">
+                <option value="km/h">km/h</option>
+                <option value="mph">mph</option>
+            </select>
+        </span>
+        <span id="unitsWeight" class="hud-btn">
+            <label for="unitsWeight">Units for weight: </label>
+            <select name="unitsWeight" id="unitInputWeight">
+                <option value="kg">kg</option>
+                <option value="lb">lb</option>
+            </select>
+        </span>
+        <!-- Delete this comment if you want to add alternate options for power input 
         <span id="unitsPower" class="hud-btn">
             <label for="unitsPower">Units for power: </label>
             <select name="unitsPower" id="unitInputPower">
