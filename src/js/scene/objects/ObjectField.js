@@ -20,15 +20,15 @@ export class ObjectField {
     this.policy = policy;
 
     // Stores immediate past, current, and upcoming template pieces
-    // BETTER IDEA: STORE FUNCTION NAMES AND CALL THE RELATED FUNCTION INSTEAD OF STORING WHOLE TEMPLATE PIECES IN ARRAY
+    // BETTER IDEA: ADD A CONFIGURATION ELEMENT TO NEW PIECES SO YOU CAN JUST PING THEM AND GET THE UPDATE EQUATION
     this.path_element = document.getElementById('track');
-    this.templatePieces = [];
 
-    // Add a straight piece for initial testing
+    // Add a straight piece for initial testing. You need about 5 pieces to get to the horizon
     this.track.straightPiece(0);
-    this.track.straightPiece(-59);
-    //console.log(this.path_element)
-
+    this.track.straightPiece(-60);
+    this.track.straightPiece(-120);
+    this.track.straightPiece(-180);
+    this.track.straightPiece(-240);
 
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
@@ -65,10 +65,10 @@ export class ObjectField {
   // Initializes items that move with the rider (buildings and trees)
   init() {
     if (this.initialized) return;
-    //for (let z = 0; z > -200; z -= 5) {
-      //this._spawnAtZ(z);
-      //if (Math.random() < 0.7) this._spawnAtZ(z); // original density
-    //}
+    for (let z = 0; z > -200; z -= 5) {
+      this._spawnAtZ(z);
+      if (Math.random() < 0.7) this._spawnAtZ(z); // original density
+    }
     this.initialized = true;
   }
 
@@ -140,24 +140,17 @@ export class ObjectField {
   for (let segment of this.path_element.children) {
     const pos = getPos(segment);
     pos.z += dz;
-    //console.log(pos)
     setPos(segment, pos);
   }
 
-  // Spawn new track section if the rider has traveled 30 units
-  if (constants.worldZ > constants.trackLastUpdate + 30) {
-    constants.trackLastUpdate = constants.worldZ;
-    this.track.straightPiece(-59);
-    
-    // Remove first child
+  // Spawn new track section if the rider has traveled 60 units
+  if (constants.worldZ > constants.trackLastUpdate + 60) {
+    constants.trackLastUpdate += 60;
+
+    //Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
+    this.track.straightPiece(getPos(this.path_element.children[this.path_element.children.length-1]).z - 60);
     this.path_element.removeChild(this.path_element.children[0]);
-    //console.log(this.path_element.children.length)
   }
-  
-  // Is finding distance properly
-  // on second thoughts do I care?
-  //console.log("Distance: " + document.getElementById('distance').innerHTML)
-  //console.log(constants.worldZ)
 
     // Advance clouds
     if (Date.now() > constants.lastCloud + constants.updateEvery) {
