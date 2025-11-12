@@ -3,6 +3,9 @@ import { constants } from "./constants.js";
 import {Strava} from "./strava.js";
 
 export function initSettings() {
+  if (sessionStorage.getItem("peerToPeer")==='true') {
+    jQuery("#peer-name").fadeToggle(500);
+  }
   let standardMode = new StandardMode();
   //Connect Trainer
   const connectBtn = document.getElementById("connect-btn");
@@ -29,6 +32,12 @@ export function initSettings() {
       peerBtn.textContent = peerHosting
         ? "Host peer-to-peer: ON"
         : "Host peer-to-peer";
+        jQuery("#peer-name").fadeToggle(500);
+  });
+
+  const peerNameInput = document.getElementById("name-input");
+  peerNameInput.addEventListener("input", () => {
+      localStorage.setItem("Name",peerNameInput.value);
   });
 
   //Test Mode

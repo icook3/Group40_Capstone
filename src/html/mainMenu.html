@@ -112,6 +112,10 @@
         </span>
         -->
       <button id="peer-btn" class="hud-btn">Host peer-to-peer</button>
+      <span id="peer-name" class="hud-btn">
+        <label for="name-input">Name: </label>
+        <input id="name-input" />
+      </span>
       <button id="clear-btn" class="hud-btn" onclick="sessionStorage.clear();">
         Clear settings
       </button>
@@ -169,6 +173,12 @@
         ></a-asset-item>
       </a-assets>
     </a-scene>
+
+    <script>
+      jQuery( document ).ready(function() {
+        console.log("Ready!");
+      });
+    </script>
 
     <script type="module">
       import { AvatarCreator } from "../js/avatarCreator.js";

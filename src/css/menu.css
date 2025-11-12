@@ -56,6 +56,9 @@ button {
     gap: 8px;
 }
 
+#peer-name {
+    display:none;
+}
 
 /*
     Customize Button
