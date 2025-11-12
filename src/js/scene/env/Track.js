@@ -6,8 +6,6 @@ import { constants } from "../../constants.js";
 
 export class Track {
 
-  // parseFloat(getElement("distance").textContent) <- HOPEFULLY WORKS TO GET TOTAL DISTANCE TRAVELED
-  
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
 
