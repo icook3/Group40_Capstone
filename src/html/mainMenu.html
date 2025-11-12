@@ -9,7 +9,15 @@
     <link rel="stylesheet" href="../css/menu.css" />
     <style>
       body {
-        background-image: url("../../resources/images/background.png");
+        #sky-gradient {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: -2;
+          background: linear-gradient(to bottom, #7cd1f3 0%, #c4eeff 100%);
+        }
       }
     </style>
     <link
@@ -195,6 +203,8 @@
       });
     </script> -->
 
+    <div id="sky-gradient"></div>
+
     <!-- Main Menu 3D Background -->
     <a-scene
       id="mainMenuScene"
@@ -215,10 +225,11 @@
         rotation="10 -20 0"
         fov="45"
         look-controls="enabled: false"
+        wasd-controls="enabled: true"
       ></a-entity>
 
       <!-- Sky -->
-      <a-sky color="#87ceeb"></a-sky>
+      <a-sky color="transparent" opacity="0"></a-sky>
 
       <a-light type="ambient" color="#FFF" intensity="0.8"></a-light>
       <a-light
@@ -236,7 +247,7 @@
         distance="3"
       ></a-light>
 
-      <!-- Ground plane with solid green color -->
+      <!-- Ground plane with solid green color (it's dark to compensate for lighting) -->
       <a-plane
         position="0 0 0"
         rotation="-90 0 0"
@@ -257,6 +268,38 @@
           id="bikeGLB"
           src="../../resources/models/playermodels/bikeV4.glb"
         ></a-asset-item>
+
+        <a-asset-item
+          id="bush1"
+          src="../../resources/models/bgmodels/bush1.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="cloud1"
+          src="../../resources/models/bgmodels/cloud1.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud2"
+          src="../../resources/models/bgmodels/cloud2.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud3"
+          src="../../resources/models/bgmodels/cloud3.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="house-obj"
+          src="../../resources/models/bgmodels/House.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tall-building-obj"
+          src="../../resources/models/bgmodels/TallBuilding.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="wide-building-obj"
+          src="../../resources/models/bgmodels/WideBuilding.glb"
+        ></a-asset-item>
+        s
       </a-assets>
 
       <!--  Main tree -->
@@ -267,14 +310,76 @@
         scale=".8 .8 .8"
       ></a-entity>
 
-      <!--  Main tree -->
+      <!--  Main bike -->
       <a-entity
         gltf-model="#bikeGLB"
         position="-2.65 0 2"
         rotation="0 -10 -20"
         scale=".1 .1 .1"
       ></a-entity>
+
+      <!-- Foreground bush -->
+      <a-entity
+        gltf-model="#bush1"
+        position="-3.8 0 2"
+        rotation="0 45 0"
+        scale=".3 .3 .3"
+      ></a-entity>
+
+      <!-- Some clouds -->
+      <a-entity
+        gltf-model="#cloud1"
+        position="-8 4 -5"
+        scale=".1 .1 .1"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud2"
+        position="-3 8 -9"
+        scale=".2 .2 .2"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud3"
+        position="-16 6 -10"
+        scale=".3 .3 .3"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud3"
+        position="60 20 -10"
+        scale=".5 .5 .5"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud1"
+        position="100 40 -5"
+        scale=".4 .4 .4"
+      ></a-entity>
+
+      <!-- Some buildings and a house -->
+      <a-entity
+        gltf-model="#tall-building-obj"
+        position="-10 0 -20"
+        rotation="0 -50 10"
+        scale="1 1 1"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#house-obj"
+        position="50 0 -18"
+        rotation="0 180 0"
+        scale="2 2 2"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#wide-building-obj"
+        position="-16 -0.1 -28"
+        rotation="0 -50 10"
+        scale="1.2 1.2 1.2"
+      ></a-entity>
     </a-scene>
+
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         if (window.initSettings) window.initSettings();
