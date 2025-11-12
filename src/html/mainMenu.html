@@ -76,32 +76,36 @@
         <span class="speedUnit">km/h</span>
       </span>
 
-        <span id="weight" class="hud-btn">
-            <label for="rider-weight">Weight:</label>
-            <input id="rider-weight"
-                   type="number"
-                   min="40"
-                   max="150"
-                   value="70"
-                   step="1" />
-            <span class="weightUnit"> kg</span>
-        </span>
-        <button id="connect-strava-btn" class="hud-btn" disabled>Connect Strava</button>
-        <span id="unitsSpeed" class="hud-btn">
-            <label for="unitsSpeed">Units for speed: </label>
-            <select name="unitsSpeed" id="unitInputSpeed">
-                <option value="km/h">km/h</option>
-                <option value="mph">mph</option>
-            </select>
-        </span>
-        <span id="unitsWeight" class="hud-btn">
-            <label for="unitsWeight">Units for weight: </label>
-            <select name="unitsWeight" id="unitInputWeight">
-                <option value="kg">kg</option>
-                <option value="lb">lb</option>
-            </select>
-        </span>
-        <!-- Delete this comment if you want to add alternate options for power input 
+      <span id="weight" class="hud-btn">
+        <label for="rider-weight">Weight:</label>
+        <input
+          id="rider-weight"
+          type="number"
+          min="40"
+          max="150"
+          value="70"
+          step="1"
+        />
+        <span class="weightUnit"> kg</span>
+      </span>
+      <button id="connect-strava-btn" class="hud-btn" disabled>
+        Connect Strava
+      </button>
+      <span id="unitsSpeed" class="hud-btn">
+        <label for="unitsSpeed">Units for speed: </label>
+        <select name="unitsSpeed" id="unitInputSpeed">
+          <option value="km/h">km/h</option>
+          <option value="mph">mph</option>
+        </select>
+      </span>
+      <span id="unitsWeight" class="hud-btn">
+        <label for="unitsWeight">Units for weight: </label>
+        <select name="unitsWeight" id="unitInputWeight">
+          <option value="kg">kg</option>
+          <option value="lb">lb</option>
+        </select>
+      </span>
+      <!-- Delete this comment if you want to add alternate options for power input 
         <span id="unitsPower" class="hud-btn">
             <label for="unitsPower">Units for power: </label>
             <select name="unitsPower" id="unitInputPower">
@@ -140,7 +144,7 @@
       </div>
     </div>
 
-    <!-- Main Menu Avatar -->
+    <!-- Main Menu Avatar
     <a-scene
       id="mainMenuScene"
       embedded
@@ -189,7 +193,41 @@
           }
         );
       });
-    </script>
+    </script> -->
+
+    <!-- Main Menu 3D Background -->
+    <a-scene
+      id="mainMenuScene"
+      embedded
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+      "
+    >
+      <!-- Camera -->
+      <a-entity
+        camera
+        position="0 1.6 5"
+        look-controls="enabled: false"
+      ></a-entity>
+
+      <!-- Sky -->
+      <a-sky color="#87ceeb"></a-sky>
+
+      <!-- Ground plane with grass color -->
+      <a-plane
+        position="0 0 0"
+        rotation="-90 0 0"
+        width="50"
+        height="50"
+        color="#7cb342"
+        roughness="0.9"
+      ></a-plane>
+    </a-scene>
 
     <script>
       window.addEventListener("DOMContentLoaded", () => {
