@@ -19,12 +19,11 @@ export class ObjectField {
     this.externalGroups = [];
     this.policy = policy;
 
-    // Stores immediate past, current, and upcoming template pieces
     // BETTER IDEA: ADD A CONFIGURATION ELEMENT TO NEW PIECES SO YOU CAN JUST PING THEM AND GET THE UPDATE EQUATION
     // PROBABLY OVERZEALOUS IDEA: FIGURE OUT HOW TO ADD UPDATE FUNCTIONALITY DIRECTLY TO OBJECTS
     this.path_element = document.getElementById('track');
 
-    // Add a straight piece for initial testing. You need about 5 pieces to get to the horizon
+    // Add a straight pieces for initial testing. You need about 5 pieces to get to the horizon
     this.track.straightPiece(0);
     this.track.straightPiece(-60);
     this.track.straightPiece(-120);
@@ -148,7 +147,7 @@ export class ObjectField {
   if (constants.worldZ > constants.trackLastUpdate + 60) {
     constants.trackLastUpdate += 60;
 
-    //Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
+    // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
     this.track.straightPiece(getPos(this.path_element.children[this.path_element.children.length-1]).z - 60);
     this.path_element.removeChild(this.path_element.children[0]);
   }

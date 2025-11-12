@@ -114,7 +114,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `util.js` — Contains several utilities for scene generation.
 			- `env` — Handles the overall environment.
 				- `Cloud.js` — Handles creating the clouds above the scene.
-				- `DirtPattern.js` — Handles creating the track and the dirt pattern on it.
+				- `Track.js` — Handles creating track template pieces.
 				- `SceneryBand.js` — Handles creating the bands and object placement within.
 				- `SceneryManager.js` — Loads the config files from /policy.
 			- `objects` — Handles various 3D objects.

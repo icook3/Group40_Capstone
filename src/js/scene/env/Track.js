@@ -16,8 +16,8 @@ export class Track {
     sceneEl.appendChild(path_element);
   }
 
+  // Create and append track straight track piece
   straightPiece(spawnZ) {
-    // Create and append track
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
 
@@ -26,5 +26,4 @@ export class Track {
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
     this.path_element.appendChild(track);
   }
-
 }
