@@ -115,4 +115,17 @@ export class AvatarMovement {
         this.animatePedalingBike(dt);
         this.animatePedalingPerson(dt)
     }
+
+    setPosition(pos) {
+        this.avatarEntity.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+    }
+    setHorizontalPosition(pos) {
+        let val = this.avatarEntity.getAttribute('position');
+        if (typeof val === 'string') val = AFRAME.utils.coordinates.parse(val);
+        this.avatarEntity.setAttribute('position', `${pos.x} ${val.y} ${pos.z}`);
+    }
+
+    setRotation(rot) {
+        this.avatarEntity.setAttribute('rotation',`${rot.x} ${rot.y} ${rot.z}`);
+    }
 }

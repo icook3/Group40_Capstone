@@ -25,16 +25,7 @@ button {
     z-index: 1000;
     left: 36%;
 }
-/*
-    Start Button
-*/
-#start-btn {
-    position: fixed;
-    top: 40%;
-    font-size: xx-large;
-    justify-content: center;
-    overflow: visible;
-}
+
 #menu-bottom {
     position: fixed;
     bottom: 20px;
@@ -91,3 +82,93 @@ a-scene {
     background-color: transparent !important;
     pointer-events: none;
 }
+
+
+/* PILL WRAPPER */
+.split-btn {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%) scale(1.4);
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  overflow: visible;                 /* dropdown not clipped */
+  background: linear-gradient(90deg, #ffb5b5, #b7f1df);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  z-index: 1000;
+  white-space: nowrap;
+  max-width: 90vw;
+  isolation: isolate;
+
+  /* NEW: make it the positioning anchor for the dropdown */
+  position: fixed;                   /* already fixed, but ensure it's a positioned ancestor */
+}
+
+/* MAIN HALF */
+.split-btn .main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1 auto;
+  background: transparent;
+  color: #223138;
+  border: none;
+  font-size: 1rem;
+  line-height: 1.2;
+  padding: 16px 26px;
+  cursor: pointer;
+  text-align: center;                /* extra safety for centering text */
+}
+
+/* TOGGLE HALF — keep the arrow visible and centered */
+.split-btn .toggle {
+  display: flex;                     /* center the ▾ glyph */
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #223138;
+  border: none;
+  font-size: 1rem;
+  width: 48px;
+  min-width: 48px;                   /* don’t collapse */
+  border-left: 1px solid rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+/* Keep your existing blocks; add these if missing */
+.dropdown-content {
+  /* JS sets position/left/top; we only ensure visibility */
+  display: none;
+  background: rgb(53,72,79);
+  color: #fff;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  pointer-events: auto;
+  z-index: 9999;
+
+  /* Debug visibility */
+  visibility: visible;
+  opacity: 1;
+}
+.dropdown-content.show { display: block; }
+
+.dropdown-item {
+  display: block;        /* ensure they occupy height */
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
