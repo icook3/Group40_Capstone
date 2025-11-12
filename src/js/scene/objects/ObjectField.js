@@ -21,6 +21,7 @@ export class ObjectField {
 
     // Stores immediate past, current, and upcoming template pieces
     // BETTER IDEA: ADD A CONFIGURATION ELEMENT TO NEW PIECES SO YOU CAN JUST PING THEM AND GET THE UPDATE EQUATION
+    // PROBABLY OVERZEALOUS IDEA: FIGURE OUT HOW TO ADD UPDATE FUNCTIONALITY DIRECTLY TO OBJECTS
     this.path_element = document.getElementById('track');
 
     // Add a straight piece for initial testing. You need about 5 pieces to get to the horizon
