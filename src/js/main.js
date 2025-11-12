@@ -119,6 +119,8 @@ let pacer;
 // workout session
 let workoutStorage;
 let workoutSession;
+let peer;
+let conn;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -238,11 +240,48 @@ function setUnits(storageVal, className) {
     elements.item(i).innerHTML = storageVal;
   }
 }
+
+function sendPeerDataOver() {
+
+}
+
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+  // initialize peer-to-peer connection
+  if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
+    console.log("connecting to peer");
+    peer = new Peer();
+    peer.on('open', function(id) {
+        conn = peer.connect(sessionStorage.getItem("peer"));
+        console.log("ID="+id);
+        conn.on('open', function() {
+      console.log("connected!");
+        // initially send over JSON of character design
+        conn.send(localStorage.getItem('playerData'));
+    });
+    conn.on('data', function(data) {
+      console.log(data);
+    });
+    });
+    
+  } else if (sessionStorage.getItem("peerToPeer")=='true') {
+    console.log("hosting peer");
+    peer = new Peer(localStorage.getItem("Name"));
+    peer.on('open', function(id) {
+        console.log("ID="+id);        
+    });
+    peer.on('connection', function(conn) {
+      console.log("connected!");
+      conn.send(localStorage.getItem('playerData'));
+      conn.on('data', function(data) {
+        console.log(data);
+      });
+    });
+
+  }
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
   console.log("Selected workout:", selectedWorkout);
 

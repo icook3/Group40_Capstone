@@ -25,15 +25,14 @@ button {
     width: 250px;
 }
 
-#peerList {
+#peerConnectMenu {
     position: fixed;
-    top:12.5%;
+    top:43%;
     left:25%;
     /* Background color */
     background: rgb(53, 72, 79);
     padding: 15px;
     border-radius: 30px;
     width: 50%;
-    overflow: scroll;
-    height: 75%;
+    height: 15%;
 }

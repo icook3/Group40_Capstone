@@ -20,14 +20,20 @@
                 <button id="cancelButton" onclick="window.location.href='mainMenu.html'" class="hud-btn">Cancel</button>
             </div>
         </div>
-        <div id="peerList" class="control-buttons">
-            <!--dummy values for now - will fill in using JS later-->
-            <button class="hud-btn">AndrewsLaptop2</button>
-            <button class="hud-btn">Andrews Laptop</button>
+        <div id="peerConnectMenu" class="control-buttons">
+            <span id="peer-name" class="hud-btn">
+                <label for="name-input">Peer Name: </label>
+                <input id="name-input" />
+            </span>
+            <button class="hud-btn" id="connect-btn">Connect!</button>
+            
         </div>
+        <script type="module" src="../js/peerConnector.js"></script>
+
         <script>
             window.addEventListener("DOMContentLoaded", () => {
-                if (window.initSettings) window.peerInit();
+                console.log("LOADING");
+                if (window.peerInit) window.peerInit();
             });
         </script>
     </body>

@@ -1,18 +1,16 @@
 export function peerInit() {
+    const peerNameInput = document.getElementById("name-input");
+    const connectBtn = document.getElementById("connect-btn");
+    connectBtn.addEventListener("click", () => {
+        if (peerNameInput.value!="") {
+            sessionStorage.setItem("peer",peerNameInput.value);
+            window.location.href="./zlow.html"
+        }
+    });
     var peer = new Peer();
     peer.on('open', function(id) {
-        console.log("ID="+id);
-        // populate the list
-        const peerList = document.getElementById("peerList");
-        
+        console.log("ID="+id);        
     });
-
-
-}
-
-function setPeer(peerID) {
-    sessionStorage.setItem("peer",peerID);
-    window.location.href = "zlow.html";
 }
 
 if (typeof window !== "undefined") {
