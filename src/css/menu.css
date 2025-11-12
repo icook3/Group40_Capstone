@@ -86,7 +86,7 @@ a-scene {
   top: 0;
   left: 0;
   z-index: -1;
-  filter: blur(2px);
+  filter: blur(3px);
 }
 
 /* PILL WRAPPER */
@@ -121,7 +121,7 @@ a-scene {
   border: none;
   font-size: 1rem;
   line-height: 1.2;
-  padding: 16px 26px;
+  padding: 12px 20px;
   cursor: pointer;
   text-align: center; /* extra safety for centering text */
 }
@@ -135,8 +135,8 @@ a-scene {
   color: #223138;
   border: none;
   font-size: 1rem;
-  width: 48px;
-  min-width: 48px; /* don’t collapse */
+  width: 40px;
+  min-width: 40px; /* don’t collapse */
   border-left: 1px solid rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
