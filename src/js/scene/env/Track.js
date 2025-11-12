@@ -24,7 +24,7 @@ export class Track {
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
 
     // Repeat does not work as intended
-    track.setAttribute('material', `src: #track-texture; repeat: 0 0`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
     this.path_element.appendChild(track);
   }
