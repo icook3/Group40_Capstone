@@ -241,9 +241,38 @@ function setUnits(storageVal, className) {
   }
 }
 
-function sendPeerDataOver() {
-
+function setPacerSpeed(speed) {
+  if (peerState==0) {
+    pacer.setSpeed(speed);
+  }
 }
+
+//0: not in peer-peer mode
+//1: host
+//2: peer
+let peerState=0;
+let connected = false;
+//used for frequent updates in update method
+function sendPeerDataOver() {
+  if (connected) {
+
+  }
+}
+
+function recieveData(data) {
+  console.log("Recieving data");
+  console.log(data);
+  switch(data.name) {
+    case "playerData":
+      pacer = new AvatarMovement("P2", {
+        position: { x: 0.5, y: 1, z: -2 },
+        isPacer: true,
+      });
+      pacer.creator.loadOtherData(data.data);
+      break;
+  }
+}
+
 
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
@@ -251,34 +280,46 @@ export function initZlowApp({
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
   // initialize peer-to-peer connection
+  // if you are the peer
   if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
+    peerState = 2;
     console.log("connecting to peer");
     peer = new Peer();
     peer.on('open', function(id) {
         conn = peer.connect(sessionStorage.getItem("peer"));
         console.log("ID="+id);
         conn.on('open', function() {
-      console.log("connected!");
-        // initially send over JSON of character design
-        conn.send(localStorage.getItem('playerData'));
-    });
-    conn.on('data', function(data) {
-      console.log(data);
-    });
+          console.log("connected!");
+          console.log(conn);
+          connected = true;
+          // initially send over JSON of character design
+          //when you recieve data? - not working
+          conn.on('data', function(data) {
+            recieveData(data);
+          });
+          conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+        });
     });
     
-  } else if (sessionStorage.getItem("peerToPeer")=='true') {
+  }
+  // You are hosting a session 
+  else if (sessionStorage.getItem("peerToPeer")=='true') {
+    peerState = 1;
     console.log("hosting peer");
     peer = new Peer(localStorage.getItem("Name"));
     peer.on('open', function(id) {
         console.log("ID="+id);        
     });
-    peer.on('connection', function(conn) {
+    peer.on('connection', function(connection) {
+      conn = connection;
+      connected = true;
       console.log("connected!");
-      conn.send(localStorage.getItem('playerData'));
+      console.log(conn);
+      // when recieve data
       conn.on('data', function(data) {
-        console.log(data);
+          recieveData(data);
       });
+      conn.send({name:"playerData", data:localStorage.getItem('playerData')});
     });
 
   }
@@ -325,11 +366,13 @@ export function initZlowApp({
     position: { x: -0.5, y: 1, z: 0 },
     isPacer: false,
   });
-  pacer = new AvatarMovement("pacer", {
-    position: { x: 0.5, y: 1, z: -2 },
-    isPacer: true,
-  });
-  pacer.creator.setPacerColors();
+  if (peerState == 0) {
+    pacer = new AvatarMovement("pacer", {
+      position: { x: 0.5, y: 1, z: -2 },
+      isPacer: true,
+    });
+    pacer.creator.setPacerColors();
+  }
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
 
@@ -355,26 +398,26 @@ export function initZlowApp({
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
       // scene.setPacerSpeed(val);
     });
 
-    pacer.setSpeed(Number(pacerSpeedInput.value));
+    setPacerSpeed(Number(pacerSpeedInput.value));
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     });
   } else {
     if (sessionStorage.getItem("PacerSpeed") !== null) {
       const val = Number(sessionStorage.getItem("PacerSpeed"));
       scene = new ZlowScene(val, { getElement });
       // scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     } else {
       const val = 20;
       scene = new ZlowScene(val, { getElement });
       //scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     }
   }
   //map the pacer speed input to the pacer speed variable
@@ -448,7 +491,9 @@ export function initZlowApp({
     updateMassAndMaybeSpeed();
   }
 
-  let savedPacerSpeed = pacer.speed;
+  if (peerState = 0) {
+    let savedPacerSpeed = pacer.speed;
+  }
   const pauseBtn = getElement("pause-btn");
   pauseBtn.addEventListener("click", () => {
     simulationState.isPaused = !simulationState.isPaused;
@@ -457,13 +502,13 @@ export function initZlowApp({
     if (simulationState.isPaused) {
       hud.pause();
       savedPacerSpeed = pacer.speed;
-      pacer.setSpeed(0); // Stop pacer when paused
+      setPacerSpeed(0); // Stop pacer when paused
       // start countdown
       countdown.start(() => {
         // auto-resume when hits 0
         simulationState.isPaused = false;
         hud.resume();
-        pacer.setSpeed(savedPacerSpeed);
+        setPacerSpeed(savedPacerSpeed);
         pauseBtn.textContent = "Pause";
       });
     } else {
@@ -471,7 +516,7 @@ export function initZlowApp({
       countdown.cancel();
       hud.resume();
       simulationState.isPaused = false;
-      pacer.setSpeed(savedPacerSpeed);
+      setPacerSpeed(savedPacerSpeed);
       pauseBtn.textContent = "Pause";
     }
   });
@@ -529,7 +574,7 @@ export function initZlowApp({
         pauseBtn.textContent = "Pause";
 
         // Reset pacer
-        pacer.setSpeed(0);
+        setPacerSpeed(0);
         const startPos = { x: 0.5, y: 1, z: -2 };
         pacer.avatarEntity.setAttribute("position", startPos);
         constants.pacerStarted = false;
