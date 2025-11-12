@@ -211,24 +211,70 @@
       <!-- Camera -->
       <a-entity
         camera
-        position="0 1.6 5"
+        position="-3.44 0.28 2.51"
+        rotation="10 -20 0"
+        fov="45"
         look-controls="enabled: false"
       ></a-entity>
 
       <!-- Sky -->
       <a-sky color="#87ceeb"></a-sky>
 
-      <!-- Ground plane with grass color -->
+      <a-light type="ambient" color="#FFF" intensity="0.8"></a-light>
+      <a-light
+        type="directional"
+        color="#FFF"
+        intensity="1.5"
+        position="-2 5 3"
+      ></a-light>
+
+      <a-light
+        type="point"
+        color="#FFF"
+        intensity="5.5"
+        position="-2 0 2"
+        distance="3"
+      ></a-light>
+
+      <!-- Ground plane with solid green color -->
       <a-plane
         position="0 0 0"
         rotation="-90 0 0"
         width="50"
         height="50"
-        color="#7cb342"
-        roughness="0.9"
+        color="#2d5016"
+        roughness="1"
       ></a-plane>
-    </a-scene>
 
+      <!-- Assets (we just reuse in game models) -->
+      <a-assets>
+        <a-asset-item
+          id="tree1"
+          src="../../resources/models/bgmodels/tree1.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="bikeGLB"
+          src="../../resources/models/playermodels/bikeV4.glb"
+        ></a-asset-item>
+      </a-assets>
+
+      <!--  Main tree -->
+      <a-entity
+        gltf-model="#tree1"
+        position="-2.5 0.1 2"
+        rotation="0 80 0"
+        scale=".8 .8 .8"
+      ></a-entity>
+
+      <!--  Main tree -->
+      <a-entity
+        gltf-model="#bikeGLB"
+        position="-2.65 0 2"
+        rotation="0 -10 -20"
+        scale=".1 .1 .1"
+      ></a-entity>
+    </a-scene>
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         if (window.initSettings) window.initSettings();
