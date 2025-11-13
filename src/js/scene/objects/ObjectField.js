@@ -10,14 +10,25 @@ import { KINDS, detectKind } from './kinds/index.js';
 
 export class ObjectField {
 
-  constructor({ sceneEl, dirtPattern, policy, clouds }) {
+  constructor({ sceneEl, track, policy, clouds }) {
     this.sceneEl = sceneEl;
-    this.dirtPattern = dirtPattern;
+    this.track = track;
     this.clouds = clouds;
     this.items = [];
     this.initialized = false;
     this.externalGroups = [];
     this.policy = policy;
+
+    // BETTER IDEA: ADD A CONFIGURATION ELEMENT TO NEW PIECES SO YOU CAN JUST PING THEM AND GET THE UPDATE EQUATION
+    // PROBABLY OVERZEALOUS IDEA: FIGURE OUT HOW TO ADD UPDATE FUNCTIONALITY DIRECTLY TO OBJECTS
+    this.path_element = document.getElementById('track');
+
+    // Add a straight pieces for initial testing. You need about 5 pieces to get to the horizon
+    this.track.straightPiece(0);
+    this.track.straightPiece(-60);
+    this.track.straightPiece(-120);
+    this.track.straightPiece(-180);
+    this.track.straightPiece(-240);
 
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
@@ -95,7 +106,8 @@ export class ObjectField {
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
-    // re-roll kind by band policy mix (keeps long-run ratios)
+        
+        // re-roll kind by band policy mix (keeps long-run ratios)
         if (band.policy && typeof band.policy.xAnchor === 'function') {
           const mix = typeof band.policy.mix === 'function' ? band.policy.mix() : { tree: 0.5, building: 0.5 };
           const roll = Math.random();
@@ -124,6 +136,22 @@ export class ObjectField {
     }
   }
 
+  // Advance track
+  for (let segment of this.path_element.children) {
+    const pos = getPos(segment);
+    pos.z += dz;
+    setPos(segment, pos);
+  }
+
+  // Spawn new track section if the rider has traveled 60 units
+  if (constants.worldZ > constants.trackLastUpdate + 60) {
+    constants.trackLastUpdate += 60;
+
+    // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
+    this.track.straightPiece(getPos(this.path_element.children[this.path_element.children.length-1]).z - 60);
+    this.path_element.removeChild(this.path_element.children[0]);
+  }
+
     // Advance clouds
     if (Date.now() > constants.lastCloud + constants.updateEvery) {
       constants.lastCloud = Date.now();
@@ -143,29 +171,6 @@ export class ObjectField {
             this.clouds.clouds.removeChild(cloud);
             this.clouds.clouds.appendChild(spawnCloud(4));
           }
-        }
-      }
-    }
-
-    // Advances the dirt pattern
-    if (this.dirtPattern?.patternEl) {
-      const kids = Array.from(this.dirtPattern.patternEl.children);
-      if (kids.length) {
-        // const farthestZ = Math.min(...kids.map(c => getPos(c).z));
-        
-        for (const circle of kids) {
-          const pos = getPos(circle);
-
-          // Update z as item moves closer to rider
-          pos.z += dz;
-          
-          // Reset position when item is within 10 of rider
-          if (pos.z > 10) {
-            //pos.z = farthestZ - 5;
-            // Reset z to -30, which is about as far as you can see on the track
-            pos.z = -30;
-          }
-          setPos(circle, pos);
         }
       }
     }

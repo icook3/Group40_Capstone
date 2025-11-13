@@ -1,59 +1,61 @@
 body {
-    margin: 0;
-    font-family: sans-serif;
-    color: #fff;
-    font-family: "Fugaz One", sans-serif;
-    font-size: 1.5em;
+  margin: 0;
+  font-family: sans-serif;
+  color: #fff;
+  font-family: "Fugaz One", sans-serif;
+  font-size: 1.5em;
 }
 button {
-    font-size: 1em;
-    cursor: pointer;
+  font-size: 1em;
+  cursor: pointer;
 }
 .center-item {
-    left: 40%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 /*
     Welcome message
 */
 #welcome-msg {
-    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
-    position: fixed;
-    top: 10%;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 1000;
-    left: 36%;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  position: fixed;
+  top: 10%;
+  z-index: 1000;
+
+  /* Changed this to center the title of main menu screen */
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 #menu-bottom {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 1000;
-    /* Background color */
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 250px;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  /* Background color */
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 250px;
 }
 /*
     other settings
 */
 #menu-settings {
-    position: fixed;
-    bottom: 290px;
-    left: 20px;
-    z-index: 1000;
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 300px;
-    display:none;
-    /* Stack controls vertically */
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+  position: fixed;
+  bottom: 290px;
+  left: 20px;
+  z-index: 1000;
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 300px;
+  display: none;
+  /* Stack controls vertically */
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
 }
 
 #peer-name {
@@ -64,28 +66,32 @@ button {
     Customize Button
  */
 #customize {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    /* Background color */
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 250px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  /* Background color */
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 250px;
 }
 
 a-scene {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    background-color: transparent !important;
-    pointer-events: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-color: transparent !important;
+  pointer-events: none;
 }
 
+#mainMenuScene {
+  top: 0;
+  left: 0;
+  z-index: -1;
+  filter: blur(3px);
+}
 
 /* PILL WRAPPER */
 .split-btn {
@@ -96,16 +102,16 @@ a-scene {
   display: inline-flex;
   align-items: center;
   border-radius: 9999px;
-  overflow: visible;                 /* dropdown not clipped */
+  overflow: visible; /* dropdown not clipped */
   background: linear-gradient(90deg, #ffb5b5, #b7f1df);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
   z-index: 1000;
   white-space: nowrap;
   max-width: 90vw;
   isolation: isolate;
 
   /* NEW: make it the positioning anchor for the dropdown */
-  position: fixed;                   /* already fixed, but ensure it's a positioned ancestor */
+  position: fixed; /* already fixed, but ensure it's a positioned ancestor */
 }
 
 /* MAIN HALF */
@@ -119,34 +125,34 @@ a-scene {
   border: none;
   font-size: 1rem;
   line-height: 1.2;
-  padding: 16px 26px;
+  padding: 12px 20px;
   cursor: pointer;
-  text-align: center;                /* extra safety for centering text */
+  text-align: center; /* extra safety for centering text */
 }
 
 /* TOGGLE HALF — keep the arrow visible and centered */
 .split-btn .toggle {
-  display: flex;                     /* center the ▾ glyph */
+  display: flex; /* center the ▾ glyph */
   align-items: center;
   justify-content: center;
   background: transparent;
   color: #223138;
   border: none;
   font-size: 1rem;
-  width: 48px;
-  min-width: 48px;                   /* don’t collapse */
-  border-left: 1px solid rgba(0,0,0,0.15);
+  width: 40px;
+  min-width: 40px; /* don’t collapse */
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
 /* Keep your existing blocks; add these if missing */
 .dropdown-content {
   /* JS sets position/left/top; we only ensure visibility */
   display: none;
-  background: rgb(53,72,79);
+  background: rgb(53, 72, 79);
   color: #fff;
   border-radius: 12px;
   padding: 6px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   pointer-events: auto;
   z-index: 9999;
 
@@ -154,10 +160,12 @@ a-scene {
   visibility: visible;
   opacity: 1;
 }
-.dropdown-content.show { display: block; }
+.dropdown-content.show {
+  display: block;
+}
 
 .dropdown-item {
-  display: block;        /* ensure they occupy height */
+  display: block; /* ensure they occupy height */
   width: 100%;
   text-align: left;
   background: transparent;
@@ -168,10 +176,3 @@ a-scene {
   border-radius: 8px;
   cursor: pointer;
 }
-
-
-
-
-
-
-
