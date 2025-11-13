@@ -341,7 +341,29 @@ export function initZlowApp({
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
+
+  // Map workout keys to user-facing labels
+  const workoutLabels = {
+    free: "Free Ride",
+    ramp: "Ramp Test",
+    ftp20: "FTP Test (20-min)",
+  };
+
+  const workoutName =
+    workoutLabels[selectedWorkout] || "Free Ride";
+
+  // Show which workout was chosen and countdown to start
+  hud.showWorkoutCountdown({
+    workoutName,
+    seconds: 5, // tweak as desired
+    onDone: () => {
+      // When countdown finishes, let the simulation run
+      simulationState.isPaused = false;
+    },
+  });
+
   const strava = new Strava();
+
 
   //Pacer speed control input
   //Rider state and history

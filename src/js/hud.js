@@ -13,6 +13,12 @@ export class HUD {
 
     // Added for pausing
     this.pausedAtMs = null;
+
+    // --- NEW: workout overlay elements + timer id ---
+    this.workoutOverlay = getElement("workout-overlay");
+    this.workoutDialog =
+    this.workoutOverlay?.querySelector(".workout-dialog") || null;
+    this.workoutCountdownId = null;
   }
 
   pause() {
@@ -42,6 +48,52 @@ export class HUD {
     if (this.time) this.time.textContent = "00:00";
     if (this.calories) this.calories.textContent = "0";
   }
+
+    /**
+   * Shows "WORKOUT NAME – starting in N" overlay and counts down.
+   * When it finishes, hides overlay and calls onDone().
+   */
+  showWorkoutCountdown({ workoutName, seconds = 5, onDone } = {}) {
+    if (!this.workoutOverlay || !this.workoutDialog) {
+      // If overlay isn't in the DOM, just skip the countdown.
+      if (typeof onDone === "function") onDone();
+      return;
+    }
+
+    // Ensure any prior countdown is cleared
+    if (this.workoutCountdownId !== null) {
+      clearInterval(this.workoutCountdownId);
+      this.workoutCountdownId = null;
+    }
+
+    let remaining = seconds;
+
+    const updateText = () => {
+      this.workoutDialog.textContent = `${workoutName} starts in ${remaining}`;
+    };
+
+    // Show overlay and set initial text
+    this.workoutOverlay.style.display = "flex";
+    updateText();
+
+    this.workoutCountdownId = window.setInterval(() => {
+      remaining -= 1;
+
+      if (remaining <= 0) {
+        clearInterval(this.workoutCountdownId);
+        this.workoutCountdownId = null;
+        this.workoutOverlay.style.display = "none";
+
+        if (typeof onDone === "function") {
+          onDone();
+        }
+        return;
+      }
+
+      updateText();
+    }, 1000);
+  }
+
 
   update({ power, speed, calories }, dt) {
     const fields = [
