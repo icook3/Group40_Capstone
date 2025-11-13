@@ -346,7 +346,7 @@ export function initZlowApp({
   const workoutLabels = {
     free: "Free Ride",
     ramp: "Ramp Test",
-    ftp20: "FTP Test (20-min)",
+    sprint: "Sprint Intervals",
   };
 
   const workoutName =
