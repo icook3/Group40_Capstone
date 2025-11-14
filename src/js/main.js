@@ -276,7 +276,7 @@ function recieveData(data) {
   //console.log(data);
   switch(data.name) {
     case "playerData":
-      pacer = new AvatarMovement("P2", {
+      pacer = new AvatarMovement("pacer", {
         position: { x: 0.5, y: 1, z: 0 },
         isPacer: false,
       });
@@ -733,6 +733,10 @@ export function initZlowApp({
       conn.send({name: "syncPlayers", data: {}});
     }
   });
+
+  if (peerState!=0) {
+    pacerSyncBtn.innerHTML = "Sync Players";
+  }
 
   // Calorie reset button
   const caloriesResetBtn = getElement("calories-reset-btn");
