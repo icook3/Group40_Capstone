@@ -19,20 +19,21 @@ export class ObjectField {
     this.externalGroups = [];
     this.policy = policy;
 
+    
+    // weights parallel KINDS (keep 50/50 for identical behavior)
+    this.weights = [1, 1];
+    this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
+
     // BETTER IDEA: ADD A CONFIGURATION ELEMENT TO NEW PIECES SO YOU CAN JUST PING THEM AND GET THE UPDATE EQUATION
     // PROBABLY OVERZEALOUS IDEA: FIGURE OUT HOW TO ADD UPDATE FUNCTIONALITY DIRECTLY TO OBJECTS
     this.path_element = document.getElementById('track');
 
     // Add a straight pieces for initial testing. You need about 5 pieces to get to the horizon
-    this.track.straightPiece(0);
-    this.track.straightPiece(-60);
-    this.track.straightPiece(-120);
-    this.track.straightPiece(-180);
-    this.track.straightPiece(-240);
-
-    // weights parallel KINDS (keep 50/50 for identical behavior)
-    this.weights = [1, 1];
-    this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
+    this.spawnScenery(this.track.straightPiece(0), 0);
+    this.spawnScenery(this.track.straightPiece(-60), -60);
+    this.spawnScenery(this.track.straightPiece(-120), -120);
+    this.spawnScenery(this.track.straightPiece(-180), -180);
+    this.spawnScenery(this.track.straightPiece(-240), -240);
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -65,10 +66,6 @@ export class ObjectField {
   // Initializes items that move with the rider (buildings and trees)
   init() {
     if (this.initialized) return;
-    for (let z = 0; z > -200; z -= 5) {
-      this._spawnAtZ(z);
-      if (Math.random() < 0.7) this._spawnAtZ(z); // original density
-    }
     this.initialized = true;
   }
 
@@ -148,7 +145,8 @@ export class ObjectField {
     constants.trackLastUpdate += 60;
 
     // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
-    this.track.straightPiece(getPos(this.path_element.children[this.path_element.children.length-1]).z - 60);
+    const lastPiece = getPos(this.path_element.children[this.path_element.children.length-1]).z - 60
+    this.spawnScenery(this.track.straightPiece(lastPiece), lastPiece);
     this.path_element.removeChild(this.path_element.children[0]);
   }
 
@@ -172,6 +170,15 @@ export class ObjectField {
             this.clouds.clouds.appendChild(spawnCloud(4));
           }
         }
+      }
+    }
+  }
+
+  spawnScenery(trackPiece, initialZ) {
+    if (trackPiece == "straight_vertical") {
+      for (let z = initialZ; z > initialZ-60; z -= 5) {
+        this._spawnAtZ(z);
+        if (Math.random() < 0.7) this._spawnAtZ(z); // original density
       }
     }
   }

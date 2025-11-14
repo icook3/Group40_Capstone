@@ -21,9 +21,10 @@ export class Track {
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
 
-    // Repeat does not work as intended
     track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
+    track.setAttribute('configuration', `straight_vertical`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
     this.path_element.appendChild(track);
+    return track.getAttribute("configuration")
   }
 }
