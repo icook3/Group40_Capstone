@@ -266,7 +266,7 @@ let connected = false;
 //used for frequent updates in update method
 function sendPeerDataOver(speed) {
   //console.log("sending data: "+connected);
-  if (connected) {
+  if (connected&&conn.open) {
     conn.send({name:"speed",data:speed})
   }
 }
@@ -286,10 +286,10 @@ function recieveData(data) {
       }
       break;
     case "speed":
-      console.log("Set pacer speed to "+data.data);
+      //console.log("Set pacer speed to "+data.data);
       activatePacer();
       pacer.setSpeed(Number(data.data));
-      console.log(pacer.speed);
+      //console.log(pacer.speed);
       break;
   }
 }
@@ -320,8 +320,35 @@ export function initZlowApp({
           });
           conn.send({name:"playerData", data:localStorage.getItem('playerData')});
         });
+        conn.on('error', function(err) {
+          //console.log("ERROR:");
+          //console.log(err);
+        });
     });
-    
+    peer.on('error', function(err) {
+      switch(err.type) {
+        case "browser-incompatible":
+          console.log("Peer-to-peer multiplayer is not compatible with this browser. Try updating your browser.");
+          break;
+        case "invalid-id":
+          window.location.href = "./mainMenu.html";
+          break;
+        case "network":
+          console.log("Cannot connect to server");
+          peerState = 0;
+          break;
+        case "peer-unavailable":
+          console.log("The given peer does not exist");
+          break;
+        case "server-error":
+          console.log("Cannot connect to server");
+          peerState = 0;
+          break;
+        default:
+          console.log("There have been some other errors");
+          console.log(err);
+      }
+    });    
   }
   // You are hosting a session 
   else if (sessionStorage.getItem("peerToPeer")=='true') {
@@ -340,8 +367,35 @@ export function initZlowApp({
       conn.on('data', function(data) {
           recieveData(data);
       });
+      conn.on('error', function(err) {
+        console.log("ERROR:");
+        console.log(err);
+      });
     });
-
+    peer.on('error', function(err) {
+      switch(err.type) {
+        case "browser-incompatible":
+          console.log("Peer-to-peer multiplayer is not compatible with this browser. Try updating your browser.");
+          break;
+        case "invalid-id":
+          window.location.href = "./mainMenu.html";
+          break;
+        case "network":
+          console.log("Cannot connect to server");
+          peerState = 0;
+          break;
+        case "peer-unavailable":
+          console.log("The given peer does not exist");
+          break;
+        case "server-error":
+          console.log("Cannot connect to server");
+          peerState = 0;
+          break;
+        default:
+          console.log("There have been some other errors");
+          console.log(err);
+      }
+    });
   }
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
   console.log("Selected workout:", selectedWorkout);
