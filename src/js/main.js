@@ -291,6 +291,14 @@ function recieveData(data) {
       pacer.setSpeed(Number(data.data));
       //console.log(pacer.speed);
       break;
+    case "syncPlayers":
+      if (scene && rider && pacer) {
+        const riderSyncPos = rider.avatarEntity.getAttribute("position");
+        const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
+        pacerSyncPos.z = riderSyncPos.z;
+        pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+      }
+      break;
   }
 }
 
@@ -720,6 +728,9 @@ export function initZlowApp({
       const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
       pacerSyncPos.z = riderSyncPos.z;
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+    }
+    if (connected) {
+      conn.send({name: "syncPlayers", data: {}});
     }
   });
 
