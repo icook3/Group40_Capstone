@@ -293,7 +293,7 @@ export function initZlowApp({
           console.log(conn);
           connected = true;
           // initially send over JSON of character design
-          //when you recieve data? - not working
+          // when you recieve data? - not working
           conn.on('data', function(data) {
             recieveData(data);
           });
@@ -318,8 +318,8 @@ export function initZlowApp({
       // when recieve data
       conn.on('data', function(data) {
           recieveData(data);
+          conn.send({name:"playerData", data:localStorage.getItem('playerData')});
       });
-      conn.send({name:"playerData", data:localStorage.getItem('playerData')});
     });
 
   }
