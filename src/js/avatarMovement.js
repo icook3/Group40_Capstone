@@ -82,7 +82,7 @@ export class AvatarMovement {
                 this.creator.rightPedalBone.rotation.y = -this.creator.pedalCrankBone.rotation.x;
             } else {
                 //Rotate crank
-                const speedKmh = powerToSpeed({power: this.power}, true);
+                const speedKmh = powerToSpeed({power: this.power});
                 const crankAngularSpeed = ((speedKmh * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
                 const crankRotationAmount = crankAngularSpeed * dt;
                 this.creator.pedalCrankBone.rotation.x -= crankRotationAmount;

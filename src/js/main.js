@@ -17,7 +17,7 @@ import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
-export function powerToSpeed({ power } = {}, sendData) {
+export function powerToSpeed({ power } = {}) {
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda = air resistance
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope)) = rolling resistance + gravity
@@ -277,7 +277,7 @@ function recieveData(data) {
   switch(data.name) {
     case "playerData":
       pacer = new AvatarMovement("P2", {
-        position: { x: 0.5, y: 1, z: -2 },
+        position: { x: 0.5, y: 1, z: 0 },
         isPacer: false,
       });
       pacer.creator.loadOtherData(data.data);
@@ -476,7 +476,7 @@ export function initZlowApp({
 
         // Only recompute from power if we're not in direct speed mode and power > 0
         if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-          constants.riderState.speed = powerToSpeed({ power: p }, true);
+          constants.riderState.speed = powerToSpeed({ power: p });
         }
         // If power === 0, coasting uses the new mass automatically on the next frame.
       };
@@ -502,7 +502,7 @@ export function initZlowApp({
 
       // Only recompute from power if we're not in direct speed mode and power > 0
       if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p }, true);
+        constants.riderState.speed = powerToSpeed({ power: p });
       }
       // If power === 0, coasting uses the new mass automatically on the next frame.
     };
