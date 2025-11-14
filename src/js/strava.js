@@ -7,17 +7,18 @@ export class Strava {
         this.refreshToken = null;
         this.expiresAt = null;
 
-        this.STRAVA_BASE_URL = "https://www.strava.com";
-        this.STRAVA_TOKEN_URL = this.STRAVA_BASE_URL + "/oauth/token";
-        this.STRAVA_ACTIVITIES_URL = this.STRAVA_BASE_URL + "/api/v3/activities";
+        this.CLIENT_ID = "INPUT CLIENT ID"; // TODO
+        this.BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+        this.OAUTH_CALLBACK = "/oauth/callback"
+        this.REFRESH = "/oauth/refresh"
     }
 
     // Begin OAuth
-    startOAuth(clientId, backendCallbackUrl) {
+    startOAuth() {
         const url = `https://www.strava.com/oauth/authorize` +
-            `?client_id=${clientId}` +
+            `?client_id=${this.CLIENT_ID}` +
             `&response_type=code` +
-            `&redirect_uri=${encodeURIComponent(backendCallbackUrl)}` +
+            `&redirect_uri=${encodeURIComponent(this.BACKEND_URL + this.OAUTH_CALLBACK)}` +
             `&scope=activity:write`;
 
         window.location.href = url;
@@ -61,11 +62,68 @@ export class Strava {
         return now >= this.expiresAt;
     }
 
+    // Strava frontend refresh (can only get new tokens hour before expiration)
+    async refreshTokens() {
+        this.loadToken();
+        if (!this.refreshToken) {
+            console.error("No refresh token stored.");
+            return null;
+        }
+
+        // Call backend
+        const res = await fetch (`${this.BACKEND_URL}${this.REFRESH}`, {
+           method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ refresh_token: this.refreshToken })
+        });
+
+        if (!res.ok) {
+            return null;
+        }
+
+        const data = await res.json();
+
+        // Update local storage
+        localStorage.setItem("strava_access_token", data.access_token);
+        localStorage.setItem("strava_refresh_token", data.refresh_token);
+        localStorage.setItem("strava_expires_at", data.expires_at);
+
+        // Update in-memory
+        this.accessToken = data.access_token;
+        this.refreshToken = data.refresh_token;
+        this.expiresAt = data.expires_at;
+
+        return this.accessToken;
+    }
+
+
     // Upload workout to Strava (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
     async uploadActivity({name, description}) {
         this.loadToken();
-        if (!this.accessToken || this.isTokenExpired()) {
-            alert("Strava session expired — please reconnect Strava.");
+
+        // Expired token
+        if (this.accessToken && this.isTokenExpired()) {
+            const newToken = await this.refreshTokens();
+            if (!newToken) {
+                alert("Strava session expired — please reconnect Strava.");
+                return;
+            }
+            this.loadToken();
+        }
+
+        // No access token but has refresh token
+        if (!this.accessToken && this.refreshToken) {
+            const ok = await this.refreshTokens();
+            if (!ok) {
+                alert("Error — please reconnect Strava.");
+                return;
+            }
+            this.loadToken();
+        }
+
+        // No access token still
+        if (!this.accessToken) {
+            alert("Error — please reconnect Strava.");
             return;
         }
 
@@ -103,6 +161,6 @@ export class Strava {
 
     // Checks if user has been connected to Strava
     static isConnected() {
-        return !!localStorage.getItem("strava_access_token");
+        return !!localStorage.getItem("strava_access_token") || !!localStorage.getItem("strava_refresh_token");
     }
 }
