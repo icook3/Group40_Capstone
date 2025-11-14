@@ -6,13 +6,7 @@ This takes a json String formatted in the same way the player color data is stor
 
 This connection is done by both sides at the start of the connection, and is used to set up the other character
 
-# weight
-This takes an integer, for the weight.
+# speed
+This takes a float, for the speed that the player moves
 
-This connection is done by both sides at the start of the connection, and is used to set up the weight of the character
-
-# power
-
-This takes a float, for the power outputted by the player
-
-This connection is sent over every time the power changes for one of the characters. It is used to calculate the movement on the other person's screen.
+This connection is sent over in the update function, to give an accurate representation of the other player's speed

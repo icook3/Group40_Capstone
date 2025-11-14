@@ -33,9 +33,6 @@ export function powerToSpeed({ power } = {}, sendData) {
     v = v - f / df;
     if (v < 0) v = 0.1; // prevent negative speeds
   }
-  if (sendData) {
-    sendPeerDataOver(power);
-  }
   return constants.msToKmh(v);
 }
 
@@ -234,6 +231,7 @@ function loop({
     });
     constants.lastHistorySecond = thisSecond;
   }
+  sendPeerDataOver(constants.riderState.speed);
   requestAnimationFrameFn(loop);
 }
 
@@ -266,10 +264,10 @@ function setPacerSpeed(speed) {
 let peerState=0;
 let connected = false;
 //used for frequent updates in update method
-function sendPeerDataOver(power) {
+function sendPeerDataOver(speed) {
   //console.log("sending data: "+connected);
   if (connected) {
-    conn.send({name:"power",data:power})
+    conn.send({name:"speed",data:speed})
   }
 }
 
@@ -287,10 +285,10 @@ function recieveData(data) {
         conn.send({name:"playerData", data:localStorage.getItem('playerData')});
       }
       break;
-    case "power":
-      console.log("Set pacer power to "+data.data);
+    case "speed":
+      console.log("Set pacer speed to "+data.data);
       activatePacer();
-      pacer.setSpeed(powerToSpeed({power:Number(data.data)},false));
+      pacer.setSpeed(Number(data.data));
       console.log(pacer.speed);
       break;
   }
