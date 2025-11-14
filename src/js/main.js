@@ -11,6 +11,7 @@ import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
+import { RampTestController } from "./workouts/RampTestController.js";
 
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
@@ -119,6 +120,7 @@ let pacer;
 // workout session
 let workoutStorage;
 let workoutSession;
+let rampController = null
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -190,6 +192,16 @@ function loop({
     pacerPos.z -= relativeSpeed * dt;
     pacer.setPosition(pacerPos);
   }
+
+  // Let the ramp controller advance its state
+  if (rampController) {
+    rampController.update(now);
+
+    // Optional: attach target watts to riderState so HUD can use it
+    const target = rampController.getCurrentTargetWatts();
+    constants.riderState.targetWatts = typeof target === "number" ? target : 0;
+  }
+
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {
     localStorage.setItem("testMode", false);
@@ -352,6 +364,22 @@ export function initZlowApp({
   const workoutName =
     workoutLabels[selectedWorkout] || "Free Ride";
 
+  // Set up ramp test controller if applicable
+  if (selectedWorkout === "ramp") {
+    const now = Date.now();
+    rampController = new RampTestController({
+      hud,
+      nowMs: now,
+      warmupSeconds: 5 * 60, // 5-minute warmup
+      startWatts: 100,
+      stepWatts: 20,
+      stepSeconds: 60,
+      ftpFactor: 0.75,
+    });
+  } else {
+    rampController = null;
+  }  
+
   // Show which workout was chosen and countdown to start
   hud.showWorkoutCountdown({
     workoutName,
@@ -494,6 +522,22 @@ export function initZlowApp({
       () => {
         // End the session and get final stats
         const finalStats = workoutSession.end();
+
+        // After you compute finalStats from workoutSession / history, etc.
+        let ftpEstimate = null;
+
+        if (selectedWorkout === "ramp" && rampController) {
+          const result = rampController.computeFtpFromHistory(constants.rideHistory);
+          if (result) {
+            ftpEstimate = result.ftp;
+            finalStats.ftpEstimate = ftpEstimate;
+
+            hud.showWorkoutMessage({
+              text: `Ramp Test FTP ≈ ${ftpEstimate.toFixed(0)} W`,
+              seconds: 8,
+            });
+          }
+        }
 
         // Save workout and check for records
         const { newRecords, streak } = workoutStorage.saveWorkout(finalStats);

@@ -14,11 +14,12 @@ export class HUD {
     // Added for pausing
     this.pausedAtMs = null;
 
-    // --- NEW: workout overlay elements + timer id ---
+    // NEW: workout overlay for messages / countdowns
     this.workoutOverlay = getElement("workout-overlay");
-    this.workoutDialog =
-    this.workoutOverlay?.querySelector(".workout-dialog") || null;
-    this.workoutCountdownId = null;
+    this.workoutDialog = this.workoutOverlay
+      ? this.workoutOverlay.querySelector(".workout-dialog")
+      : null;
+    this.workoutMessageTimeoutId = null;
   }
 
   pause() {
@@ -92,6 +93,28 @@ export class HUD {
 
       updateText();
     }, 1000);
+  }
+
+    /**
+   * Show a temporary workout message in the center overlay.
+   * Reuses the same area as the countdown.
+   */
+  showWorkoutMessage({ text, seconds = 4 } = {}) {
+    if (!this.workoutOverlay || !this.workoutDialog) return;
+
+    // clear any previous hide timer
+    if (this.workoutMessageTimeoutId) {
+      clearTimeout(this.workoutMessageTimeoutId);
+      this.workoutMessageTimeoutId = null;
+    }
+
+    this.workoutDialog.textContent = text;
+    this.workoutOverlay.style.display = "flex";
+
+    this.workoutMessageTimeoutId = window.setTimeout(() => {
+      this.workoutOverlay.style.display = "none";
+      this.workoutMessageTimeoutId = null;
+    }, seconds * 1000);
   }
 
 
