@@ -738,15 +738,7 @@ export function getWorkoutSummary() {
 function updateStravaButtonState() {
     const btn = document.getElementById("summary-export-strava");
     if (!btn) return;
-
-    const strava = new Strava();
-    strava.loadToken();
-
-    if (Strava.isConnected() && !strava.isTokenExpired()) {
-        btn.disabled = false;
-    } else {
-        btn.disabled = true;
-    }
+    btn.disabled = !Strava.isConnected();
 }
 
 updateStravaButtonState();
@@ -754,9 +746,8 @@ setInterval(updateStravaButtonState, 2000);
 
 export async function exportToStrava() {
     const strava = new Strava();
-    strava.loadToken();
 
-    if (!Strava.isConnected() || strava.isTokenExpired()) {
+    if (!Strava.isConnected()) {
         alert("You must connect to Strava first (from main menu).");
         return;
     }
