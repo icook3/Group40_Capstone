@@ -482,7 +482,6 @@ export function initZlowApp({
         // Reset everything
         simulationState.isPaused = false;
         countdown.cancel();
-        constants.rideHistory = [];
         constants.historyStartTime = Date.now();
         constants.lastHistorySecond = null;
         constants.riderState = { power: 0, speed: 0 };
