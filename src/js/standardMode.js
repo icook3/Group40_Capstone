@@ -17,7 +17,7 @@ export class StandardMode {
             if (!keyboardMode.keyboardMode) {
                 let speed = 0;
                 if (typeof data.power === "number" && data.power > 0) {
-                    speed = powerToSpeed({ power: data.power });
+                    speed = powerToSpeed({ power: data.power }, true);
                 }
                 constants.riderState = {
                     ...constants.riderState,

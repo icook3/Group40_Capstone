@@ -17,7 +17,7 @@ import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
-export function powerToSpeed({ power } = {}) {
+export function powerToSpeed({ power } = {}, sendData) {
   // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
   // a = 0.5 * airDensity * cda = air resistance
   // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope)) = rolling resistance + gravity
@@ -32,6 +32,9 @@ export function powerToSpeed({ power } = {}) {
     const df = 3 * a * v * v + b;
     v = v - f / df;
     if (v < 0) v = 0.1; // prevent negative speeds
+  }
+  if (sendData) {
+    sendPeerDataOver(power);
   }
   return constants.msToKmh(v);
 }
@@ -182,10 +185,19 @@ function loop({
   rider.setSpeed(constants.riderState.speed);
   rider.setPower(constants.riderState.power);
   rider.update(dt);
-  if (constants.pacerStarted) {
+  if (constants.pacerStarted&&peerState==0) {
     pacer.update(dt);
     //Update pacer position
     const riderSpeed = constants.riderState.speed;
+    const pacerSpeed = pacer.speed;
+    const relativeSpeed = pacerSpeed - riderSpeed;
+    const pacerPos = pacer.avatarEntity.getAttribute("position");
+    pacerPos.z -= relativeSpeed * dt;
+    pacer.setPosition(pacerPos);
+  } else if (peerState!=0&&connected&&pacer!=undefined) {
+    pacer.update(dt);
+
+    const riderSpeed = constants.riderState.speed;    
     const pacerSpeed = pacer.speed;
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
@@ -226,6 +238,7 @@ function loop({
 }
 
 export function activatePacer() {
+  //if (peerState!=0) {return;}
   if (!constants.pacerStarted) {
     //scene.activatePacer();
     constants.pacerStarted = true;
@@ -253,22 +266,32 @@ function setPacerSpeed(speed) {
 let peerState=0;
 let connected = false;
 //used for frequent updates in update method
-function sendPeerDataOver() {
+function sendPeerDataOver(power) {
+  //console.log("sending data: "+connected);
   if (connected) {
-
+    conn.send({name:"power",data:power})
   }
 }
 
 function recieveData(data) {
-  console.log("Recieving data");
-  console.log(data);
+  //console.log("Recieving data");
+  //console.log(data);
   switch(data.name) {
     case "playerData":
       pacer = new AvatarMovement("P2", {
         position: { x: 0.5, y: 1, z: -2 },
-        isPacer: true,
+        isPacer: false,
       });
       pacer.creator.loadOtherData(data.data);
+      if (peerState==1) {
+        conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+      }
+      break;
+    case "power":
+      console.log("Set pacer power to "+data.data);
+      activatePacer();
+      pacer.setSpeed(powerToSpeed({power:Number(data.data)},false));
+      console.log(pacer.speed);
       break;
   }
 }
@@ -293,7 +316,7 @@ export function initZlowApp({
           console.log(conn);
           connected = true;
           // initially send over JSON of character design
-          // when you recieve data? - not working
+          // when you recieve data
           conn.on('data', function(data) {
             recieveData(data);
           });
@@ -318,7 +341,6 @@ export function initZlowApp({
       // when recieve data
       conn.on('data', function(data) {
           recieveData(data);
-          conn.send({name:"playerData", data:localStorage.getItem('playerData')});
       });
     });
 
@@ -456,7 +478,7 @@ export function initZlowApp({
 
         // Only recompute from power if we're not in direct speed mode and power > 0
         if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-          constants.riderState.speed = powerToSpeed({ power: p });
+          constants.riderState.speed = powerToSpeed({ power: p }, true);
         }
         // If power === 0, coasting uses the new mass automatically on the next frame.
       };
@@ -482,7 +504,7 @@ export function initZlowApp({
 
       // Only recompute from power if we're not in direct speed mode and power > 0
       if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p });
+        constants.riderState.speed = powerToSpeed({ power: p }, true);
       }
       // If power === 0, coasting uses the new mass automatically on the next frame.
     };
@@ -490,10 +512,7 @@ export function initZlowApp({
     // Initialize once
     updateMassAndMaybeSpeed();
   }
-
-  if (peerState = 0) {
-    let savedPacerSpeed = pacer.speed;
-  }
+  let savedPacerSpeed;
   const pauseBtn = getElement("pause-btn");
   pauseBtn.addEventListener("click", () => {
     simulationState.isPaused = !simulationState.isPaused;
