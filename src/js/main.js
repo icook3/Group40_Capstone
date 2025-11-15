@@ -195,12 +195,13 @@ function loop({
 
   // Let the ramp controller advance its state
   if (rampController) {
-    rampController.update(now);
+    const power = constants.riderState.power || 0;
+    rampController.update(now, power);
 
-    // Optional: attach target watts to riderState so HUD can use it
     const target = rampController.getCurrentTargetWatts();
-    constants.riderState.targetWatts = typeof target === "number" ? target : 0;
+    constants.riderState.targetWatts = target || 0;
   }
+
 
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {

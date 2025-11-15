@@ -38,7 +38,7 @@ export class HUD {
       // dim the screen for the start countdown
       this.workoutOverlay.classList.add("dim");
       this.workoutOverlay.classList.remove("clear");
-      
+
       let remaining = seconds;
       const tick = () => {
         this.workoutDialog.textContent =
@@ -60,6 +60,24 @@ export class HUD {
         tick();
       }, 1000);
     }
+
+  skipWarmupCountdownEarly() {
+    if (!this.workoutOverlay) return;
+
+    // stop countdown timer
+    if (this.workoutCountdownId != null) {
+      clearInterval(this.workoutCountdownId);
+      this.workoutCountdownId = null;
+    }
+
+    // prevent the warmup from finishing normally
+    this.warmupOnDone = null;
+
+    // hide overlay
+    this.workoutOverlay.style.display = "none";
+    this.workoutOverlay.classList.remove("dim", "clear");
+  }
+
 
     // 5-minute warmup countdown – ONLY visual
     showWarmupCountdown({ seconds = 300, onDone } = {}) {

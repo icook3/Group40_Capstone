@@ -9,6 +9,7 @@ export class RampTestController {
     stepWatts = 20,
     stepSeconds = 60,
     ftpFactor = 0.75,
+    
   } = {}) {
     this.hud = hud;
 
@@ -21,6 +22,11 @@ export class RampTestController {
     this.rampStartTimeMs = null;
     this.lastStepChangeMs = null;
     this.currentStep = -1;
+
+    this.earlyExitWatts = 120;
+    this.earlyExitDurationSec = 30;
+    this.aboveThresholdAccumSec = 0;
+    this.lastUpdateMs = nowMs;
 
     // Kick off warmup countdown in the overlay
     if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
@@ -40,19 +46,40 @@ export class RampTestController {
   /**
    * Call this once per frame from the main loop.
    */
-  update(nowMs) {
-    if (this.phase !== "ramp" || this.lastStepChangeMs == null) return;
+  update(nowMs, currentPowerWatts = 0) {
+    const dtSec = (nowMs - this.lastUpdateMs) / 1000;
+    this.lastUpdateMs = nowMs;
 
-    const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
-    if (sinceStepSec >= this.stepSeconds) {
-      this.currentStep += 1;
-      this.lastStepChangeMs = nowMs;
+    // --- Warmup phase logic ---
+    if (this.phase === "warmup") {
+      if (currentPowerWatts > this.earlyExitWatts) {
+        this.aboveThresholdAccumSec += dtSec;
 
-      const stepNumber = this.currentStep + 1;
-      const target = this.getCurrentTargetWatts();
-      this._announceStep(stepNumber, target);
+        if (this.aboveThresholdAccumSec >= this.earlyExitDurationSec) {
+          console.log("Warmup ended early due to power threshold");
+          this._startRamp();
+          return;
+        }
+      } else {
+        this.aboveThresholdAccumSec = 0;
+      }
+
+      return; // <-- ensures no ramp logic until warmup ends/forced
+    }
+
+    // --- Ramp phase logic ---
+    if (this.phase === "ramp" && this.lastStepChangeMs != null) {
+      const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
+      if (sinceStepSec >= this.stepSeconds) {
+        this.currentStep++;
+        this.lastStepChangeMs = nowMs;
+        const target = this.getCurrentTargetWatts();
+        this._announceStep(this.currentStep + 1, target);
+      }
     }
   }
+
+
 
 
   /**
@@ -99,17 +126,27 @@ export class RampTestController {
     return this.ftpResult;
   }
 
-  _startRamp() {
+  _startRamp(nowMs = Date.now()) {
+    console.log("Ramp starting");
+
+    // ensure warmup cannot restart
     this.phase = "ramp";
-    const nowMs = Date.now();
+    this.aboveThresholdAccumSec = 0;
+
+    // timestamp ramp init
     this.rampStartTimeMs = nowMs;
     this.lastStepChangeMs = nowMs;
     this.currentStep = 0;
 
+    // make sure warmup countdown can never resume
+    if (this.hud?.skipWarmupCountdownEarly) {
+      this.hud.skipWarmupCountdownEarly();
+    }
+
+    // Show first ramp target
     const target = this.getCurrentTargetWatts();
     this._announceStep(1, target);
   }
-
 
   _announceStep(stepNumber, targetWatts) {
     if (!this.hud || typeof this.hud.showWorkoutMessage !== "function") return;
