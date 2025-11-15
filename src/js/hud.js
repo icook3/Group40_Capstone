@@ -175,36 +175,67 @@ export class HUD {
     }, seconds * 1000);
   }
 
-  update({ power, speed, calories }, dt) {
+  update({ power, speed, calories, targetWatts }, dt) {
+    // ----- color-code power vs ramp target -----
+    if (this.power) {
+      // clear any previous state
+      this.power.classList.remove("power-above-target", "power-below-target");
+
+      const hasTarget =
+        typeof targetWatts === "number" && Number.isFinite(targetWatts) && targetWatts > 0;
+      const hasPower =
+        typeof power === "number" && Number.isFinite(power);
+
+      if (hasTarget && hasPower) {
+        // compare in raw watts (both are in W)
+        if (power >= targetWatts) {
+          this.power.classList.add("power-above-target");
+        } else {
+          this.power.classList.add("power-below-target");
+        }
+      }
+      // if no target, we leave it with no extra class → default white color
+    }
+
+    // ----- existing numeric updates -----
     const fields = [
-      { 
-        el: this.power, val: power, format: (v) => {
+      {
+        el: this.power,
+        val: power,
+        format: (v) => {
           v = units.powerUnit.convertTo(v);
           return v.toFixed(0);
-        } 
+        },
       },
       {
-          el: this.speed, val: speed, format: (v) => {
-              v = units.speedUnit.convertTo(v);
-              return v?.toFixed(1);
-              //console.log("formatting speed: " + speed + ". v=" + v);
-          }
+        el: this.speed,
+        val: speed,
+        format: (v) => {
+          v = units.speedUnit.convertTo(v);
+          return v?.toFixed(1);
+        },
       },
       { el: this.calories, val: calories, format: (v) => v?.toFixed(0) },
     ];
+
     fields.forEach(({ el, val, format }) => {
-        if (val !== undefined) el.textContent = format(val);
+      if (val !== undefined) el.textContent = format(val);
     });
+
     if (speed !== undefined) {
       this.totalDistance += (speed * dt) / 3600; // km
-      this.distance.textContent = units.distanceUnit.convertTo(this.totalDistance).toFixed(2);
+      this.distance.textContent = units.distanceUnit
+        .convertTo(this.totalDistance)
+        .toFixed(2);
     }
+
     if (!this.startTime) this.startTime = Date.now();
     const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
     const min = String(Math.floor(elapsed / 60)).padStart(2, "0");
     const sec = String(elapsed % 60).padStart(2, "0");
     this.time.textContent = `${min}:${sec}`;
   }
+
 
   setPacerDiff(diff) {
     // No longer used: pacerDiff HUD element removed

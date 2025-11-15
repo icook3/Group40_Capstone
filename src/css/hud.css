@@ -425,3 +425,12 @@
   font-size: 50px;
   color: rgb(220, 229, 222);
 }
+
+/* Ramp test power vs target colors */
+#power.power-above-target {
+  color: #4caf50; /* green when at/above target */
+}
+
+#power.power-below-target {
+  color: #ff5252; /* red when below target */
+}

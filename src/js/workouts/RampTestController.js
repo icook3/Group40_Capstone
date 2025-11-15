@@ -157,7 +157,7 @@ export class RampTestController {
 
     this.hud.showWorkoutMessage({
       text: label,
-      seconds: 4,
+      seconds: 8,
     });
   }
 }
