@@ -99,8 +99,12 @@ export class HUD {
       const tick = () => {
         const min = Math.floor(remaining / 60);
         const sec = remaining % 60;
-        this.workoutDialog.textContent =
-          `Warmup: ${min}:${sec.toString().padStart(2, "0")}`;
+        this.workoutDialog.innerHTML = `
+          Warmup: ${min}:${sec.toString().padStart(2, "0")}
+          <div style="font-size: 0.6em; opacity: 0.8; margin-top: 8px;">
+            Hold >120W for 30s to skip warmup
+          </div>
+        `;
       };
 
       this.workoutOverlay.style.display = "flex";
