@@ -380,13 +380,24 @@ export function initZlowApp({
     rampController = null;
   }  
 
-  // Show which workout was chosen and countdown to start
-  hud.showWorkoutCountdown({
+  hud.showStartCountdown({
     workoutName,
-    seconds: 5, // tweak as desired
+    seconds: 5,
     onDone: () => {
-      // When countdown finishes, let the simulation run
+      // After 5s, unpause the sim
       simulationState.isPaused = false;
+
+      // If ramp, begin warmup countdown (no pause)
+      if (selectedWorkout === "ramp") {
+        // tell HUD to show 5-minute warmup timer
+        hud.showWarmupCountdown({
+          seconds: 5 * 60,
+          onDone: () => {
+            // Warmup over → tell RampTestController to start ramps
+            rampController?.startRamp?.();
+          },
+        });
+      }
     },
   });
 

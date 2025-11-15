@@ -4,73 +4,56 @@ export class RampTestController {
   constructor({
     hud,
     nowMs = Date.now(),
-
-    // protocol tuning knobs:
-    warmupSeconds = 5 * 60,  // 5-minute warmup
-    startWatts = 100,        // starting ramp power
-    stepWatts = 20,          // +20 W per step
-    stepSeconds = 60,        // 1 minute per step
-    ftpFactor = 0.75,        // FTP ≈ 75% of peak 1-min power
+    warmupSeconds = 5 * 60,
+    startWatts = 100,
+    stepWatts = 20,
+    stepSeconds = 60,
+    ftpFactor = 0.75,
   } = {}) {
     this.hud = hud;
 
-    this.phase = "warmup";         // "warmup" | "ramp" | "finished"
-    this.startTimeMs = nowMs;
-    this.lastStepChangeMs = nowMs;
-    this.currentStep = -1;         // -1 = no ramp yet
-
-    this.warmupSeconds = warmupSeconds;
+    this.phase = "warmup";      // "warmup" | "ramp" | "finished"
     this.startWatts = startWatts;
     this.stepWatts = stepWatts;
     this.stepSeconds = stepSeconds;
     this.ftpFactor = ftpFactor;
 
-    // Optional: store calculated FTP result
-    this.ftpResult = null;
+    this.rampStartTimeMs = null;
+    this.lastStepChangeMs = null;
+    this.currentStep = -1;
 
-    // Kick off warmup message
-    if (this.hud && typeof this.hud.showWorkoutMessage === "function") {
-      this.hud.showWorkoutMessage({
-        text: `Warmup – ride easy for ${(warmupSeconds / 60).toFixed(0)}:00`,
-        seconds: 5,
+    // Kick off warmup countdown in the overlay
+    if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
+      this.hud.showWarmupCountdown({
+        seconds: warmupSeconds,
+        onDone: () => {
+          this._startRamp();
+        },
       });
+    } else {
+      // Fallback: if HUD can’t do the countdown, just start ramp immediately
+      this._startRamp();
     }
   }
+
 
   /**
    * Call this once per frame from the main loop.
    */
   update(nowMs) {
-    if (this.phase === "finished") return;
+    if (this.phase !== "ramp" || this.lastStepChangeMs == null) return;
 
-    const elapsedSec = (nowMs - this.startTimeMs) / 1000;
+    const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
+    if (sinceStepSec >= this.stepSeconds) {
+      this.currentStep += 1;
+      this.lastStepChangeMs = nowMs;
 
-    if (this.phase === "warmup") {
-      if (elapsedSec >= this.warmupSeconds) {
-        // Switch into ramp mode
-        this.phase = "ramp";
-        this.currentStep = 0;
-        this.lastStepChangeMs = nowMs;
-
-        const target = this.getCurrentTargetWatts();
-        this._announceStep(1, target);
-      }
-      return;
-    }
-
-    if (this.phase === "ramp") {
-      const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
-
-      if (sinceStepSec >= this.stepSeconds) {
-        this.currentStep += 1;
-        this.lastStepChangeMs = nowMs;
-
-        const stepNumber = this.currentStep + 1;
-        const target = this.getCurrentTargetWatts();
-        this._announceStep(stepNumber, target);
-      }
+      const stepNumber = this.currentStep + 1;
+      const target = this.getCurrentTargetWatts();
+      this._announceStep(stepNumber, target);
     }
   }
+
 
   /**
    * Current ramp target watts, or null during warmup / finished.
@@ -115,6 +98,18 @@ export class RampTestController {
     this.ftpResult = { peakMinute: bestAvg, ftp };
     return this.ftpResult;
   }
+
+  _startRamp() {
+    this.phase = "ramp";
+    const nowMs = Date.now();
+    this.rampStartTimeMs = nowMs;
+    this.lastStepChangeMs = nowMs;
+    this.currentStep = 0;
+
+    const target = this.getCurrentTargetWatts();
+    this._announceStep(1, target);
+  }
+
 
   _announceStep(stepNumber, targetWatts) {
     if (!this.hud || typeof this.hud.showWorkoutMessage !== "function") return;

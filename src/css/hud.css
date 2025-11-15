@@ -403,10 +403,20 @@
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
   z-index: 9999;
   pointer-events: none;
 }
+
+/* Use this when you WANT the greyed-out effect (start countdown) */
+#workout-overlay.dim {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Use this when you DON'T want dimming (warmup, ramp messages) */
+#workout-overlay.clear {
+  background: transparent;
+}
+
 
 #workout-overlay .workout-dialog {
   pointer-events: none;
