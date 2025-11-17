@@ -25,6 +25,23 @@ export class Track {
     track.setAttribute('configuration', `straight_vertical`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
     this.path_element.appendChild(track);
-    return track.getAttribute("configuration")
+    return track.getAttribute("configuration");
+  }
+
+  curvedPiece(spawnZ) {
+    const track = document.createElement('a-entity');
+    track.setAttribute('geometry',`primitive: ring; radiusInner: 22; radiusOuter: 30`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 7.5, side: double`);
+    track.setAttribute('configuration', `curve_right_90`);
+    track.setAttribute('position', `5 ${constants.pathHeight} ${spawnZ}`);
+    track.setAttribute('theta-start', '180');
+    track.setAttribute('theta-length', '180');
+    track.setAttribute('rotation', '-90 0 0');
+    this.path_element.appendChild(track);
+    return track.getAttribute("configuration");
+
+
+
+    //<a-entity geometry="primitive: ring; material="side: double"></a-entity>
   }
 }

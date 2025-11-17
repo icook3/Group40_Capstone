@@ -29,7 +29,8 @@ export class ObjectField {
     this.path_element = document.getElementById('track');
 
     // Add a straight pieces for initial testing. You need about 5 pieces to get to the horizon
-    this.spawnScenery(this.track.straightPiece(0), 0);
+    this.track.curvedPiece(0);
+    //this.spawnScenery(this.track.straightPiece(0), 0);
     this.spawnScenery(this.track.straightPiece(-60), -60);
     this.spawnScenery(this.track.straightPiece(-120), -120);
     this.spawnScenery(this.track.straightPiece(-180), -180);
