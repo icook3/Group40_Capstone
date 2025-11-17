@@ -20,7 +20,6 @@ export class Track {
   straightPiece(spawnZ) {
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-
     track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
     track.setAttribute('configuration', `straight_vertical`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
@@ -30,18 +29,24 @@ export class Track {
 
   curvedPiece(spawnZ) {
     const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 22; radiusOuter: 30`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 7.5, side: double`);
-    track.setAttribute('configuration', `curve_right_90`);
-    track.setAttribute('position', `5 ${constants.pathHeight} ${spawnZ}`);
-    track.setAttribute('theta-start', '180');
-    track.setAttribute('theta-length', '180');
+    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
+    //track.setAttribute('geometry',`primitive: ring; radiusInner: 20; radiusOuter: 30; thetaLength: 180; thetaStart: 270`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
+    track.setAttribute('configuration', `curve_right_180`);
+    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${spawnZ}`);
     track.setAttribute('rotation', '-90 0 0');
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
 
-
-
     //<a-entity geometry="primitive: ring; material="side: double"></a-entity>
+  }
+
+  test() {
+    const track = document.createElement('a-entity');
+    track.setAttribute('geometry',`primitive: circle; radius: 2`);
+
+    track.setAttribute('position', `20 ${constants.pathHeight} -10`);
+    track.setAttribute('rotation', '-90 0 0');
+    this.path_element.appendChild(track);
   }
 }
