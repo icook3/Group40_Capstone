@@ -29,6 +29,7 @@ export class ZlowScene {
     this.objectField.attachExternalBands(this.scenery.bands);
   }
   
+  // Pass speed and time instead of dz and calculate in ObjectField
   update(riderSpeed = 0, dt = 0) {
     const dz = riderSpeed * dt;
     constants.worldZ += dz;
@@ -37,6 +38,6 @@ export class ZlowScene {
       this.objectField.init(); // keep the original delayed spawn for field
       this.objectsLoaded = true;
     }
-    this.objectField.advance(dz);  // ← the ONLY advancer  
+    this.objectField.advance(riderSpeed, dt);  // ← the ONLY advancer  
   }
 }

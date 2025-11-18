@@ -38,12 +38,13 @@ export class Track {
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
   }
-  test() {
+
+  test(x, z) {
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: circle; radius: 2`);
 
-    track.setAttribute('position', `20 ${constants.pathHeight} -10`);
-    track.setAttribute('rotation', '-90 0 0');
+    track.setAttribute('position', `${x} ${constants.pathHeight} ${z}`);
+    track.setAttribute('rotation', '0 0 0');
     this.path_element.appendChild(track);
   }
 }

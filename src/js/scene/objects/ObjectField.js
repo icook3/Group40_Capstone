@@ -23,7 +23,6 @@ export class ObjectField {
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
 
-    // PROBABLY OVERZEALOUS IDEA: FIGURE OUT HOW TO ADD UPDATE FUNCTIONALITY DIRECTLY TO OBJECTS
     this.path_element = document.getElementById('track');
 
     // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
@@ -37,7 +36,7 @@ export class ObjectField {
     this.spawnScenery(this.track.straightPiece(-240), -240);
 
     // Test marking a specific location in-scene
-    //this.track.test();
+    //this.track.test(0, -25);
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -74,8 +73,42 @@ export class ObjectField {
   }
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
-  advance(dz) {
-    if (!this.initialized || dz === 0) return;
+  advance(riderSpeed, dt) {
+    if (!this.initialized || (riderSpeed, dt) === 0) return;
+
+    let dx = 0;
+    let dz = 0;
+    let tempZ = 0;
+
+    // Calculate X and Z positional changes
+    if (this.path_element.children[0].getAttribute("configuration") == "straight_vertical") {
+      dz = riderSpeed * dt;
+    }
+
+    // CORRECTLY FIGURES OUT WHERE A CURVE STARTS AND STOPS -- NOTE YOU SAID WITHIN 25 SINCE IT SEEMS TO 
+    if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
+      
+      // Determine angular velocity -> speed/radius
+      const av = (riderSpeed)/dt;
+
+      // Calculate X -> radius * cos(angularV*time)
+
+      // I THINK YOU'RE THINKING ABOUT THIS WRONG - YOU NEED DELTAX, NOT X -- MAY NEED TO CORRECT FOR THE -3.5 THING
+      dx = parseFloat(constants.curveRadius) * Math.cos((av * dt));
+      console.log(dx)
+
+      
+      
+
+      // Calculate Z -> radius * sin(angularV*time)
+
+      
+      dz = riderSpeed * dt;
+    }
+
+    else {
+      dz = riderSpeed * dt;
+    }
 
     // Handles all objects currently part of the items array
     for (const obj of this.items) {
@@ -92,7 +125,6 @@ export class ObjectField {
         pos.x = kind.resampleX();
 
       }
-
         setPos(obj, pos);
     }
 
@@ -143,7 +175,7 @@ export class ObjectField {
     pos.z += dz;
     setPos(segment, pos);
 
-    // Not sure why rotation reverts to 0 0 0 in case of curved pieces?
+    // Not sure why rotation reverts to 0 0 0 in case of curved pieces? Probably inheritance
     if (segment.getAttribute("configuration") == "curve_right_180") {
       segment.setAttribute('rotation', '-90 0 0');
     }
@@ -152,7 +184,6 @@ export class ObjectField {
   // Spawn new track section if the farthest piece of track is under 240 units in front of worldZ
   if (constants.worldZ > constants.trackLastUpdate + 60) {
     constants.trackLastUpdate += 60;
-
     // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
     const lastPiece = getPos(this.path_element.children[this.path_element.children.length-1]).z - 60
     this.spawnScenery(this.track.straightPiece(lastPiece), lastPiece);
