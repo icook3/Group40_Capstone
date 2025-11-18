@@ -18,7 +18,6 @@ export class ObjectField {
     this.initialized = false;
     this.externalGroups = [];
     this.policy = policy;
-
     
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
@@ -30,23 +29,12 @@ export class ObjectField {
     // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
     // You can't start with a curved piece, because you'll start right in the middle of the ring
     // NOTE: Be sure to create the array from smallest to largest or else track respawning will break!!
-    //this.track.straightPiece(0)
+    
     this.spawnScenery(this.track.straightPiece(0), 0);
-    this.track.curvedPiece(-60);
-    this.track.straightPiece(-120)
-    this.track.straightPiece(-180)
-    this.track.straightPiece(-240)
-
-
-    
-
-    // Perspective makes it look like the curved piece is sitting under the straight piece
-    
-
-    //this.spawnScenery(this.track.straightPiece(-60), -60);
-    //this.spawnScenery(this.track.straightPiece(-120), -120);
-    //this.spawnScenery(this.track.straightPiece(-180), -180);
-    //this.spawnScenery(this.track.straightPiece(-240), -240);
+    this.track.curve_180_right(-60);
+    this.spawnScenery(this.track.straightPiece(-120), -120);
+    this.spawnScenery(this.track.straightPiece(-180), -180);
+    this.spawnScenery(this.track.straightPiece(-240), -240);
 
     // Test marking a specific location in-scene
     //this.track.test();
@@ -195,14 +183,13 @@ export class ObjectField {
     }
   }
 
-  // MEASURES WRONG - Z IS SMACK IN THE MIDDLE, NOT THE STARTING EDGE
   spawnScenery(trackPiece, initialZ) {
+    // initialz refers to the central point of a 60-unit segment
     if (trackPiece == "straight_vertical") {
-      for (let z = initialZ; z > initialZ-30; z -= 5) {
+      for (let z = initialZ+30; z > initialZ-30; z -= 5) {
         this._spawnAtZ(z);
         if (Math.random() < 0.7) this._spawnAtZ(z); // original density
       }
-      
     }
   }
 }

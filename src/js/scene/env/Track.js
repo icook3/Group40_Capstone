@@ -27,20 +27,17 @@ export class Track {
     return track.getAttribute("configuration");
   }
 
-  curvedPiece(spawnZ) {
+  // Create an append a track piece curving to the right
+  curve_180_right(spawnZ) {
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
-    //track.setAttribute('geometry',`primitive: ring; radiusInner: 20; radiusOuter: 30; thetaLength: 180; thetaStart: 270`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
+    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
     track.setAttribute('configuration', `curve_right_180`);
     track.setAttribute('position', `-3.5 ${constants.pathHeight} ${spawnZ}`);
     track.setAttribute('rotation', '-90 0 0');
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
-
-    //<a-entity geometry="primitive: ring; material="side: double"></a-entity>
   }
-
   test() {
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: circle; radius: 2`);
