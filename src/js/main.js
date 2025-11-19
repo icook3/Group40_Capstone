@@ -313,10 +313,11 @@ export function initZlowApp({
   if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
     peerState = 2;
     console.log("connecting to peer");
-    peer = new Peer();
+    peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
     peer.on('open', function(id) {
         conn = peer.connect(sessionStorage.getItem("peer"));
         console.log("ID="+id);
+        //console.log("Peer: "+peer);
         conn.on('open', function() {
           console.log("connected!");
           console.log(conn);
@@ -362,7 +363,7 @@ export function initZlowApp({
   else if (sessionStorage.getItem("peerToPeer")=='true') {
     peerState = 1;
     console.log("hosting peer");
-    peer = new Peer(localStorage.getItem("Name"));
+    peer = new Peer(localStorage.getItem("Name"), {host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
     peer.on('open', function(id) {
         console.log("ID="+id);        
     });

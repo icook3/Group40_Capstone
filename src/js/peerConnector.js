@@ -1,6 +1,7 @@
+import { constants } from "./constants.js";
 function openZlow(peer) {
     sessionStorage.setItem("peer",peer);
-    var me = new Peer();
+    var me = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
     me.on('open', function() {
         let conn = me.connect(peer);
         conn.on('open', function() {
