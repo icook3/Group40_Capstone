@@ -1,6 +1,8 @@
 /* 
 	Note: this component requires mathematical parser library from:
 	https://github.com/silentmatt/expr-eval
+
+	expr-eval has a serious security vulernability, so https://www.npmjs.com/package/expr-eval-fork has been substituted EGD 11/19/2025.
  */
  import { Parser } from "../../../node_modules/expr-eval-fork/dist/index.mjs"
 

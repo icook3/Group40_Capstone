@@ -29,14 +29,17 @@ export class ObjectField {
     // You can't start with a curved piece, because you'll start right in the middle of the ring
     // NOTE: Be sure to create the array from smallest to largest or else track respawning will break!!
     
-    this.track.curve_180_right(0);
-    this.spawnScenery(this.track.straightPiece(-60), -60);
+    
+    this.spawnScenery(this.track.straightPiece(0), 0);
+    this.track.curve_180_right(-60);
     this.spawnScenery(this.track.straightPiece(-120), -120);
     this.spawnScenery(this.track.straightPiece(-180), -180);
     this.spawnScenery(this.track.straightPiece(-240), -240);
 
+    this.track.test(0,0);
     // Test marking a specific location in-scene
     //this.track.test(0, -25);
+    this.test_thing = document.getElementById('test_thing');
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -80,35 +83,26 @@ export class ObjectField {
     let dz = 0;
     let tempZ = 0;
 
-    // Calculate X and Z positional changes
-    if (this.path_element.children[0].getAttribute("configuration") == "straight_vertical") {
+    // Advance scenery on z axis unless on a curve
+    if (this.path_element.children[1].getAttribute("configuration") == "straight_vertical" && this.path_element.children[1].getAttribute("position").z > -25 && constants.worldZ > 0) {
+
+      // Turn off curve-follow if within 25 units of a straight piece
+       this.test_thing.setAttribute("curve-follow", "enabled", "false");
+       console.log(this.test_thing.getAttribute("curve-follow").enabled)
+
       dz = riderSpeed * dt;
     }
 
     // CORRECTLY FIGURES OUT WHERE A CURVE STARTS AND STOPS -- NOTE YOU SAID WITHIN 25 SINCE IT SEEMS TO 
     if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
       
-      // Determine angular velocity -> speed/radius
-      const av = (riderSpeed)/dt;
+      // Turn on curve-follow if within 25 units of a curved piece
+      this.test_thing.setAttribute("curve-follow", "enabled", "true");
 
-      // Calculate X -> radius * cos(angularV*time)
+      console.log(this.test_thing.getAttribute("curve-follow").enabled)
 
-      // I THINK YOU'RE THINKING ABOUT THIS WRONG - THIS GIVES YOU WHAT X IS, NOT DX. MAYBE JUST USE ABSOLUTE VALUE AND SUBTRACT 34?
-      dx = parseFloat(constants.curveRadius) * Math.cos((av * dt) + 270);
-      //dx = parseFloat(constants.curveRadius) * Math.cos(((riderSpeed * dt)/constants.curveRadius));
-      console.log(dx)
-
-      
-      
-
-      // Calculate Z -> radius * sin(angularV*time)
-      tempZ = parseFloat(constants.curveRadius) * (av * dt);
-      //console.log("Z " + tempZ)
-
-      // SO EITHER YOU'RE CALCULATING Z WRONG OR THIS WHOLE THING IS A MAJOR PROBLEM
-
-      
-      dz = riderSpeed * dt;
+      // FOR SOME REASON ANY DZ THAT ISN'T RIDER SPEED * DT MESSES UP TRACK GENERATION?? -- Pulling the last element too fast
+     dz = (riderSpeed * dt)/2;
     }
 
     // If something goes wrong, default to original dz
