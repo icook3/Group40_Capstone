@@ -170,6 +170,10 @@ function loop({
 
   //update workout session with current values
   if (workoutSession.isWorkoutActive()) {
+    if (rampController) {
+      // Update FTP result if available
+      workoutSession.addFTPResult(rampController.ftpResult);
+    }
     workoutSession.update({
       speed: constants.riderState.speed || 0,
       power: constants.riderState.power || 0,
@@ -535,21 +539,20 @@ export function initZlowApp({
         // End the session and get final stats
         const finalStats = workoutSession.end();
 
-        // After you compute finalStats from workoutSession / history, etc.
-        let ftpEstimate = null;
+      // After you compute finalStats from workoutSession / history, etc.
+      if (selectedWorkout === "ramp" && rampController) {
+        const result = rampController.computeFtpFromHistory(constants.rideHistory);
+        if (result) {
+          // Flatten FTP numbers into stats for summary + records
+          finalStats.ftp = Math.round(result.ftp);
+          finalStats.peakMinutePower = Math.round(result.peakMinute);
 
-        if (selectedWorkout === "ramp" && rampController) {
-          const result = rampController.computeFtpFromHistory(constants.rideHistory);
-          if (result) {
-            ftpEstimate = result.ftp;
-            finalStats.ftpEstimate = ftpEstimate;
-
-            hud.showWorkoutMessage({
-              text: `Ramp Test FTP ≈ ${ftpEstimate.toFixed(0)} W`,
-              seconds: 8,
-            });
-          }
+          hud.showWorkoutMessage({
+            text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
+            seconds: 8,
+          });
         }
+      }
 
         // Save workout and check for records
         const { newRecords, streak } = workoutStorage.saveWorkout(finalStats);
