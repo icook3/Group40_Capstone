@@ -91,7 +91,7 @@ export function initSettings() {
 
 
 
-    const strava = new Strava();
+    /*const strava = new Strava();
     Strava.loadFromRedirect();
     strava.loadToken();
 
@@ -105,7 +105,7 @@ export function initSettings() {
             stravaBtn.disabled = true; // TODO: Set to false once Strava app is made
             stravaBtn.addEventListener("click", strava.startOAuth);
         }
-    }
+    }*/
 }
 
 if (typeof window !== "undefined") {

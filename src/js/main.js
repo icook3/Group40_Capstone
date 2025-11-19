@@ -341,7 +341,7 @@ export function initZlowApp({
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
-  const strava = new Strava();
+  //const strava = new Strava();
 
   //Pacer speed control input
   //Rider state and history
@@ -442,9 +442,9 @@ export function initZlowApp({
       saveTCX();
     }
 
-    if (e.target && e.target.id === "summary-export-strava") {
+    /*if (e.target && e.target.id === "summary-export-strava") {
       await exportToStrava();
-    }
+    }*/
   });
 
   /*const stopBtn = getElement("stop-btn");
@@ -577,7 +577,7 @@ export function initZlowApp({
   return {
     scene,
     hud,
-    strava,
+    //strava,
     pacer,
     getRiderState: () => riderState,
     getRideHistory: () => rideHistory,
@@ -653,7 +653,7 @@ export function getWorkoutSummary() {
 }
 
 // Disable exporting if Strava is not connected
-function updateStravaButtonState() {
+/*function updateStravaButtonState() {
     const btn = document.getElementById("summary-export-strava");
     if (!btn) return;
     btn.disabled = !Strava.isConnected();
@@ -677,7 +677,7 @@ export async function exportToStrava() {
     }
 
     await strava.uploadActivity(workout);
-}
+}*/
 
 // Generates TCX file based old saveTCX
 export function generateTCXFile() {
