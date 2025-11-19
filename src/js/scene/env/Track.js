@@ -35,16 +35,18 @@ export class Track {
     track.setAttribute('configuration', `curve_right_180`);
     track.setAttribute('position', `-3.5 ${constants.pathHeight} ${spawnZ}`);
     track.setAttribute('rotation', '-90 0 0');
+    track.setAttribute('parametric-curve', 'xyzFunctions: 2*cos(t), 0.5*cos(3*t) + 2, 2*sin(t); tRange: 0, 6.283');
+
+
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
   }
 
   test(x, z) {
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: circle; radius: 2`);
+    const test = document.createElement('a-entity');
+    test.setAttribute('geometry',`primitive: circle; radius: 2`);
 
-    track.setAttribute('position', `${x} ${constants.pathHeight} ${z}`);
-    track.setAttribute('rotation', '0 0 0');
-    this.path_element.appendChild(track);
+    test.setAttribute('position', `${x} ${constants.pathHeight} ${z}`);
+    this.sceneEl.appendChild(test);
   }
 }

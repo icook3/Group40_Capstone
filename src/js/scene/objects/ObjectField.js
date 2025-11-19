@@ -29,8 +29,8 @@ export class ObjectField {
     // You can't start with a curved piece, because you'll start right in the middle of the ring
     // NOTE: Be sure to create the array from smallest to largest or else track respawning will break!!
     
-    this.spawnScenery(this.track.straightPiece(0), 0);
-    this.track.curve_180_right(-60);
+    this.track.curve_180_right(0);
+    this.spawnScenery(this.track.straightPiece(-60), -60);
     this.spawnScenery(this.track.straightPiece(-120), -120);
     this.spawnScenery(this.track.straightPiece(-180), -180);
     this.spawnScenery(this.track.straightPiece(-240), -240);
@@ -93,19 +93,25 @@ export class ObjectField {
 
       // Calculate X -> radius * cos(angularV*time)
 
-      // I THINK YOU'RE THINKING ABOUT THIS WRONG - YOU NEED DELTAX, NOT X -- MAY NEED TO CORRECT FOR THE -3.5 THING
-      dx = parseFloat(constants.curveRadius) * Math.cos((av * dt));
+      // I THINK YOU'RE THINKING ABOUT THIS WRONG - THIS GIVES YOU WHAT X IS, NOT DX. MAYBE JUST USE ABSOLUTE VALUE AND SUBTRACT 34?
+      dx = parseFloat(constants.curveRadius) * Math.cos((av * dt) + 270);
+      //dx = parseFloat(constants.curveRadius) * Math.cos(((riderSpeed * dt)/constants.curveRadius));
       console.log(dx)
 
       
       
 
       // Calculate Z -> radius * sin(angularV*time)
+      tempZ = parseFloat(constants.curveRadius) * (av * dt);
+      //console.log("Z " + tempZ)
+
+      // SO EITHER YOU'RE CALCULATING Z WRONG OR THIS WHOLE THING IS A MAJOR PROBLEM
 
       
       dz = riderSpeed * dt;
     }
 
+    // If something goes wrong, default to original dz
     else {
       dz = riderSpeed * dt;
     }
