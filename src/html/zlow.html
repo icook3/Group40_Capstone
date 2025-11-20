@@ -7,7 +7,10 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="../../resources/components/aframe_tube_geometry/index.js"></script>
     <script src="../../resources/components/aframe_curve_follow/index.js"></script>
-    <script src="../../resources/components/aframe_parametric_curve/index.js" type="module"></script>
+    <script
+      src="../../resources/components/aframe_parametric_curve/index.js"
+      type="module"
+    ></script>
     <link
       rel="stylesheet"
       type="text/css"
@@ -241,6 +244,10 @@
       window.addEventListener("DOMContentLoaded", () => {
         if (window.initZlowApp) window.initZlowApp();
       });
+    </script>
+    <script type="module">
+      import { NotificationManager } from "../js/notifications.js";
+      window.testNotifications = new NotificationManager();
     </script>
   </body>
 </html>

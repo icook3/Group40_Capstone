@@ -393,3 +393,18 @@
   font-size: 50px;
   color: rgb(220, 229, 222);
 }
+
+#milestone-notifications {
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.milestone-toast {
+  background: red; /*testing */
+  color: white;
+  padding: 20px;
+  margin: 10px;
+  font-size: 20px;
