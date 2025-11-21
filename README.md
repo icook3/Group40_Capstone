@@ -13,6 +13,13 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 
 ## Structure
 - `resources` — Contains various resources.
+	- `components` — Stores custom A-Frame components used in the program
+		- `aframe_curve_follow` — Stores an A-Frame component for following a curve
+			- `index.js` — The JavaScript file defining the A-Frame Curve Follow component
+		- `aframe_parametric_curve` — Stores an A-Frame component for a parametric curve
+			- `index.js` — The JavaScript file defining the A-Frame Parametric Curve component
+		- `aframe_tube_geometry` — Stores an A-Frame component used to help with making curves
+			- `index.js` — The JavaScript file defining the A-Frame Tube Geometry component
 	- `favicons` — Stores the program favicon.
 		- `favicon.ico` — The main favicon used for the program.
 		- `ZlowFavicon-dark.svg` — A variant of the favicon used when the browser is in dark mode for better readability.
@@ -98,6 +105,8 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `mph.js` — Handles unit conversions for Miles per Hour.
 			- `units.md` — Documentation on different units.
 			- `W.js` — Handles unit conversions for Watts - the default power unit.
+		- `workouts` — Stores different workouts
+			- `RampTestController.js` — Handles a workout involving going up ramps
 	    - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 		- `avatarMovement.js` — Updates A-Frame 3D avatar.
 		- `bluetooth.js` — Handles Bluetooth device connection and data polling.
@@ -137,6 +146,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Development Notes
 - Modular ES6 code, no build step required.
 - See each JS file for further documentation.
+- Make sure you run npm install before launching the server. Otherwise, errors will pop up.
 
 You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
 

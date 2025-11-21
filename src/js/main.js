@@ -228,6 +228,15 @@ function loop({
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
     pacer.setPosition(pacerPos);
+  } else if (peerState!=0&&connected&&pacer!=undefined) {
+    pacer.update(dt);
+
+    const riderSpeed = constants.riderState.speed;    
+    const pacerSpeed = pacer.speed;
+    const relativeSpeed = pacerSpeed - riderSpeed;
+    const pacerPos = pacer.avatarEntity.getAttribute("position");
+    pacerPos.z -= relativeSpeed * dt;
+    pacer.setPosition(pacerPos);
   }
 
 
@@ -319,7 +328,7 @@ function recieveData(data) {
       console.log("recieving player data");
       pacer = new AvatarMovement("pacer", {
         position: { x: 0.5, y: 1, z: 0 },
-        isPacer: true,
+        isPacer: false,
       });
       pacer.creator.loadOtherData(data.data);
       if (peerState==1) {
