@@ -365,6 +365,7 @@ export function initZlowApp({
   //for testing purposes
   window.testHud = hud;
   window.testStorage = workoutStorage;
+  window.testMilestones = milestoneTracker;
 
   //Pacer speed control input
   //Rider state and history

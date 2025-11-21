@@ -168,8 +168,8 @@ export class MilestoneTracker {
 
   checkCumulative(currentTimeSeconds) {
     if (this.cumulativeChecked) return null;
-    if (currentTimeSeconds < 2) return null; // for testing
-    //if (currentTimeSeconds < 600) return null; //ride has a min of 10 min
+    //if (currentTimeSeconds < 2) return null; // for testing
+    if (currentTimeSeconds < 600) return null; //ride has a min of 10 min
 
     this.cumulativeChecked = true;
 
