@@ -192,8 +192,8 @@ function loop({
   const riderSpeed = constants.riderState.speed || 0;
 
   rider.update(dt);
-
   if (constants.pacerStarted&&peerState==0) {
+    //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
     let pacerSpeed = pacer.speed || 0;
 
@@ -316,9 +316,10 @@ function recieveData(data) {
   //console.log(data);
   switch(data.name) {
     case "playerData":
+      console.log("recieving player data");
       pacer = new AvatarMovement("pacer", {
         position: { x: 0.5, y: 1, z: 0 },
-        isPacer: false,
+        isPacer: true,
       });
       pacer.creator.loadOtherData(data.data);
       if (peerState==1) {
@@ -327,6 +328,9 @@ function recieveData(data) {
       break;
     case "speed":
       //console.log("Set pacer speed to "+data.data);
+      if (pacer==null) {
+        return;
+      }
       activatePacer();
       pacer.setSpeed(Number(data.data));
       //console.log(pacer.speed);
