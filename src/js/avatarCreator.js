@@ -83,6 +83,15 @@ export class AvatarCreator {
         avatar.setAttribute('id', this.id);
         avatar.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
         avatar.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
+        
+        // Ensure curve has loaded before attempting to set curve-follow or you get a "cannot read tRange" error
+        //if (document.getElementById('curve')) {
+            setTimeout(() => {
+                avatar.setAttribute("curve-follow", 'curveData: #curve; type: parametric-curve; duration: 20; loop: false; enabled: false');
+            }, 1000);
+        //}
+        
+        
 
         //Create Person
         this.createPlayerModel(avatar);

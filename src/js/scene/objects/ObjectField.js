@@ -18,11 +18,16 @@ export class ObjectField {
     this.initialized = false;
     this.externalGroups = [];
     this.policy = policy;
+
+    // Get rider and pacer entities
+    this.rider = document.getElementById('rider');
+    this.pacer = document.getElementById('pacer');
+
+    
     
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
-
     this.path_element = document.getElementById('track');
 
     // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
@@ -36,10 +41,18 @@ export class ObjectField {
     this.spawnScenery(this.track.straightPiece(-180), -180);
     this.spawnScenery(this.track.straightPiece(-240), -240);
 
-    this.track.test(0,0);
+    //if (document.getElementById("curve")) {this.rider.setAttribute("curve-follow", 'curveData: #curve; type: parametric-curve; duration: 10; loop: false; enabled: false');}
+
+    // Add curve-follow capability
+    
+    //this.pacer.setAttribute("curve-follow", 'curveData: #curve; type: parametric-curve; duration: 10; loop: false; enabled: false');
+
+    //this.track.test(0,0);
+    //this.track.track_visualizer();
     // Test marking a specific location in-scene
     //this.track.test(0, -25);
-    this.test_thing = document.getElementById('test_thing');
+    //this.test_thing = document.getElementById('test_thing');
+    //this.visualizer = document.getElementById('visualizer');
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -78,31 +91,33 @@ export class ObjectField {
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
     if (!this.initialized || (riderSpeed, dt) === 0) return;
-
-    let dx = 0;
     let dz = 0;
-    let tempZ = 0;
 
     // Advance scenery on z axis unless on a curve
     if (this.path_element.children[1].getAttribute("configuration") == "straight_vertical" && this.path_element.children[1].getAttribute("position").z > -25 && constants.worldZ > 0) {
 
       // Turn off curve-follow if within 25 units of a straight piece
-       this.test_thing.setAttribute("curve-follow", "enabled", "false");
-       console.log(this.test_thing.getAttribute("curve-follow").enabled)
+       this.rider.setAttribute("curve-follow", "enabled", "false");
+       console.log(this.rider.getAttribute("curve-follow").enabled)
 
       dz = riderSpeed * dt;
     }
 
-    // CORRECTLY FIGURES OUT WHERE A CURVE STARTS AND STOPS -- NOTE YOU SAID WITHIN 25 SINCE IT SEEMS TO 
+    // Follow curve if beginning a curved element
     if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
       
       // Turn on curve-follow if within 25 units of a curved piece
-      this.test_thing.setAttribute("curve-follow", "enabled", "true");
+      this.rider.setAttribute("curve-follow", "enabled", "true");
+      console.log(this.rider.getAttribute("curve-follow").enabled)
 
-      console.log(this.test_thing.getAttribute("curve-follow").enabled)
+      //console.log("TIME: " + 220/riderSpeed)
 
-      // FOR SOME REASON ANY DZ THAT ISN'T RIDER SPEED * DT MESSES UP TRACK GENERATION?? -- Pulling the last element too fast
-     dz = (riderSpeed * dt)/2;
+      // CALCULATE WHAT CLIP YOU OUGHT TO GO AROUND THE CURVE BASED ON HOW LONG IT OUGHT TO TAKE TO FINISH
+      // FOR SOME REASON ANY DZ THAT ISN'T RIDER SPEED * DT MESSES UP TRACK GENERATION?? -- Pulling the last element too fast? Could be the test sphere.
+
+      //OK SO - THE CURVE IS 220 UNITS LONG. THEREFORE THE TIME NEEDED TO GET ALL THE WAY AROUND IS 220/RIDER SPEED AND DZ IS Z OF WHEREVER THE RIDER HAPPENS TO BE THEN
+
+     dz = 0;
     }
 
     // If something goes wrong, default to original dz
@@ -181,13 +196,25 @@ export class ObjectField {
     }
   }
 
+  // Advance track visualizer
+  //console.log("VISUALIZER" + this.visualizer)
+  //const pos = getPos(this.visualizer);
+    //pos.z += dz;
+    //setPos(this.visualizer, pos);
+
+
+  // END TRACK VISUALIZER
+
   // Spawn new track section if the farthest piece of track is under 240 units in front of worldZ
   if (constants.worldZ > constants.trackLastUpdate + 60) {
     constants.trackLastUpdate += 60;
-    // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
+    // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section if no longer visible
     const lastPiece = getPos(this.path_element.children[this.path_element.children.length-1]).z - 60
     this.spawnScenery(this.track.straightPiece(lastPiece), lastPiece);
-    this.path_element.removeChild(this.path_element.children[0]);
+
+    if (getPos(this.path_element.children[0]).z > 30) {
+      this.path_element.removeChild(this.path_element.children[0]);
+    }
   }
 
     // Advance clouds
