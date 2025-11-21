@@ -273,7 +273,7 @@ export function initZlowApp({
 
   // start notification manager and milestone tracker
   notificationManager = new NotificationManager();
-  milestoneTracker = new MilestoneTracker(workoutSession);
+  milestoneTracker = new MilestoneTracker(workoutSession, workoutStorage);
 
   const workoutSummary = new WorkoutSummary({
     workoutStorage,
@@ -364,6 +364,7 @@ export function initZlowApp({
 
   //for testing purposes
   window.testHud = hud;
+  window.testStorage = workoutStorage;
 
   //Pacer speed control input
   //Rider state and history
