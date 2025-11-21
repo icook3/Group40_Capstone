@@ -96,6 +96,9 @@ class Constants {
   pathPositionZ = 0;
   dirtColor = "#a0895a";
 
+  // Constants governing circular motion
+  curveRadius = 35;
+
   // Constants governing cloud speed
   lastCloud = Date.now();
   cloudSpeed = 0;

@@ -121,22 +121,15 @@ export function initSettings() {
     Strava.loadFromRedirect();
     strava.loadToken();
 
-    function connectStrava() {
-        const clientId = "INPUT CLIENT ID"; // TODO: replace clientId with Zlow's Strava App Registration
-        const backendCallback = "https://YOUR-BACKEND.com/oauth/callback"; // TODO: replace backendCallback with Zlow's backend callback
-
-        strava.startOAuth(clientId, backendCallback);
-    }
-
     const stravaBtn = document.getElementById("connect-strava-btn");
     if (stravaBtn) {
-        if (Strava.isConnected() && !strava.isTokenExpired()) {
+        if (Strava.isConnected()) {
             stravaBtn.textContent = "Strava Connected";
             stravaBtn.disabled = true;
         } else {
             stravaBtn.textContent = "Connect Strava";
             stravaBtn.disabled = true; // TODO: Set to false once Strava app is made
-            stravaBtn.addEventListener("click", connectStrava);
+            stravaBtn.addEventListener("click", strava.startOAuth);
         }
     }
 }
