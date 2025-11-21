@@ -40,6 +40,13 @@ export function initSettings() {
       localStorage.setItem("Name",peerNameInput.value);
   });
 
+  peerNameInput.addEventListener("change", () => {
+      const name = peerNameInput.value.trim();
+      if (name.length === 0) {
+          alert("Name cannot be empty");
+      }
+  });
+
   //Test Mode
   const testModeBtn = document.getElementById("testMode");
   testModeBtn.addEventListener("click", () => {

@@ -367,50 +367,61 @@ export function initZlowApp({
     peerState = 2;
     console.log("connecting to peer");
     peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
-    peer.on('open', function(id) {
+    peer.on('open', id => {
         conn = peer.connect(sessionStorage.getItem("peer"));
         console.log("ID="+id);
+
+        setTimeout(() => {
+            if (!connected) {
+                alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
+                try { conn.close(); } catch {}
+                peerState = 0;
+                window.location.href="mainMenu.html"
+            }
+        }, 1500);
+
         //console.log("Peer: "+peer);
-        conn.on('open', function() {
+        conn.on('open', () => {
           console.log("connected!");
           console.log(conn);
           connected = true;
           // initially send over JSON of character design
           // when you recieve data
-          conn.on('data', function(data) {
-            recieveData(data);
+          conn.on("data", data => {
+              if (data.name === "error") {
+                  connected = false;
+                  alert(data.data);
+                  conn.close();
+                  peerState = 0;
+                  return;
+              }
+
+              recieveData(data);
           });
           conn.send({name:"playerData", data:localStorage.getItem('playerData')});
         });
         conn.on('error', function(err) {
-          //console.log("ERROR:");
-          //console.log(err);
+            if (err.type === "peer-unavailable") {
+                alert("Could not connect — the host does not exist.");
+                peerState = 0;
+                return;
+            } else {
+                console.error("Connection Error:", err);
+            }
+
+            console.error("Connection Error:", err);
         });
     });
     peer.on('error', function(err) {
-      switch(err.type) {
-        case "browser-incompatible":
-          console.log("Peer-to-peer multiplayer is not compatible with this browser. Try updating your browser.");
-          break;
-        case "invalid-id":
-          window.location.href = "./mainMenu.html";
-          break;
-        case "network":
-          console.log("Cannot connect to server");
-          peerState = 0;
-          break;
-        case "peer-unavailable":
-          console.log("The given peer does not exist");
-          break;
-        case "server-error":
-          console.log("Cannot connect to server");
-          peerState = 0;
-          break;
-        default:
-          console.log("There have been some other errors");
-          console.log(err);
-      }
-    });    
+        // Server/connection issue
+        if (err.type === "network" || err.type === "server-error") {
+            console.log("Network/server error");
+            peerState = 0;
+            return;
+        }
+
+        console.error("PeerJS error:", err);
+    });
   }
   // You are hosting a session 
   else if (sessionStorage.getItem("peerToPeer")=='true') {
@@ -420,43 +431,65 @@ export function initZlowApp({
     peer.on('open', function(id) {
         console.log("ID="+id);        
     });
-    peer.on('connection', function(connection) {
-      conn = connection;
-      connected = true;
-      console.log("connected!");
-      console.log(conn);
-      // when recieve data
-      conn.on('data', function(data) {
-          recieveData(data);
-      });
-      conn.on('error', function(err) {
-        console.log("ERROR:");
-        console.log(err);
-      });
+    peer.on("connection", connection => {
+        if (connected) {
+            // reject second player
+            connection.send({
+                name: "error",
+                data: "This lobby is full."
+            });
+            connection.close()
+            return
+        }
+
+        conn = connection;
+        connected = true;
+
+        console.log("Peer JOINED lobby:", connection.peer);
+
+        // Immediately listen for messages
+        conn.on("data", data => recieveData(data));
+
+        // Send host's player data back
+        conn.send({
+            name: "playerData",
+            data: localStorage.getItem("playerData")
+        });
+
+        conn.on("error", err => {
+            console.error("Connection error:", err);
+        });
     });
     peer.on('error', function(err) {
-      switch(err.type) {
-        case "browser-incompatible":
-          console.log("Peer-to-peer multiplayer is not compatible with this browser. Try updating your browser.");
-          break;
-        case "invalid-id":
-          window.location.href = "./mainMenu.html";
-          break;
-        case "network":
-          console.log("Cannot connect to server");
-          peerState = 0;
-          break;
-        case "peer-unavailable":
-          console.log("The given peer does not exist");
-          break;
-        case "server-error":
-          console.log("Cannot connect to server");
-          peerState = 0;
-          break;
-        default:
-          console.log("There have been some other errors");
-          console.log(err);
-      }
+
+        if (err.type === "unavailable-id") {
+            alert("This name is already being used. Please choose a different one.");
+            peerState = 0;
+            window.location.href="mainMenu.html"
+            return;
+        }
+
+        if (err.type === "peer-unavailable") {
+            console.log("Peer unavailable.");
+            return;
+        }
+
+        if (err.type === "network" || err.type === "server-error") {
+            console.log("Network/server error");
+            peerState = 0;
+            return;
+        }
+
+        switch (err.type) {
+            case "browser-incompatible":
+                console.log("PeerJS not supported by this browser.");
+                break;
+            case "invalid-id":
+                window.location.href = "./mainMenu.html";
+                break;
+        }
+
+        console.error("PeerJS error:", err);
     });
   }
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
