@@ -100,6 +100,8 @@ export class WorkoutSummary {
           return `${Math.round(displayValue)} W`;
         } else if (recordKey === "mostCalories") {
           return `${Math.round(displayValue)} kcal`;
+        } else if (recordKey === "highestFtp") {
+          return `${Math.round(displayValue)} W`;
         }
         return `${displayValue}${unit}`;
       }
@@ -209,6 +211,38 @@ export class WorkoutSummary {
                   " W"
                 )}</td>
               </tr>
+
+              ${
+                stats.ftp != null
+                  ? `
+                <tr class="${recordKeys.highestFtp ? "record-row" : ""}">
+                  <td>FTP (estimate)</td>
+                  <td>${Math.round(stats.ftp)} W</td>
+                  <td class="record-cell">${getRecordDisplay(
+                    "highestFtp",
+                    Math.round(stats.ftp),
+                    " W"
+                  )}</td>
+                </tr>
+                ${
+                  stats.peakMinutePower
+                    ? `
+                <tr class="${recordKeys.highestPeakMinutePower ? "record-row" : ""}">
+                  <td>Best 1-min Power</td>
+                  <td>${Math.round(stats.peakMinutePower)} W</td>
+                  <td class="record-cell">${getRecordDisplay(
+                    "highestPeakMinutePower",
+                    Math.round(stats.peakMinutePower),
+                    " W"
+                  )}</td>
+                </tr>
+                `
+                    : ""
+                }
+              `
+                  : ""
+              }
+              
             </tbody>
           </table>
         </div>

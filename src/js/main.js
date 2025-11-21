@@ -11,6 +11,7 @@ import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
+import { RampTestController } from "./workouts/RampTestController.js";
 
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
@@ -119,6 +120,7 @@ let pacer;
 // workout session
 let workoutStorage;
 let workoutSession;
+let rampController = null
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -168,6 +170,10 @@ function loop({
 
   //update workout session with current values
   if (workoutSession.isWorkoutActive()) {
+    if (rampController) {
+      // Update FTP result if available
+      workoutSession.addFTPResult(rampController.ftpResult);
+    }
     workoutSession.update({
       speed: constants.riderState.speed || 0,
       power: constants.riderState.power || 0,
@@ -179,17 +185,60 @@ function loop({
   //Update Avatar and Pacer
   rider.setSpeed(constants.riderState.speed);
   rider.setPower(constants.riderState.power);
+
+  // Cache rider speed (in km/h, same units as calculateAccelerationSpeed)
+  const riderSpeed = constants.riderState.speed || 0;
+
   rider.update(dt);
+
   if (constants.pacerStarted) {
+    // Start from whatever speed the pacer currently has
+    let pacerSpeed = pacer.speed || 0;
+
+    if (rampController) {
+      // RampTestController is active (Ramp Test workout)
+      const targetWatts = rampController.getCurrentTargetWatts();
+
+      if (targetWatts == null) {
+        // Warmup or finished:
+        // Pacer exactly matches the rider so it stays beside you.
+        pacerSpeed = riderSpeed;
+      } else {
+        // Active ramp step:
+        // Pacer behaves like an ideal rider holding target watts,
+        // using the same physics as the real rider for smooth changes.
+        pacerSpeed = calculateAccelerationSpeed(
+          pacerSpeed,
+          targetWatts,
+          dt
+        );
+      }
+    }
+    // If rampController is null (free ride, other workouts),
+    // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
+
+    // Apply the computed speed to the pacer avatar
+    pacer.setSpeed(pacerSpeed);
     pacer.update(dt);
-    //Update pacer position
-    const riderSpeed = constants.riderState.speed;
-    const pacerSpeed = pacer.speed;
+
+    // Update pacer position relative to the rider based on speed difference
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
     pacer.setPosition(pacerPos);
   }
+
+
+  // Let the ramp controller advance its state
+  if (rampController) {
+    const power = constants.riderState.power || 0;
+    rampController.update(now, power);
+
+    const target = rampController.getCurrentTargetWatts();
+    constants.riderState.targetWatts = target || 0;
+  }
+
+
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {
     localStorage.setItem("testMode", false);
@@ -341,7 +390,56 @@ export function initZlowApp({
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
+
+  // Map workout keys to user-facing labels
+  const workoutLabels = {
+    free: "Free Ride",
+    ramp: "Ramp Test",
+    sprint: "Sprint Intervals",
+  };
+
+  const workoutName =
+    workoutLabels[selectedWorkout] || "Free Ride";
+
+  // Set up ramp test controller if applicable
+  if (selectedWorkout === "ramp") {
+    const now = Date.now();
+    rampController = new RampTestController({
+      hud,
+      nowMs: now,
+      warmupSeconds: 5 * 60, // 5-minute warmup
+      startWatts: 100,
+      stepWatts: 20,
+      stepSeconds: 60,
+      ftpFactor: 0.75,
+    });
+  } else {
+    rampController = null;
+  }  
+
+  hud.showStartCountdown({
+    workoutName,
+    seconds: 5,
+    onDone: () => {
+      // After 5s, unpause the sim
+      simulationState.isPaused = false;
+
+      // If ramp, begin warmup countdown (no pause)
+      if (selectedWorkout === "ramp") {
+        // tell HUD to show 5-minute warmup timer
+        hud.showWarmupCountdown({
+          seconds: 5 * 60,
+          onDone: () => {
+            // Warmup over → tell RampTestController to start ramps
+            rampController?.startRamp?.();
+          },
+        });
+      }
+    },
+  });
+
   const strava = new Strava();
+
 
   //Pacer speed control input
   //Rider state and history
@@ -472,6 +570,21 @@ export function initZlowApp({
       () => {
         // End the session and get final stats
         const finalStats = workoutSession.end();
+
+      // After you compute finalStats from workoutSession / history, etc.
+      if (selectedWorkout === "ramp" && rampController) {
+        const result = rampController.computeFtpFromHistory(constants.rideHistory);
+        if (result) {
+          // Flatten FTP numbers into stats for summary + records
+          finalStats.ftp = Math.round(result.ftp);
+          finalStats.peakMinutePower = Math.round(result.peakMinute);
+
+          hud.showWorkoutMessage({
+            text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
+            seconds: 8,
+          });
+        }
+      }
 
         // Save workout and check for records
         const { newRecords, streak } = workoutStorage.saveWorkout(finalStats);

@@ -47,6 +47,8 @@ export class WorkoutStorage {
         highestAvgPower: null,
         highestMaxSpeed: null,
         highestMaxPower: null,
+        highestFtp: null,
+        highestPeakMinutePower: null,
       },
       lastWorkoutDate: null,
       currentStreak: 0,
@@ -158,6 +160,16 @@ export class WorkoutStorage {
         key: "highestMaxPower",
         value: stats.maxPower,
         label: "Highest Max Power",
+      },
+      {
+        key: "highestFtp",
+        value: stats.ftp,
+        label: "Highest FTP",
+      },
+      {
+        key: "highestPeakMinutePower",
+        value: stats.peakMinutePower,
+        label: "Highest 1-min Power",
       },
     ];
 
