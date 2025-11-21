@@ -389,6 +389,29 @@ export class AvatarCreator {
         this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
     }
 
+    loadOtherData(json) {
+        const data = JSON.parse(json);
+        if (!data) {
+            return;
+        }
+
+        this.playerModel = data.model || this.playerModel;
+
+        const player = data.colors || {};
+        this.skinColor = player.skin || this.skinColor;
+        this.shirtColor = player.shirt || this.shirtColor;
+        this.shortsColor = player.shorts || this.shortsColor;
+        this.shoesColor = player.shoes || this.shoesColor;
+
+        const bike = data.bikeColors || {};
+        this.bikeFrameColor = bike.frame || this.bikeFrameColor;
+        this.bikeTireColor = bike.tires || this.bikeTireColor;
+        this.bikeGripColor = bike.grip || this.bikeGripColor;
+        this.bikeSeatColor = bike.seat || this.bikeSeatColor;
+        this.bikePedalColor = bike.pedals || this.bikePedalColor;
+        this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
+    }
+
     setPacerColors() {
         this.skinColor   = "#c1591a";
         this.shirtColor  = "#a32c06";
