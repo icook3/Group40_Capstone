@@ -185,17 +185,49 @@ function loop({
   //Update Avatar and Pacer
   rider.setSpeed(constants.riderState.speed);
   rider.setPower(constants.riderState.power);
+
+  // Cache rider speed (in km/h, same units as calculateAccelerationSpeed)
+  const riderSpeed = constants.riderState.speed || 0;
+
   rider.update(dt);
+
   if (constants.pacerStarted) {
+    // Start from whatever speed the pacer currently has
+    let pacerSpeed = pacer.speed || 0;
+
+    if (rampController) {
+      // RampTestController is active (Ramp Test workout)
+      const targetWatts = rampController.getCurrentTargetWatts();
+
+      if (targetWatts == null) {
+        // Warmup or finished:
+        // Pacer exactly matches the rider so it stays beside you.
+        pacerSpeed = riderSpeed;
+      } else {
+        // Active ramp step:
+        // Pacer behaves like an ideal rider holding target watts,
+        // using the same physics as the real rider for smooth changes.
+        pacerSpeed = calculateAccelerationSpeed(
+          pacerSpeed,
+          targetWatts,
+          dt
+        );
+      }
+    }
+    // If rampController is null (free ride, other workouts),
+    // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
+
+    // Apply the computed speed to the pacer avatar
+    pacer.setSpeed(pacerSpeed);
     pacer.update(dt);
-    //Update pacer position
-    const riderSpeed = constants.riderState.speed;
-    const pacerSpeed = pacer.speed;
+
+    // Update pacer position relative to the rider based on speed difference
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
     pacer.setPosition(pacerPos);
   }
+
 
   // Let the ramp controller advance its state
   if (rampController) {
