@@ -184,7 +184,7 @@ function loop({
     //if there is a milestone show it
     const milestone = milestoneTracker.check();
     if (milestone) {
-      notificationManager.show(milestone.message);
+      notificationManager.show(milestone.message, milestone.isSpecial);
     }
   }
 

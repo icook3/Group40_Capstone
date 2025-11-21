@@ -423,3 +423,32 @@
 .milestone-toast.visible {
   opacity: 1;
 }
+/* reserved style for special/major milestones */
+/* simulates holographic effect */
+.milestone-toast.special {
+  background: linear-gradient(
+    135deg,
+    rgb(237, 232, 207) 0%,
+    #fee6ca 25%,
+    #ffb3ba 50%,
+    #bae1d3 75%,
+    #87d8e1 100%
+  );
+  background-size: 200% 200%;
+  animation: rainbow-shift 3s ease infinite;
+  font-size: 24px;
+  padding: 24px 36px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+}
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

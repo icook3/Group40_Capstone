@@ -18,9 +18,10 @@ export class NotificationManager {
     return container;
   }
 
-  show(message) {
-    // add notification to queue
-    this.queue.push(message);
+  show(message, isSpecial = false) {
+    // add notification and isSpecial status to queue
+    // isSpecial is used for special notifications such as 100km/mi
+    this.queue.push({ message, isSpecial });
 
     // start processing queue
     if (!this.isProcessing) {
@@ -38,11 +39,17 @@ export class NotificationManager {
     this.isProcessing = true;
 
     // get next message/notification
-    const message = this.queue.shift();
+    const notification = this.queue.shift();
 
     const toast = document.createElement("div");
     toast.className = "milestone-toast";
-    toast.textContent = message;
+
+    //add 'special' class if it is a major milestone
+    if (notification.isSpecial) {
+      toast.classList.add("special");
+    }
+
+    toast.textContent = notification.message;
 
     this.container.appendChild(toast);
     this.currentToast = toast;
@@ -55,8 +62,6 @@ export class NotificationManager {
     setTimeout(() => {
       this.dismiss(toast);
     }, 6000);
-
-    console.log("Toast created:", message);
   }
 
   dismiss(toast) {
