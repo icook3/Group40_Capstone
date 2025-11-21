@@ -24,6 +24,23 @@ export class NotificationManager {
     // Add it to the container
     this.container.appendChild(toast);
 
-    console.log("Toast created:", message);
+    // Starts animation to show notification
+    setTimeout(() => {
+      toast.classList.add("visible");
+    }, 10);
+
+    // goes away after given time (currently 6 seconds)
+    setTimeout(() => {
+      this.dismiss(toast);
+    }, 6000);
+  }
+
+  dismiss(toast) {
+    toast.classList.remove("visible");
+
+    // removes DOM after notification disapears
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
   }
 }
