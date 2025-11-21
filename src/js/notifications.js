@@ -1,6 +1,9 @@
 export class NotificationManager {
   constructor() {
     this.container = this.createContainer();
+    this.currentToast = null;
+    this.queue = []; // to queue notifications
+    this.isProcessing = false;
   }
 
   createContainer() {
@@ -16,31 +19,55 @@ export class NotificationManager {
   }
 
   show(message) {
-    // Create a div with a message
+    // add notification to queue
+    this.queue.push(message);
+
+    // start processing queue
+    if (!this.isProcessing) {
+      this.processQueue();
+    }
+  }
+
+  processQueue() {
+    // once queue is empty, stop processing
+    if (this.queue.length === 0) {
+      this.isProcessing = false;
+      return;
+    }
+
+    this.isProcessing = true;
+
+    // get next message/notification
+    const message = this.queue.shift();
+
     const toast = document.createElement("div");
     toast.className = "milestone-toast";
     toast.textContent = message;
 
-    // Add it to the container
     this.container.appendChild(toast);
+    this.currentToast = toast;
 
-    // Starts animation to show notification
+    // animation
     setTimeout(() => {
       toast.classList.add("visible");
     }, 10);
 
-    // goes away after given time (currently 6 seconds)
     setTimeout(() => {
       this.dismiss(toast);
     }, 6000);
+
+    console.log("Toast created:", message);
   }
 
   dismiss(toast) {
     toast.classList.remove("visible");
 
-    // removes DOM after notification disapears
     setTimeout(() => {
       toast.remove();
+      this.currentToast = null;
+
+      // process the next in queue
+      this.processQueue();
     }, 300);
   }
 }

@@ -15,6 +15,9 @@ import { units } from "./units/index.js";
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
+import { MilestoneTracker } from "./milestones.js";
+import { NotificationManager } from "./notifications.js";
+
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -119,6 +122,9 @@ let pacer;
 // workout session
 let workoutStorage;
 let workoutSession;
+// milestones
+let notificationManager;
+let milestoneTracker;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -174,6 +180,12 @@ function loop({
       distance: hud.totalDistance,
       calories: constants.riderState.calories || 0,
     });
+
+    //if there is a milestone show it
+    const milestone = milestoneTracker.check();
+    if (milestone) {
+      notificationManager.show(milestone.message);
+    }
   }
 
   //Update Avatar and Pacer
@@ -257,6 +269,10 @@ export function initZlowApp({
   workoutStorage = new WorkoutStorage();
   workoutSession = new WorkoutSession();
 
+  // start notification manager and milestone tracker
+  notificationManager = new NotificationManager();
+  milestoneTracker = new MilestoneTracker(workoutSession);
+
   const workoutSummary = new WorkoutSummary({
     workoutStorage,
     onClose: () => {
@@ -265,6 +281,7 @@ export function initZlowApp({
   });
 
   workoutSession.start();
+  milestoneTracker.reset();
 
   // get the needed objects
   if (localStorage.getItem("testMode") !== "true") {
@@ -342,6 +359,9 @@ export function initZlowApp({
 
   hud = new HUD({ getElement });
   const strava = new Strava();
+
+  //for testing purposes
+  window.testHud = hud;
 
   //Pacer speed control input
   //Rider state and history
@@ -496,6 +516,7 @@ export function initZlowApp({
 
         // Start a new session for next workout
         workoutSession.start();
+        milestoneTracker.reset();
       },
       // On Cancel
       () => {
@@ -633,105 +654,111 @@ darkMode.addEventListener("change", updateFavicon);
 
 // Gets workout summary
 export function getWorkoutSummary() {
-    const history = constants.rideHistory;
-    if (!history || history.length < 2) return null;
+  const history = constants.rideHistory;
+  if (!history || history.length < 2) return null;
 
-    const startTime = history[0].time;
-    const endTime = history[history.length - 1].time;
+  const startTime = history[0].time;
+  const endTime = history[history.length - 1].time;
 
-    const duration = Math.floor((endTime - startTime) / 1000);
-    const distanceKm = history[history.length - 1].distance;
-    const avgPower = history.reduce((sum, p) => sum + p.power, 0) / history.length;
+  const duration = Math.floor((endTime - startTime) / 1000);
+  const distanceKm = history[history.length - 1].distance;
+  const avgPower =
+    history.reduce((sum, p) => sum + p.power, 0) / history.length;
 
-    return {
-        name: "Zlow Ride",
-        description: "Workout synced from Zlow Cycling",
-        distance: distanceKm,     // km to m Strava converter happens inside upload
-        duration: duration,
-        avgPower: Math.round(avgPower),
-    };
+  return {
+    name: "Zlow Ride",
+    description: "Workout synced from Zlow Cycling",
+    distance: distanceKm, // km to m Strava converter happens inside upload
+    duration: duration,
+    avgPower: Math.round(avgPower),
+  };
 }
 
 // Disable exporting if Strava is not connected
 function updateStravaButtonState() {
-    const btn = document.getElementById("summary-export-strava");
-    if (!btn) return;
-    btn.disabled = !Strava.isConnected();
+  const btn = document.getElementById("summary-export-strava");
+  if (!btn) return;
+  btn.disabled = !Strava.isConnected();
 }
 
 updateStravaButtonState();
 setInterval(updateStravaButtonState, 2000);
 
 export async function exportToStrava() {
-    const strava = new Strava();
+  const strava = new Strava();
 
-    if (!Strava.isConnected()) {
-        alert("You must connect to Strava first (from main menu).");
-        return;
-    }
+  if (!Strava.isConnected()) {
+    alert("You must connect to Strava first (from main menu).");
+    return;
+  }
 
-    const workout = getWorkoutSummary();
-    if (!workout) {
-        alert("No workout data yet. Ride first!");
-        return;
-    }
+  const workout = getWorkoutSummary();
+  if (!workout) {
+    alert("No workout data yet. Ride first!");
+    return;
+  }
 
-    await strava.uploadActivity(workout);
+  await strava.uploadActivity(workout);
 }
 
 // Generates TCX file based old saveTCX
 export function generateTCXFile() {
-    if (constants.rideHistory.length < 2) {
-        return null;
-    }
+  if (constants.rideHistory.length < 2) {
+    return null;
+  }
 
-    const startTime = new Date(constants.rideHistory[0].time);
-    let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
-    tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor(
-        (constants.rideHistory.at(-1).time -
-            constants.rideHistory[0].time) / 1000
-    )}</TotalTimeSeconds>\n        <DistanceMeters>${(
-        constants.rideHistory.at(-1).distance * 1000
-    ).toFixed(1)}</DistanceMeters>\n        <Intensity>Active</Intensity>\n        <TriggerMethod>Manual</TriggerMethod>\n        <Track>\n`;
+  const startTime = new Date(constants.rideHistory[0].time);
+  let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
+  tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor(
+    (constants.rideHistory.at(-1).time - constants.rideHistory[0].time) / 1000
+  )}</TotalTimeSeconds>\n        <DistanceMeters>${(
+    constants.rideHistory.at(-1).distance * 1000
+  ).toFixed(
+    1
+  )}</DistanceMeters>\n        <Intensity>Active</Intensity>\n        <TriggerMethod>Manual</TriggerMethod>\n        <Track>\n`;
 
-    for (let pt of constants.rideHistory) {
-        tcx += `          <Trackpoint>\n`;
-        tcx += `            <Time>${new Date(pt.time).toISOString()}</Time>\n`;
-        tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
-        tcx += `            <DistanceMeters>${(pt.distance * 1000).toFixed(1)}</DistanceMeters>\n`;
-        tcx += `            <Extensions>\n`;
-        tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
-        tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
-        tcx += `                <ns3:Speed>${constants.kmhToMs(pt.speed).toFixed(3)}</ns3:Speed>\n`;
-        tcx += `              </ns3:TPX>\n`;
-        tcx += `            </Extensions>\n`;
-        tcx += `          </Trackpoint>\n`;
-    }
+  for (let pt of constants.rideHistory) {
+    tcx += `          <Trackpoint>\n`;
+    tcx += `            <Time>${new Date(pt.time).toISOString()}</Time>\n`;
+    tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
+    tcx += `            <DistanceMeters>${(pt.distance * 1000).toFixed(
+      1
+    )}</DistanceMeters>\n`;
+    tcx += `            <Extensions>\n`;
+    tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
+    tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
+    tcx += `                <ns3:Speed>${constants
+      .kmhToMs(pt.speed)
+      .toFixed(3)}</ns3:Speed>\n`;
+    tcx += `              </ns3:TPX>\n`;
+    tcx += `            </Extensions>\n`;
+    tcx += `          </Trackpoint>\n`;
+  }
 
-    tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
+  tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
 
-    return new Blob([tcx], { type: "application/vnd.garmin.tcx+xml" });
+  return new Blob([tcx], { type: "application/vnd.garmin.tcx+xml" });
 }
 
 /**
  * Save a TCX file
  */
 function saveTCX() {
-    const tcxBlob = generateTCXFile();
-    if (!tcxBlob) {
-        alert("Not enough data to export.");
-        return;
-    }
+  const tcxBlob = generateTCXFile();
+  if (!tcxBlob) {
+    alert("Not enough data to export.");
+    return;
+  }
 
-    const url = URL.createObjectURL(tcxBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "zlow-ride.tcx";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const url = URL.createObjectURL(tcxBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "zlow-ride.tcx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 
   constants.rideHistory = [];
   constants.historyStartTime = Date.now();

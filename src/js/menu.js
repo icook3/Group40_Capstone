@@ -1,6 +1,6 @@
 ﻿import { StandardMode } from "./standardMode.js";
 import { constants } from "./constants.js";
-import {Strava} from "./strava.js";
+import { Strava } from "./strava.js";
 
 export function initSettings() {
   let standardMode = new StandardMode();
@@ -59,24 +59,24 @@ export function initSettings() {
   // speed
   const speedUnitInput = document.getElementById("unitInputSpeed");
   if (speedUnitInput) {
-      speedUnitInput.addEventListener("input", () => {
-          sessionStorage.setItem("SpeedUnit", speedUnitInput.value);
-          let elements = document.getElementsByClassName("speedUnit");
-          for (let i = 0; i < elements.length; i++) {
-              elements.item(i).innerHTML = speedUnitInput.value;
-          }
-      });
+    speedUnitInput.addEventListener("input", () => {
+      sessionStorage.setItem("SpeedUnit", speedUnitInput.value);
+      let elements = document.getElementsByClassName("speedUnit");
+      for (let i = 0; i < elements.length; i++) {
+        elements.item(i).innerHTML = speedUnitInput.value;
+      }
+    });
   }
   // weight
   const weightUnitInput = document.getElementById("unitInputWeight");
   if (weightUnitInput) {
-      weightUnitInput.addEventListener("input", () => {
-          sessionStorage.setItem("WeightUnit", weightUnitInput.value);
-          let elements = document.getElementsByClassName("weightUnit");
-          for (let i = 0; i < elements.length; i++) {
-              elements.item(i).innerHTML = weightUnitInput.value;
-          }
-      });
+    weightUnitInput.addEventListener("input", () => {
+      sessionStorage.setItem("WeightUnit", weightUnitInput.value);
+      let elements = document.getElementsByClassName("weightUnit");
+      for (let i = 0; i < elements.length; i++) {
+        elements.item(i).innerHTML = weightUnitInput.value;
+      }
+    });
   }
   // power
   //uncomment the following code if alternate units for power are implemented
@@ -89,25 +89,23 @@ export function initSettings() {
   }
   */
 
+  const strava = new Strava();
+  Strava.loadFromRedirect();
+  strava.loadToken();
 
-
-    const strava = new Strava();
-    Strava.loadFromRedirect();
-    strava.loadToken();
-
-    const stravaBtn = document.getElementById("connect-strava-btn");
-    if (stravaBtn) {
-        if (Strava.isConnected()) {
-            stravaBtn.textContent = "Strava Connected";
-            stravaBtn.disabled = true;
-        } else {
-            stravaBtn.textContent = "Connect Strava";
-            stravaBtn.disabled = true; // TODO: Set to false once Strava app is made
-            stravaBtn.addEventListener("click", strava.startOAuth);
-        }
+  const stravaBtn = document.getElementById("connect-strava-btn");
+  if (stravaBtn) {
+    if (Strava.isConnected()) {
+      stravaBtn.textContent = "Strava Connected";
+      stravaBtn.disabled = true;
+    } else {
+      stravaBtn.textContent = "Connect Strava";
+      stravaBtn.disabled = true; // TODO: Set to false once Strava app is made
+      stravaBtn.addEventListener("click", strava.startOAuth);
     }
+  }
 }
 
 if (typeof window !== "undefined") {
-    window.initSettings = initSettings;
+  window.initSettings = initSettings;
 }
