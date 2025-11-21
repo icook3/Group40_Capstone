@@ -87,7 +87,7 @@ export class AvatarCreator {
         // Ensure curve has loaded before attempting to set curve-follow or you get a "cannot read tRange" error
         //if (document.getElementById('curve')) {
             setTimeout(() => {
-                avatar.setAttribute("curve-follow", 'curveData: #curve; type: parametric-curve; duration: 20; loop: false; enabled: false');
+                avatar.setAttribute("curve-follow", 'curveData: #curve; type: parametric-curve; duration: 10; loop: false; enabled: false');
             }, 1000);
         //}
         

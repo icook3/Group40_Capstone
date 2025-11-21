@@ -18,6 +18,7 @@ export class ObjectField {
     this.initialized = false;
     this.externalGroups = [];
     this.policy = policy;
+    this.riderLastUpdate = 0;
 
     // Get rider and pacer entities
     this.rider = document.getElementById('rider');
@@ -98,28 +99,42 @@ export class ObjectField {
 
       // Turn off curve-follow if within 25 units of a straight piece
        this.rider.setAttribute("curve-follow", "enabled", "false");
-       console.log(this.rider.getAttribute("curve-follow").enabled)
+       //console.log(this.rider.getAttribute("curve-follow").enabled)
+
 
       dz = riderSpeed * dt;
     }
 
     // Follow curve if beginning a curved element
-    if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
+    // ISSUES: Does not allow starting and stopping on curves
+    if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -30) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
       
       // Turn on curve-follow if within 25 units of a curved piece
       this.rider.setAttribute("curve-follow", "enabled", "true");
-      console.log(this.rider.getAttribute("curve-follow").enabled)
+      //console.log(this.rider.getAttribute("curve-follow").enabled)
 
-      //console.log("TIME: " + 220/riderSpeed)
+      // Calculate how long it should take the rider to go around the curve
+      let speed = 220/riderSpeed;
+      this.rider.setAttribute("curve-follow", "duration", `${speed}`);
+      this.riderLastUpdate += getPos(this.rider).z;
+      //console.log(this.rider.getAttribute("curve-follow").duration)
+      //console.log("SPEED " + speed)
+      //console.log("Z " + this.riderLastUpdate)
+      //console.log("POSITION " + getPos(this.rider).z);
 
-      // CALCULATE WHAT CLIP YOU OUGHT TO GO AROUND THE CURVE BASED ON HOW LONG IT OUGHT TO TAKE TO FINISH
-      // FOR SOME REASON ANY DZ THAT ISN'T RIDER SPEED * DT MESSES UP TRACK GENERATION?? -- Pulling the last element too fast? Could be the test sphere.
+      // Figure out how far the rider went already
+      // EQUATION IS AROUND HERE SOMEWHERE
 
-      //OK SO - THE CURVE IS 220 UNITS LONG. THEREFORE THE TIME NEEDED TO GET ALL THE WAY AROUND IS 220/RIDER SPEED AND DZ IS Z OF WHEREVER THE RIDER HAPPENS TO BE THEN
+     
+      //CONCEPT - HOWEVER FAST THE SCENERY IS MOVING FORWARD, THE RIDER SHOULD MOVE BACKWARD BY THE SAME AMOUNT IN ORDER TO STAY EVEN WITH THE PIECE
+      // MAYBE USE CONSTANTS AGAIN?
+      dz = 0;
 
-     dz = 0;
+      //setPos(this.rider, -dz);
+
+      // Move the rider back by -dz to compensate for scenery movement
+
     }
-
     // If something goes wrong, default to original dz
     else {
       dz = riderSpeed * dt;
@@ -195,15 +210,6 @@ export class ObjectField {
       segment.setAttribute('rotation', '-90 0 0');
     }
   }
-
-  // Advance track visualizer
-  //console.log("VISUALIZER" + this.visualizer)
-  //const pos = getPos(this.visualizer);
-    //pos.z += dz;
-    //setPos(this.visualizer, pos);
-
-
-  // END TRACK VISUALIZER
 
   // Spawn new track section if the farthest piece of track is under 240 units in front of worldZ
   if (constants.worldZ > constants.trackLastUpdate + 60) {

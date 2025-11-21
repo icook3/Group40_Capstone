@@ -14,12 +14,6 @@ export class Track {
     path_element.setAttribute('id','track');
     this.path_element = path_element;
     sceneEl.appendChild(path_element);
-
-    // Get rider and pacer entities
-    this.rider = document.getElementById('rider');
-    this.pacer = document.getElementById('pacer');
-    console.log(this.rider)
-    
   }
 
   // Create and append track straight track piece
@@ -42,21 +36,10 @@ export class Track {
     track.setAttribute('configuration', `curve_right_180`);
     track.setAttribute('position', `-3.5 ${constants.pathHeight} ${spawnZ}`);
     track.setAttribute('rotation', '-90 0 0');
-    
-    
-
-    //3.14159, 6.283 -> top half
-    //1.57, 0 -> bottom right
-    // 4.71, 1.57 -> left side
-    // 0 seems to be at the right-hand side, so you need pi/2 through 3pi/2
 
     // Curvature basically works, but the path gets weird depending on what speed you go through at.
-    track.setAttribute('parametric-curve', `xyzFunctions: -25*cos(t), 2, -25*sin(t)-15; tRange: 4.6, 1.4;`);
+    track.setAttribute('parametric-curve', `xyzFunctions: -20*cos(t), 2, -20*sin(t)-20; tRange: 4.7, 1.5;`);
     this.path_element.appendChild(track);
-
-
-    
-    
     return track.getAttribute("configuration");
   }
 
@@ -64,11 +47,8 @@ export class Track {
     const test = document.createElement('a-entity');
     test.setAttribute('id', 'test_thing');
     test.setAttribute('geometry',`primitive: sphere; radius: 2`);
-    // TRUE/FALSE SHOULD BE DONE IN THE FOLLOWING ENTITY
     test.setAttribute("curve-follow", 'curveData: #curve; type: parametric-curve; duration: 10; loop: false; enabled: false');
-
     this.sceneEl.appendChild(test);
-
   }
 
   track_visualizer() {
