@@ -22,6 +22,7 @@
     const labelFor = (id) =>
       id === "ramp"  ? "Start (Ramp Test)" :
       id === "sprint" ? "Start (Sprint Intervals)" :
+      id === "peerServer" ? "Connect to peer":
                        "Start (Free Ride)";
 
     // Default to "free" and restore prior choice if present
@@ -175,7 +176,11 @@
       const ps = document.getElementById("pacer-speed");
       if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
       // Navigate into your app (same as your current file)
-      window.location.href = "../html/zlow.html";
+      if (sessionStorage.getItem("SelectedWorkout")==='peerServer') {
+          window.location.href = "../html/connectToPeers.html";
+      } else {
+          window.location.href = "../html/zlow.html";
+      }
     });
 
     // Keep menu positioned if viewport changes while open
