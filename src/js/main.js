@@ -340,6 +340,17 @@ export function initZlowApp({
     isPacer: true,
   });
   pacer.creator.setPacerColors();
+  // Remember the initial offset between rider and pacer, so we can restore
+  // a similar offset later when Sync is pressed.
+  const riderStartPos = rider.avatarEntity.getAttribute("position");
+  const pacerStartPos = pacer.avatarEntity.getAttribute("position");
+
+  const pacerOffset = {
+    x: pacerStartPos.x - riderStartPos.x,
+    y: pacerStartPos.y - riderStartPos.y,
+    z: pacerStartPos.z - riderStartPos.z,
+  };
+
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
 
@@ -671,14 +682,25 @@ export function initZlowApp({
 
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {
-    //Set pacer's z to rider's z
-    if (scene && rider && pacer) {
-      const riderSyncPos = rider.avatarEntity.getAttribute("position");
-      const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
-      pacerSyncPos.z = riderSyncPos.z;
-      pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+    if (!scene || !rider || !pacer) return;
+
+    // Current rider position
+    const riderSyncPos = rider.avatarEntity.getAttribute("position");
+    const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
+    pacerSyncPos.z = riderSyncPos.z;
+    pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+
+    // 2) For Ramp Test only, also match pacer speed to rider speed
+    //    at this instant so they're truly synced in motion.
+    if (rampController) {
+      const riderSpeedNow = constants.riderState.speed || 0;
+      pacer.setSpeed(riderSpeedNow);
     }
+    // For non-ramp workouts, we leave pacer speed alone to preserve
+    // the existing behavior (fixed/test-mode pacer).
   });
+
+
 
   // Calorie reset button
   const caloriesResetBtn = getElement("calories-reset-btn");
