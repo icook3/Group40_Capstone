@@ -121,6 +121,8 @@ let pacer;
 let workoutStorage;
 let workoutSession;
 let rampController = null
+let peer;
+let conn;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -190,8 +192,8 @@ function loop({
   const riderSpeed = constants.riderState.speed || 0;
 
   rider.update(dt);
-
-  if (constants.pacerStarted) {
+  if (constants.pacerStarted&&peerState==0) {
+    //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
     let pacerSpeed = pacer.speed || 0;
 
@@ -222,6 +224,15 @@ function loop({
     pacer.update(dt);
 
     // Update pacer position relative to the rider based on speed difference
+    const relativeSpeed = pacerSpeed - riderSpeed;
+    const pacerPos = pacer.avatarEntity.getAttribute("position");
+    pacerPos.z -= relativeSpeed * dt;
+    pacer.setPosition(pacerPos);
+  } else if (peerState!=0&&connected&&pacer!=undefined) {
+    pacer.update(dt);
+
+    const riderSpeed = constants.riderState.speed;    
+    const pacerSpeed = pacer.speed;
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
@@ -269,10 +280,12 @@ function loop({
     });
     constants.lastHistorySecond = thisSecond;
   }
+  sendPeerDataOver(constants.riderState.speed);
   requestAnimationFrameFn(loop);
 }
 
 export function activatePacer() {
+  //if (peerState!=0) {return;}
   if (!constants.pacerStarted) {
     //scene.activatePacer();
     constants.pacerStarted = true;
@@ -287,11 +300,198 @@ function setUnits(storageVal, className) {
     elements.item(i).innerHTML = storageVal;
   }
 }
+
+function setPacerSpeed(speed) {
+  if (peerState==0) {
+    pacer.setSpeed(speed);
+  }
+}
+
+//0: not in peer-peer mode
+//1: host
+//2: peer
+let peerState=0;
+let connected = false;
+//used for frequent updates in update method
+function sendPeerDataOver(speed) {
+  //console.log("sending data: "+connected);
+  if (connected&&conn.open) {
+    conn.send({name:"speed",data:speed})
+  }
+}
+
+function recieveData(data) {
+  //console.log("Recieving data");
+  //console.log(data);
+  switch(data.name) {
+    case "playerData":
+      console.log("recieving player data");
+      pacer = new AvatarMovement("pacer", {
+        position: { x: 0.5, y: 1, z: 0 },
+        isPacer: false,
+      });
+      pacer.creator.loadOtherData(data.data);
+      if (peerState==1) {
+        conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+      }
+      break;
+    case "speed":
+      //console.log("Set pacer speed to "+data.data);
+      if (pacer==null) {
+        return;
+      }
+      activatePacer();
+      pacer.setSpeed(Number(data.data));
+      //console.log(pacer.speed);
+      break;
+    case "syncPlayers":
+      if (scene && rider && pacer) {
+        const riderSyncPos = rider.avatarEntity.getAttribute("position");
+        const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
+        pacerSyncPos.z = riderSyncPos.z;
+        pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+      }
+      break;
+  }
+}
+
+
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+  // initialize peer-to-peer connection
+  // if you are the peer
+  if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
+    peerState = 2;
+    console.log("connecting to peer");
+    peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
+    peer.on('open', id => {
+        conn = peer.connect(sessionStorage.getItem("peer"));
+        console.log("ID="+id);
+
+        setTimeout(() => {
+            if (!connected) {
+                alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
+                try { conn.close(); } catch {}
+                peerState = 0;
+                window.location.href="mainMenu.html"
+            }
+        }, 1500);
+
+        //console.log("Peer: "+peer);
+        conn.on('open', () => {
+          console.log("connected!");
+          console.log(conn);
+          connected = true;
+          // initially send over JSON of character design
+          // when you recieve data
+          conn.on("data", data => {
+              if (data.name === "error") {
+                  connected = false;
+                  alert(data.data);
+                  conn.close();
+                  peerState = 0;
+                  return;
+              }
+
+              recieveData(data);
+          });
+          conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+        });
+        conn.on('error', function(err) {
+            if (err.type === "peer-unavailable") {
+                alert("Could not connect — the host does not exist.");
+                peerState = 0;
+                return;
+            } else {
+                console.error("Connection Error:", err);
+            }
+
+            console.error("Connection Error:", err);
+        });
+    });
+    peer.on('error', function(err) {
+        // Server/connection issue
+        if (err.type === "network" || err.type === "server-error") {
+            console.log("Network/server error");
+            peerState = 0;
+            return;
+        }
+
+        console.error("PeerJS error:", err);
+    });
+  }
+  // You are hosting a session 
+  else if (sessionStorage.getItem("peerToPeer")=='true') {
+    peerState = 1;
+    console.log("hosting peer");
+    peer = new Peer(localStorage.getItem("Name"), {host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
+    peer.on('open', function(id) {
+        console.log("ID="+id);        
+    });
+    peer.on("connection", connection => {
+        if (connected) {
+            // reject second player
+            connection.send({
+                name: "error",
+                data: "This lobby is full."
+            });
+            connection.close()
+            return
+        }
+
+        conn = connection;
+        connected = true;
+
+        console.log("Peer JOINED lobby:", connection.peer);
+
+        // Immediately listen for messages
+        conn.on("data", data => recieveData(data));
+
+        // Send host's player data back
+        conn.send({
+            name: "playerData",
+            data: localStorage.getItem("playerData")
+        });
+
+        conn.on("error", err => {
+            console.error("Connection error:", err);
+        });
+    });
+    peer.on('error', function(err) {
+
+        if (err.type === "unavailable-id") {
+            alert("This name is already being used. Please choose a different one.");
+            peerState = 0;
+            window.location.href="mainMenu.html"
+            return;
+        }
+
+        if (err.type === "peer-unavailable") {
+            console.log("Peer unavailable.");
+            return;
+        }
+
+        if (err.type === "network" || err.type === "server-error") {
+            console.log("Network/server error");
+            peerState = 0;
+            return;
+        }
+
+        switch (err.type) {
+            case "browser-incompatible":
+                console.log("PeerJS not supported by this browser.");
+                break;
+            case "invalid-id":
+                window.location.href = "./mainMenu.html";
+                break;
+        }
+
+        console.error("PeerJS error:", err);
+    });
+  }
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
   console.log("Selected workout:", selectedWorkout);
 
@@ -335,11 +535,13 @@ export function initZlowApp({
     position: { x: -0.5, y: 1, z: 0 },
     isPacer: false,
   });
-  pacer = new AvatarMovement("pacer", {
-    position: { x: 0.5, y: 1, z: -2 },
-    isPacer: true,
-  });
-  pacer.creator.setPacerColors();
+  if (peerState == 0) {
+    pacer = new AvatarMovement("pacer", {
+      position: { x: 0.5, y: 1, z: -2 },
+      isPacer: true,
+    });
+    pacer.creator.setPacerColors();
+  }
   // Remember the initial offset between rider and pacer, so we can restore
   // a similar offset later when Sync is pressed.
   const riderStartPos = rider.avatarEntity.getAttribute("position");
@@ -376,26 +578,26 @@ export function initZlowApp({
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
       // scene.setPacerSpeed(val);
     });
 
-    pacer.setSpeed(Number(pacerSpeedInput.value));
+    setPacerSpeed(Number(pacerSpeedInput.value));
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     });
   } else {
     if (sessionStorage.getItem("PacerSpeed") !== null) {
       const val = Number(sessionStorage.getItem("PacerSpeed"));
       scene = new ZlowScene(val, { getElement });
       // scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     } else {
       const val = 20;
       scene = new ZlowScene(val, { getElement });
       //scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     }
   }
   //map the pacer speed input to the pacer speed variable
@@ -517,8 +719,7 @@ export function initZlowApp({
     // Initialize once
     updateMassAndMaybeSpeed();
   }
-
-  let savedPacerSpeed = pacer.speed;
+  let savedPacerSpeed;
   const pauseBtn = getElement("pause-btn");
   pauseBtn.addEventListener("click", () => {
     simulationState.isPaused = !simulationState.isPaused;
@@ -527,13 +728,13 @@ export function initZlowApp({
     if (simulationState.isPaused) {
       hud.pause();
       savedPacerSpeed = pacer.speed;
-      pacer.setSpeed(0); // Stop pacer when paused
+      setPacerSpeed(0); // Stop pacer when paused
       // start countdown
       countdown.start(() => {
         // auto-resume when hits 0
         simulationState.isPaused = false;
         hud.resume();
-        pacer.setSpeed(savedPacerSpeed);
+        setPacerSpeed(savedPacerSpeed);
         pauseBtn.textContent = "Pause";
       });
     } else {
@@ -541,7 +742,7 @@ export function initZlowApp({
       countdown.cancel();
       hud.resume();
       simulationState.isPaused = false;
-      pacer.setSpeed(savedPacerSpeed);
+      setPacerSpeed(savedPacerSpeed);
       pauseBtn.textContent = "Pause";
     }
   });
@@ -613,7 +814,7 @@ export function initZlowApp({
         pauseBtn.textContent = "Pause";
 
         // Reset pacer
-        pacer.setSpeed(0);
+        setPacerSpeed(0);
         const startPos = { x: 0.5, y: 1, z: -2 };
         pacer.avatarEntity.setAttribute("position", startPos);
         constants.pacerStarted = false;
@@ -696,11 +897,14 @@ export function initZlowApp({
       const riderSpeedNow = constants.riderState.speed || 0;
       pacer.setSpeed(riderSpeedNow);
     }
-    // For non-ramp workouts, we leave pacer speed alone to preserve
-    // the existing behavior (fixed/test-mode pacer).
+    if (connected) {
+      conn.send({name: "syncPlayers", data: {}});
+    }
   });
 
-
+  if (peerState!=0) {
+    pacerSyncBtn.innerHTML = "Sync Players";
+  }
 
   // Calorie reset button
   const caloriesResetBtn = getElement("calories-reset-btn");
