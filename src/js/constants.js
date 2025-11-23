@@ -104,6 +104,14 @@ class Constants {
   cloudSpeed = 0;
   updateEvery = 0;
   totalCloudTypes = 3;
+
+
+  // Constants to locate the peerServer
+  // If you change the backend environment variables, change this
+  // Also change this before hosting it publicly
+  peerHost = "127.0.0.1";
+  peerPath = "/peerServer";
+  peerPort = "9000";
 }
 
 export const constants = new Constants();
