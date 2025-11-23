@@ -250,5 +250,9 @@
         if (window.initZlowApp) window.initZlowApp();
       });
     </script>
+    <script type="module">
+      import { NotificationManager } from "../js/notifications.js";
+      window.testNotifications = new NotificationManager();
+    </script>
   </body>
 </html>
