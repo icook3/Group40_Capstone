@@ -103,12 +103,13 @@ export class ObjectField {
 
 
       dz = riderSpeed * dt;
+      //console.log("STRAIGHT DZ " + dz)
     }
 
     // Follow curve if beginning a curved element
     // ISSUES: Does not allow starting and stopping on curves
     if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -30) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
-      
+      //console.log("POSITION BEFORE " + getPos(this.rider).z);
       // Turn on curve-follow if within 25 units of a curved piece
       this.rider.setAttribute("curve-follow", "enabled", "true");
       //console.log(this.rider.getAttribute("curve-follow").enabled)
@@ -120,18 +121,20 @@ export class ObjectField {
       //console.log(this.rider.getAttribute("curve-follow").duration)
       //console.log("SPEED " + speed)
       //console.log("Z " + this.riderLastUpdate)
-      //console.log("POSITION " + getPos(this.rider).z);
+      
 
       // Figure out how far the rider went already
       // EQUATION IS AROUND HERE SOMEWHERE
 
      
       //CONCEPT - HOWEVER FAST THE SCENERY IS MOVING FORWARD, THE RIDER SHOULD MOVE BACKWARD BY THE SAME AMOUNT IN ORDER TO STAY EVEN WITH THE PIECE
-      // MAYBE USE CONSTANTS AGAIN?
+      // So position is a negative number, but dz should be positive
+      // SOMEHOW THIS GOES WAY TOO FAST
       dz = 0;
+      //console.log("DZ " + dz)
 
-      //setPos(this.rider, -dz);
-
+      //setPos(this.rider, 0);
+      //console.log("POSITION AFTER " + getPos(this.rider).z);
       // Move the rider back by -dz to compensate for scenery movement
 
     }
@@ -205,7 +208,7 @@ export class ObjectField {
     pos.z += dz;
     setPos(segment, pos);
 
-    // Not sure why rotation reverts to 0 0 0 in case of curved pieces? Probably inheritance
+    // Reset rotation - track segments inherit 0 0 0 from parent
     if (segment.getAttribute("configuration") == "curve_right_180") {
       segment.setAttribute('rotation', '-90 0 0');
     }
