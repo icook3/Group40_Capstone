@@ -1,0 +1,314 @@
+/* same fonts as HUD */
+@font-face {
+  font-family: "Fugaz One";
+  src: url("../../resources/fonts/FugazOne-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+#stop-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+#stop-confirmation-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#workout-summary-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+#workout-summary-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* end workout confirmation container */
+#stop-confirmation-container {
+  background-color: rgb(53, 72, 79);
+  border: none;
+  border-radius: 30px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+/* after workout summary stats container */
+#workout-summary-container {
+  background-color: rgb(220, 229, 222);
+  border: none;
+  border-radius: 30px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+/* headers */
+#workout-summary-container h2 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  color: rgb(53, 72, 79);
+  font-size: 2rem;
+  font-weight: normal;
+  font-family: "Fugaz One", sans-serif;
+}
+
+#stop-confirmation-container h3 {
+  margin: 0 0 1rem 0;
+  text-align: center;
+  color: rgb(220, 229, 222);
+  font-size: 1.5rem;
+  font-weight: normal;
+  font-family: "Fugaz One", sans-serif;
+}
+
+#stop-confirmation-container p {
+  text-align: center;
+  color: rgb(220, 229, 222);
+  font-size: 1rem;
+  font-family: "Nunito", sans-serif;
+  margin-bottom: 1.5rem;
+}
+
+/* streak in days container */
+.streak-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: rgb(186, 225, 211);
+  border-radius: 20px;
+}
+
+.streak-number {
+  font-size: 3rem;
+  font-weight: normal;
+  font-family: "Fugaz One", sans-serif;
+  color: #4d78a9;
+  line-height: 1;
+}
+
+.streak-label {
+  font-size: 1.2rem;
+  font-family: "Fugaz One", sans-serif;
+  color: rgb(53, 72, 79);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* main stats table */
+.stats-container {
+  margin-bottom: 2rem;
+}
+
+.summary-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.summary-stats-table thead {
+  background-color: rgb(186, 225, 211);
+}
+
+.summary-stats-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: rgb(53, 72, 79);
+  font-size: 0.9rem;
+  font-family: "Nunito", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.summary-stats-table th:nth-child(2),
+.summary-stats-table th:nth-child(3) {
+  text-align: right;
+}
+
+.summary-stats-table tbody tr {
+  border-bottom: 1px solid rgb(220, 229, 222);
+}
+
+.summary-stats-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.summary-stats-table td {
+  padding: 1rem;
+  color: rgb(53, 72, 79);
+  font-size: 1.1rem;
+  font-family: "Nunito", sans-serif;
+}
+
+.summary-stats-table td:first-child {
+  color: rgb(77, 120, 169);
+  font-weight: 600;
+}
+
+.summary-stats-table td:nth-child(2) {
+  text-align: right;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.summary-stats-table td:nth-child(3) {
+  text-align: right;
+  color: rgb(100, 100, 100);
+  font-size: 0.95rem;
+}
+
+.record-cell {
+  color: #4d78a9 !important;
+  font-weight: bold !important;
+}
+
+/* bottom buttons  */
+.export-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.summary-btn,
+.close-btn,
+.confirm-btn,
+.cancel-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Nunito", sans-serif;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.confirm-btn {
+  background-color: transparent;
+  color: #ff6b6b;
+  flex: 1;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: rgb(220, 229, 222);
+  flex: 1;
+}
+
+.summary-btn {
+  background-color: rgb(53, 72, 79);
+  color: rgb(220, 229, 222);
+}
+
+.summary-btn:disabled {
+  background-color: rgb(180, 180, 180);
+  color: rgb(120, 120, 120);
+  cursor: not-allowed;
+}
+
+.close-btn {
+  width: 100%;
+  background-color: #d67373;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  border-radius: 8px;
+}
+
+.new-record {
+  background-color: rgb(53, 72, 79);
+  color: rgb(220, 229, 222);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  #workout-summary-container,
+  #stop-confirmation-container {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  #workout-summary-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .streak-number {
+    font-size: 2.5rem;
+  }
+
+  .summary-stats-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .summary-stats-table td:nth-child(2) {
+    font-size: 1.1rem;
+  }
+
+  .export-buttons {
+    flex-direction: column;
+  }
+
+  .summary-btn {
+    width: 100%;
+  }
+}
