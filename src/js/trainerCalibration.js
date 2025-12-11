@@ -267,5 +267,3 @@ window.initCalibration = function () {
   calibration.updateStatus("Ready to calibrate", "info");
   calibration.updateStepUI(1);
 };
-
-export { TrainerCalibration };
