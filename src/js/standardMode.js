@@ -14,21 +14,17 @@ export class StandardMode {
     } 
     init() {
         this.trainer.onData = (data) => {
-            if (!keyboardMode.keyboardMode) {
-                let speed = 0;
-                if (typeof data.power === "number" && data.power > 0) {
-                    speed = powerToSpeed({ power: data.power });
-                }
-                constants.riderState = {
-                    ...constants.riderState,
-                    power: data.power,
-                    speed,
-                };
-                if (speed > 0) {
-                    activatePacer();
-                }
-            } else {
-                constants.riderState = { ...constants.riderState, power: data.power };
+            let speed = 0;
+            if (typeof data.power === "number" && data.power > 0) {
+                speed = powerToSpeed({ power: data.power });
+            }
+            constants.riderState = {
+                ...constants.riderState,
+                power: data.power,
+                speed,
+            };
+            if (speed > 0) {
+                activatePacer();
             }
         };
     }
