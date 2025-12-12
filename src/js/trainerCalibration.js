@@ -2,10 +2,11 @@
 import { TrainerBluetooth } from "./bluetooth.js";
 
 export class TrainerCalibration {
-  constructor() {
-    this.trainer = new TrainerBluetooth();
+  constructor(options = {}) {
+    this.trainer = options.trainer || new TrainerBluetooth();
     this.isConnected = false;
     this.calibrationInProgress = false;
+    this.isModal = options.isModal || false; // Flag to determine if running as modal
     this.calibrationSteps = {
       CONNECT: "connect",
       SPINDOWN: "spindown",
@@ -22,7 +23,9 @@ export class TrainerCalibration {
 
   // Update UI elements
   updateStatus(message, type = "info") {
-    const statusDisplay = document.getElementById("status-display");
+    const statusDisplay = this.isModal
+      ? document.getElementById("calibration-status-display")
+      : document.getElementById("status-display");
     if (statusDisplay) {
       statusDisplay.textContent = message;
       statusDisplay.className = "calibration-status";
@@ -37,29 +40,36 @@ export class TrainerCalibration {
   }
 
   updateStepUI(stepNumber) {
+    const prefix = this.isModal ? "calibration-step-" : "step-";
     // Clear all steps
     for (let i = 1; i <= 4; i++) {
-      const step = document.getElementById(`step-${i}`);
+      const step = document.getElementById(`${prefix}${i}`);
       if (step) {
         step.classList.remove("active", "completed");
       }
     }
     // Mark previous steps as completed and current as active
     for (let i = 1; i < stepNumber; i++) {
-      const step = document.getElementById(`step-${i}`);
+      const step = document.getElementById(`${prefix}${i}`);
       if (step) step.classList.add("completed");
     }
-    const currentStepEl = document.getElementById(`step-${stepNumber}`);
+    const currentStepEl = document.getElementById(`${prefix}${stepNumber}`);
     if (currentStepEl) currentStepEl.classList.add("active");
   }
 
   updateDataDisplay() {
-    const dataDisplay = document.getElementById("data-display");
+    const dataDisplay = this.isModal
+      ? document.getElementById("calibration-data-display")
+      : document.getElementById("data-display");
     if (dataDisplay) {
       dataDisplay.style.display = "block";
-      const powerValue = document.getElementById("power-value");
-      const calibrationState = document.getElementById("calibration-state");
-      const lastEvent = document.getElementById("last-event");
+      const powerValueId = this.isModal ? "calibration-power-value" : "power-value";
+      const calibrationStateId = this.isModal ? "calibration-state-value" : "calibration-state";
+      const lastEventId = this.isModal ? "calibration-last-event" : "last-event";
+
+      const powerValue = document.getElementById(powerValueId);
+      const calibrationState = document.getElementById(calibrationStateId);
+      const lastEvent = document.getElementById(lastEventId);
 
       if (powerValue)
         powerValue.textContent = this.calibrationData.power.toFixed(0) + " W";
@@ -91,7 +101,10 @@ export class TrainerCalibration {
         this.updateDataDisplay();
 
         // Enable calibration button
-        const startBtn = document.getElementById("start-calibration-btn");
+        const startBtnId = this.isModal
+          ? "calibration-start-btn"
+          : "start-calibration-btn";
+        const startBtn = document.getElementById(startBtnId);
         if (startBtn) startBtn.disabled = false;
 
         return true;
@@ -215,7 +228,19 @@ export class TrainerCalibration {
     // Store that calibration was skipped but trainer is available
     sessionStorage.setItem("TrainerCalibrationSkipped", "true");
     sessionStorage.setItem("Trainer", JSON.stringify(this.trainer));
-    this.returnToMenu();
+    if (this.isModal) {
+      this.closeModal();
+    } else {
+      this.returnToMenu();
+    }
+  }
+
+  closeModal() {
+    const modal = document.getElementById("calibration-modal");
+    if (modal) {
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+    }
   }
 
   returnToMenu() {
@@ -223,12 +248,21 @@ export class TrainerCalibration {
   }
 }
 
-// Initialize on page load
+// Initialize on page load - handles both modal and standalone modes
 window.initCalibration = function () {
-  const calibration = new TrainerCalibration();
+  // Determine if we're in modal mode by checking if the modal exists
+  const isModal = !!document.getElementById("calibration-modal");
+  const calibration = new TrainerCalibration({ isModal });
+
+  const connectBtnId = isModal
+    ? "calibration-connect-trainer-btn"
+    : "connect-trainer-btn";
+  const startBtnId = isModal ? "calibration-start-btn" : "start-calibration-btn";
+  const skipBtnId = isModal ? "calibration-skip-btn" : "skip-calibration-btn";
+  const closeBtnId = isModal ? "calibration-close-btn" : "back-menu-btn";
 
   // Connect trainer button
-  const connectBtn = document.getElementById("connect-trainer-btn");
+  const connectBtn = document.getElementById(connectBtnId);
   if (connectBtn) {
     connectBtn.addEventListener("click", async () => {
       connectBtn.disabled = true;
@@ -238,7 +272,7 @@ window.initCalibration = function () {
   }
 
   // Start calibration button
-  const startBtn = document.getElementById("start-calibration-btn");
+  const startBtn = document.getElementById(startBtnId);
   if (startBtn) {
     startBtn.addEventListener("click", async () => {
       startBtn.disabled = true;
@@ -248,22 +282,29 @@ window.initCalibration = function () {
   }
 
   // Skip calibration button
-  const skipBtn = document.getElementById("skip-calibration-btn");
+  const skipBtn = document.getElementById(skipBtnId);
   if (skipBtn) {
     skipBtn.addEventListener("click", () => {
       calibration.skipCalibration();
     });
   }
 
-  // Back to menu button
-  const backBtn = document.getElementById("back-menu-btn");
-  if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      calibration.returnToMenu();
+  // Close/Back button
+  const closeBtn = document.getElementById(closeBtnId);
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      if (isModal) {
+        calibration.closeModal();
+      } else {
+        calibration.returnToMenu();
+      }
     });
   }
 
   // Initial display update
   calibration.updateStatus("Ready to calibrate", "info");
   calibration.updateStepUI(1);
+
+  // Store calibration instance globally for access from main.js
+  window.trainerCalibration = calibration;
 };
