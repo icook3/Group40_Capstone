@@ -4,7 +4,7 @@ import { TrainerBluetooth } from "./bluetooth.js";
 export class TrainerCalibration {
   constructor(options = {}) {
     this.trainer = options.trainer || new TrainerBluetooth();
-    this.isConnected = false;
+    this.isConnected = this.trainer?.device ? true : false; // Check if trainer already connected
     this.calibrationInProgress = false;
     this.isModal = options.isModal || false; // Flag to determine if running as modal
     this.calibrationSteps = {
@@ -19,6 +19,12 @@ export class TrainerCalibration {
       timestamp: null,
       lastEvent: "Waiting for trainer connection...",
     };
+    
+    // If trainer is already connected, update UI to reflect that
+    if (this.isConnected) {
+      this.calibrationData.lastEvent = "Trainer already connected";
+      this.currentStep = this.calibrationSteps.CONNECT;
+    }
   }
 
   // Update UI elements
@@ -82,6 +88,23 @@ export class TrainerCalibration {
 
   async connectTrainer() {
     try {
+      // If trainer is already connected, just update UI and return
+      if (this.isConnected && this.trainer?.device) {
+        this.updateStatus("Trainer already connected!", "connected");
+        this.updateStepUI(1);
+        this.calibrationData.lastEvent = "Trainer connected successfully";
+        this.updateDataDisplay();
+        
+        // Enable calibration button
+        const startBtnId = this.isModal
+          ? "calibration-start-btn"
+          : "start-calibration-btn";
+        const startBtn = document.getElementById(startBtnId);
+        if (startBtn) startBtn.disabled = false;
+        
+        return true;
+      }
+
       this.updateStatus("Connecting to trainer...", "in-progress");
       this.updateStepUI(1);
 
@@ -166,6 +189,8 @@ export class TrainerCalibration {
       this.updateDataDisplay();
 
       // Store calibration data
+      // Note: this.trainer is the shared instance from standardMode, 
+      // so it's automatically updated in the main app
       sessionStorage.setItem("TrainerCalibrated", "true");
       sessionStorage.setItem("TrainerCalibrationTime", new Date().toISOString());
       sessionStorage.setItem("Trainer", JSON.stringify(this.trainer));
@@ -226,6 +251,7 @@ export class TrainerCalibration {
 
   skipCalibration() {
     // Store that calibration was skipped but trainer is available
+    // Note: this.trainer is the shared instance from standardMode
     sessionStorage.setItem("TrainerCalibrationSkipped", "true");
     sessionStorage.setItem("Trainer", JSON.stringify(this.trainer));
     if (this.isModal) {
@@ -249,10 +275,13 @@ export class TrainerCalibration {
 }
 
 // Initialize on page load - handles both modal and standalone modes
-window.initCalibration = function () {
+window.initCalibration = function (options = {}) {
   // Determine if we're in modal mode by checking if the modal exists
   const isModal = !!document.getElementById("calibration-modal");
-  const calibration = new TrainerCalibration({ isModal });
+  const calibration = new TrainerCalibration({ 
+    isModal, 
+    trainer: options.trainer // Pass the shared trainer instance if provided
+  });
 
   const connectBtnId = isModal
     ? "calibration-connect-trainer-btn"
@@ -302,7 +331,13 @@ window.initCalibration = function () {
   }
 
   // Initial display update
-  calibration.updateStatus("Ready to calibrate", "info");
+  if (calibration.isConnected) {
+    calibration.updateStatus("Trainer already connected! Ready to calibrate", "connected");
+    const connectBtn = document.getElementById(connectBtnId);
+    if (connectBtn) connectBtn.textContent = "Trainer Connected";
+  } else {
+    calibration.updateStatus("Ready to calibrate", "info");
+  }
   calibration.updateStepUI(1);
 
   // Store calibration instance globally for access from main.js

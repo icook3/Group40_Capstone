@@ -532,9 +532,9 @@ export function initZlowApp({
       if (modal) {
         modal.classList.add("show");
         modal.setAttribute("aria-hidden", "false");
-        // Initialize calibration if not already done
+        // Initialize calibration if not already done, passing the shared trainer
         if (window.initCalibration) {
-          window.initCalibration();
+          window.initCalibration({ trainer: standardMode.trainer });
         }
       }
     });
