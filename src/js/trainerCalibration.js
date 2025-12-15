@@ -94,13 +94,8 @@ export class TrainerCalibration {
         this.updateStepUI(1);
         this.calibrationData.lastEvent = "Trainer connected successfully";
         
-        // Set up data callback to receive power updates
-        this.trainer.onData = (data) => {
-          this.calibrationData.power = data.power || 0;
-          this.calibrationData.timestamp = new Date();
-          this.updateDataDisplay();
-        };
-        
+        // Set up data callback - chain it with existing callback
+        this.setupDataCallback();
         this.updateDataDisplay();
         
         // Enable calibration button
@@ -121,12 +116,8 @@ export class TrainerCalibration {
         this.isConnected = true;
         this.calibrationData.lastEvent = "Trainer connected successfully";
 
-        // Set up data callback
-        this.trainer.onData = (data) => {
-          this.calibrationData.power = data.power || 0;
-          this.calibrationData.timestamp = new Date();
-          this.updateDataDisplay();
-        };
+        // Set up data callback - chain it with existing callback
+        this.setupDataCallback();
 
         this.updateStatus("Trainer connected! Ready to calibrate", "connected");
         this.updateDataDisplay();
@@ -153,6 +144,24 @@ export class TrainerCalibration {
       this.updateDataDisplay();
       return false;
     }
+  }
+
+  setupDataCallback() {
+    // Store the original onData callback (likely from standardMode)
+    const originalCallback = this.trainer.onData;
+    
+    // Create a chained callback that calls both the original and the calibration callback
+    this.trainer.onData = (data) => {
+      // Call the original callback first (for main app)
+      if (originalCallback && typeof originalCallback === 'function') {
+        originalCallback(data);
+      }
+      
+      // Update calibration data
+      this.calibrationData.power = data.power || 0;
+      this.calibrationData.timestamp = new Date();
+      this.updateDataDisplay();
+    };
   }
 
   async startCalibration() {
