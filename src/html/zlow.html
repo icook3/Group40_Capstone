@@ -132,6 +132,53 @@
         flex-wrap: wrap;
       }
 
+      /* Override hud-btn styling for modal context */
+      .calibration-button-group .hud-btn {
+        background: #3498db;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 1.1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #3498db;
+      }
+
+      .calibration-button-group .hud-btn:hover:not(:disabled) {
+        background: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .calibration-button-group .hud-btn:disabled {
+        background: #95a5a6;
+        border-color: #95a5a6;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* Specific button colors */
+      #calibration-skip-btn {
+        background: #95a5a6 !important;
+        border-color: #95a5a6 !important;
+      }
+
+      #calibration-skip-btn:hover:not(:disabled) {
+        background: #7f8c8d !important;
+        border-color: #7f8c8d !important;
+      }
+
+      #calibration-close-btn {
+        background: #e74c3c !important;
+        border-color: #e74c3c !important;
+      }
+
+      #calibration-close-btn:hover:not(:disabled) {
+        background: #c0392b !important;
+        border-color: #c0392b !important;
+      }
+
       .calibration-data-display {
         background: #f8f9fa;
         border-radius: 8px;

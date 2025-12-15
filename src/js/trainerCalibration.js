@@ -88,11 +88,19 @@ export class TrainerCalibration {
 
   async connectTrainer() {
     try {
-      // If trainer is already connected, just update UI and return
+      // If trainer is already connected, just update UI and set up data callback
       if (this.isConnected && this.trainer?.device) {
         this.updateStatus("Trainer already connected!", "connected");
         this.updateStepUI(1);
         this.calibrationData.lastEvent = "Trainer connected successfully";
+        
+        // Set up data callback to receive power updates
+        this.trainer.onData = (data) => {
+          this.calibrationData.power = data.power || 0;
+          this.calibrationData.timestamp = new Date();
+          this.updateDataDisplay();
+        };
+        
         this.updateDataDisplay();
         
         // Enable calibration button
