@@ -524,6 +524,22 @@ export function initZlowApp({
     if (ok) connectBtn.disabled = true;
   });
 
+  // Calibration modal button
+  const calibrateModalBtn = getElement("calibrate-trainer-modal-btn");
+  if (calibrateModalBtn) {
+    calibrateModalBtn.addEventListener("click", () => {
+      const modal = document.getElementById("calibration-modal");
+      if (modal) {
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+        // Initialize calibration if not already done, passing the shared trainer
+        if (window.initCalibration) {
+          window.initCalibration({ trainer: standardMode.trainer });
+        }
+      }
+    });
+  }
+
   standardMode.init();
   // setup the speed when using an actual trainer
   /*trainer.onData = (data) => {
