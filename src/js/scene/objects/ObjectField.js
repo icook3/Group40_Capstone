@@ -61,6 +61,7 @@ export class ObjectField {
   }
 
   // Initializes items that move with the rider (buildings and trees)
+  // May not do anything
   init() {
     if (this.initialized) return;
     this.initialized = true;
