@@ -26,20 +26,12 @@ export class ObjectField {
     this.path_element = document.getElementById('track');
 
     // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
-    // You can't start with a curved piece, because you'll start right in the middle of the ring
     // NOTE: Be sure to create the array from smallest to largest or else track respawning will break!!
-    
-    
     this.spawnScenery(this.track.straightPiece(0), 0);
-    this.track.curve_180_right(-60);
+    this.spawnScenery(this.track.straightPiece(-60), -160);
     this.spawnScenery(this.track.straightPiece(-120), -120);
     this.spawnScenery(this.track.straightPiece(-180), -180);
     this.spawnScenery(this.track.straightPiece(-240), -240);
-
-    this.track.test(0,0);
-    // Test marking a specific location in-scene
-    //this.track.test(0, -25);
-    this.test_thing = document.getElementById('test_thing');
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -66,7 +58,6 @@ export class ObjectField {
     const kind = this._pickKind();
     const entity = kind.spawn(this.sceneEl, z);
     this.items.push(entity);
-    //console.log("Placing object at (" + getPos(entity).x + ", " + getPos(entity).y + ", " + getPos(entity).z + "). This is in ObjectField");
   }
 
   // Initializes items that move with the rider (buildings and trees)
@@ -85,24 +76,11 @@ export class ObjectField {
 
     // Advance scenery on z axis unless on a curve
     if (this.path_element.children[1].getAttribute("configuration") == "straight_vertical" && this.path_element.children[1].getAttribute("position").z > -25 && constants.worldZ > 0) {
-
-      // Turn off curve-follow if within 25 units of a straight piece
-       this.test_thing.setAttribute("curve-follow", "enabled", "false");
-       console.log(this.test_thing.getAttribute("curve-follow").enabled)
-
       dz = riderSpeed * dt;
     }
 
-    // CORRECTLY FIGURES OUT WHERE A CURVE STARTS AND STOPS -- NOTE YOU SAID WITHIN 25 SINCE IT SEEMS TO 
     if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
-      
-      // Turn on curve-follow if within 25 units of a curved piece
-      this.test_thing.setAttribute("curve-follow", "enabled", "true");
-
-      console.log(this.test_thing.getAttribute("curve-follow").enabled)
-
-      // FOR SOME REASON ANY DZ THAT ISN'T RIDER SPEED * DT MESSES UP TRACK GENERATION?? -- Pulling the last element too fast
-     dz = (riderSpeed * dt)/2;
+     dz = (riderSpeed * dt);
     }
 
     // If something goes wrong, default to original dz
