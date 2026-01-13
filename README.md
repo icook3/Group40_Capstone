@@ -37,16 +37,14 @@ Some installations of python use a different name. If this is the case, you migh
 Some features of Zlow are not available with just the frontend. To use these locally, you will need to run the backend as well. This is a bit more complicated. 
 
 1. Go the the Zlow folder, and navigate to backend. 
-2. Under the peer_service folder is a file called .env.example. Copy it:
-```bash
-cp .env.example .env
-```
+2. Under the peer_service folder is a file called .env.example. Copy it, and name it .env.
 3. Open .env and fill in your values:
 ```
 PATH=/peerServer
 PORT=8080
 ```
-4. Do steps 2 and 3 in the strava_service folder
+4. Go to frontend/src/js/constants.js, and at the bottom, change the values of the variables peerHost, peerPath, and peerPort to match what is in .env. 
+5. Do steps 2 and 3 in the strava_service folder. Below are the values to put in .env.
 ```
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
@@ -54,13 +52,15 @@ FRONTEND_URI=https://your-frontend.example.com
 FRONTEND_REDIRECT_URI=https://your-frontend.example.com/path
 PORT=8080
 ```
-5. Download and install Docker at https://www.docker.com/products/docker-desktop/
+6. Download and install Docker at https://www.docker.com/products/docker-desktop/
     - You can check that you have it installed by typing in ```docker -v```
-6. Go back to the backend folder, and open up the command line in it.
+7. Go back to the backend folder, and open up the command line in it.
     - On Windows 11, you do this by right-clicking, and selecting "Open in Terminal"
     - On windows 10, you do this by holding shift, right-clicking, and selecting "open PowerShell window here".
-7. On the command line, type in ```docker-compose up```
-8. If you want to use the Strava services, follow steps 5 and 6 in strava_service/README.md. 
+8. On the command line, type in ```docker-compose up```
+9. If you want to use the Strava services, follow steps 5 and 6 in strava_service/README.md. 
+
+Instead of doing steps 6 and 7, you can instead double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js. 
 
 ## A note about running the backend: 
 When running the backend locally, multiplayer will not work properly. You will only be able to run local multiplayer using two browser instances on the same computer. 
