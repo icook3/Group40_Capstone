@@ -969,9 +969,9 @@ function updateFavicon() {
   }
 
   if (darkMode.matches) {
-    favicon.href = "/resources/favicons/ZlowFavicon-dark.svg";
+    favicon.href = "../../resources/favicons/ZlowFavicon-dark.svg";
   } else {
-    favicon.href = "/resources/favicons/ZlowFavicon.svg";
+    favicon.href = "../../resources/favicons/ZlowFavicon.svg";
   }
 }
 
