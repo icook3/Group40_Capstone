@@ -757,9 +757,9 @@ export function initZlowApp({
       saveTCX();
     }
 
-    /*if (e.target && e.target.id === "summary-export-strava") {
+    if (e.target && e.target.id === "summary-export-strava") {
       await exportToStrava();
-    }*/
+    }
   });
 
   /*const stopBtn = getElement("stop-btn");
@@ -924,7 +924,7 @@ export function initZlowApp({
   return {
     scene,
     hud,
-    //strava,
+    strava,
     pacer,
     getRiderState: () => riderState,
     getRideHistory: () => rideHistory,
