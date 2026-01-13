@@ -1,0 +1,15 @@
+services: 
+  strava-service:
+    build: ./strava_service
+    ports: 
+      - 8080:8080
+#    volumes:
+ #     - ./strava_service
+  peer-server-service:
+    build: ./peer_service
+    ports: 
+      - 9000:9000
+ #   volumes:
+  #    - ./peer_service
+   # command: npm start
+    
