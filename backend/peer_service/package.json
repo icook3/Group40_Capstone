@@ -1,0 +1,13 @@
+{
+  "name": "peer-server-service",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/peerServer.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "peer": "^1.0.2"
+  }
+}
