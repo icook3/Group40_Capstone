@@ -21,10 +21,11 @@
 
     const labelFor = (id) =>
       id === "ramp"  ? "Start (Ramp Test)" :
-      id === "ftp20" ? "Start (FTP 20-min)" :
+      id === "sprint" ? "Start (Sprint Intervals)" :
+      id === "peerServer" ? "Connect to peer":
                        "Start (Free Ride)";
 
-    // ✅ Default to "free" and restore prior choice if present
+    // Default to "free" and restore prior choice if present
     let selected = sessionStorage.getItem("SelectedWorkout") || "free";
     splitRoot.dataset.workout = selected;
     startBtn.textContent = labelFor(selected);
@@ -175,7 +176,11 @@
       const ps = document.getElementById("pacer-speed");
       if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
       // Navigate into your app (same as your current file)
-      window.location.href = "../html/zlow.html";
+      if (sessionStorage.getItem("SelectedWorkout")==='peerServer') {
+          window.location.href = "../html/connectToPeers.html";
+      } else {
+          window.location.href = "../html/zlow.html";
+      }
     });
 
     // Keep menu positioned if viewport changes while open

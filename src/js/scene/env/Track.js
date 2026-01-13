@@ -20,10 +20,24 @@ export class Track {
   straightPiece(spawnZ) {
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-
-    // Repeat does not work as intended
     track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
+    track.setAttribute('configuration', `straight_vertical`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
     this.path_element.appendChild(track);
+    return track.getAttribute("configuration");
+  }
+
+  // Create an append a track piece curving to the right
+  curve_180_right(spawnZ) {
+    const track = document.createElement('a-entity');
+    track.setAttribute('id', 'curve')
+    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
+    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
+    track.setAttribute('configuration', `curve_right_180`);
+    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${spawnZ}`);
+    track.setAttribute('rotation', '-90 0 0');
+    track.setAttribute('parametric-curve', `xyzFunctions: -18*cos(t), 2, -18*sin(t); tRange: 4.7, 1.5;`);
+    this.path_element.appendChild(track);
+    return track.getAttribute("configuration");
   }
 }

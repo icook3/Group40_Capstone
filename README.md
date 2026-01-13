@@ -13,6 +13,13 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 
 ## Structure
 - `resources` — Contains various resources.
+	- `components` — Stores custom A-Frame components used in the program
+		- `aframe_curve_follow` — Stores an A-Frame component for following a curve
+			- `index.js` — The JavaScript file defining the A-Frame Curve Follow component
+		- `aframe_parametric_curve` — Stores an A-Frame component for a parametric curve
+			- `index.js` — The JavaScript file defining the A-Frame Parametric Curve component
+		- `aframe_tube_geometry` — Stores an A-Frame component used to help with making curves
+			- `index.js` — The JavaScript file defining the A-Frame Tube Geometry component
 	- `favicons` — Stores the program favicon.
 		- `favicon.ico` — The main favicon used for the program.
 		- `ZlowFavicon-dark.svg` — A variant of the favicon used when the browser is in dark mode for better readability.
@@ -24,7 +31,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `OFL 2.txt` — The license for the font Nunito.
 		- `OFL.txt` — The license for the font Fugaz One.
 	- `images` — Contains a number of important images for different pages.
-		- `backgroung.png` — The background for the main menu.
+		- `backgroung.png` — The background for the peer menu (temporary).
 		- `calories.svg` — The icon used to represent calories in the hud.
 		- `center-hud.svg` — A mask to shape the center of the hud, alongside some buttons on other pages.
 		- `license.pdf` — The license for the calories and time images.
@@ -54,9 +61,12 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `css` — Stores CSS source code.
 		- `hud.css` — Handles CSS styles for the modern HUD.
 		- `menu.css` — Handles CSS styles for the main menu.
+		- `peerToPeer.css` — Handles CSS styles for the peer-to-peer menu
 		- `playerCustomization.css` — Handles CSS styles for the player customization screen.
+		- `strava.css` — Handles CSS styles for the strava connection screen
 		- `style.css` — Handles general CSS styles for the program.
 	- `html` — Stores HTML source code.
+		- `connectToPeers.html` — Screen for connecting via the peer-to-peer network
 		- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings.
 		- `playerCustomization.html` — Screen for customizing the player.
 		- `zlow.html` — Loads A-Frame scene and UI.
@@ -67,9 +77,9 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `util.js` — Contains several utilities for scene generation.
 			- `env` — Handles the overall environment.
 				- `Cloud.js` — Handles creating the clouds above the scene.
-				- `Track.js` — Handles creating track template pieces.
 				- `SceneryBand.js` — Handles creating the bands and object placement within.
 				- `SceneryManager.js` — Loads the config files from /policy.
+				- `Track.js` — Handles creating track template pieces.
 			- `objects` — Handles various 3D objects.
 				- `kinds` — Stores representations of different 3D objects along the side of the track.
 					- `Building.js` — Handles various buildings along the side of the track.
@@ -95,19 +105,26 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `mph.js` — Handles unit conversions for Miles per Hour.
 			- `units.md` — Documentation on different units.
 			- `W.js` — Handles unit conversions for Watts - the default power unit.
+		- `workouts` — Stores different workouts
+			- `RampTestController.js` — Handles a workout involving going up ramps
 	    - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 		- `avatarMovement.js` — Updates A-Frame 3D avatar.
 		- `bluetooth.js` — Handles Bluetooth device connection and data polling.
+		- `connectionProtocol.md` — Documentation on the protocol for peer-to-peer connection
 		- `constants.js` — Stores important constants for the program execution.
 		- `hud.js` — Renders the heads-up display overlay.
 		- `keyboardMode.js` — Handles keyboard mode functionalities and variables.
 		- `main.js` — Main app entry point.
 		- `menu.js` — Handles event listeners on the main menu.
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
+		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling
 		- `simulationstate.js` — Handles tracking the state of the simulation.
 		- `standardMode.js` — Handles standard mode functionalities and variables.
 		- `strava.js` — Handles Strava OAuth and activity upload.
-		- `workoutChoice` — Handles the dropdown menu for choosing workouts
+		- `workoutChoice.js` — Handles the dropdown menu for choosing workouts
+		- `workoutSession.js` — Handles tracking statistics across a workout
+		- `workoutStorage.js` — Handles storing and loading workout data for best/worst
+		- `workoutSummary.js` — Handles the workout summary page
 
 ## Stretch Goals
 - Local/cloud session storage
@@ -129,6 +146,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Development Notes
 - Modular ES6 code, no build step required.
 - See each JS file for further documentation.
+- Make sure you run npm install before launching the server. Otherwise, errors will pop up.
 
 You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="../css/hud.css" />
     <link rel="stylesheet" href="../css/menu.css" />
     <style>
@@ -61,14 +62,14 @@
       <div id="start-menu" class="dropdown-content" role="menu">
         <button class="dropdown-item" data-workout="free">Free Ride</button>
         <button class="dropdown-item" data-workout="ramp">Ramp Test</button>
-        <button class="dropdown-item" data-workout="ftp20">
-          FTP Test (20-min)
+        <button class="dropdown-item" data-workout="sprint">
+          Sprint Intervals
         </button>
-      </div>-->
+        <button class="dropdown-item" data-workout="peerServer">Connect to peer</button>
+      </div>
     </div>
 
-    <!-- at the bottom of the body 
-    <script defer src="../js/workoutChoice.js"></script>-->
+    <!-- at the bottom of the body <script defer src="../js/workoutChoice.js"></script>-->
 
     <div id="menu-settings">
       <span id="pacer" class="hud-btn">
@@ -121,6 +122,11 @@
             </select>
         </span>
         -->
+      <button id="peer-btn" class="hud-btn">Host peer-to-peer</button>
+      <span id="peer-name" class="hud-btn">
+        <label for="name-input">Name: </label>
+        <input id="name-input" />
+      </span>
       <button id="clear-btn" class="hud-btn" onclick="sessionStorage.clear();">
         Clear settings
       </button>
@@ -178,6 +184,12 @@
         ></a-asset-item>
       </a-assets>
     </a-scene>
+
+    <script>
+      jQuery( document ).ready(function() {
+        console.log("Ready!");
+      });
+    </script>
 
     <script type="module">
       import { AvatarCreator } from "../js/avatarCreator.js";

@@ -31,6 +31,7 @@ export class WorkoutSession {
     this.maxPower = 0;
     this.samples = [];
     this.lastSampleTime = this.startTime;
+    this.ftpResult = null;
   }
 
   update(currentStats) {
@@ -74,6 +75,10 @@ export class WorkoutSession {
     return this.calculateStats();
   }
 
+  addFTPResult(ftpResult) {
+    this.ftpResult = ftpResult;
+  }
+  
   calculateStats() {
     const totalTime = this.getTotalTime();
     const avgSpeed = this.calculateAverage("speed");
@@ -87,6 +92,11 @@ export class WorkoutSession {
       avgPower, // in watts
       maxSpeed: this.maxSpeed, // in km/h
       maxPower: this.maxPower, //in watts
+
+      // FTP result if available
+      ftpResult: this.ftpResult || null,
+      peakMinutePower: this.ftpResult?.peakMinute ?? null,
+      bestAvg: this.ftpResult?.bestAvg ?? null,
     };
   }
 

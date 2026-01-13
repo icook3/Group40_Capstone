@@ -18,21 +18,20 @@ export class ObjectField {
     this.initialized = false;
     this.externalGroups = [];
     this.policy = policy;
-
-    // BETTER IDEA: ADD A CONFIGURATION ELEMENT TO NEW PIECES SO YOU CAN JUST PING THEM AND GET THE UPDATE EQUATION
-    // PROBABLY OVERZEALOUS IDEA: FIGURE OUT HOW TO ADD UPDATE FUNCTIONALITY DIRECTLY TO OBJECTS
-    this.path_element = document.getElementById('track');
-
-    // Add a straight pieces for initial testing. You need about 5 pieces to get to the horizon
-    this.track.straightPiece(0);
-    this.track.straightPiece(-60);
-    this.track.straightPiece(-120);
-    this.track.straightPiece(-180);
-    this.track.straightPiece(-240);
-
+    
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
+
+    this.path_element = document.getElementById('track');
+
+    // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
+    // NOTE: Be sure to create the array from smallest to largest or else track respawning will break!!
+    this.spawnScenery(this.track.straightPiece(0), 0);
+    this.spawnScenery(this.track.straightPiece(-60), -160);
+    this.spawnScenery(this.track.straightPiece(-120), -120);
+    this.spawnScenery(this.track.straightPiece(-180), -180);
+    this.spawnScenery(this.track.straightPiece(-240), -240);
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -59,22 +58,35 @@ export class ObjectField {
     const kind = this._pickKind();
     const entity = kind.spawn(this.sceneEl, z);
     this.items.push(entity);
-    //console.log("Placing object at (" + getPos(entity).x + ", " + getPos(entity).y + ", " + getPos(entity).z + "). This is in ObjectField");
   }
 
   // Initializes items that move with the rider (buildings and trees)
   init() {
     if (this.initialized) return;
-    for (let z = 0; z > -200; z -= 5) {
-      this._spawnAtZ(z);
-      if (Math.random() < 0.7) this._spawnAtZ(z); // original density
-    }
     this.initialized = true;
   }
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
-  advance(dz) {
-    if (!this.initialized || dz === 0) return;
+  advance(riderSpeed, dt) {
+    if (!this.initialized || (riderSpeed, dt) === 0) return;
+
+    let dx = 0;
+    let dz = 0;
+    let tempZ = 0;
+
+    // Advance scenery on z axis unless on a curve
+    if (this.path_element.children[1].getAttribute("configuration") == "straight_vertical" && this.path_element.children[1].getAttribute("position").z > -25 && constants.worldZ > 0) {
+      dz = riderSpeed * dt;
+    }
+
+    if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
+     dz = (riderSpeed * dt);
+    }
+
+    // If something goes wrong, default to original dz
+    else {
+      dz = riderSpeed * dt;
+    }
 
     // Handles all objects currently part of the items array
     for (const obj of this.items) {
@@ -91,7 +103,6 @@ export class ObjectField {
         pos.x = kind.resampleX();
 
       }
-
         setPos(obj, pos);
     }
 
@@ -141,14 +152,19 @@ export class ObjectField {
     const pos = getPos(segment);
     pos.z += dz;
     setPos(segment, pos);
+
+    // Not sure why rotation reverts to 0 0 0 in case of curved pieces? Probably inheritance
+    if (segment.getAttribute("configuration") == "curve_right_180") {
+      segment.setAttribute('rotation', '-90 0 0');
+    }
   }
 
-  // Spawn new track section if the rider has traveled 60 units
+  // Spawn new track section if the farthest piece of track is under 240 units in front of worldZ
   if (constants.worldZ > constants.trackLastUpdate + 60) {
     constants.trackLastUpdate += 60;
-
     // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
-    this.track.straightPiece(getPos(this.path_element.children[this.path_element.children.length-1]).z - 60);
+    const lastPiece = getPos(this.path_element.children[this.path_element.children.length-1]).z - 60
+    this.spawnScenery(this.track.straightPiece(lastPiece), lastPiece);
     this.path_element.removeChild(this.path_element.children[0]);
   }
 
@@ -172,6 +188,16 @@ export class ObjectField {
             this.clouds.clouds.appendChild(spawnCloud(4));
           }
         }
+      }
+    }
+  }
+
+  spawnScenery(trackPiece, initialZ) {
+    // initialz refers to the central point of a 60-unit segment
+    if (trackPiece == "straight_vertical") {
+      for (let z = initialZ+30; z > initialZ-30; z -= 5) {
+        this._spawnAtZ(z);
+        if (Math.random() < 0.7) this._spawnAtZ(z); // original density
       }
     }
   }

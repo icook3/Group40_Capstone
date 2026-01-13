@@ -10,7 +10,8 @@
 
 @font-face {
   font-family: "Nunito";
-  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf") format("truetype");
+  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf")
+    format("truetype");
   font-weight: 100 900;
   font-style: normal;
 }
@@ -134,7 +135,8 @@
   padding: 15px 100px;
 
   /* Custom SVG shape mask */
-  mask: url("../../resources/images/center-hud.svg") no-repeat center / 100% 100%;
+  mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
+    100%;
   -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
     100% 100%;
 }
@@ -392,4 +394,101 @@
   font-weight: 600;
   font-size: 50px;
   color: rgb(220, 229, 222);
+}
+
+#milestone-notifications {
+  position: fixed;
+  top: 170px; /* below center hud stats */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.milestone-toast {
+  font-family: "Fugaz One", sans-serif;
+  background: linear-gradient(to bottom, #bae1d3, #87d8e1);
+  color: rgb(53, 72, 79);
+  padding: 20px;
+  margin: 10px;
+  font-size: 20px;
+  min-width: 400px;
+  text-align: center;
+  border-radius: 25px;
+
+  /* animate toast notification */
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.milestone-toast.visible {
+  opacity: 1;
+}
+/* reserved style for special/major milestones */
+/* simulates holographic effect */
+.milestone-toast.special {
+  background: linear-gradient(
+    135deg,
+    rgb(237, 232, 207) 0%,
+    #fee6ca 25%,
+    #ffb3ba 50%,
+    #bae1d3 75%,
+    #87d8e1 100%
+  );
+  background-size: 200% 200%;
+  animation: rainbow-shift 3s ease infinite;
+  font-size: 24px;
+  padding: 24px 36px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+}
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ========================================
+   Workout overlay style
+   ======================================== */
+#workout-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Use this when you WANT the greyed-out effect (start countdown) */
+#workout-overlay.dim {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Use this when you DON'T want dimming (warmup, ramp messages) */
+#workout-overlay.clear {
+  background: transparent;
+}
+
+#workout-overlay .workout-dialog {
+  pointer-events: none;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 50px;
+  color: rgb(220, 229, 222);
+}
+
+/* Ramp test power vs target colors */
+#power.power-above-target {
+  color: #4caf50; /* green when at/above target */
+}
+
+#power.power-below-target {
+  color: #ff5252; /* red when below target */
 }

@@ -47,6 +47,8 @@ export class WorkoutStorage {
         highestAvgPower: null,
         highestMaxSpeed: null,
         highestMaxPower: null,
+        highestFtp: null,
+        highestPeakMinutePower: null,
       },
       lastWorkoutDate: null,
       currentStreak: 0,
@@ -68,8 +70,11 @@ export class WorkoutStorage {
     // Add to history
     this.data.workouts.push(workout);
 
-    // Update streak (daily)
-    const streak = this.updateStreak(now);
+    // Update streak (daily) only if workout is 10 minutes or more
+    const streak =
+      workoutStats.totalTime >= 600
+        ? this.updateStreak(now)
+        : this.breakStreak(now);
 
     // Check for personal history
     const newRecords = this.checkPersonalRecords(workout);
@@ -110,6 +115,17 @@ export class WorkoutStorage {
 
     this.data.lastWorkoutDate = today;
     return this.data.currentStreak;
+  }
+
+  // Helper function to break steaks
+  breakStreak(workoutDate) {
+    const today = this.getDateString(workoutDate);
+
+    // Reset streak to 0
+    this.data.currentStreak = 0;
+    this.data.lastWorkoutDate = today;
+
+    return 0;
   }
 
   //Get date string from local user
@@ -159,6 +175,16 @@ export class WorkoutStorage {
         value: stats.maxPower,
         label: "Highest Max Power",
       },
+      {
+        key: "highestFtp",
+        value: stats.ftp,
+        label: "Highest FTP",
+      },
+      {
+        key: "highestPeakMinutePower",
+        value: stats.peakMinutePower,
+        label: "Highest 1-min Power",
+      },
     ];
 
     checks.forEach(({ key, value, label }) => {
@@ -194,6 +220,11 @@ export class WorkoutStorage {
 
   getCurrentStreak() {
     return this.data.currentStreak || 0;
+  }
+
+  // Get count of workouts that are 10+ minutes
+  getCumulativeRideCount() {
+    return this.data.workouts.filter((w) => w.stats.totalTime >= 600).length;
   }
 
   // Clear all workout records

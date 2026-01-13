@@ -11,10 +11,14 @@ import { StandardMode } from "./standardMode.js";
 import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
+import { RampTestController } from "./workouts/RampTestController.js";
 
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
+import { MilestoneTracker } from "./milestones.js";
+import { NotificationManager } from "./notifications.js";
+
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -119,6 +123,12 @@ let pacer;
 // workout session
 let workoutStorage;
 let workoutSession;
+// milestones
+let notificationManager;
+let milestoneTracker;
+let rampController = null;
+let peer;
+let conn;
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -168,28 +178,86 @@ function loop({
 
   //update workout session with current values
   if (workoutSession.isWorkoutActive()) {
+    if (rampController) {
+      // Update FTP result if available
+      workoutSession.addFTPResult(rampController.ftpResult);
+    }
     workoutSession.update({
       speed: constants.riderState.speed || 0,
       power: constants.riderState.power || 0,
       distance: hud.totalDistance,
       calories: constants.riderState.calories || 0,
     });
+
+    //if there is a milestone show it
+    const milestone = milestoneTracker.check();
+    if (milestone) {
+      //console.log("Milestone found, showing notification:", milestone.message);
+
+      notificationManager.show(milestone.message, milestone.isSpecial);
+    }
   }
 
   //Update Avatar and Pacer
   rider.setSpeed(constants.riderState.speed);
   rider.setPower(constants.riderState.power);
+
+  // Cache rider speed (in km/h, same units as calculateAccelerationSpeed)
+  const riderSpeed = constants.riderState.speed || 0;
+
   rider.update(dt);
-  if (constants.pacerStarted) {
+  if (constants.pacerStarted&&peerState==0) {
+    //console.log("Inside if statement");
+    // Start from whatever speed the pacer currently has
+    let pacerSpeed = pacer.speed || 0;
+
+    if (rampController) {
+      // RampTestController is active (Ramp Test workout)
+      const targetWatts = rampController.getCurrentTargetWatts();
+
+      if (targetWatts == null) {
+        // Warmup or finished:
+        // Pacer exactly matches the rider so it stays beside you.
+        pacerSpeed = riderSpeed;
+      } else {
+        // Active ramp step:
+        // Pacer behaves like an ideal rider holding target watts,
+        // using the same physics as the real rider for smooth changes.
+        pacerSpeed = calculateAccelerationSpeed(pacerSpeed, targetWatts, dt);
+      }
+    }
+    // If rampController is null (free ride, other workouts),
+    // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
+
+    // Apply the computed speed to the pacer avatar
+    pacer.setSpeed(pacerSpeed);
     pacer.update(dt);
-    //Update pacer position
-    const riderSpeed = constants.riderState.speed;
+
+    // Update pacer position relative to the rider based on speed difference
+    const relativeSpeed = pacerSpeed - riderSpeed;
+    const pacerPos = pacer.avatarEntity.getAttribute("position");
+    pacerPos.z -= relativeSpeed * dt;
+    pacer.setPosition(pacerPos);
+  } else if (peerState!=0&&connected&&pacer!=undefined) {
+    pacer.update(dt);
+
+    const riderSpeed = constants.riderState.speed;    
     const pacerSpeed = pacer.speed;
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
     pacer.setPosition(pacerPos);
   }
+
+  // Let the ramp controller advance its state
+  if (rampController) {
+    const power = constants.riderState.power || 0;
+    rampController.update(now, power);
+
+    const target = rampController.getCurrentTargetWatts();
+    constants.riderState.targetWatts = target || 0;
+  }
+
   hud.update(constants.riderState, dt);
   if (localStorage.getItem("testMode") == null) {
     localStorage.setItem("testMode", false);
@@ -220,10 +288,12 @@ function loop({
     });
     constants.lastHistorySecond = thisSecond;
   }
+  sendPeerDataOver(constants.riderState.speed);
   requestAnimationFrameFn(loop);
 }
 
 export function activatePacer() {
+  //if (peerState!=0) {return;}
   if (!constants.pacerStarted) {
     //scene.activatePacer();
     constants.pacerStarted = true;
@@ -238,11 +308,198 @@ function setUnits(storageVal, className) {
     elements.item(i).innerHTML = storageVal;
   }
 }
+
+function setPacerSpeed(speed) {
+  if (peerState==0) {
+    pacer.setSpeed(speed);
+  }
+}
+
+//0: not in peer-peer mode
+//1: host
+//2: peer
+let peerState=0;
+let connected = false;
+//used for frequent updates in update method
+function sendPeerDataOver(speed) {
+  //console.log("sending data: "+connected);
+  if (connected&&conn.open) {
+    conn.send({name:"speed",data:speed})
+  }
+}
+
+function recieveData(data) {
+  //console.log("Recieving data");
+  //console.log(data);
+  switch(data.name) {
+    case "playerData":
+      console.log("recieving player data");
+      pacer = new AvatarMovement("pacer", {
+        position: { x: 0.5, y: 1, z: 0 },
+        isPacer: false,
+      });
+      pacer.creator.loadOtherData(data.data);
+      if (peerState==1) {
+        conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+      }
+      break;
+    case "speed":
+      //console.log("Set pacer speed to "+data.data);
+      if (pacer==null) {
+        return;
+      }
+      activatePacer();
+      pacer.setSpeed(Number(data.data));
+      //console.log(pacer.speed);
+      break;
+    case "syncPlayers":
+      if (scene && rider && pacer) {
+        const riderSyncPos = rider.avatarEntity.getAttribute("position");
+        const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
+        pacerSyncPos.z = riderSyncPos.z;
+        pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+      }
+      break;
+  }
+}
+
+
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+  // initialize peer-to-peer connection
+  // if you are the peer
+  if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
+    peerState = 2;
+    console.log("connecting to peer");
+    peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
+    peer.on('open', id => {
+        conn = peer.connect(sessionStorage.getItem("peer"));
+        console.log("ID="+id);
+
+        setTimeout(() => {
+            if (!connected) {
+                alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
+                try { conn.close(); } catch {}
+                peerState = 0;
+                window.location.href="mainMenu.html"
+            }
+        }, 1500);
+
+        //console.log("Peer: "+peer);
+        conn.on('open', () => {
+          console.log("connected!");
+          console.log(conn);
+          connected = true;
+          // initially send over JSON of character design
+          // when you recieve data
+          conn.on("data", data => {
+              if (data.name === "error") {
+                  connected = false;
+                  alert(data.data);
+                  conn.close();
+                  peerState = 0;
+                  return;
+              }
+
+              recieveData(data);
+          });
+          conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+        });
+        conn.on('error', function(err) {
+            if (err.type === "peer-unavailable") {
+                alert("Could not connect — the host does not exist.");
+                peerState = 0;
+                return;
+            } else {
+                console.error("Connection Error:", err);
+            }
+
+            console.error("Connection Error:", err);
+        });
+    });
+    peer.on('error', function(err) {
+        // Server/connection issue
+        if (err.type === "network" || err.type === "server-error") {
+            console.log("Network/server error");
+            peerState = 0;
+            return;
+        }
+
+        console.error("PeerJS error:", err);
+    });
+  }
+  // You are hosting a session 
+  else if (sessionStorage.getItem("peerToPeer")=='true') {
+    peerState = 1;
+    console.log("hosting peer");
+    peer = new Peer(localStorage.getItem("Name"), {host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
+    peer.on('open', function(id) {
+        console.log("ID="+id);        
+    });
+    peer.on("connection", connection => {
+        if (connected) {
+            // reject second player
+            connection.send({
+                name: "error",
+                data: "This lobby is full."
+            });
+            connection.close()
+            return
+        }
+
+        conn = connection;
+        connected = true;
+
+        console.log("Peer JOINED lobby:", connection.peer);
+
+        // Immediately listen for messages
+        conn.on("data", data => recieveData(data));
+
+        // Send host's player data back
+        conn.send({
+            name: "playerData",
+            data: localStorage.getItem("playerData")
+        });
+
+        conn.on("error", err => {
+            console.error("Connection error:", err);
+        });
+    });
+    peer.on('error', function(err) {
+
+        if (err.type === "unavailable-id") {
+            alert("This name is already being used. Please choose a different one.");
+            peerState = 0;
+            window.location.href="mainMenu.html"
+            return;
+        }
+
+        if (err.type === "peer-unavailable") {
+            console.log("Peer unavailable.");
+            return;
+        }
+
+        if (err.type === "network" || err.type === "server-error") {
+            console.log("Network/server error");
+            peerState = 0;
+            return;
+        }
+
+        switch (err.type) {
+            case "browser-incompatible":
+                console.log("PeerJS not supported by this browser.");
+                break;
+            case "invalid-id":
+                window.location.href = "./mainMenu.html";
+                break;
+        }
+
+        console.error("PeerJS error:", err);
+    });
+  }
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
   console.log("Selected workout:", selectedWorkout);
 
@@ -257,6 +514,10 @@ export function initZlowApp({
   workoutStorage = new WorkoutStorage();
   workoutSession = new WorkoutSession();
 
+  // start notification manager and milestone tracker
+  notificationManager = new NotificationManager();
+  milestoneTracker = new MilestoneTracker(workoutSession, workoutStorage);
+
   const workoutSummary = new WorkoutSummary({
     workoutStorage,
     onClose: () => {
@@ -265,6 +526,7 @@ export function initZlowApp({
   });
 
   workoutSession.start();
+  milestoneTracker.reset();
 
   // get the needed objects
   if (localStorage.getItem("testMode") !== "true") {
@@ -286,11 +548,13 @@ export function initZlowApp({
     position: { x: -0.5, y: 1, z: 0 },
     isPacer: false,
   });
-  pacer = new AvatarMovement("pacer", {
-    position: { x: 0.5, y: 1, z: -2 },
-    isPacer: true,
-  });
-  pacer.creator.setPacerColors();
+  if (peerState == 0) {
+    pacer = new AvatarMovement("pacer", {
+      position: { x: 0.5, y: 1, z: -2 },
+      isPacer: true,
+    });
+    pacer.creator.setPacerColors();
+  }
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
 
@@ -316,32 +580,84 @@ export function initZlowApp({
     scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
       // scene.setPacerSpeed(val);
     });
 
-    pacer.setSpeed(Number(pacerSpeedInput.value));
+    setPacerSpeed(Number(pacerSpeedInput.value));
     pacerSpeedInput.addEventListener("input", () => {
       const val = Number(pacerSpeedInput.value);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     });
   } else {
     if (sessionStorage.getItem("PacerSpeed") !== null) {
       const val = Number(sessionStorage.getItem("PacerSpeed"));
       scene = new ZlowScene(val, { getElement });
       // scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     } else {
       const val = 20;
       scene = new ZlowScene(val, { getElement });
       //scene.setPacerSpeed(val);
-      pacer.setSpeed(val);
+      setPacerSpeed(val);
     }
   }
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
-  //const strava = new Strava();
+
+  const strava = new Strava();
+
+  // Map workout keys to user-facing labels
+  const workoutLabels = {
+    free: "Free Ride",
+    ramp: "Ramp Test",
+    sprint: "Sprint Intervals",
+  };
+
+  const workoutName = workoutLabels[selectedWorkout] || "Free Ride";
+
+  // Set up ramp test controller if applicable
+  if (selectedWorkout === "ramp") {
+    const now = Date.now();
+    rampController = new RampTestController({
+      hud,
+      nowMs: now,
+      warmupSeconds: 5 * 60, // 5-minute warmup
+      startWatts: 100,
+      stepWatts: 20,
+      stepSeconds: 60,
+      ftpFactor: 0.75,
+    });
+  } else {
+    rampController = null;
+  }
+
+  hud.showStartCountdown({
+    workoutName,
+    seconds: 5,
+    onDone: () => {
+      // After 5s, unpause the sim
+      simulationState.isPaused = false;
+
+      // If ramp, begin warmup countdown (no pause)
+      if (selectedWorkout === "ramp") {
+        // tell HUD to show 5-minute warmup timer
+        hud.showWarmupCountdown({
+          seconds: 5 * 60,
+          onDone: () => {
+            // Warmup over → tell RampTestController to start ramps
+            rampController?.startRamp?.();
+          },
+        });
+      }
+    },
+  });
+
+  //for testing purposes
+  window.testHud = hud;
+  window.testStorage = workoutStorage;
+  window.testMilestones = milestoneTracker;
 
   //Pacer speed control input
   //Rider state and history
@@ -408,8 +724,7 @@ export function initZlowApp({
     // Initialize once
     updateMassAndMaybeSpeed();
   }
-
-  let savedPacerSpeed = pacer.speed;
+  let savedPacerSpeed;
   const pauseBtn = getElement("pause-btn");
   pauseBtn.addEventListener("click", () => {
     simulationState.isPaused = !simulationState.isPaused;
@@ -418,13 +733,13 @@ export function initZlowApp({
     if (simulationState.isPaused) {
       hud.pause();
       savedPacerSpeed = pacer.speed;
-      pacer.setSpeed(0); // Stop pacer when paused
+      setPacerSpeed(0); // Stop pacer when paused
       // start countdown
       countdown.start(() => {
         // auto-resume when hits 0
         simulationState.isPaused = false;
         hud.resume();
-        pacer.setSpeed(savedPacerSpeed);
+        setPacerSpeed(savedPacerSpeed);
         pauseBtn.textContent = "Pause";
       });
     } else {
@@ -432,7 +747,7 @@ export function initZlowApp({
       countdown.cancel();
       hud.resume();
       simulationState.isPaused = false;
-      pacer.setSpeed(savedPacerSpeed);
+      setPacerSpeed(savedPacerSpeed);
       pauseBtn.textContent = "Pause";
     }
   });
@@ -473,6 +788,23 @@ export function initZlowApp({
         // End the session and get final stats
         const finalStats = workoutSession.end();
 
+        // After you compute finalStats from workoutSession / history, etc.
+        if (selectedWorkout === "ramp" && rampController) {
+          const result = rampController.computeFtpFromHistory(
+            constants.rideHistory
+          );
+          if (result) {
+            // Flatten FTP numbers into stats for summary + records
+            finalStats.ftp = Math.round(result.ftp);
+            finalStats.peakMinutePower = Math.round(result.peakMinute);
+
+            hud.showWorkoutMessage({
+              text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
+              seconds: 8,
+            });
+          }
+        }
+
         // Save workout and check for records
         const { newRecords, streak } = workoutStorage.saveWorkout(finalStats);
 
@@ -489,13 +821,14 @@ export function initZlowApp({
         pauseBtn.textContent = "Pause";
 
         // Reset pacer
-        pacer.setSpeed(0);
+        setPacerSpeed(0);
         const startPos = { x: 0.5, y: 1, z: -2 };
         pacer.avatarEntity.setAttribute("position", startPos);
         constants.pacerStarted = false;
 
         // Start a new session for next workout
         workoutSession.start();
+        milestoneTracker.reset();
       },
       // On Cancel
       () => {
@@ -572,7 +905,14 @@ export function initZlowApp({
       pacerSyncPos.z = riderSyncPos.z;
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
     }
+    if (connected) {
+      conn.send({name: "syncPlayers", data: {}});
+    }
   });
+
+  if (peerState!=0) {
+    pacerSyncBtn.innerHTML = "Sync Players";
+  }
 
   // Calorie reset button
   const caloriesResetBtn = getElement("calories-reset-btn");
@@ -640,105 +980,111 @@ darkMode.addEventListener("change", updateFavicon);
 
 // Gets workout summary
 export function getWorkoutSummary() {
-    const history = constants.rideHistory;
-    if (!history || history.length < 2) return null;
+  const history = constants.rideHistory;
+  if (!history || history.length < 2) return null;
 
-    const startTime = history[0].time;
-    const endTime = history[history.length - 1].time;
+  const startTime = history[0].time;
+  const endTime = history[history.length - 1].time;
 
-    const duration = Math.floor((endTime - startTime) / 1000);
-    const distanceKm = history[history.length - 1].distance;
-    const avgPower = history.reduce((sum, p) => sum + p.power, 0) / history.length;
+  const duration = Math.floor((endTime - startTime) / 1000);
+  const distanceKm = history[history.length - 1].distance;
+  const avgPower =
+    history.reduce((sum, p) => sum + p.power, 0) / history.length;
 
-    return {
-        name: "Zlow Ride",
-        description: "Workout synced from Zlow Cycling",
-        distance: distanceKm,     // km to m Strava converter happens inside upload
-        duration: duration,
-        avgPower: Math.round(avgPower),
-    };
+  return {
+    name: "Zlow Ride",
+    description: "Workout synced from Zlow Cycling",
+    distance: distanceKm, // km to m Strava converter happens inside upload
+    duration: duration,
+    avgPower: Math.round(avgPower),
+  };
 }
 
 // Disable exporting if Strava is not connected
-/*function updateStravaButtonState() {
-    const btn = document.getElementById("summary-export-strava");
-    if (!btn) return;
-    btn.disabled = !Strava.isConnected();
+function updateStravaButtonState() {
+  const btn = document.getElementById("summary-export-strava");
+  if (!btn) return;
+  btn.disabled = !Strava.isConnected();
 }
 
 updateStravaButtonState();
 setInterval(updateStravaButtonState, 2000);
 
 export async function exportToStrava() {
-    const strava = new Strava();
+  const strava = new Strava();
 
-    if (!Strava.isConnected()) {
-        alert("You must connect to Strava first (from main menu).");
-        return;
-    }
+  if (!Strava.isConnected()) {
+    alert("You must connect to Strava first (from main menu).");
+    return;
+  }
 
-    const workout = getWorkoutSummary();
-    if (!workout) {
-        alert("No workout data yet. Ride first!");
-        return;
-    }
+  const workout = getWorkoutSummary();
+  if (!workout) {
+    alert("No workout data yet. Ride first!");
+    return;
+  }
 
-    await strava.uploadActivity(workout);
-}*/
+  await strava.uploadActivity(workout);
+}
 
 // Generates TCX file based old saveTCX
 export function generateTCXFile() {
-    if (constants.rideHistory.length < 2) {
-        return null;
-    }
+  if (constants.rideHistory.length < 2) {
+    return null;
+  }
 
-    const startTime = new Date(constants.rideHistory[0].time);
-    let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
-    tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor(
-        (constants.rideHistory.at(-1).time -
-            constants.rideHistory[0].time) / 1000
-    )}</TotalTimeSeconds>\n        <DistanceMeters>${(
-        constants.rideHistory.at(-1).distance * 1000
-    ).toFixed(1)}</DistanceMeters>\n        <Intensity>Active</Intensity>\n        <TriggerMethod>Manual</TriggerMethod>\n        <Track>\n`;
+  const startTime = new Date(constants.rideHistory[0].time);
+  let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
+  tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor(
+    (constants.rideHistory.at(-1).time - constants.rideHistory[0].time) / 1000
+  )}</TotalTimeSeconds>\n        <DistanceMeters>${(
+    constants.rideHistory.at(-1).distance * 1000
+  ).toFixed(
+    1
+  )}</DistanceMeters>\n        <Intensity>Active</Intensity>\n        <TriggerMethod>Manual</TriggerMethod>\n        <Track>\n`;
 
-    for (let pt of constants.rideHistory) {
-        tcx += `          <Trackpoint>\n`;
-        tcx += `            <Time>${new Date(pt.time).toISOString()}</Time>\n`;
-        tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
-        tcx += `            <DistanceMeters>${(pt.distance * 1000).toFixed(1)}</DistanceMeters>\n`;
-        tcx += `            <Extensions>\n`;
-        tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
-        tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
-        tcx += `                <ns3:Speed>${constants.kmhToMs(pt.speed).toFixed(3)}</ns3:Speed>\n`;
-        tcx += `              </ns3:TPX>\n`;
-        tcx += `            </Extensions>\n`;
-        tcx += `          </Trackpoint>\n`;
-    }
+  for (let pt of constants.rideHistory) {
+    tcx += `          <Trackpoint>\n`;
+    tcx += `            <Time>${new Date(pt.time).toISOString()}</Time>\n`;
+    tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
+    tcx += `            <DistanceMeters>${(pt.distance * 1000).toFixed(
+      1
+    )}</DistanceMeters>\n`;
+    tcx += `            <Extensions>\n`;
+    tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
+    tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
+    tcx += `                <ns3:Speed>${constants
+      .kmhToMs(pt.speed)
+      .toFixed(3)}</ns3:Speed>\n`;
+    tcx += `              </ns3:TPX>\n`;
+    tcx += `            </Extensions>\n`;
+    tcx += `          </Trackpoint>\n`;
+  }
 
-    tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
+  tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
 
-    return new Blob([tcx], { type: "application/vnd.garmin.tcx+xml" });
+  return new Blob([tcx], { type: "application/vnd.garmin.tcx+xml" });
 }
 
 /**
  * Save a TCX file
  */
 function saveTCX() {
-    const tcxBlob = generateTCXFile();
-    if (!tcxBlob) {
-        alert("Not enough data to export.");
-        return;
-    }
+  const tcxBlob = generateTCXFile();
+  if (!tcxBlob) {
+    alert("Not enough data to export.");
+    return;
+  }
 
-    const url = URL.createObjectURL(tcxBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "zlow-ride.tcx";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const url = URL.createObjectURL(tcxBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "zlow-ride.tcx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 
   constants.rideHistory = [];
   constants.historyStartTime = Date.now();
