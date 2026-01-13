@@ -60,7 +60,7 @@ PORT=8080
 8. On the command line, type in ```docker-compose up```
 9. If you want to use the Strava services, follow steps 5 and 6 in strava_service/README.md. 
 
-Instead of doing steps 6 and 7, you can instead double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js. 
+Instead of doing steps 6 and 7, you can double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js. 
 
 ## A note about running the backend: 
 When running the backend locally, multiplayer will not work properly. You will only be able to run local multiplayer using two browser instances on the same computer. 
