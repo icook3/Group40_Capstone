@@ -606,8 +606,6 @@ export function initZlowApp({
 
   hud = new HUD({ getElement });
 
-  const strava = new Strava();
-
   // Map workout keys to user-facing labels
   const workoutLabels = {
     free: "Free Ride",
@@ -654,6 +652,8 @@ export function initZlowApp({
     },
   });
 
+  const strava = new Strava();
+
   //for testing purposes
   window.testHud = hud;
   window.testStorage = workoutStorage;
@@ -661,7 +661,7 @@ export function initZlowApp({
 
   //Pacer speed control input
   //Rider state and history
-  if (sessionStorage.getItem("testMode") == "true") {
+  if (localStorage.getItem("testMode") == "true") {
     /*const keyboardBtn = getElement("keyboard-btn");
         keyboardBtn.removeAttribute("hidden");
         keyboardBtn.addEventListener("click", () => {
@@ -849,14 +849,12 @@ export function initZlowApp({
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
-
   const connectBtn = getElement("connect-btn");
   connectBtn.addEventListener("click", async () => {
     await standardMode.connectTrainer();
     const ok = await standardMode.trainer.connect();
     if (ok) connectBtn.disabled = true;
   });
-
   // Calibration modal button
   const calibrateModalBtn = getElement("calibrate-trainer-modal-btn");
   if (calibrateModalBtn) {
@@ -872,7 +870,6 @@ export function initZlowApp({
       }
     });
   }
-
   standardMode.init();
   // setup the speed when using an actual trainer
   /*trainer.onData = (data) => {
