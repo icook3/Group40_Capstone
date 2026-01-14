@@ -30,9 +30,9 @@ Its upload responsibilities include:
 - `package-lock.json` - Locked dependency versions
 - `README.md` - Strava service documentation
 
-## How to Run This Service Locally
-This backend performs the secure Strava OAuth **code → token** exchange.  
-Follow the steps below to run it locally and test Strava login without deploying a full frontend.
+## How to Run This Service
+This backend performs the secure Strava OAuth **code → token** exchange and uploading activities to Strava.
+Follow the steps below to run it.
 
 ### 1. Clone the Repository
 ```bash
@@ -50,8 +50,13 @@ Open .env and fill in your values:
 ```
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
-FRONTEND_URI=https://your-frontend.example.com
-FRONTEND_REDIRECT_URI=https://your-frontend.example.com/path
+
+# Public origin of frontend (used for redirects)
+FRONTEND_URI=https://your-frontend-example.com
+
+# Full redirect URL where frontend handles Strava response
+FRONTEND_REDIRECT_URI=https://your-frontend-example.com/path
+
 PORT=8080
 ```
 
@@ -64,7 +69,7 @@ docker build -t strava-oauth-service .
 ```bash
 docker run --rm -p 8080:8080 --env-file .env strava-oauth-service
 ```
-You can verify if it is running at `http://localhost:8080/health`
+You can verify if it is running at `http://localhost:8080/health` or `http://your-backend-example.com/health`
 You should get back `ok`
 
 ### 5. Deploy or Expose Publicly to Test with Strava
