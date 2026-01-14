@@ -24,6 +24,189 @@
       type="image/svg+xml"
       href="../../resources/favicons/ZlowFavicon.svg"
     />
+    <style>
+      /* Trainer Calibration Modal Styles */
+      #calibration-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #calibration-modal.show {
+        display: flex;
+      }
+
+      .calibration-modal-content {
+        background: white;
+        border-radius: 10px;
+        padding: 40px;
+        max-width: 600px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .calibration-modal-content h2 {
+        color: #333;
+        margin-top: 0;
+        font-size: 1.8em;
+      }
+
+      .calibration-status {
+        font-size: 1.2em;
+        color: #666;
+        margin: 20px 0;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .status-connected {
+        color: #27ae60;
+        font-weight: bold;
+      }
+
+      .status-error {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .status-in-progress {
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .calibration-steps {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .calibration-steps h3 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .step {
+        margin: 10px 0;
+        padding: 10px;
+        background: white;
+        border-left: 4px solid #3498db;
+        border-radius: 4px;
+      }
+
+      .step.completed {
+        border-left-color: #27ae60;
+        background: #f0fdf4;
+      }
+
+      .step.active {
+        border-left-color: #f39c12;
+        background: #fffbf0;
+      }
+
+      .step-title {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .step-description {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .calibration-button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+
+      /* Override hud-btn styling for modal context */
+      .calibration-button-group .hud-btn {
+        background: #3498db;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 1.1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #3498db;
+      }
+
+      .calibration-button-group .hud-btn:hover:not(:disabled) {
+        background: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .calibration-button-group .hud-btn:disabled {
+        background: #95a5a6;
+        border-color: #95a5a6;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* Specific button colors */
+      #calibration-skip-btn {
+        background: #95a5a6 !important;
+        border-color: #95a5a6 !important;
+      }
+
+      #calibration-skip-btn:hover:not(:disabled) {
+        background: #7f8c8d !important;
+        border-color: #7f8c8d !important;
+      }
+
+      #calibration-close-btn {
+        background: #e74c3c !important;
+        border-color: #e74c3c !important;
+      }
+
+      #calibration-close-btn:hover:not(:disabled) {
+        background: #c0392b !important;
+        border-color: #c0392b !important;
+      }
+
+      .calibration-data-display {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        font-family: monospace;
+        color: #333;
+      }
+
+      .data-item {
+        margin: 8px 0;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .data-label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .data-value {
+        color: #27ae60;
+      }
+    </style>
   </head>
   <body>
     <div id="hud-top">
@@ -78,7 +261,8 @@
           Main Menu
         </button>
         <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
-
+        <button id="calibrate-trainer-modal-btn" class="hud-btn">Calibrate Trainer</button>
+        <button id="connect-btn">Connect Trainer</button>
         <button id="pause-btn" class="hud-btn">Pause</button>
         <button id="stop-btn" class="hud-btn">Stop</button>
       </div>
@@ -112,7 +296,6 @@
         <span class="weight-unit">kg</span>
       </span>
 
-      <button id="connect-btn">Connect Trainer</button>
       <button id="calories-reset-btn">Reset Calories</button>
     </div>
 
@@ -120,6 +303,75 @@
     <div id="pause-overlay" aria-hidden="true">
       <div class="pause-dialog">
         Resuming in <span id="pause-countdown">10</span>…
+      </div>
+    </div>
+
+    <!-- Trainer Calibration Modal -->
+<div id="calibration-modal" aria-hidden="true">
+      <div class="calibration-modal-content">
+        <h2>Trainer Calibration</h2>
+
+        <div class="calibration-status" id="calibration-status-display">
+          Ready to calibrate
+        </div>
+
+        <div class="calibration-steps">
+          <h3>Calibration Process</h3>
+          <div id="calibration-step-1" class="step active">
+            <div class="step-title">1. Connect Trainer</div>
+            <div class="step-description">
+              Search for and connect to your Bluetooth trainer device
+            </div>
+          </div>
+          <div id="calibration-step-2" class="step">
+            <div class="step-title">2. Spin-Down Calibration</div>
+            <div class="step-description">
+              Pedal at steady power, then stop and let trainer coast to measure resistance
+            </div>
+          </div>
+          <div id="calibration-step-3" class="step">
+            <div class="step-title">3. Zero Offset</div>
+            <div class="step-description">
+              Calibrate power meter zero offset
+            </div>
+          </div>
+          <div id="calibration-step-4" class="step">
+            <div class="step-title">4. Complete</div>
+            <div class="step-description">
+              Calibration successful - ready to ride
+            </div>
+          </div>
+        </div>
+
+        <div class="calibration-data-display" id="calibration-data-display" style="display: none;">
+          <div class="data-item">
+            <span class="data-label">Power (W):</span>
+            <span class="data-value" id="calibration-power-value">—</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Calibration State:</span>
+            <span class="data-value" id="calibration-state-value">—</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Last Event:</span>
+            <span class="data-value" id="calibration-last-event">—</span>
+          </div>
+        </div>
+
+        <div class="calibration-button-group">
+          <button id="calibration-connect-trainer-btn" class="hud-btn">
+            Connect Trainer
+          </button>
+          <button id="calibration-start-btn" class="hud-btn" disabled>
+            Start Calibration
+          </button>
+          <button id="calibration-skip-btn" class="hud-btn" style="background: #95a5a6;">
+            Skip Calibration
+          </button>
+          <button id="calibration-close-btn" class="hud-btn" style="background: #e74c3c;">
+            Close
+          </button>
+        </div>
       </div>
     </div>
 
@@ -245,6 +497,7 @@
     </a-scene>
 
     <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/trainerCalibration.js"></script>
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         if (window.initZlowApp) window.initZlowApp();
