@@ -3,28 +3,36 @@
 To run Zlow, first you will need to download the code for it: 
 
 1. Download and install git at https://git-scm.com
-    - You can check that you have it installed by typing in ```git -v``` in the command line. 
-2. Go to the folder you want to download Zlow to, and open the command line in it
-    - On Windows 11, you do this by right-clicking, and selecting "Open in Terminal"
-    - On windows 10, you do this by holding shift, right-clicking, and selecting "open PowerShell window here". 
-3. In the command line, type in ```git clone https://github.com/gioandjake/zlow.git```
+    - Get the most recent version (x64).
+    - The default installer settings work fine here.
+    - To can check that you have it installed, type ```git -v``` in the terminal/comand line. 
+    - To access the terminal/command line: 
+        - On Windows 11, hold shift, right-click on a folder area in Windows explorer, and select "Open in Terminal". 
+        - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
+2. In the file explorer, go to the folder you want to download Zlow to, and open the command line in it.
+3. In the command line, enter ```git clone https://github.com/gioandjake/zlow.git```
+4. Once this is done, close the command terminal.
 
-# Running the frontend
+# Running the frontend (Zlow)
 
-To run the frontend, you will need to set up a local server for it. There are many ways to do this, but here is the way that it has been tested using. 
+To run Zlow, you will need to set up a local server for it. 
 
-1. Download and install Python at https://www.python.org/downloads/
-    - You can check that you have it installed by typing in ```python3 --version``` in the command line. 
-2. Go to the folder you downloaded Zlow to, navigate to frontend, and open the command line in it. 
-    - On Windows 11, you do this by right-clicking, and selecting "Open in Terminal"
-    - On windows 10, you do this by holding shift, right-clicking, and selecting "open PowerShell window here".
-3. Type in the command ```python3 -m http.server 8000```
-4. In your web browser, navigate to ```localhost:8000/src/html/mainMenu.html```
-
-I have also provided a handy .bat file if you do not want to deal with navigating the command line. To use this, here are the steps: 
+## Option 1 - using the command line
 
 1. Download and install Python at https://www.python.org/downloads/
-    - You can check that you have it installed by typing in ```python3 --version``` in the command line. 
+    - When running the installer, the capital letters are the default.
+    - You can check that you have it installed by entering ```python3 --version``` in the command line. 
+    - To access the terminal/command line: 
+        - On Windows 11, hold shift, right-click on a folder area in Windows explorer, and select "Open in Terminal". 
+        - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
+2. Go to the folder where Zlow is located, open the folder called frontend, and open the command line in it. 
+3. Enter the command ```python3 -m http.server 8000```
+4. In your web browser, open a tab to to ```localhost:8000/src/html/mainMenu.html```
+
+## Option 2 - using a batch file
+
+1. Download and install Python at https://www.python.org/downloads/
+    - You can check that you have it installed by entering ```python3 --version``` in the command line. 
 2. Go to the folder you downloaded Zlow to. 
 3. Double-click on ```frontend.bat```
 4. In your web browser, navigate to ```localhost:8000/src/html/mainMenu.html```
@@ -32,9 +40,9 @@ I have also provided a handy .bat file if you do not want to deal with navigatin
 ## Important note about running the frontend
 Some installations of python use a different name. If this is the case, you might have to replace python3 in the command prompt above with python or py. If this is the case, the .bat script won't work either, and will also require modification. 
 
-# Running the backend
+# Running the backend (Strava and Multiplayer)
 
-Some features of Zlow are not available with just the frontend. To use these locally, you will need to run the backend as well. This is a bit more complicated. 
+To run multiplayer and Strava, you need a custom server. 
 
 1. Go the the Zlow folder, and navigate to backend. 
 2. Under the peer_service folder is a file called .env.example. Copy it, and name it .env.
@@ -54,13 +62,29 @@ PORT=8080
 ```
 6. Download and install Docker at https://www.docker.com/products/docker-desktop/
     - You can check that you have it installed by typing in ```docker -v```
+    - To access the terminal/command line: 
+        - On Windows 11, hold shift, right-click on a folder area in Windows explorer, and select "Open in Terminal". 
+        - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
 7. Go back to the backend folder, and open up the command line in it.
-    - On Windows 11, you do this by right-clicking, and selecting "Open in Terminal"
-    - On windows 10, you do this by holding shift, right-clicking, and selecting "open PowerShell window here".
 8. On the command line, type in ```docker-compose up```
 9. If you want to use the Strava services, follow steps 5 and 6 in strava_service/README.md. 
 
-Instead of doing steps 6 and 7, you can instead double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js. 
+Instead of doing steps 7 and 8, you can double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js. 
 
 ## A note about running the backend: 
 When running the backend locally, multiplayer will not work properly. You will only be able to run local multiplayer using two browser instances on the same computer. 
+
+# Reopening Zlow
+When you close the command terminal, you will have to rerun the commands related to the fronend and backend to run Zlow again. You will not have to redownload Git, Python, Docker, or the Zlow source code itself. 
+
+If you simply close the browser window, you will just have to enter ```localhost:8000/src/html/mainMenu.html``` in the web browser's address bar to reopen Zlow. 
+
+To update Zlow, follow these steps: 
+
+1. In the file explorer, go to the folder you want to download Zlow to, and open the command line in it.
+    - To access the terminal/command line: 
+        - On Windows 11, hold shift, right-click on a folder area in Windows explorer, and select "Open in Terminal". 
+        - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
+2. in the command line, enter the command ```git pull```.
+
+You do not need to close and reopen the main program terminal if you already have it running. You only need to close and reopen the backend.
