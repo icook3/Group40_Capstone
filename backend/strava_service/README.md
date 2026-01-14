@@ -36,8 +36,8 @@ Follow the steps below to run it locally and test Strava login without deploying
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/icook3/Group40_Capstone_Backend.git
-cd Group40_Capstone_Backend
+git clone https://github.com/icook3/Group40_Capstone.git
+cd Group40_Capstone
 ```
 
 ### 2. Create your `.env` File
