@@ -51,7 +51,7 @@ Open .env and fill in your values:
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
 
-# Public origin of frontend (used for redirects)
+# Public origin of frontend
 FRONTEND_URI=https://your-frontend-example.com
 
 # Full redirect URL where frontend handles Strava response
