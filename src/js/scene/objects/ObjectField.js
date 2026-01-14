@@ -32,8 +32,9 @@ export class ObjectField {
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
 
-    //camera
-    this.camera = document.getElementById('rig');
+    // Rotate rig to face forwards relative to the rider
+    this.rig = document.getElementById('rig');
+    this.rig.setAttribute('rotation', '0 -105 0'); 
     
 
   }
@@ -80,6 +81,10 @@ export class ObjectField {
     //console.log("SPEED: " + riderSpeed);
 
 
+
+
+
+    //console.log(this.rider.getAttribute('position').dur);
 
 
 

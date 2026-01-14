@@ -29,7 +29,7 @@ export class Track {
 
 
 
-    this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-20, 0,2,-30; dur: 2000; loop: false; delay: 5000; rotate: true;');
+    this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-30, 0,2,-45; loop: false; delay: 5000; rotate: true;');
 
     //this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-20, 0,2,-30; dur: 2000; loop: false; delay:5000;');
 

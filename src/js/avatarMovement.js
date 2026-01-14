@@ -18,19 +18,19 @@ export class AvatarMovement {
 
     // Add point-of-view camera to rider using a rig
     addCamera() {
+        // Spawn from class rather than creating new
         this.rider = document.getElementById('rider');
         const rig = document.createElement('a-entity');
         rig.setAttribute('id','rig');
         const camera = document.createElement('a-entity');
         camera.setAttribute('id','camera');
         camera.setAttribute('look-controls','');
-        camera.setAttribute('position','-10 5 0');
+        camera.setAttribute('position','4 5 10');
         camera.setAttribute('look-at', rider);
         camera.setAttribute('camera', 'active', true);
         rig.appendChild(camera);
         this.rider.appendChild(rig);
     }
-
 
     //Helper to interpolate smoothly between A and B
     cycleInterpolate (a, b, phase) {
