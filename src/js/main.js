@@ -117,12 +117,15 @@ let scene;
 let hud;
 let keyboardMode;
 let standardMode;
+
 //Avatar and Pacer
 let rider;
 let pacer;
+
 // workout session
 let workoutStorage;
 let workoutSession;
+
 // milestones
 let notificationManager;
 let milestoneTracker;

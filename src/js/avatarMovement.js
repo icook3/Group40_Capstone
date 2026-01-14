@@ -9,7 +9,28 @@ export class AvatarMovement {
         this.speed = 0;
         this.power = 0;
         this.isPacer = options.isPacer || false;
+
+        // Fix camera to rider entity
+        if (id == "rider") {
+            this.addCamera();
+        }
     }
+
+    // Add point-of-view camera to rider using a rig
+    addCamera() {
+        this.rider = document.getElementById('rider');
+        const rig = document.createElement('a-entity');
+        rig.setAttribute('id','rig');
+        const camera = document.createElement('a-entity');
+        camera.setAttribute('id','camera');
+        camera.setAttribute('look-controls','');
+        camera.setAttribute('position','-10 5 0');
+        camera.setAttribute('look-at', rider);
+        camera.setAttribute('camera', 'active', true);
+        rig.appendChild(camera);
+        this.rider.appendChild(rig);
+    }
+
 
     //Helper to interpolate smoothly between A and B
     cycleInterpolate (a, b, phase) {

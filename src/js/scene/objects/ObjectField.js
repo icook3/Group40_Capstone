@@ -73,6 +73,20 @@ export class ObjectField {
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
+
+    //DOES FIRE IF YOU ONLY HAVE THE ANIMATION RUNNING AND NOT ANYTHING ELSE
+    // CAN YOU HAVE THE THING PAUSE??
+    //console.log("TIME: " + dt);
+    //console.log("SPEED: " + riderSpeed);
+
+
+
+
+
+
+
+
+
     if (!this.initialized || (riderSpeed, dt) === 0) return;
     let dz = 0;
 
@@ -80,7 +94,9 @@ export class ObjectField {
     for (const obj of this.items) {
       const pos = getPos(obj);
       pos.z += dz;
-
+      
+      // SHOULD KEEP RECYCLING IN FRONT OF FARTHEST OBJECT WITHOUT ADVANCING SCENERY
+      // MAY NEED TO DEFINE AS A FUNTION OF HOW FAR THE THING IS IN FRONT OF THE RIDER
       if (pos.z > 10) {
         // recycle in front of farthest
         const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
@@ -91,7 +107,7 @@ export class ObjectField {
         pos.x = kind.resampleX();
 
       }
-        setPos(obj, pos);
+        //setPos(obj, pos);
     }
 
     for (const band of this.externalGroups) {
@@ -131,7 +147,7 @@ export class ObjectField {
           pos.x = kind.resampleX();
         }
       }
-      setPos(obj, pos);
+      //setPos(obj, pos);
     }
   }
 

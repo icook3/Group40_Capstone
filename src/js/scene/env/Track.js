@@ -10,6 +10,8 @@ export class Track {
   constructor({ sceneEl }) {
     this.sceneEl = sceneEl;
 
+    //REM YOU NEED TO GET THE LENGTH OF THE WHOLE PATH, NOT JUST THE LENGTH BETWEEN SEGEMENTS
+
     // Create a-entity for the path and set ID
     // MAY NOT NEED THIS ANYMORE
     const path_element = document.createElement('a-entity');
@@ -17,21 +19,19 @@ export class Track {
     this.path_element = path_element;
     sceneEl.appendChild(path_element);
 
-
     // Get rider and pacer entities
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
 
-    //const sphere = document.createElement('a-sphere');
-    //sphere.setAttribute('color', 'red');
-    //sphere.setAttribute('radius', '0.25');
-    //sphere.setAttribute('position', '0 0 0');
-    //sphere.setAttribute('alongpath', 'path:2,2,-5 -2,1,-2.5 0,1,-1; closed:true; dur:5000; delay:4000;');
-    //this.sceneEl.appendChild(sphere);
-
-
     // ALONGPATH FUNCTIONS AS EXPECTED BUT NEEDS THE RIGHT PATH AND SPEED ADJUSTMENTS
-    this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-20; dur: 0; loop: false; delay:5000;');
+    // TRY TO CONVERT THE PATH PART TO SOME SORT OF ARRAY
+
+
+
+
+    this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-20, 0,2,-30; dur: 2000; loop: false; delay: 5000; rotate: true;');
+
+    //this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-20, 0,2,-30; dur: 2000; loop: false; delay:5000;');
 
 
 
