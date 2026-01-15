@@ -206,7 +206,7 @@ function loop({
   const riderSpeed = constants.riderState.speed || 0;
 
   rider.update(dt);
-  if (constants.pacerStarted&&peerState==0) {
+  if (constants.pacerStarted && peerState == 0) {
     //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
     let pacerSpeed = pacer.speed || 0;
@@ -238,10 +238,10 @@ function loop({
     const pacerPos = pacer.avatarEntity.getAttribute("position");
     pacerPos.z -= relativeSpeed * dt;
     pacer.setPosition(pacerPos);
-  } else if (peerState!=0&&connected&&pacer!=undefined) {
+  } else if (peerState != 0 && connected && pacer != undefined) {
     pacer.update(dt);
 
-    const riderSpeed = constants.riderState.speed;    
+    const riderSpeed = constants.riderState.speed;
     const pacerSpeed = pacer.speed;
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
@@ -310,7 +310,7 @@ function setUnits(storageVal, className) {
 }
 
 function setPacerSpeed(speed) {
-  if (peerState==0) {
+  if (peerState == 0) {
     pacer.setSpeed(speed);
   }
 }
@@ -318,20 +318,20 @@ function setPacerSpeed(speed) {
 //0: not in peer-peer mode
 //1: host
 //2: peer
-let peerState=0;
+let peerState = 0;
 let connected = false;
 //used for frequent updates in update method
 function sendPeerDataOver(speed) {
   //console.log("sending data: "+connected);
-  if (connected&&conn.open) {
-    conn.send({name:"speed",data:speed})
+  if (connected && conn.open) {
+    conn.send({ name: "speed", data: speed });
   }
 }
 
 function recieveData(data) {
   //console.log("Recieving data");
   //console.log(data);
-  switch(data.name) {
+  switch (data.name) {
     case "playerData":
       console.log("recieving player data");
       pacer = new AvatarMovement("pacer", {
@@ -339,13 +339,16 @@ function recieveData(data) {
         isPacer: false,
       });
       pacer.creator.loadOtherData(data.data);
-      if (peerState==1) {
-        conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+      if (peerState == 1) {
+        conn.send({
+          name: "playerData",
+          data: localStorage.getItem("playerData"),
+        });
       }
       break;
     case "speed":
       //console.log("Set pacer speed to "+data.data);
-      if (pacer==null) {
+      if (pacer == null) {
         return;
       }
       activatePacer();
@@ -363,7 +366,6 @@ function recieveData(data) {
   }
 }
 
-
 // Exported function to initialize app (for browser and test)
 export function initZlowApp({
   getElement = (id) => document.getElementById(id),
@@ -371,133 +373,149 @@ export function initZlowApp({
 } = {}) {
   // initialize peer-to-peer connection
   // if you are the peer
-  if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
+  if (sessionStorage.getItem("SelectedWorkout") == "peerServer") {
     peerState = 2;
     console.log("connecting to peer");
-    peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
-    peer.on('open', id => {
-        conn = peer.connect(sessionStorage.getItem("peer"));
-        console.log("ID="+id);
-
-        setTimeout(() => {
-            if (!connected) {
-                alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
-                try { conn.close(); } catch {}
-                peerState = 0;
-                window.location.href="mainMenu.html"
-            }
-        }, 1500);
-
-        //console.log("Peer: "+peer);
-        conn.on('open', () => {
-          console.log("connected!");
-          console.log(conn);
-          connected = true;
-          // initially send over JSON of character design
-          // when you recieve data
-          conn.on("data", data => {
-              if (data.name === "error") {
-                  connected = false;
-                  alert(data.data);
-                  conn.close();
-                  peerState = 0;
-                  return;
-              }
-
-              recieveData(data);
-          });
-          conn.send({name:"playerData", data:localStorage.getItem('playerData')});
-        });
-        conn.on('error', function(err) {
-            if (err.type === "peer-unavailable") {
-                alert("Could not connect — the host does not exist.");
-                peerState = 0;
-                return;
-            } else {
-                console.error("Connection Error:", err);
-            }
-
-            console.error("Connection Error:", err);
-        });
+    peer = new Peer({
+      host: constants.peerHost,
+      port: constants.peerPort,
+      path: constants.peerPath,
     });
-    peer.on('error', function(err) {
-        // Server/connection issue
-        if (err.type === "network" || err.type === "server-error") {
-            console.log("Network/server error");
+    peer.on("open", (id) => {
+      conn = peer.connect(sessionStorage.getItem("peer"));
+      console.log("ID=" + id);
+
+      setTimeout(() => {
+        if (!connected) {
+          alert(
+            "Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist"
+          );
+          try {
+            conn.close();
+          } catch {}
+          peerState = 0;
+          window.location.href = "mainMenu.html";
+        }
+      }, 1500);
+
+      //console.log("Peer: "+peer);
+      conn.on("open", () => {
+        console.log("connected!");
+        console.log(conn);
+        connected = true;
+        // initially send over JSON of character design
+        // when you recieve data
+        conn.on("data", (data) => {
+          if (data.name === "error") {
+            connected = false;
+            alert(data.data);
+            conn.close();
             peerState = 0;
             return;
+          }
+
+          recieveData(data);
+        });
+        conn.send({
+          name: "playerData",
+          data: localStorage.getItem("playerData"),
+        });
+      });
+      conn.on("error", function (err) {
+        if (err.type === "peer-unavailable") {
+          alert("Could not connect — the host does not exist.");
+          peerState = 0;
+          return;
+        } else {
+          console.error("Connection Error:", err);
         }
 
-        console.error("PeerJS error:", err);
+        console.error("Connection Error:", err);
+      });
+    });
+    peer.on("error", function (err) {
+      // Server/connection issue
+      if (err.type === "network" || err.type === "server-error") {
+        console.log("Network/server error");
+        peerState = 0;
+        return;
+      }
+
+      console.error("PeerJS error:", err);
     });
   }
-  // You are hosting a session 
-  else if (sessionStorage.getItem("peerToPeer")=='true') {
+  // You are hosting a session
+  else if (sessionStorage.getItem("peerToPeer") == "true") {
     peerState = 1;
     console.log("hosting peer");
-    peer = new Peer(localStorage.getItem("Name"), {host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
-    peer.on('open', function(id) {
-        console.log("ID="+id);        
+    peer = new Peer(localStorage.getItem("Name"), {
+      host: constants.peerHost,
+      port: constants.peerPort,
+      path: constants.peerPath,
     });
-    peer.on("connection", connection => {
-        if (connected) {
-            // reject second player
-            connection.send({
-                name: "error",
-                data: "This lobby is full."
-            });
-            connection.close()
-            return
-        }
-
-        conn = connection;
-        connected = true;
-
-        console.log("Peer JOINED lobby:", connection.peer);
-
-        // Immediately listen for messages
-        conn.on("data", data => recieveData(data));
-
-        // Send host's player data back
-        conn.send({
-            name: "playerData",
-            data: localStorage.getItem("playerData")
-        });
-
-        conn.on("error", err => {
-            console.error("Connection error:", err);
-        });
+    peer.on("open", function (id) {
+      console.log("ID=" + id);
     });
-    peer.on('error', function(err) {
+    peer.on("connection", (connection) => {
+      if (connected) {
+        // reject second player
+        connection.send({
+          name: "error",
+          data: "This lobby is full.",
+        });
+        connection.close();
+        return;
+      }
 
-        if (err.type === "unavailable-id") {
-            alert("This name is already being used. Please choose a different one.");
-            peerState = 0;
-            window.location.href="mainMenu.html"
-            return;
-        }
+      conn = connection;
+      connected = true;
 
-        if (err.type === "peer-unavailable") {
-            console.log("Peer unavailable.");
-            return;
-        }
+      console.log("Peer JOINED lobby:", connection.peer);
 
-        if (err.type === "network" || err.type === "server-error") {
-            console.log("Network/server error");
-            peerState = 0;
-            return;
-        }
+      // Immediately listen for messages
+      conn.on("data", (data) => recieveData(data));
 
-        switch (err.type) {
-            case "browser-incompatible":
-                console.log("PeerJS not supported by this browser.");
-                break;
-            case "invalid-id":
-                window.location.href = "./mainMenu.html";
-                break;
-        }
+      // Send host's player data back
+      conn.send({
+        name: "playerData",
+        data: localStorage.getItem("playerData"),
+      });
 
-        console.error("PeerJS error:", err);
+      conn.on("error", (err) => {
+        console.error("Connection error:", err);
+      });
+    });
+    peer.on("error", function (err) {
+      if (err.type === "unavailable-id") {
+        alert(
+          "This name is already being used. Please choose a different one."
+        );
+        peerState = 0;
+        window.location.href = "mainMenu.html";
+        return;
+      }
+
+      if (err.type === "peer-unavailable") {
+        console.log("Peer unavailable.");
+        return;
+      }
+
+      if (err.type === "network" || err.type === "server-error") {
+        console.log("Network/server error");
+        peerState = 0;
+        return;
+      }
+
+      switch (err.type) {
+        case "browser-incompatible":
+          console.log("PeerJS not supported by this browser.");
+          break;
+        case "invalid-id":
+          window.location.href = "./mainMenu.html";
+          break;
+      }
+
+      console.error("PeerJS error:", err);
     });
   }
   const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
@@ -521,7 +539,7 @@ export function initZlowApp({
   const workoutSummary = new WorkoutSummary({
     workoutStorage,
     onClose: () => {
-      console.log("Summary was closed");
+      window.location.href = "mainMenu.html";
     },
   });
 
@@ -903,11 +921,11 @@ export function initZlowApp({
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
     }
     if (connected) {
-      conn.send({name: "syncPlayers", data: {}});
+      conn.send({ name: "syncPlayers", data: {} });
     }
   });
 
-  if (peerState!=0) {
+  if (peerState != 0) {
     pacerSyncBtn.innerHTML = "Sync Players";
   }
 
