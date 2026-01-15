@@ -2,8 +2,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 
-import oauthRoutes from "./routes/oauthRoutes.js"
-import stravaRoutes from "./routes/stravaRoutes.js"
+import oauthRoutes from "./routes/oauthRoutes.js";
+import stravaRoutes from "./routes/stravaRoutes.js";
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ app.use(cors({
 
 // Health check
 app.get("/health", (_req, res) => {
-    res.status(200).send("ok")
+    res.status(200).send("ok");
 });
 
 

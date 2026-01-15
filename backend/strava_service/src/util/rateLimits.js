@@ -9,7 +9,7 @@ let daily = [];
 function prune() {
     const now = Date.now();
     fifteenMinutes = fifteenMinutes.filter(time => now - time < FIFTEEN_MINUTES);
-    daily = daily.filter(time => now - time < ONE_DAY)
+    daily = daily.filter(time => now - time < ONE_DAY);
 }
 
 export function canMakeCall() {
@@ -32,5 +32,5 @@ export function getStatus() {
             fifteenMinutes: FIFTEEN_MINUTES_LIMIT,
             daily: ONE_DAY_LIMIT
         }
-    }
+    };
 }

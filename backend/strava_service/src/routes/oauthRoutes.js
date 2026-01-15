@@ -20,7 +20,7 @@ router.get("/callback", async (req, res) =>{
 
         // If Strava doesn't send code
         if (!code) {
-            return res.status(400).send("Missing 'code' query parameter")
+            return res.status(400).send("Missing 'code' query parameter");
         }
 
         // Exchange code for access token securely from server side
@@ -56,7 +56,7 @@ router.get("/callback", async (req, res) =>{
     catch (err) {
         // If Strava token exchange fails
         console.error("OAuth exchange failed:", err?.response?.data || err.message);
-        return res.status(500).send("OAuth token exchange failed")
+        return res.status(500).send("OAuth token exchange failed");
     }
 });
 
@@ -79,14 +79,14 @@ router.post("/refresh", async (req, res) => {
             client_id: STRAVA_CLIENT_ID,
             client_secret: STRAVA_CLIENT_SECRET,
             grant_type: "refresh_token",
-            refresh_token,
+            refresh_token
         };
 
         // Perform POST to Strava OAuth token endpoint
         const {data} = await axios.post(tokenURL, payload, {
             headers: { "Content-Type": "application/json" },
             timeout: 10000
-        })
+        });
 
         // Return minimal JSON response
         return res.json({

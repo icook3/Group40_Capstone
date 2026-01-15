@@ -73,7 +73,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
         );
 
         recordCall();
-        return res.json(response.data)
+        return res.json(response.data);
     } catch (err) {
         console.error(
             "Strava upload failed: ",
