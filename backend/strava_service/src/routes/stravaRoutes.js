@@ -10,7 +10,10 @@ import {
 } from "../util/rateLimits.js";
 
 const router = express.Router();
-const upload = multer({storage: multer.memoryStorage()});
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {fileSize: 10 * 1024 * 1024} // 10 MB
+});
 
 // Rate limit status endpoint
 router.get("/count", (_req, res) => {
