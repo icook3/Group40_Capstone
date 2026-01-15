@@ -32,7 +32,7 @@ Its upload responsibilities include:
 
 ## How to Run This Service
 This backend performs the secure Strava OAuth **code → token** exchange and uploading activities to Strava.
-Follow the steps below to run it.
+Follow the steps below to run it. You need a Strava App created beforehand.
 
 ### 1. Clone the Repository
 ```bash
@@ -74,12 +74,12 @@ You should get back `ok`
 
 ### 5. Deploy or Expose Publicly to Test with Strava
 
-Strava must be able to reach this service at a **public HTTPS URL** when it performs the OAuth redirect.
+Strava must be able to reach this service at a **public HTTPS URL**.
 For local development or production, this means one of the following:
 
-| Environment | Requirement |
-|------------|-------------|
-| Local Development | Expose `http://localhost:8080` through a secure public URL (HTTP tunneling or reverse proxy) |
+| Environment               | Requirement |
+|---------------------------|-------------|
+| Local Deployment          | Expose `http://localhost:8080` through a secure public URL (HTTP tunneling or reverse proxy) |
 | Cloud / Server Deployment | Deploy the container to any hosting provider that provides HTTPS |
 
 This service is deployment-agnostic and works anywhere Docker runs.
