@@ -1,8 +1,8 @@
 // RideHistory class to manage historical ride data samples
-// Currently only stores up to 60 minutes of data at 1 sample per second
+// Currently only stores up to 120 minutes of data at 1 sample per second
 
 export class RideHistory {
-  constructor({ maxSamples = 60 * 60 } = {}) {
+  constructor({ maxSamples = 120 * 60 } = {}) {
     this.maxSamples = maxSamples;
     this.samples = [];
     this.lastSecond = null;
