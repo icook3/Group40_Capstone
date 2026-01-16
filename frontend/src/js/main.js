@@ -12,7 +12,7 @@ import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
 import { RampTestController } from "./workouts/RampTestController.js";
-
+import { rideHistory } from "./rideHistoryStore.js";
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
@@ -279,15 +279,7 @@ function loop({
       parseFloat(getElement("distance").textContent)
     ) || 0;
 
-  if (constants.lastHistorySecond !== thisSecond) {
-    constants.rideHistory.push({
-      time: pushTime,
-      power: pushPower,
-      speed: pushSpeed,
-      distance: pushDistance,
-    });
-    constants.lastHistorySecond = thisSecond;
-  }
+  rideHistory.pushSample(pushTime, pushPower, pushSpeed, pushDistance);
   sendPeerDataOver(constants.riderState.speed);
   requestAnimationFrameFn(loop);
 }
@@ -762,23 +754,6 @@ export function initZlowApp({
     }
   });
 
-  /*const stopBtn = getElement("stop-btn");
-  stopBtn.addEventListener("click", () => {
-    simulationState.isPaused = false;
-    countdown.cancel();
-    constants.rideHistory = [];
-    constants.historyStartTime = Date.now();
-    constants.lastHistorySecond = null;
-    constants.riderState = { power: 0, speed: 0 };
-    hud.resetWorkOut();
-    pauseBtn.textContent = "Pause";
-
-    // Reset pacer
-    pacer.setSpeed(0);
-    const startPos = { x: 0.5, y: 1, z: -2 };
-    pacer.avatarEntity.setAttribute("position", startPos);
-    constants.pacerStarted = false;
-  });*/
   const stopBtn = getElement("stop-btn");
   stopBtn.addEventListener("click", () => {
     // Show confirmation dialog
@@ -791,7 +766,7 @@ export function initZlowApp({
         // After you compute finalStats from workoutSession / history, etc.
         if (selectedWorkout === "ramp" && rampController) {
           const result = rampController.computeFtpFromHistory(
-            constants.rideHistory
+            rideHistory
           );
           if (result) {
             // Flatten FTP numbers into stats for summary + records
@@ -924,7 +899,7 @@ export function initZlowApp({
     strava,
     pacer,
     getRiderState: () => riderState,
-    getRideHistory: () => rideHistory,
+    getRideHistory: () => rideHistory.samples,
     setRiderState: (state) => {
       riderState = state;
     },
@@ -944,10 +919,9 @@ export function initZlowApp({
       historyStartTime = val;
     },
     getHistoryStartTime: () => historyStartTime,
-    setLastHistorySecond: (val) => {
-      lastHistorySecond = val;
-    },
-    getLastHistorySecond: () => lastHistorySecond,
+    setLastHistorySecond: (val) => { rideHistory.lastSecond = val; },
+    getLastHistorySecond: () => rideHistory.lastSecond,
+
   };
 }
 
@@ -977,7 +951,7 @@ darkMode.addEventListener("change", updateFavicon);
 
 // Gets workout summary
 export function getWorkoutSummary() {
-  const history = constants.rideHistory;
+  const history = rideHistory.samples;
   if (!history || history.length < 2) return null;
 
   const startTime = history[0].time;
@@ -1026,22 +1000,22 @@ export async function exportToStrava() {
 
 // Generates TCX file based old saveTCX
 export function generateTCXFile() {
-  if (constants.rideHistory.length < 2) {
+  if (rideHistory.length() < 2) {
     return null;
   }
 
-  const startTime = new Date(constants.rideHistory[0].time);
+  const startTime = new Date(rideHistory[0].time);
   let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
   tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor(
-    (constants.rideHistory.at(-1).time - constants.rideHistory[0].time) / 1000
+    (rideHistory.at(-1).time - rideHistory[0].time) / 1000
   )}</TotalTimeSeconds>\n        <DistanceMeters>${(
-    constants.rideHistory.at(-1).distance * 1000
+    rideHistory.at(-1).distance * 1000
   ).toFixed(
     1
   )}</DistanceMeters>\n        <Intensity>Active</Intensity>\n        <TriggerMethod>Manual</TriggerMethod>\n        <Track>\n`;
 
-  for (let pt of constants.rideHistory) {
+  for (let pt of rideHistory) {
     tcx += `          <Trackpoint>\n`;
     tcx += `            <Time>${new Date(pt.time).toISOString()}</Time>\n`;
     tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
