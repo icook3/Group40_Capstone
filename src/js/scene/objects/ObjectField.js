@@ -23,10 +23,10 @@ export class ObjectField {
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
 
-    //this.path_element = document.getElementById('track');
+    // SPAWN IN TRACK HERE
 
 
-
+    let dt_total = 0;
     // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
     //straightSpline(0);
     this.rider = document.getElementById('rider');
@@ -74,26 +74,50 @@ export class ObjectField {
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
+    let dz = riderSpeed * dt;
+    
 
-    //DOES FIRE IF YOU ONLY HAVE THE ANIMATION RUNNING AND NOT ANYTHING ELSE
-    // CAN YOU HAVE THE THING PAUSE??
-    //console.log("TIME: " + dt);
-    //console.log("SPEED: " + riderSpeed);
-
+    // REMEMBER YOU HAVE TO PUSH W TO GET RIDER SPEED
 
 
+    // SO DZ IS UNITS TRAVELED PER MILLISECOND -- USUALLY ABOUT .1
+
+    // If rider speed is greater than 0 and alongpath exists, update it
+    // OK SO - TO FIGURE OUT HOW MANY MILLISECONTS IT TAKES TO TRAVERSE THE TRACK take the length of the track (90) divided by speed (units per second) times 1000
+    if (riderSpeed > 0) {
+      constants.dt_total += dt;
+      //console.log("DT TOTAL: " + constants.dt_total);
+      // UPDATE WHEN TOTAL OF DT IS > 1
+
+      // Update duration once per second
+      if (constants.dt_total > 1) {
+        //this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-120; loop: false; dur: 3600;');
+        const trackLength = 12000; // length of the path in alongpath
+
+        // ORIGINAL TRACK LENGTH / DZ * 1000 MAY WORK IF THE TRACK IS LONGER
+        const dur = (trackLength / dz); // duration in milliseconds
+        this.rider.setAttribute('alongpath', `path: 0,2,5 0,2,-12000; loop: false; dur: ${dur}};`);
 
 
-    //console.log(this.rider.getAttribute('position').dur);
 
+        console.log("HIT");
+        constants.dt_total = 0
+      }
 
+      
 
+      // JITTER IN SCENE SEEMS TO BE A FUNCTION OF UPDATING THE ATTRIBUTE TOO OFTEN
+      //this.rider.setAttribute('alongpath', `path: 0,2,0 0,2,-120; loop: false; dur: ${dur};`);
 
+      //console.log("DURATION: " + this.rider.getAttribute('alongpath').dur);
+    }
 
-
+    // If rider speed returns to 0, remove alongpath to stop avatar movement
+    if (riderSpeed == 0 && this.rider.hasAttribute('alongpath')) {
+      this.rider.removeAttribute('alongpath');
+    }
 
     if (!this.initialized || (riderSpeed, dt) === 0) return;
-    let dz = 0;
 
     // Handles all objects currently part of the items array
     for (const obj of this.items) {

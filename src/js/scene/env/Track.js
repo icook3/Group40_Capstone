@@ -19,73 +19,20 @@ export class Track {
     this.path_element = path_element;
     sceneEl.appendChild(path_element);
 
-    // Get rider and pacer entities
+    // Get rider and pacer entities -- MAY NOT NEED THIS
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
 
-    // ALONGPATH FUNCTIONS AS EXPECTED BUT NEEDS THE RIGHT PATH AND SPEED ADJUSTMENTS
-    // TRY TO CONVERT THE PATH PART TO SOME SORT OF ARRAY
-
-
-
-
-    this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-30, 0,2,-45; loop: false; delay: 5000; rotate: true;');
-
-    //this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-15 0,2,-20, 0,2,-30; dur: 2000; loop: false; delay:5000;');
-
-
-
-
-
     
-    //const track1 = document.createElement('a-entity');
-    //track1.setAttribute('id','track1');
 
 
 
-
-    //const point1 = document.createElement('a-curve-point');
-    //point1.setAttribute('position', '0 0 -15');
-    //track1.appendChild(point1);
-
-    //const point2 = document.createElement('a-curve-point');
-    //point2.setAttribute('position', '0 5 -30');
-    //track1.appendChild(point2);
-
-
-    //const point3 = document.createElement('a-curve-point');
-    //point3.setAttribute('position', '0 10 -45');
-    //track1.appendChild(point3);
-
-
-    //console.log(track1)
-
-    //this.sceneEl.appendChild(track1);
-
-
-    //this.rider.setAttribute('alongpath', 'curve: #track1');
 
 
     
 
   }
 
-  straightSpline(spawnZ) {
-    // Spawn a series of points defining the track
-    
-
-
-
-    // Add to follow-spline for the rider
-
-
-    // See what happens?!
-
-    // CAN PROBABLY UPDATE CAMERA POSITION BASED ON RIDER POSITION
-
-
-
-  }
 
   // Create and append track straight track piece
   straightPiece(spawnZ) {
