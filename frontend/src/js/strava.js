@@ -11,6 +11,7 @@ export class Strava {
         this.BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
         this.OAUTH_CALLBACK = "/oauth/callback"
         this.REFRESH = "/oauth/refresh"
+        this.UPLOAD = "/strava/upload"
     }
 
     // Begin OAuth
@@ -97,7 +98,7 @@ export class Strava {
     }
 
 
-    // Upload workout to Strava (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
+    // Upload workout to Strava through backend (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
     async uploadActivity({name, description}) {
         this.loadToken();
 
@@ -142,7 +143,7 @@ export class Strava {
         formData.append("data_type", "tcx");
         formData.append("external_id", "zlow-" + Date.now());
 
-        const res = await fetch("https://www.strava.com/api/v3/uploads", {
+        const res = await fetch(`${this.BACKEND_URL}${this.UPLOAD}`, {
             method: "POST",
             headers: { Authorization: `Bearer ${this.accessToken}` },
             body: formData,
@@ -151,7 +152,7 @@ export class Strava {
         const json = await res.json();
         console.log("UPLOAD RESPONSE:", json);
 
-        if (json.error || json.errors) {
+        if (!res.ok || json.error || json.errors) {
             alert("Upload failed:\n" + JSON.stringify(json, null, 2));
             return;
         }
