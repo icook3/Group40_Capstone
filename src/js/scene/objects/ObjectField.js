@@ -32,6 +32,9 @@ export class ObjectField {
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
 
+
+    
+
     // Rotate rig to face forwards relative to the rider
     this.rig = document.getElementById('rig');
     this.rig.setAttribute('rotation', '0 -105 0'); 
@@ -75,47 +78,41 @@ export class ObjectField {
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
     let dz = riderSpeed * dt;
-    
 
     // REMEMBER YOU HAVE TO PUSH W TO GET RIDER SPEED
+    // RIDER CAN BE ACCESSED SUCCESSFULLY HERE
 
+    if (this.rider.hasAttribute("animation")) {
+      // JUST PUT THE POINTS LIKE 10 APART AND UPDATE SPEED FROM THERE
+      this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 5000; easing: linear; loop: false; delay: 5000`);
+      //this.rider.setAttribute("animation", `property: position; to: 10 2 -1000; dur: 3000; easing: linear; loop: false`);
+      //console.log(this.rider.getAttribute("animation"));
+      //let newDur = this.rider.getAttribute("animation").dur;
+      //newDur += 1000
+      //this.rider.setAttribute("animation", `property: position; to: 10 2 -1000; dur: ${newDur}}; easing: linear; loop: false`);
+    }
 
-    // SO DZ IS UNITS TRAVELED PER MILLISECOND -- USUALLY ABOUT .1
-
-    // If rider speed is greater than 0 and alongpath exists, update it
-    // OK SO - TO FIGURE OUT HOW MANY MILLISECONTS IT TAKES TO TRAVERSE THE TRACK take the length of the track (90) divided by speed (units per second) times 1000
-    if (riderSpeed > 0) {
-      constants.dt_total += dt;
-      //console.log("DT TOTAL: " + constants.dt_total);
-      // UPDATE WHEN TOTAL OF DT IS > 1
-
-      // Update duration once per second
-      if (constants.dt_total > 1) {
-        //this.rider.setAttribute('alongpath', 'path: 0,2,0 0,2,-120; loop: false; dur: 3600;');
-        const trackLength = 12000; // length of the path in alongpath
-
-        // ORIGINAL TRACK LENGTH / DZ * 1000 MAY WORK IF THE TRACK IS LONGER
-        const dur = (trackLength / dz); // duration in milliseconds
-        this.rider.setAttribute('alongpath', `path: 0,2,5 0,2,-12000; loop: false; dur: ${dur}};`);
-
-
-
-        console.log("HIT");
-        constants.dt_total = 0
-      }
-
+    else {
+      this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 10000; easing: linear; loop: false; delay: 5000`);
       
-
-      // JITTER IN SCENE SEEMS TO BE A FUNCTION OF UPDATING THE ATTRIBUTE TOO OFTEN
-      //this.rider.setAttribute('alongpath', `path: 0,2,0 0,2,-120; loop: false; dur: ${dur};`);
-
-      //console.log("DURATION: " + this.rider.getAttribute('alongpath').dur);
     }
 
-    // If rider speed returns to 0, remove alongpath to stop avatar movement
-    if (riderSpeed == 0 && this.rider.hasAttribute('alongpath')) {
-      this.rider.removeAttribute('alongpath');
-    }
+    //CORRECTLY ACCESSES THE SPEED
+    //console.log(constants.riderState.speed);
+    
+    
+
+    
+
+
+    
+
+
+
+
+
+
+
 
     if (!this.initialized || (riderSpeed, dt) === 0) return;
 

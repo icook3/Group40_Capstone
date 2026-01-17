@@ -23,13 +23,11 @@ export class Track {
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
 
-    
+    // USE AN ANIMATION TIMELINE TO MOVE THE AVATAR AROUND -- SHOULD BE ABLE TO USE THE RIDERSPEED CONSTANT TO CALCULATE DURATION
 
-
-
-
-
-    
+    // NAVIGATES PROPERLY SO FAR
+    //this.rider.setAttribute("animation", "property: position; to: 30 2 -50; dur: 8000; easing: linear; loop: false");
+    //console.log(this.rider);
 
   }
 
