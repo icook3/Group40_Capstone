@@ -82,20 +82,20 @@ export class ObjectField {
     // REMEMBER YOU HAVE TO PUSH W TO GET RIDER SPEED
     // RIDER CAN BE ACCESSED SUCCESSFULLY HERE
 
-    if (this.rider.hasAttribute("animation")) {
+    //if (this.rider.hasAttribute("animation")) {
       // JUST PUT THE POINTS LIKE 10 APART AND UPDATE SPEED FROM THERE
-      this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 5000; easing: linear; loop: false; delay: 5000`);
+      //this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 5000; easing: linear; loop: false; delay: 5000`);
       //this.rider.setAttribute("animation", `property: position; to: 10 2 -1000; dur: 3000; easing: linear; loop: false`);
       //console.log(this.rider.getAttribute("animation"));
       //let newDur = this.rider.getAttribute("animation").dur;
       //newDur += 1000
       //this.rider.setAttribute("animation", `property: position; to: 10 2 -1000; dur: ${newDur}}; easing: linear; loop: false`);
-    }
+    //}
 
-    else {
-      this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 10000; easing: linear; loop: false; delay: 5000`);
+    //else {
+      //this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 10000; easing: linear; loop: false; delay: 5000`);
       
-    }
+    //}
 
     //CORRECTLY ACCESSES THE SPEED
     //console.log(constants.riderState.speed);

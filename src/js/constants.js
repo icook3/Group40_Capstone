@@ -96,6 +96,11 @@ class Constants {
   pathPositionZ = 0;
   dirtColor = "#a0895a";
 
+
+  farthestSpawn = 0;
+  trackPoints = [];
+  currentTrackPiece = 0;
+
   // Constant governing avatar movement along path
   dt_total = 10;
 
