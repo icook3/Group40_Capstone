@@ -18,6 +18,7 @@ import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
+import { riderState } from "./riderState.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -145,15 +146,15 @@ function loop({
   constants.lastTime = now;
 
   // Coasting happens here, only in Q/S keyboard mode
-  const currentPower = constants.riderState.power || 0;
-  const currentSpeed = constants.riderState.speed || 0;
+  const currentPower = riderState.power || 0;
+  const currentSpeed = riderState.speed || 0;
 
   // Calculate calories burned using the following formula:
   // calories = (power in watts * delta time (seconds) / 1000)
   if (currentPower > 0) {
     const caloriesBurned = (currentPower * dt) / 1000;
-    constants.riderState.calories =
-      (constants.riderState.calories || 0) + caloriesBurned;
+    riderState.calories =
+      (riderState.calories || 0) + caloriesBurned;
   }
 
   // If using W/S keyboard mode, don't coast (since power is always zero)
@@ -162,7 +163,7 @@ function loop({
 
   // calculates speed based on acceleration and power
   if (currentPower > 0 && !(keyboardMode.wKeyDown || keyboardMode.sKeyDown)) {
-    constants.riderState.speed = calculateAccelerationSpeed(
+    riderState.speed = calculateAccelerationSpeed(
       currentSpeed,
       currentPower,
       dt
@@ -171,10 +172,10 @@ function loop({
 
   // If rider is not peddaling and their speed is not zero, calculate new speed
   if (currentPower === 0 && currentSpeed > 0 && !isUsingDirectSpeedControl) {
-    constants.riderState.speed = calculateCoastingSpeed(currentSpeed, dt);
+    riderState.speed = calculateCoastingSpeed(currentSpeed, dt);
   }
 
-  scene.update(constants.riderState.speed || 0, dt);
+  scene.update(riderState.speed || 0, dt);
 
   //update workout session with current values
   if (workoutSession.isWorkoutActive()) {
@@ -183,10 +184,10 @@ function loop({
       workoutSession.addFTPResult(rampController.ftpResult);
     }
     workoutSession.update({
-      speed: constants.riderState.speed || 0,
-      power: constants.riderState.power || 0,
+      speed: riderState.speed || 0,
+      power: riderState.power || 0,
       distance: hud.totalDistance,
-      calories: constants.riderState.calories || 0,
+      calories: riderState.calories || 0,
     });
 
     //if there is a milestone show it
@@ -199,11 +200,11 @@ function loop({
   }
 
   //Update Avatar and Pacer
-  rider.setSpeed(constants.riderState.speed);
-  rider.setPower(constants.riderState.power);
+  rider.setSpeed(riderState.speed);
+  rider.setPower(riderState.power);
 
   // Cache rider speed (in km/h, same units as calculateAccelerationSpeed)
-  const riderSpeed = constants.riderState.speed || 0;
+  const riderSpeed = riderState.speed || 0;
 
   rider.update(dt);
   if (constants.pacerStarted&&peerState==0) {
@@ -241,7 +242,7 @@ function loop({
   } else if (peerState!=0&&connected&&pacer!=undefined) {
     pacer.update(dt);
 
-    const riderSpeed = constants.riderState.speed;    
+    const riderSpeed = riderState.speed;    
     const pacerSpeed = pacer.speed;
     const relativeSpeed = pacerSpeed - riderSpeed;
     const pacerPos = pacer.avatarEntity.getAttribute("position");
@@ -251,14 +252,14 @@ function loop({
 
   // Let the ramp controller advance its state
   if (rampController) {
-    const power = constants.riderState.power || 0;
+    const power = riderState.power || 0;
     rampController.update(now, power);
 
     const target = rampController.getCurrentTargetWatts();
-    constants.riderState.targetWatts = target || 0;
+    riderState.targetWatts = target || 0;
   }
 
-  hud.update(constants.riderState, dt);
+  hud.update(riderState, dt);
   if (localStorage.getItem("testMode") == null) {
     localStorage.setItem("testMode", false);
   }
@@ -272,8 +273,8 @@ function loop({
 
   //set up values to push
   let pushTime = now;
-  let pushPower = constants.riderState.power || 0;
-  let pushSpeed = units.speedUnit.convertFrom(constants.riderState.speed) || 0;
+  let pushPower = riderState.power || 0;
+  let pushSpeed = units.speedUnit.convertFrom(riderState.speed) || 0;
   let pushDistance =
     units.distanceUnit.convertFrom(
       parseFloat(getElement("distance").textContent)
@@ -288,7 +289,7 @@ function loop({
     });
     constants.lastHistorySecond = thisSecond;
   }
-  sendPeerDataOver(constants.riderState.speed);
+  sendPeerDataOver(riderState.speed);
   requestAnimationFrameFn(loop);
 }
 
@@ -671,7 +672,7 @@ export function initZlowApp({
                 ? keyboardMode.keyboardOnText
                 : "Keyboard Mode";*/
     if (!keyboardMode.keyboardMode) {
-      constants.riderState.speed = 0;
+      riderState.speed = 0;
     }
     //});
   }
@@ -685,12 +686,12 @@ export function initZlowApp({
         if (!Number.isFinite(newMass)) return;
         constants.riderMass = units.weightUnit.convertFrom(newMass);
 
-        const p = constants.riderState.power || 0;
+        const p = riderState.power || 0;
         const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
         // Only recompute from power if we're not in direct speed mode and power > 0
         if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-          constants.riderState.speed = powerToSpeed({ power: p });
+          riderState.speed = powerToSpeed({ power: p });
         }
         // If power === 0, coasting uses the new mass automatically on the next frame.
       };
@@ -711,12 +712,12 @@ export function initZlowApp({
       if (!Number.isFinite(newMass)) return;
       constants.riderMass = newMass;
 
-      const p = constants.riderState.power || 0;
+      const p = riderState.power || 0;
       const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
 
       // Only recompute from power if we're not in direct speed mode and power > 0
       if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p });
+        riderState.speed = powerToSpeed({ power: p });
       }
       // If power === 0, coasting uses the new mass automatically on the next frame.
     };
@@ -769,7 +770,7 @@ export function initZlowApp({
     constants.rideHistory = [];
     constants.historyStartTime = Date.now();
     constants.lastHistorySecond = null;
-    constants.riderState = { power: 0, speed: 0 };
+    riderState = { power: 0, speed: 0 };
     hud.resetWorkOut();
     pauseBtn.textContent = "Pause";
 
@@ -816,7 +817,7 @@ export function initZlowApp({
         countdown.cancel();
         constants.historyStartTime = Date.now();
         constants.lastHistorySecond = null;
-        constants.riderState = { power: 0, speed: 0 };
+        riderState = { power: 0, speed: 0 };
         hud.resetWorkOut();
         pauseBtn.textContent = "Pause";
 
@@ -878,8 +879,8 @@ export function initZlowApp({
       if (typeof data.power === "number" && data.power > 0) {
         speed = powerToSpeed({ power: data.power });
       }
-      constants.riderState = {
-        ...constants.riderState,
+      riderState = {
+        ...riderState,
         power: data.power,
         speed,
       };
@@ -887,7 +888,7 @@ export function initZlowApp({
         activatePacer();
       }
     } else {
-      constants.riderState = { ...constants.riderState, power: data.power };
+      riderState = { ...riderState, power: data.power };
     }
   };*/
 
@@ -914,7 +915,7 @@ export function initZlowApp({
   // Calorie reset button
   const caloriesResetBtn = getElement("calories-reset-btn");
   caloriesResetBtn.addEventListener("click", () => {
-    constants.riderState.calories = 0;
+    riderState.calories = 0;
   });
 
   // For testing: export some internals

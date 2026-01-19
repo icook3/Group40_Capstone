@@ -1,6 +1,7 @@
 import { constants } from "./constants.js";
 import { powerToSpeed } from "./main.js";
 import { activatePacer } from "./main.js";
+import { riderState } from "./riderState.js";
 
 export class KeyboardMode {
   keyboardMode = false;
@@ -16,12 +17,12 @@ export class KeyboardMode {
   setKeyboardModeSpeed(key) {
     if (key === "w" && !this.wKeyDown) {
       this.wKeyDown = true;
-      constants.riderState.speed = this.keyboardSpeed;
-      constants.riderState.power = 0; // Reset power when using speed keys
+      riderState.speed = this.keyboardSpeed;
+      riderState.power = 0; // Reset power when using speed keys
     } else if (key === "s" && !this.sKeyDown) {
       this.sKeyDown = true;
-      constants.riderState.speed = this.keyboardHalfSpeed;
-      constants.riderState.power = 0; // Reset power when using speed keys
+      riderState.speed = this.keyboardHalfSpeed;
+      riderState.power = 0; // Reset power when using speed keys
     }
     activatePacer();
   }
@@ -35,11 +36,11 @@ export class KeyboardMode {
   setKeyboardModePower(key) {
     if (key === "q" && !this.qKeyDown) {
       this.qKeyDown = true;
-      constants.riderState.power = (constants.riderState.power || 0) + 10;
+      riderState.power = (riderState.power || 0) + 10;
     } else if (key === "a" && !this.aKeyDown) {
       this.aKeyDown = true;
-      constants.riderState.power = Math.max(
-        (constants.riderState.power || 0) - 10,
+      riderState.power = Math.max(
+        (riderState.power || 0) - 10,
         0
       );
     }

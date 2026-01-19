@@ -40,7 +40,6 @@ class Constants {
   qKeyDown = false;
   aKeyDown = false;
 
-  riderState = { power: 0, speed: 0, calories: 0 };
   rideHistory = [];
   lastHistorySecond = null;
   pacerStarted = false;

@@ -1,7 +1,7 @@
 import { TrainerBluetooth } from "./bluetooth.js";
-import { constants } from "./constants.js";
 import { powerToSpeed } from "./main.js";
 import { activatePacer } from "./main.js";
+import { riderState } from "./riderState.js";
 
 export class StandardMode {
     trainer = new TrainerBluetooth();
@@ -18,8 +18,8 @@ export class StandardMode {
             if (typeof data.power === "number" && data.power > 0) {
                 speed = powerToSpeed({ power: data.power });
             }
-            constants.riderState = {
-                ...constants.riderState,
+            riderState = {
+                ...riderState,
                 power: data.power,
                 speed,
             };

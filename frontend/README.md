@@ -118,6 +118,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `menu.js` — Handles event listeners on the main menu.
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
 		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling
+		- `riderState.js` — Stores the riders current state
 		- `simulationstate.js` — Handles tracking the state of the simulation.
 		- `standardMode.js` — Handles standard mode functionalities and variables.
 		- `strava.js` — Handles Strava OAuth and activity upload.

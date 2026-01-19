@@ -1,6 +1,6 @@
 ﻿import { StandardMode } from "./standardMode.js";
-import { constants } from "./constants.js";
 import { Strava } from "./strava.js";
+import { riderState } from "./riderState.js";
 
 export function initSettings() {
   if (sessionStorage.getItem("peerToPeer")==='true') {
@@ -64,7 +64,7 @@ export function initSettings() {
       ? "Test Mode: ON"
       : "Developer Testing Mode";
     if (!inTestMode) {
-      constants.riderState.speed = 0;
+      riderState.speed = 0;
     }
   });
   //Pacer speed input
