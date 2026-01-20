@@ -9,9 +9,22 @@ export class Strava {
 
         this.CLIENT_ID = "INPUT CLIENT ID"; // TODO
         this.BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+        this.STRAVA_BACKEND_HEALTH = "/stravaHealth"
         this.OAUTH_CALLBACK = "/oauth/callback"
         this.REFRESH = "/oauth/refresh"
         this.UPLOAD = "/strava/upload"
+    }
+
+    async isStravaBackendUp() {
+        try {
+            const res = await fetch(`${this.BACKEND_URL}${this.STRAVA_BACKEND_HEALTH}`, {
+                method: "GET",
+            });
+
+            return res.ok;
+        } catch {
+            return false;
+        }
     }
 
     // Begin OAuth
@@ -74,8 +87,8 @@ export class Strava {
         // Call backend
         const res = await fetch (`${this.BACKEND_URL}${this.REFRESH}`, {
            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ refresh_token: this.refreshToken })
+           headers: {"Content-Type": "application/json"},
+           body: JSON.stringify({ refresh_token: this.refreshToken })
         });
 
         if (!res.ok) {
@@ -97,6 +110,10 @@ export class Strava {
         return this.accessToken;
     }
 
+    // Checks if user has been connected to Strava
+    static isConnected() {
+        return !!localStorage.getItem("strava_access_token") || !!localStorage.getItem("strava_refresh_token");
+    }
 
     // Upload workout to Strava through backend (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
     async uploadActivity({name, description}) {
@@ -158,10 +175,5 @@ export class Strava {
         }
 
         alert("Upload sent! It may take 10–30 seconds to appear in Strava.");
-    }
-
-    // Checks if user has been connected to Strava
-    static isConnected() {
-        return !!localStorage.getItem("strava_access_token") || !!localStorage.getItem("strava_refresh_token");
     }
 }

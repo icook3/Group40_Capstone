@@ -19,7 +19,7 @@ app.use(cors({
 }));
 
 // Health check
-app.get("/health", (_req, res) => {
+app.get("/stravaHealth", (_req, res) => {
     res.status(200).send("ok");
 });
 
