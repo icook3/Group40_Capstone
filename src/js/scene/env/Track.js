@@ -42,10 +42,12 @@ export class Track {
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider')
     avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: 8000; easing: linear; loop: false`);
-    console.log(avatar)
-
-
-    console.log("FML")
+    document.addEventListener('riderStopped', () => {
+    console.log('My event has been triggered!');
+});
+  
+  
+  
   }
 
   // Create an animation timeline and make events for the various track points

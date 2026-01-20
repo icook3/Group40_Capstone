@@ -131,6 +131,8 @@ export class AvatarMovement {
 
     update(dt) {
         if (this.speed === 0) {
+            const stopEvent = new Event('riderStopped');
+            document.dispatchEvent(stopEvent);
             return;
         }
         this.animatePedalingBike(dt);
