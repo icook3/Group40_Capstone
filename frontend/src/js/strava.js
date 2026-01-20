@@ -123,8 +123,9 @@ export class Strava {
         if (this.accessToken && this.isTokenExpired()) {
             const newToken = await this.refreshTokens();
             if (!newToken) {
-                alert("Strava session expired — please reconnect Strava.");
-                return;
+                const err = new Error("Strava session expired");
+                err.status = 401;
+                throw err;
             }
             this.loadToken();
         }
@@ -133,8 +134,9 @@ export class Strava {
         if (!this.accessToken && this.refreshToken) {
             const ok = await this.refreshTokens();
             if (!ok) {
-                alert("Error — please reconnect Strava.");
-                return;
+                const err = new Error("Strava token refresh failed");
+                err.status = 401;
+                throw err;
             }
             this.loadToken();
         }
