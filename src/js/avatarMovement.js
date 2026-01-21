@@ -130,11 +130,22 @@ export class AvatarMovement {
     }
 
     update(dt) {
+        
         if (this.speed === 0) {
-            const stopEvent = new Event('riderStopped');
-            document.dispatchEvent(stopEvent);
+
+            // AT LEAST DOESN'T THROW AN ERROR
+            document.getElementById('rider').emit('riderStopped');
+
             return;
         }
+
+        if (constants.worldZ == 0) {
+            document.getElementById('rider').emit('riderStarted');
+        }
+        else {
+            document.getElementById('rider').emit('riderResumed');
+        }
+
         this.animatePedalingBike(dt);
         this.animatePedalingPerson(dt)
     }

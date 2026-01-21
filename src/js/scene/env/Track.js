@@ -20,31 +20,23 @@ export class Track {
     // Get entities needed to create the timeline animation
     this.assets = document.getElementById('scene_assets');
     this.rider = document.getElementById('rider');
-    
     this.pacer = document.getElementById('pacer');
 
     // Add event listener, set up iteration through points, and call the animation loop
     this.rider.addEventListener('animationcomplete', this.update_animation);
-
-  // ADD PAUSE IN HERE SOMEPLACE SO YOU CAN STOP IF THE SPEED IS ZERO
-
     this.animate_avatar();
-
-    // USE AN ANIMATION TIMELINE TO MOVE THE AVATAR AROUND -- SHOULD BE ABLE TO USE THE RIDERSPEED CONSTANT TO CALCULATE DURATION
-
-    // NAVIGATES PROPERLY SO FAR
-    //this.rider.setAttribute("animation", "property: position; to: 30 2 -50; dur: 8000; easing: linear; loop: false");
-    //console.log(this.rider);
-
   }
 
   update_animation() {
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider')
-    avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: 8000; easing: linear; loop: false`);
-    document.addEventListener('riderStopped', () => {
-    console.log('My event has been triggered!');
-});
+    avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: 8000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    //avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: 8000; easing: linear; loop: false; autoplay: true;`);
+    
+    // ANIMATION NEEDS TO BE PUT AS A WHOLE ENTITY RATHER THAN AN ATTRIBUTE OF RIDER MAYBE
+
+
+
   
   
   
@@ -57,9 +49,10 @@ export class Track {
     constants.trackPoints.push({x: 25, y: 2, z: -50});
     constants.trackPoints.push({x: 10, y: 2, z: -100});
 
-    console.log(constants.trackPoints[1]);
+
     // Initialize rider animation attribute
-    this.rider.setAttribute("animation", "property: position; to: 25 2 -50; dur: 8000; easing: linear; loop: false");
+    this.rider.setAttribute("animation", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 8000; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    //this.rider.setAttribute("animation", "property: position; to: 25 2 -50; dur: 8000; easing: linear; loop: false");
     //this.rider.setAttribute("animationcomplete", "completiontest");
 
 
@@ -67,6 +60,7 @@ export class Track {
 
 
     // ADD SOMETHING TO RESPAWN AT THE END OF THE LAST POINT
+    // PUT IN THE ADVANCE LOGIC
 
 
 
@@ -100,14 +94,5 @@ export class Track {
     track.setAttribute('parametric-curve', `xyzFunctions: -18*cos(t), 2, -18*sin(t); tRange: 4.7, 1.5;`);
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
-  }
-
-
-
-  avatar_mixin() {
-    const mixin = document.createElement('a-mixin');
-    mixin.setAttribute('id', 'avatar_location');
-    mixin.setAttribute('position', `${constants.riderState.speed}`);
-    this.assets.appendChild(mixin);
   }
 }
