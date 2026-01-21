@@ -130,18 +130,17 @@ export class AvatarMovement {
     }
 
     update(dt) {
-        
         if (this.speed === 0) {
-
-            // AT LEAST DOESN'T THROW AN ERROR
+            // Emit a stop event if speed is 0
             document.getElementById('rider').emit('riderStopped');
-
             return;
         }
 
+        // Emit either a start or a resume event based on worldZ
         if (constants.worldZ == 0) {
             document.getElementById('rider').emit('riderStarted');
         }
+
         else {
             document.getElementById('rider').emit('riderResumed');
         }

@@ -23,17 +23,13 @@ export class ObjectField {
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
 
-    // SPAWN IN TRACK HERE
-
+    
 
     let dt_total = 0;
     // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
     //straightSpline(0);
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
-
-
-    
 
     // Rotate rig to face forwards relative to the rider
     this.rig = document.getElementById('rig');
@@ -79,41 +75,6 @@ export class ObjectField {
   advance(riderSpeed, dt) {
     let dz = riderSpeed * dt;
 
-    // REMEMBER YOU HAVE TO PUSH W TO GET RIDER SPEED
-    // RIDER CAN BE ACCESSED SUCCESSFULLY HERE
-
-    //if (this.rider.hasAttribute("animation")) {
-      // JUST PUT THE POINTS LIKE 10 APART AND UPDATE SPEED FROM THERE
-      //this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 5000; easing: linear; loop: false; delay: 5000`);
-      //this.rider.setAttribute("animation", `property: position; to: 10 2 -1000; dur: 3000; easing: linear; loop: false`);
-      //console.log(this.rider.getAttribute("animation"));
-      //let newDur = this.rider.getAttribute("animation").dur;
-      //newDur += 1000
-      //this.rider.setAttribute("animation", `property: position; to: 10 2 -1000; dur: ${newDur}}; easing: linear; loop: false`);
-    //}
-
-    //else {
-      //this.rider.setAttribute("animation", `property: position; to: 10 2 -100; dur: 10000; easing: linear; loop: false; delay: 5000`);
-      
-    //}
-
-    //CORRECTLY ACCESSES THE SPEED
-    //console.log(constants.riderState.speed);
-    
-    
-
-    
-
-
-    
-
-
-
-
-
-
-
-
     if (!this.initialized || (riderSpeed, dt) === 0) return;
 
     // Handles all objects currently part of the items array
@@ -121,8 +82,6 @@ export class ObjectField {
       const pos = getPos(obj);
       pos.z += dz;
       
-      // SHOULD KEEP RECYCLING IN FRONT OF FARTHEST OBJECT WITHOUT ADVANCING SCENERY
-      // MAY NEED TO DEFINE AS A FUNTION OF HOW FAR THE THING IS IN FRONT OF THE RIDER
       if (pos.z > 10) {
         // recycle in front of farthest
         const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
@@ -131,9 +90,7 @@ export class ObjectField {
         // resample X per-kind (keeps trees closer than buildings)
         const kind = detectKind(obj);
         pos.x = kind.resampleX();
-
       }
-        //setPos(obj, pos);
     }
 
     for (const band of this.externalGroups) {
@@ -173,7 +130,6 @@ export class ObjectField {
           pos.x = kind.resampleX();
         }
       }
-      //setPos(obj, pos);
     }
   }
 

@@ -3,7 +3,6 @@
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
 import { constants } from "../../constants.js";
-import { getPos, setPos } from '../core/util.js';
 
 export class Track {
 
@@ -11,7 +10,7 @@ export class Track {
     this.sceneEl = sceneEl;
 
     // Create a-entity for the path and set ID
-    // MAY NOT NEED THIS ANYMORE
+    // Will deprecate when
     const path_element = document.createElement('a-entity');
     path_element.setAttribute('id','track');
     this.path_element = path_element;
@@ -22,32 +21,37 @@ export class Track {
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer');
 
-    // Add event listener, set up iteration through points, and call the animation loop
+    // Spawn track pieces
+    constants.trackPoints.push({x: 25, y: 2, z: -50, length: 30});
+    constants.trackPoints.push({x: 10, y: 2, z: -100, length: 30});
+
+    // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete', this.update_animation);
-    this.animate_avatar();
+    this.initialize_animation();
+
   }
 
+  // IDEA - HAVE THE AVATAR CLASS CALCULATE THE DURATION BEFORE IT EMITS THE EVENT TO PREVENT DIVISION BY 0
   update_animation() {
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider')
-    avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: 8000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    //avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: 8000; easing: linear; loop: false; autoplay: true;`);
-    
-    // ANIMATION NEEDS TO BE PUT AS A WHOLE ENTITY RATHER THAN AN ATTRIBUTE OF RIDER MAYBE
 
+    let duration;
 
+    if (constants.riderState.speed > 0) {
+      duration = (30/constants.riderState.speed) * 1000;
+    }
 
-  
-  
+    else {
+      duration = 10000
+    }
+
+    avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
   
   }
 
   // Create an animation timeline and make events for the various track points
-  animate_avatar() {
-
-    // Add trackpoints to scene
-    constants.trackPoints.push({x: 25, y: 2, z: -50});
-    constants.trackPoints.push({x: 10, y: 2, z: -100});
+  initialize_animation() {
 
 
     // Initialize rider animation attribute
@@ -69,7 +73,6 @@ export class Track {
 
 
   }
-
 
   // Create and append track straight track piece
   straightPiece(spawnZ) {
@@ -95,4 +98,10 @@ export class Track {
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
   }
+
+  // Helper function to calculate duration
+  calculate_duration(speed, distance) {
+    return distance/speed;
+  }
+
 }
