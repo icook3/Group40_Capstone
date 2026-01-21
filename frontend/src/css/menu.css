@@ -176,3 +176,78 @@ a-scene {
   border-radius: 8px;
   cursor: pointer;
 }
+
+/* Main menu dropdown: clear hover feedback */
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* When an item is selected, keep it highlighted (JS should add .selected) */
+.dropdown-item.selected {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+
+/* When hovering either half, darken the whole pill */
+.split-btn:hover {
+  filter: brightness(85%);
+  transition: filter 0.15s ease;
+}
+
+/* ========================================
+   Main menu side buttons: hover feedback
+   Targets buttons, links, and common "row" items inside the panels
+   ======================================== */
+
+#menu-bottom button,
+#menu-bottom a,
+#menu-bottom [role="button"],
+#menu-bottom .hud-btn,
+#menu-bottom .menu-item,
+#menu-bottom .menu-btn,
+#menu-bottom .btn,
+#customize button,
+#customize a,
+#customize [role="button"],
+#customize .menu-item,
+#customize .menu-btn,
+#customize .btn,
+#menu-settings button,
+#menu-settings a,
+#menu-settings [role="button"],
+#menu-settings .menu-item,
+#menu-settings .menu-btn,
+#menu-settings .btn {
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 10px 12px;   /* harmless for buttons; helps if they are div rows */
+  display: block;       /* harmless for buttons; ensures full-width hitbox for rows */
+  width: 100%;
+  box-sizing: border-box;
+  transition: filter 0.15s ease, background 0.15s ease;
+}
+
+#menu-bottom button:hover,
+#menu-bottom a:hover,
+#menu-bottom [role="button"]:hover,
+#menu-bottom .hud-btn:hover,
+#menu-bottom .menu-item:hover,
+#menu-bottom .menu-btn:hover,
+#menu-bottom .btn:hover,
+#customize button:hover,
+#customize a:hover,
+#customize [role="button"]:hover,
+#customize .menu-item:hover,
+#customize .menu-btn:hover,
+#customize .btn:hover,
+#menu-settings button:hover,
+#menu-settings a:hover,
+#menu-settings [role="button"]:hover,
+#menu-settings .menu-item:hover,
+#menu-settings .menu-btn:hover,
+#menu-settings .btn:hover {
+  background: rgba(255, 255, 255, 0.10); /* visible on your dark panels */
+  filter: brightness(90%);
+}
+
+
