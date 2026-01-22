@@ -19,13 +19,15 @@ export class Track {
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
 
-    // Spawn track pieces
+    // Spawn track pieces - maybe add some before so it doesn't look so weird
+    const track = document.createElement('a-entity');
+    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: 15`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 1`);
+    track.setAttribute('position', `0 0 4`);
+    this.path_element.appendChild(track);
+
     constants.trackPoints.push({x: 0, y: 2, z: -1, length: 1});
-    constants.trackPoints.push({x: 0, y: 2, z: -31, length: 30});
-    constants.trackPoints.push({x: 0, y: 2, z: -61, length: 30});
-    constants.trackPoints.push({x: 0, y: 2, z: -91, length: 30});
-    constants.trackPoints.push({x: 0, y: 2, z: -121, length: 30});
-    constants.trackPoints.push({x: 0, y: 2, z: -151, length: 30});
+    this.spawn_track();
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete', this.update_animation);
@@ -35,40 +37,44 @@ export class Track {
 
   // Update animation speed and target based on current track piece
   update_animation() {
+
+    // Can probably fix lack of restarting bug by removing and adding back the animation property, but is not ideal
+    // Alternatively, add a function that will add a "bridge" track piece to finish the stretch the rider paused on
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider')
-    //let dt = (Date.now() - constants.lastTime);
-
-    // This may be unnecessary based on pause events; delete if so
-    while (constants.riderState.speed == 0) {
-      // If the rider is not moving, wait until they are
-    }
-
     let duration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
-    console.log("DURATION CALCULATED AS " + duration);
-    //console.log("DT CALCULATED AS " + dt);
+
+    //console.log("DURATION CALCULATED AS " + duration);
     //console.log("SPEED CALCULATED AS " + constants.riderState.speed);
     //console.log("LENGTH CALCULATED AS " + constants.trackPoints[constants.currentTrackPiece].length);
-
-    avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
   
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   initialize_animation() {
-    this.rider.setAttribute("animation", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    constants.farthestSpawn = 1;
+    this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
   }
 
   // Create and append track straight track piece
-  straightPiece(spawnZ) {
+  straightPiece() {
+
+    // Spawn track pieces in 30 unit increments for now; correct to more like 5 to make coasting less choppy
+    let pointZ = -1 * (constants.farthestSpawn + 5);
+
+    // Adjust Z spawn position to correct for centering of the box geometry
+    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+
+    constants.farthestSpawn += 5;
+    constants.trackPoints.push({x: 0, y: 2, z: pointZ, length: 5});
+
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 7.5`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
     track.setAttribute('configuration', `straight_vertical`);
-    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${spawnZ}`);
+    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
     this.path_element.appendChild(track);
-    return track.getAttribute("configuration");
+    //return track.getAttribute("configuration");
   }
 
   // Create an append a track piece curving to the right
@@ -83,5 +89,12 @@ export class Track {
     track.setAttribute('parametric-curve', `xyzFunctions: -18*cos(t), 2, -18*sin(t); tRange: 4.7, 1.5;`);
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
+  }
+
+  // Spawn track pieces in
+  spawn_track() {
+    for (let i = 0; i < 80; i++) {
+      this.straightPiece();
+    }
   }
 }

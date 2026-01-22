@@ -23,23 +23,14 @@ export class ObjectField {
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
 
-    
-
-    let dt_total = 0;
-    // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
-    //straightSpline(0);
-    this.rider = document.getElementById('rider');
-    this.pacer = document.getElementById('pacer');
-
     // Rotate rig to face forwards relative to the rider
     this.rig = document.getElementById('rig');
     this.rig.setAttribute('rotation', '0 -105 0'); 
     
-
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
-  // Not currently used
+  // Not currently used?
   attachExternalBands(groups) {
     for (const g of groups) {
       if (!g || !Array.isArray(g.items)) continue;
@@ -73,6 +64,9 @@ export class ObjectField {
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
+    // Rewrite logic to use rider position and not item position
+
+
     let dz = riderSpeed * dt;
 
     if (!this.initialized || (riderSpeed, dt) === 0) return;

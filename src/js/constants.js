@@ -90,13 +90,13 @@ class Constants {
   // Constants governing path generation
   pathWidth = 8;
   pathHeight = 1.02;
-  pathDepth = 60;
+  pathDepth = 5;
   pathPositionX = 0;
   pathPositionY = 0;
   pathPositionZ = 0;
   dirtColor = "#a0895a";
 
-  farthestSpawn = 0;
+  farthestSpawn = 1;
   trackPoints = [];
   currentTrackPiece = 0;
 
