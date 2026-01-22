@@ -810,6 +810,7 @@ export function initZlowApp({
 
         // Show the summary!
         workoutSummary.show(finalStats, newRecords, streak);
+        updateStravaButtonState();
 
         // Reset everything
         simulationState.isPaused = false;
@@ -995,6 +996,13 @@ export function getWorkoutSummary() {
     duration: duration,
     avgPower: Math.round(avgPower),
   };
+}
+
+// Disable exporting if Strava is not connected
+function updateStravaButtonState() {
+  const btn = document.getElementById("summary-export-strava");
+  if (!btn) return;
+  btn.disabled = !Strava.isConnected();
 }
 
 export async function exportToStrava() {
