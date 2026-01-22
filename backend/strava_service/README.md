@@ -31,6 +31,8 @@ Its upload responsibilities include:
 - `README.md` - Strava service documentation
 
 ## How to Run This Service
+Video: https://www.youtube.com/watch?v=4mcSj8wlH-s
+
 This backend performs the secure Strava OAuth **code → token** exchange and uploading activities to Strava.
 Follow the steps below to run it. You need a Strava App created beforehand.
 
