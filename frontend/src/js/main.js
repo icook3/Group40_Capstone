@@ -521,7 +521,7 @@ export function initZlowApp({
   const workoutSummary = new WorkoutSummary({
     workoutStorage,
     onClose: () => {
-      console.log("Summary was closed");
+      window.location.href = 'mainMenu.html';
     },
   });
 
