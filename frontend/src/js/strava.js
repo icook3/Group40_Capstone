@@ -7,8 +7,8 @@ export class Strava {
         this.refreshToken = null;
         this.expiresAt = null;
 
-        this.CLIENT_ID = "182729"; // TODO
-        this.BACKEND_URL = "https://group40-capstone.onrender.com"; // TODO
+        this.CLIENT_ID = "INPUT CLIENT ID"; // TODO
+        this.BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
         this.STRAVA_BACKEND_HEALTH = "/stravaHealth"
         this.OAUTH_CALLBACK = "/oauth/callback"
         this.REFRESH = "/oauth/refresh"
