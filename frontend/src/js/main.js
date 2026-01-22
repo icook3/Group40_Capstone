@@ -810,7 +810,6 @@ export function initZlowApp({
 
         // Show the summary!
         workoutSummary.show(finalStats, newRecords, streak);
-        updateStravaButtonState();
 
         // Reset everything
         simulationState.isPaused = false;
@@ -998,18 +997,12 @@ export function getWorkoutSummary() {
   };
 }
 
-// Disable exporting if Strava is not connected
-function updateStravaButtonState() {
-  const btn = document.getElementById("summary-export-strava");
-  if (!btn) return;
-  btn.disabled = !Strava.isConnected();
-}
-
 export async function exportToStrava() {
   const strava = new Strava();
 
   if (!Strava.isConnected()) {
-    alert("You must connect to Strava first (from main menu).");
+    alert("You must connect to Strava first (from main menu).\n" +
+        "Please upload the TCX manually.");
     return;
   }
 
