@@ -810,6 +810,7 @@ export function initZlowApp({
 
         // Show the summary!
         workoutSummary.show(finalStats, newRecords, streak);
+        updateStravaButtonState();
 
         // Reset everything
         simulationState.isPaused = false;
@@ -1003,8 +1004,6 @@ function updateStravaButtonState() {
   if (!btn) return;
   btn.disabled = !Strava.isConnected();
 }
-
-updateStravaButtonState();
 
 export async function exportToStrava() {
   const strava = new Strava();
