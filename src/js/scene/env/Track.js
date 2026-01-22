@@ -17,13 +17,15 @@ export class Track {
     sceneEl.appendChild(path_element);
 
     // Get entities needed to create the timeline animation
-    this.assets = document.getElementById('scene_assets');
     this.rider = document.getElementById('rider');
-    this.pacer = document.getElementById('pacer');
 
     // Spawn track pieces
-    constants.trackPoints.push({x: 25, y: 2, z: -50, length: 30});
-    constants.trackPoints.push({x: 10, y: 2, z: -100, length: 30});
+    constants.trackPoints.push({x: 0, y: 2, z: -1, length: 1});
+    constants.trackPoints.push({x: 0, y: 2, z: -31, length: 30});
+    constants.trackPoints.push({x: 0, y: 2, z: -61, length: 30});
+    constants.trackPoints.push({x: 0, y: 2, z: -91, length: 30});
+    constants.trackPoints.push({x: 0, y: 2, z: -121, length: 30});
+    constants.trackPoints.push({x: 0, y: 2, z: -151, length: 30});
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete', this.update_animation);
@@ -31,47 +33,31 @@ export class Track {
 
   }
 
-  // IDEA - HAVE THE AVATAR CLASS CALCULATE THE DURATION BEFORE IT EMITS THE EVENT TO PREVENT DIVISION BY 0
+  // Update animation speed and target based on current track piece
   update_animation() {
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider')
+    //let dt = (Date.now() - constants.lastTime);
 
-    let duration;
-
-    if (constants.riderState.speed > 0) {
-      duration = (30/constants.riderState.speed) * 1000;
+    // This may be unnecessary based on pause events; delete if so
+    while (constants.riderState.speed == 0) {
+      // If the rider is not moving, wait until they are
     }
 
-    else {
-      duration = 10000
-    }
+    let duration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
+    console.log("DURATION CALCULATED AS " + duration);
+    //console.log("DT CALCULATED AS " + dt);
+    //console.log("SPEED CALCULATED AS " + constants.riderState.speed);
+    //console.log("LENGTH CALCULATED AS " + constants.trackPoints[constants.currentTrackPiece].length);
 
     avatar.setAttribute("animation", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
   
   }
 
-  // Create an animation timeline and make events for the various track points
+  // Initialize rider animation attribute using a very short section of track to avoid division by zero
   initialize_animation() {
-
-
-    // Initialize rider animation attribute
-    this.rider.setAttribute("animation", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 8000; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    //this.rider.setAttribute("animation", "property: position; to: 25 2 -50; dur: 8000; easing: linear; loop: false");
-    //this.rider.setAttribute("animationcomplete", "completiontest");
-
-
-
-
-
-    // ADD SOMETHING TO RESPAWN AT THE END OF THE LAST POINT
-    // PUT IN THE ADVANCE LOGIC
-
-
-
-
-
-
-
+    this.rider.setAttribute("animation", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    constants.farthestSpawn = 1;
   }
 
   // Create and append track straight track piece
@@ -98,10 +84,4 @@ export class Track {
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
   }
-
-  // Helper function to calculate duration
-  calculate_duration(speed, distance) {
-    return distance/speed;
-  }
-
 }
