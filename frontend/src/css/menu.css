@@ -250,4 +250,39 @@ a-scene {
   filter: brightness(90%);
 }
 
+/* ========================================
+   FIX: Settings panel cursor behavior
+   (mainMenu.html uses <span class="hud-btn"> rows inside #menu-settings)
+   ======================================== */
+
+/* The settings panel background should be normal arrow */
+#menu-settings {
+  cursor: default;
+}
+
+/* IMPORTANT: rows in settings are spans with class hud-btn
+   They should NOT show a hand unless you're on a real control */
+#menu-settings .hud-btn {
+  cursor: default;
+}
+
+/* Dropdowns (select) should be a hand */
+#menu-settings select,
+#menu-settings option {
+  cursor: pointer;
+}
+
+/* Buttons inside settings remain a hand (Connect Strava, Host, Clear, Dev Mode) */
+#menu-settings button {
+  cursor: pointer;
+}
+
+/* Editable fields show text cursor */
+#menu-settings input[type="number"],
+#menu-settings input[type="text"],
+#menu-settings input:not([type]) {
+  cursor: text;
+}
+
+
 
