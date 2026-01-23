@@ -49,12 +49,14 @@ export class Track {
     //console.log("LENGTH CALCULATED AS " + constants.trackPoints[constants.currentTrackPiece].length);
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
     
-
-    // If you're within 40 units of the end, spawn some more pieces
-
+    // If you're within 40 units of the end, spawn some more track pieces
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-      console.log(constants.trackPoints[constants.trackPoints.length - 1]);
       spawn_track();
+    }
+
+    // If you're about to run out of ground, add some more tiles
+    if (getPos(avatar).z < (-constants.gridDepth * 10) + 300) {
+      add_tile();
     }
     
   }
@@ -101,7 +103,33 @@ export class Track {
     track.setAttribute('configuration', `straight_vertical`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
     path_element.appendChild(track);
-    //return track.getAttribute("configuration");
+  }
+
+  function add_tile() {
+
+    // Add more ground tiles as the rider moves forward
+    let tilesEntity = document.getElementById('tiles');
+    let start = constants.gridDepth;
+    constants.gridDepth += 80;
+
+    for (let x = 0; x < constants.gridWidth; x++) {
+      for (let z = start; z < constants.gridDepth; z++) {
+        const tile = document.createElement("a-entity");
+        tile.setAttribute("geometry", `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
+            tile.setAttribute("material", "src: #grass-texture");
+            tile.setAttribute(
+              "position",
+              `${constants.startX + x * constants.tileSize} 0 ${
+                (-z + (constants.startZ/constants.tileSize)) * constants.tileSize
+              }`
+            );
+            tilesEntity.appendChild(tile);
+          }
+        }
+    
+    // Delete tiles more than 50 units behind the rider
+    let ground = document.getElementById('checkerboard-ground');
+    let riderZ = getPos(document.getElementById('rider')).z;
   }
 
 // Spawn track pieces in
