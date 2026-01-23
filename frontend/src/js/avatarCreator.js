@@ -73,6 +73,11 @@ export class AvatarCreator {
         this.bikePedalColor = "#555555";
         this.bikeCrankColor = "#888888";
 
+        //Helmet
+        this.helmetModel = null;
+        this.helmetColor = "#A7E800";
+        this.helmetPaddingColor = "#333333";
+
         this.loadPlayerData();
         this.avatarEntity = this.createEntity();
     }
@@ -154,6 +159,7 @@ export class AvatarCreator {
                     this.setInitialPose();
                     this.personLoaded = true;
                     checkReady();
+                    this.createHelmetModel(avatarEntity);
                 }
             });
         });
@@ -238,6 +244,58 @@ export class AvatarCreator {
             });
         });
     }
+
+    //helmetModel.setAttribute('scale', '0.35 0.35 0.35');
+    //helmetModel.setAttribute('position', '.38 -.18 0');
+
+createHelmetModel(avatarEntity) {
+    const helmetModel = document.createElement('a-entity');
+    helmetModel.setAttribute('gltf-model', '#helmetGLB');
+    helmetModel.setAttribute('no-cull', '');
+    avatarEntity.appendChild(helmetModel);
+
+    this.helmetModel = helmetModel;
+    helmetModel.addEventListener('model-loaded', (e) => {
+        if (this.spine6) {
+            const loadedModel = e.detail.model;
+            
+            // Helmet should dynamically follow the head
+            loadedModel.position.set(0, .2, -0.03);
+            loadedModel.rotation.set(0, 135, 0);
+            loadedModel.scale.set(.35, .35, .35);
+            this.spine6.add(loadedModel);
+            
+            // Store reference for color changes
+            this.helmetObject = loadedModel;
+        }
+
+        this.applyHelmetColors();
+    });
+}
+
+setHelmetColors(helmet, padding) {
+    this.helmetColor = helmet;
+    this.helmetPaddingColor = padding;
+    this.applyHelmetColors();
+    this.savePlayerData();
+}
+
+applyHelmetColors() {
+    if (!this.helmetObject) {
+        return;
+    }
+
+    this.helmetObject.traverse((child) => {
+        if (child.isMesh && child.material) {
+            if (child.material.name.includes("Helmet")) {
+                child.material.color.set(this.helmetColor);
+            }
+            if (child.material.name.includes("Padding")) {
+                child.material.color.set(this.helmetPaddingColor);
+            }
+        }
+    });
+}
 
     setBikeColors(frame, tires, grip, seat, pedals, pedalCrank) {
         this.bikeFrameColor = frame;
