@@ -303,6 +303,47 @@
       });
     </script>
 
+    <!-- Helmet Colors -->
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    function initHelmetColors() {
+      if (!window.avatarInstance) {
+        requestAnimationFrame(initHelmetColors);
+        return;
+      }
+
+      const colorPickers = document.querySelectorAll(
+        '#playerControls .color-picker[data-mat="Helmet"], #playerControls .color-picker[data-mat="Padding"]'
+      );
+
+      colorPickers.forEach((picker) => {
+        picker.addEventListener("input", (e) => {
+          const mat = picker.dataset.mat;
+          const color = e.target.value;
+
+          const avatar = window.avatarInstance;
+
+          let helmet = avatar.helmetColor;
+          let padding = avatar.helmetPaddingColor;
+
+          switch (mat) {
+            case "Helmet":
+              helmet = color;
+              break;
+            case "Padding":
+              padding = color;
+              break;
+          }
+
+          avatar.setHelmetColors(helmet, padding);
+        });
+      });
+    }
+
+    initHelmetColors();
+  });
+</script>
+
     <script>
       function setInitialPickerValues() {
         if (!window.avatarInstance) {
@@ -343,6 +384,13 @@
         document.querySelector(
           '#bikeControls .color-picker[data-mat="PedalCrank_Mat"]'
         ).value = avatar.bikeCrankColor;
+
+        document.querySelector(
+          '#playerControls .color-picker[data-mat="Helmet"]'
+        ).value = avatar.helmetColor;
+        document.querySelector(
+          '#playerControls .color-picker[data-mat="Padding"]'
+        ).value = avatar.helmetPaddingColor;
       }
 
       setInitialPickerValues();
@@ -391,6 +439,24 @@
               class="color-picker"
               data-mat="Shoes"
               value="#ff0000"
+          /></label>
+        </div>
+        <div class="option">
+          <label
+            >Helmet<input
+              type="color"
+              class="color-picker"
+              data-mat="Helmet"
+              value="#A7E800"
+          /></label>
+        </div>
+        <div class="option">
+          <label
+            >Padding<input
+            type="color"
+            class="color-picker"
+            data-mat="Padding"
+            value="#333333"
           /></label>
         </div>
       </div>

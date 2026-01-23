@@ -418,6 +418,10 @@ applyHelmetColors() {
                 seat: this.bikeSeatColor,
                 pedals: this.bikePedalColor,
                 pedalCrank: this.bikeCrankColor
+            },
+            helmetColors: {
+            helmet: this.helmetColor,
+            padding: this.helmetPaddingColor
             }
         };
 
@@ -445,6 +449,10 @@ applyHelmetColors() {
         this.bikeSeatColor = bike.seat || this.bikeSeatColor;
         this.bikePedalColor = bike.pedals || this.bikePedalColor;
         this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
+        
+        const helmet = data.helmetColors || {};
+        this.helmetColor = helmet.helmet || this.helmetColor;
+        this.helmetPaddingColor = helmet.padding || this.helmetPaddingColor;
     }
 
     loadOtherData(json) {
@@ -468,6 +476,10 @@ applyHelmetColors() {
         this.bikeSeatColor = bike.seat || this.bikeSeatColor;
         this.bikePedalColor = bike.pedals || this.bikePedalColor;
         this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
+
+        const helmet = data.helmetColors || {};
+        this.helmetColor = helmet.helmet || this.helmetColor;
+        this.helmetPaddingColor = helmet.padding || this.helmetPaddingColor;
     }
 
     setPacerColors() {
