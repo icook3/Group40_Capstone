@@ -26,7 +26,6 @@ export class ObjectField {
     // Rotate rig to face forwards relative to the rider
     this.rig = document.getElementById('rig');
     this.rig.setAttribute('rotation', '0 -105 0'); 
-    
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -65,8 +64,6 @@ export class ObjectField {
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
     // Rewrite logic to use rider position and not item position
-
-
     let dz = riderSpeed * dt;
 
     if (!this.initialized || (riderSpeed, dt) === 0) return;
@@ -74,9 +71,8 @@ export class ObjectField {
     // Handles all objects currently part of the items array
     for (const obj of this.items) {
       const pos = getPos(obj);
-      pos.z += dz;
       
-      if (pos.z > 10) {
+      if (pos.z > getPos(document.getElementById('rider')).z + 20) {
         // recycle in front of farthest
         const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
@@ -85,16 +81,21 @@ export class ObjectField {
         const kind = detectKind(obj);
         pos.x = kind.resampleX();
       }
+
+      setPos(obj, pos);
+
     }
 
     for (const band of this.externalGroups) {
     if (band?.policy?.isStatic()) continue;
     if (!band?.items?.length) continue;
+    
     for (const obj of band.items) {
       const pos = getPos(obj);
-      pos.z += dz;
 
-      if (pos.z > 10) {
+      if (pos.z > getPos(document.getElementById('rider')).z + 20) {
+        //console.log(getPos(document.getElementById('rider')))
+
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
@@ -114,16 +115,19 @@ export class ObjectField {
             ? band.policy.jitterX()
             : 0;
           let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
+          
           if (typeof band.policy.clampX === 'function') {
             newX = band.policy.clampX(kindName, side, newX);
           }
           pos.x = newX;            
+        
         } else {
           // fallback: detect and use kind’s own resample
           const kind = this._detectKind(obj);
           pos.x = kind.resampleX();
         }
       }
+      setPos(obj, pos);
     }
   }
 
@@ -136,13 +140,16 @@ export class ObjectField {
           const pos = getPos(cloud);
           
           // If the cloud is still in visible range, move it forward
-          if ((pos.z + 1) < -20) {
+          //console.log(constants.worldZ)
+          if (pos.z < getPos(document.getElementById('rider')).z) {
             pos.z += 1;
             setPos(cloud, pos);
           }
 
           // Otherwise, remove it from the array and respawn in zone 4
           else {
+            // REMOVING CORRECTLY BUT NOT RESPAWNING
+            //console.log(pos);
             this.clouds.clouds.removeChild(cloud);
             this.clouds.clouds.appendChild(spawnCloud(4));
           }

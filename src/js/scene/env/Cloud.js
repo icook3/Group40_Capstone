@@ -1,3 +1,4 @@
+import { getPos, setPos } from '../core/util.js';
 import { constants } from "../../constants.js";
 
 export class Cloud {
@@ -30,6 +31,7 @@ export class Cloud {
     // Determine how fast clouds will move (10 to 30 MPH)
     constants.cloudSpeed = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
     constants.updateEvery = (1/constants.cloudSpeed) * 1000;
+    
   }
 }
 
@@ -48,8 +50,8 @@ export function spawnCloud(zone) {
     maxX = 190;
     minY = 20;
     maxY = 80;
-    minZ = 20;
-    maxZ = 120;
+    minZ = constants.worldZ + 20;
+    maxZ = constants.worldZ + 120;
   }
   
   else if (zone === 2) {
@@ -57,8 +59,8 @@ export function spawnCloud(zone) {
     maxX = 400;
     minY = 20;
     maxY = 150;
-    minZ = 121;
-    maxZ = 240;
+    minZ = constants.worldZ + 121;
+    maxZ = constants.worldZ + 240;
   }
 
   else if (zone === 3) {
@@ -66,8 +68,8 @@ export function spawnCloud(zone) {
     maxX = 345;
     minY = 30;
     maxY = 170;
-    minZ = 141;
-    maxZ = 360;
+    minZ = constants.worldZ + 141;
+    maxZ = constants.worldZ + 360;
   }
 
   else if (zone === 4) {
@@ -75,8 +77,8 @@ export function spawnCloud(zone) {
     maxX = 345;
     minY = 30;
     maxY = 170;
-    minZ = 300;
-    maxZ = 360;
+    minZ = constants.worldZ + 300;
+    maxZ = constants.worldZ + 360;
   }
 
   // Get x and determine sign
@@ -103,6 +105,7 @@ export function spawnCloud(zone) {
   cloud.setAttribute('gltf-model',`#${cloudType}`);
   cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
 
+  //console.log(`Spawned cloud at ${cloudX}, ${cloudY}, ${cloudZ}`);
   // Flip cloud on the y-axis to add more variation based on getSign()
   if (getSign()) {
     cloud.setAttribute('rotation', `0 180 0`);

@@ -3,6 +3,7 @@
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
 import { constants } from "../../constants.js";
+import { getPos, setPos } from '../core/util.js';
 
 export class Track {
 
@@ -10,7 +11,6 @@ export class Track {
     this.sceneEl = sceneEl;
 
     // Create a-entity for the path and set ID
-    // Will deprecate when
     const path_element = document.createElement('a-entity');
     path_element.setAttribute('id','track');
     this.path_element = path_element;
@@ -27,7 +27,7 @@ export class Track {
     this.path_element.appendChild(track);
 
     constants.trackPoints.push({x: 0, y: 2, z: -1, length: 1});
-    this.spawn_track();
+    spawn_track();
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete', this.update_animation);
@@ -48,7 +48,15 @@ export class Track {
     //console.log("SPEED CALCULATED AS " + constants.riderState.speed);
     //console.log("LENGTH CALCULATED AS " + constants.trackPoints[constants.currentTrackPiece].length);
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-  
+    
+
+    // If you're within 40 units of the end, spawn some more pieces
+
+    if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+      console.log(constants.trackPoints[constants.trackPoints.length - 1]);
+      spawn_track();
+    }
+    
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
@@ -56,26 +64,7 @@ export class Track {
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
   }
 
-  // Create and append track straight track piece
-  straightPiece() {
-
-    // Spawn track pieces in 30 unit increments for now; correct to more like 5 to make coasting less choppy
-    let pointZ = -1 * (constants.farthestSpawn + 5);
-
-    // Adjust Z spawn position to correct for centering of the box geometry
-    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-
-    constants.farthestSpawn += 5;
-    constants.trackPoints.push({x: 0, y: 2, z: pointZ, length: 5});
-
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
-    track.setAttribute('configuration', `straight_vertical`);
-    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
-    this.path_element.appendChild(track);
-    //return track.getAttribute("configuration");
-  }
+  
 
   // Create an append a track piece curving to the right
   curve_180_right(spawnZ) {
@@ -91,10 +80,33 @@ export class Track {
     return track.getAttribute("configuration");
   }
 
-  // Spawn track pieces in
-  spawn_track() {
+  
+}
+
+// Create and append track straight track piece
+  function straightPiece() {
+    let path_element = document.getElementById('track');
+    // Spawn track pieces in 30 unit increments for now; correct to more like 5 to make coasting less choppy
+    let pointZ = -1 * (constants.farthestSpawn + 5);
+
+    // Adjust Z spawn position to correct for centering of the box geometry
+    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+
+    constants.farthestSpawn += 5;
+    constants.trackPoints.push({x: 0, y: 2, z: pointZ, length: 5});
+
+    const track = document.createElement('a-entity');
+    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
+    track.setAttribute('configuration', `straight_vertical`);
+    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
+    path_element.appendChild(track);
+    //return track.getAttribute("configuration");
+  }
+
+// Spawn track pieces in
+  function spawn_track() {
     for (let i = 0; i < 80; i++) {
-      this.straightPiece();
+      straightPiece();
     }
   }
-}
