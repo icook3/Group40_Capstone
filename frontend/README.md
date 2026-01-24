@@ -149,7 +149,13 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - See each JS file for further documentation.
 - Make sure you run npm install before launching the server. Otherwise, errors will pop up.
 
-You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
+You can find a live example at https://gioandjake.com/zlow-preview/src/html/mainMenu.html
+
+Zlow is confirmed to work on the following browsers: 
+- Google Chrome
+- Microsoft Edge
+- Safari
+- Firefox
 
 # Surviving on your donations
 [Donations help keep the server up](https://paypal.me/jsimonson2013) :smile:
