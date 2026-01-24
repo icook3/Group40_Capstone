@@ -43,10 +43,6 @@ export class Track {
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider')
     let duration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
-
-    //console.log("DURATION CALCULATED AS " + duration);
-    //console.log("SPEED CALCULATED AS " + constants.riderState.speed);
-    //console.log("LENGTH CALCULATED AS " + constants.trackPoints[constants.currentTrackPiece].length);
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
     
     // If you're within 40 units of the end, spawn some more track pieces
@@ -58,15 +54,12 @@ export class Track {
     if (getPos(avatar).z < (-constants.gridDepth * 10) + 300) {
       add_tile();
     }
-    
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   initialize_animation() {
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
   }
-
-  
 
   // Create an append a track piece curving to the right
   curve_180_right(spawnZ) {
@@ -81,19 +74,16 @@ export class Track {
     this.path_element.appendChild(track);
     return track.getAttribute("configuration");
   }
-
-  
 }
 
 // Create and append track straight track piece
   function straightPiece() {
     let path_element = document.getElementById('track');
-    // Spawn track pieces in 30 unit increments for now; correct to more like 5 to make coasting less choppy
+    // Spawn track pieces in 5 unit increments
     let pointZ = -1 * (constants.farthestSpawn + 5);
 
     // Adjust Z spawn position to correct for centering of the box geometry
     let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-
     constants.farthestSpawn += 5;
     constants.trackPoints.push({x: 0, y: 2, z: pointZ, length: 5});
 
@@ -127,14 +117,20 @@ export class Track {
           }
         }
     
-    // Delete tiles more than 50 units behind the rider
-    let ground = document.getElementById('checkerboard-ground');
-    let riderZ = getPos(document.getElementById('rider')).z;
-  }
+    // Add functionality to delete tiles behind the rider
+}
 
 // Spawn track pieces in
   function spawn_track() {
     for (let i = 0; i < 80; i++) {
       straightPiece();
     }
+
+    // Shorten track element array every time it exceeds 200 elements
+    let track_elements = document.getElementById('track').children;
+    if (track_elements.length > 200) {
+      for (let i = 0; i < 100; i++) {
+        track_elements[0].parentNode.removeChild(track_elements[0]);
+      }
   }
+}

@@ -140,7 +140,6 @@ export class ObjectField {
           const pos = getPos(cloud);
           
           // If the cloud is still in visible range, move it forward
-          //console.log(constants.worldZ)
           if (pos.z < getPos(document.getElementById('rider')).z) {
             pos.z += 1;
             setPos(cloud, pos);
@@ -148,8 +147,6 @@ export class ObjectField {
 
           // Otherwise, remove it from the array and respawn in zone 4
           else {
-            // REMOVING CORRECTLY BUT NOT RESPAWNING
-            //console.log(pos);
             this.clouds.clouds.removeChild(cloud);
             this.clouds.clouds.appendChild(spawnCloud(4));
           }
