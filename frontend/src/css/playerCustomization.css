@@ -152,4 +152,13 @@ input[type="color"] {
   cursor: pointer;
 }
 
+/* Main Menu button should feel clickable */
+#menuButton {
+  cursor: pointer;
+}
+
+#menuButton:hover {
+  filter: brightness(85%);
+  transition: filter 0.15s ease;
+}
 

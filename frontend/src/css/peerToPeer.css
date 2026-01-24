@@ -36,3 +36,26 @@ button {
     width: 50%;
     height: 15%;
 }
+
+/* Hover feedback for buttons on Connect to Peer screen */
+#cancel:hover,
+#peerConnectMenu button:hover,
+button:hover {
+  filter: brightness(85%);
+  transition: filter 0.15s ease;
+}
+
+
+/* Hover feedback for clickable option rows (if options are divs/spans/lis) */
+#peerConnectMenu [role="button"]:hover,
+#peerConnectMenu .option:hover,
+#peerConnectMenu .peer-option:hover,
+#peerConnectMenu li:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+#peerConnectMenu [role="button"],
+#peerConnectMenu .option,
+#peerConnectMenu .peer-option,
+#peerConnectMenu li {
+  cursor: pointer;
+}
