@@ -209,6 +209,7 @@ function loop({
   const riderSpeed = constants.riderState.speed || 0;
 
   rider.update(dt);
+
   if (constants.pacerStarted&&peerState==0) {
     //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
@@ -233,7 +234,8 @@ function loop({
     // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
 
     // Apply the computed speed to the pacer avatar
-    pacer.setSpeed(pacerSpeed);
+    //pacer.setSpeed(pacerSpeed);
+    pacer.setSpeed(40);
     pacer.update(dt);
 
     // Update pacer position relative to the rider based on speed difference

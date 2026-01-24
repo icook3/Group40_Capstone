@@ -4,7 +4,7 @@
 */
 import { constants } from "../../constants.js";
 import { getPos, setPos } from '../core/util.js';
-
+import {activatePacer} from '../../main.js'
 export class Track {
 
   constructor({ sceneEl }) {
@@ -45,6 +45,8 @@ export class Track {
     let duration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
     
+    //console.log(duration)
+
     // If you're within 40 units of the end, spawn some more track pieces
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
@@ -58,7 +60,12 @@ export class Track {
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   initialize_animation() {
+
+    
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    
+    // Start pacer and ensure that it doesn't go backwards
+    setTimeout(() => activatePacer(), 5000);
   }
 
   // Create an append a track piece curving to the right
