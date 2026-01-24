@@ -449,7 +449,7 @@ applyHelmetColors() {
         this.bikeSeatColor = bike.seat || this.bikeSeatColor;
         this.bikePedalColor = bike.pedals || this.bikePedalColor;
         this.bikeCrankColor = bike.pedalCrank || this.bikeCrankColor;
-        
+
         const helmet = data.helmetColors || {};
         this.helmetColor = helmet.helmet || this.helmetColor;
         this.helmetPaddingColor = helmet.padding || this.helmetPaddingColor;
@@ -494,6 +494,10 @@ applyHelmetColors() {
         this.bikeSeatColor  = "#FF6F00";
         this.bikePedalColor = "#FF8C00";
         this.bikeCrankColor = "#FFA500";
+
+        this.helmetColor = "#A7E800";
+        this.helmetPaddingColor = "#333333";
+
 
         this.applyPlayerColors();
         this.applyBikeColors();
