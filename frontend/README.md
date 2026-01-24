@@ -121,6 +121,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `simulationstate.js` — Handles tracking the state of the simulation.
 		- `standardMode.js` — Handles standard mode functionalities and variables.
 		- `strava.js` — Handles Strava OAuth and activity upload.
+		- `trainerCalibration.js` — Handles calibrating and connecting the trainer.
 		- `workoutChoice.js` — Handles the dropdown menu for choosing workouts
 		- `workoutSession.js` — Handles tracking statistics across a workout
 		- `workoutStorage.js` — Handles storing and loading workout data for best/worst
@@ -148,7 +149,13 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - See each JS file for further documentation.
 - Make sure you run npm install before launching the server. Otherwise, errors will pop up.
 
-You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
+You can find a live example at https://gioandjake.com/zlow-preview/src/html/mainMenu.html
+
+Zlow is confirmed to work on the following browsers: 
+- Google Chrome
+- Microsoft Edge
+- Safari
+- Firefox
 
 # Surviving on your donations
 [Donations help keep the server up](https://paypal.me/jsimonson2013) :smile:

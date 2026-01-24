@@ -524,7 +524,7 @@ export function initZlowApp({
   const workoutSummary = new WorkoutSummary({
     workoutStorage,
     onClose: () => {
-      console.log("Summary was closed");
+      window.location.href = 'mainMenu.html';
     },
   });
 
@@ -664,7 +664,7 @@ export function initZlowApp({
 
   //Pacer speed control input
   //Rider state and history
-  if (sessionStorage.getItem("testMode") == "true") {
+  if (localStorage.getItem("testMode") == "true") {
     /*const keyboardBtn = getElement("keyboard-btn");
         keyboardBtn.removeAttribute("hidden");
         keyboardBtn.addEventListener("click", () => {
@@ -852,22 +852,26 @@ export function initZlowApp({
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.stopKeyboardMode(e.key.toLowerCase());
   });
-  if (localStorage.getItem("testMode") == "true") {
-    const connectBtn = getElement("connect-btn");
-    connectBtn.addEventListener("click", async () => {
-      await standardMode.connectTrainer();
-      //const ok = await standardMode.trainer.connect();
-      //if (ok) connectBtn.disabled = true;
-    });
-  } else {
-    if (sessionStorage.getItem("Trainer") !== null) {
-      try {
-        //HOPEFULLY this works
-        standardMode.setTrainer(JSON.parse(sessionStorage.getItem("Trainer")));
-      } catch {
-        console.log("JSON trainer did not work. This will need reworking :(");
+  const connectBtn = getElement("connect-btn");
+  connectBtn.addEventListener("click", async () => {
+    await standardMode.connectTrainer();
+    const ok = await standardMode.trainer.connect();
+    if (ok) connectBtn.disabled = true;
+  });
+  // Calibration modal button
+  const calibrateModalBtn = getElement("calibrate-trainer-modal-btn");
+  if (calibrateModalBtn) {
+    calibrateModalBtn.addEventListener("click", () => {
+      const modal = document.getElementById("calibration-modal");
+      if (modal) {
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+        // Initialize calibration if not already done, passing the shared trainer
+        if (window.initCalibration) {
+          window.initCalibration({ trainer: standardMode.trainer });
+        }
       }
-    }
+    });
   }
   standardMode.init();
   // setup the speed when using an actual trainer
@@ -965,9 +969,9 @@ function updateFavicon() {
   }
 
   if (darkMode.matches) {
-    favicon.href = "/resources/favicons/ZlowFavicon-dark.svg";
+    favicon.href = "../../resources/favicons/ZlowFavicon-dark.svg";
   } else {
-    favicon.href = "/resources/favicons/ZlowFavicon.svg";
+    favicon.href = "../../resources/favicons/ZlowFavicon.svg";
   }
 }
 
