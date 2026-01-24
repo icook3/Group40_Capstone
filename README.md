@@ -100,4 +100,6 @@ To update Zlow, follow these steps:
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
 2. in the command line, enter the command ```git pull```.
 
+You can also run update.bat by double-clicking on the file. This will update Zlow without needing to use the command line. 
+
 You do not need to close and reopen the main program terminal if you already have it running. You only need to close and reopen the backend.
