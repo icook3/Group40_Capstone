@@ -63,8 +63,6 @@ export class ObjectField {
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
-    // Rewrite logic to use rider position and not item position
-    let dz = riderSpeed * dt;
 
     if (!this.initialized || (riderSpeed, dt) === 0) return;
 
@@ -94,7 +92,6 @@ export class ObjectField {
       const pos = getPos(obj);
 
       if (pos.z > getPos(document.getElementById('rider')).z + 20) {
-        //console.log(getPos(document.getElementById('rider')))
 
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
@@ -155,13 +152,12 @@ export class ObjectField {
     }
   }
 
-  //spawnScenery(trackPiece, initialZ) {
-    // initialz refers to the central point of a 60-unit segment
-    //if (trackPiece == "straight_vertical") {
-      //for (let z = initialZ+30; z > initialZ-30; z -= 5) {
-        //this._spawnAtZ(z);
-        //if (Math.random() < 0.7) this._spawnAtZ(z); // original density
-      //}
-    //}
-  //}
+  spawnScenery(trackPiece, initialZ) {
+    if (trackPiece == "straight_vertical") {
+      for (let z = initialZ+30; z > initialZ-30; z -= 5) {
+        this._spawnAtZ(z);
+        if (Math.random() < 0.7) this._spawnAtZ(z); // original density
+      }
+    }
+  }
 }

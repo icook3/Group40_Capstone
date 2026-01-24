@@ -105,7 +105,6 @@ export function spawnCloud(zone) {
   cloud.setAttribute('gltf-model',`#${cloudType}`);
   cloud.setAttribute('position', `${cloudX} ${cloudY} ${cloudZ}`);
 
-  //console.log(`Spawned cloud at ${cloudX}, ${cloudY}, ${cloudZ}`);
   // Flip cloud on the y-axis to add more variation based on getSign()
   if (getSign()) {
     cloud.setAttribute('rotation', `0 180 0`);

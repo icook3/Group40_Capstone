@@ -212,8 +212,8 @@
       <!-- Use constants to generate checkerboard tiles for ground dynamically -->
       <script type="module">
         import { constants } from "../js/constants.js";
-        for (let x = 0; x < constants.gridWidth; x++) {
-          for (let z = 0; z < constants.gridDepth; z++) {
+        for (let z = 0; z < constants.gridDepth; z++) {
+          for (let x = 0; x < constants.gridWidth; x++) {
             const color =
               (x + z) % 2 === 0
                 ? constants.groundColor1

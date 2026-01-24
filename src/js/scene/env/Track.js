@@ -19,7 +19,7 @@ export class Track {
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
 
-    // Spawn track pieces - maybe add some before so it doesn't look so weird
+    // Spawn track pieces
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: 15`);
     track.setAttribute('material', `src: #track-texture; repeat: 1 1`);
@@ -95,15 +95,15 @@ export class Track {
     path_element.appendChild(track);
   }
 
+  // Add more ground tiles as the rider moves forward
   function add_tile() {
-
-    // Add more ground tiles as the rider moves forward
     let tilesEntity = document.getElementById('tiles');
+    let delete_tiles = tilesEntity.children;
     let start = constants.gridDepth;
     constants.gridDepth += 80;
 
-    for (let x = 0; x < constants.gridWidth; x++) {
-      for (let z = start; z < constants.gridDepth; z++) {
+    for (let z = start; z < constants.gridDepth; z++) {
+      for (let x = 0; x < constants.gridWidth; x++) {
         const tile = document.createElement("a-entity");
         tile.setAttribute("geometry", `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
             tile.setAttribute("material", "src: #grass-texture");
@@ -117,11 +117,16 @@ export class Track {
           }
         }
     
-    // Add functionality to delete tiles behind the rider
+    // Delete tiles behind the rider
+    if (delete_tiles.length > 1500) {
+      for (let i = 0; i < 500; i++) {
+        delete_tiles[0].parentNode.removeChild(delete_tiles[0]);
+      }
+  }
 }
 
-// Spawn track pieces in
-  function spawn_track() {
+  // Spawn track pieces in
+  export function spawn_track() {
     for (let i = 0; i < 80; i++) {
       straightPiece();
     }
