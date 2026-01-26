@@ -1,0 +1,24 @@
+button {
+  font-size: 1em;
+  cursor: pointer;
+}
+#menu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  /* Background color */
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 250px;
+}
+.changelog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color:white;
+}
