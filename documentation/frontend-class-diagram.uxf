@@ -1,4 +1,4 @@
-<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><element><id>UMLClass</id><coordinates><x>688</x><y>1032</y><w>168</w><h>88</h></coordinates><panel_attributes>Units
+<diagram program="umletino" version="15.1"><zoom_level>6</zoom_level><element><id>UMLClass</id><coordinates><x>342</x><y>786</y><w>126</w><h>66</h></coordinates><panel_attributes>Units
 --
 +speedUnit: UnitInterface
 +distanceUnit: UnitInterface
@@ -6,53 +6,53 @@
 +weightUnit: UnitInterface
 --
 +setUnits(): void
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>688</x><y>1152</y><w>168</w><h>80</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>342</x><y>876</y><w>126</w><h>60</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
 UnitsInterface
 --
 +name:string
 --
 +convertTo(val: number): number
 +convertFrom(val: number): number
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>760</x><y>1112</y><w>24</w><h>56</h></coordinates><panel_attributes>lt=&lt;-
-group=group-1</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>664</x><y>1224</y><w>40</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;30;30;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>640</x><y>1248</y><w>32</w><h>24</h></coordinates><panel_attributes>kg
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>396</x><y>846</y><w>18</w><h>42</h></coordinates><panel_attributes>lt=&lt;-
+group=group-1</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>324</x><y>930</y><w>30</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;30;30;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>306</x><y>948</y><w>24</w><h>18</h></coordinates><panel_attributes>kg
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>696</x><y>1256</y><w>24</w><h>24</h></coordinates><panel_attributes>km
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>348</x><y>954</y><w>18</w><h>18</h></coordinates><panel_attributes>km
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>744</x><y>1256</y><w>24</w><h>24</h></coordinates><panel_attributes>kmh
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>384</x><y>954</y><w>18</w><h>18</h></coordinates><panel_attributes>kmh
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>784</x><y>1256</y><w>24</w><h>24</h></coordinates><panel_attributes>lb
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>414</x><y>954</y><w>18</w><h>18</h></coordinates><panel_attributes>lb
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>824</x><y>1256</y><w>24</w><h>24</h></coordinates><panel_attributes>mi
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>444</x><y>954</y><w>18</w><h>18</h></coordinates><panel_attributes>mi
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>712</x><y>1288</y><w>32</w><h>24</h></coordinates><panel_attributes>mph
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>978</y><w>24</w><h>18</h></coordinates><panel_attributes>mph
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>808</x><y>1288</y><w>24</w><h>24</h></coordinates><panel_attributes>W
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>432</x><y>978</y><w>18</w><h>18</h></coordinates><panel_attributes>W
 --
 --
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>696</x><y>1224</y><w>32</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;40;20;10</additional_attributes></element><element><id>Relation</id><coordinates><x>744</x><y>1224</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>784</x><y>1224</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>824</x><y>1224</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>808</x><y>1224</y><w>24</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>720</x><y>1224</y><w>32</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-
-group=group-1</panel_attributes><additional_attributes>10;80;20;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>624</x><y>976</y><w>248</w><h>360</h></coordinates><panel_attributes>units
-group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>888</x><y>816</y><w>776</w><h>568</h></coordinates><panel_attributes>scene</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1176</x><y>992</y><w>272</w><h>200</h></coordinates><panel_attributes>core
-group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1208</x><y>1016</y><w>168</w><h>64</h></coordinates><panel_attributes>Terrain
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>348</x><y>930</y><w>24</w><h>36</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;20;10</additional_attributes></element><element><id>Relation</id><coordinates><x>384</x><y>930</y><w>18</w><h>36</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>414</x><y>930</y><w>18</w><h>36</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>444</x><y>930</y><w>18</w><h>36</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>432</x><y>930</y><w>18</w><h>60</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>366</x><y>930</y><w>24</w><h>60</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;80;20;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>294</x><y>744</y><w>186</w><h>270</h></coordinates><panel_attributes>units
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>492</x><y>624</y><w>582</w><h>426</h></coordinates><panel_attributes>scene</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>708</x><y>756</y><w>204</w><h>150</h></coordinates><panel_attributes>core
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>732</x><y>774</y><w>126</w><h>48</h></coordinates><panel_attributes>Terrain
 --
 +terrainEl: HTMLElement
 --
 +constructor({getElement}): Terrain
-group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1208</x><y>1096</y><w>216</w><h>24</h></coordinates><panel_attributes>+getPos(el: HTMLElement): {x: int, y: int, z: int}
-group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1200</x><y>1128</y><w>240</w><h>24</h></coordinates><panel_attributes>+setPos(el: HTMLElement, {x: int, y: int, z: int}): void
-group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1224</x><y>1160</y><w>168</w><h>24</h></coordinates><panel_attributes>+sampleSideX({isBuilding}): number
-group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1040</x><y>480</y><w>264</w><h>176</h></coordinates><panel_attributes>TrainerBluetooth
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>732</x><y>834</y><w>162</w><h>18</h></coordinates><panel_attributes>+getPos(el: HTMLElement): {x: int, y: int, z: int}
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>726</x><y>858</y><w>180</w><h>18</h></coordinates><panel_attributes>+setPos(el: HTMLElement, {x: int, y: int, z: int}): void
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>744</x><y>882</y><w>126</w><h>18</h></coordinates><panel_attributes>+sampleSideX({isBuilding}): number
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>606</x><y>372</y><w>198</w><h>132</h></coordinates><panel_attributes>TrainerBluetooth
 --
 +device: BluetoothDevice
 +server: BluetoothRemoteGATTServer
@@ -66,7 +66,7 @@ group=group-0</panel_attributes><additional_attributes></additional_attributes><
 /+get CYCLINE_POWER_MEASUREMENT_UUID(): string/
 +async connect(): Promise&lt;boolean&gt;
 +handlePower(event: {target: {value: DataView}}): void
-+handleCadence(event: {target: {value: DataView}}): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1336</x><y>0</y><w>296</w><h>784</h></coordinates><panel_attributes>Constants
++handleCadence(event: {target: {value: DataView}}): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>828</x><y>12</y><w>222</w><h>588</h></coordinates><panel_attributes>Constants
 --
 +KMH_TO_MS: number
 +MS_TO_KMS: number
@@ -131,7 +131,7 @@ group=group-0</panel_attributes><additional_attributes></additional_attributes><
 +kmhToMs(kmh: number): number
 +msToKmh(ms: number): number
 +get mass(): number
-+windResistance(velocity: number): number</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>472</x><y>592</y><w>296</w><h>280</h></coordinates><panel_attributes>HUD
++windResistance(velocity: number): number</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>180</x><y>456</y><w>222</w><h>210</h></coordinates><panel_attributes>HUD
 --
 +power: HTMLElement
 +speed: HTMLElement
@@ -154,4 +154,18 @@ workoutCountdownId: number
 +resetWorkOut(): void
 +showWorkoutMessage({test, seconds}): void
 +update({power, speed, calories, targetWatts}, dt): void
-+setPacerDiff(diff): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>624</x><y>864</y><w>112</w><h>184</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>120;210;10;10</additional_attributes></element></diagram>
++setPacerDiff(diff): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>294</x><y>660</y><w>84</w><h>138</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>120;210;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>546</x><y>198</y><w>156</w><h>132</h></coordinates><panel_attributes>KeyboardMode
+--
++keyboardmode: boolean
++keyboardSpeed: number
++keyboardHalfSpeed: number
++wKeyDown: boolean
++sKeyDown: boolean
++qKeyDown: boolean
++aKeyDown: boolean
++keyboardOnText: string
+--
++setKeyboardModeSpeed(key: string): void
++setKeyboardModePower(key: string): void
++keyboardInputActive(k: string): void
++stopKeyboardMode(key: string): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>696</x><y>270</y><w>144</w><h>18</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>220;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>726</x><y>300</y><w>78</w><h>18</h></coordinates><panel_attributes>+activatePacer(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>696</x><y>306</y><w>42</w><h>18</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>50;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>798</x><y>306</y><w>42</w><h>18</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>50;10;10;10</additional_attributes></element></diagram>
