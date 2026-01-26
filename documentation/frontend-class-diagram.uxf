@@ -1,28 +1,55 @@
-<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><element><id>UMLClass</id><coordinates><x>296</x><y>272</y><w>168</w><h>88</h></coordinates><panel_attributes>Units
+<diagram program="umletino" version="15.1"><zoom_level>8</zoom_level><element><id>UMLClass</id><coordinates><x>64</x><y>408</y><w>168</w><h>88</h></coordinates><panel_attributes>Units
 --
 +speedUnit: UnitInterface
 +distanceUnit: UnitInterface
 +powerUnit: UnitInterface
 +weightUnit: UnitInterface
 --
-+setUnits(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>296</x><y>392</y><w>168</w><h>80</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
++setUnits(): void
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>64</x><y>528</y><w>168</w><h>80</h></coordinates><panel_attributes>&lt;&lt;Interface&gt;&gt;
 UnitsInterface
 --
 +name:string
 --
 +convertTo(val: number): number
-+convertFrom(val: number): number</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>368</x><y>352</y><w>24</w><h>56</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>272</x><y>464</y><w>40</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;30;30;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>248</x><y>488</y><w>32</w><h>24</h></coordinates><panel_attributes>kg
++convertFrom(val: number): number
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>136</x><y>488</y><w>24</w><h>56</h></coordinates><panel_attributes>lt=&lt;-
+group=group-1</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>40</x><y>600</y><w>40</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;30;30;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>16</x><y>624</y><w>32</w><h>24</h></coordinates><panel_attributes>kg
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>304</x><y>496</y><w>24</w><h>24</h></coordinates><panel_attributes>km
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>352</x><y>496</y><w>24</w><h>24</h></coordinates><panel_attributes>kmh
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>72</x><y>632</y><w>24</w><h>24</h></coordinates><panel_attributes>km
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>392</x><y>496</y><w>24</w><h>24</h></coordinates><panel_attributes>lb
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>432</x><y>496</y><w>24</w><h>24</h></coordinates><panel_attributes>mi
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>120</x><y>632</y><w>24</w><h>24</h></coordinates><panel_attributes>kmh
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>320</x><y>528</y><w>32</w><h>24</h></coordinates><panel_attributes>mph
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>416</x><y>528</y><w>24</w><h>24</h></coordinates><panel_attributes>W
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>632</y><w>24</w><h>24</h></coordinates><panel_attributes>lb
 --
---</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>304</x><y>464</y><w>32</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;40;20;10</additional_attributes></element><element><id>Relation</id><coordinates><x>352</x><y>464</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>392</x><y>464</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>432</x><y>464</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>416</x><y>464</y><w>24</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>328</x><y>464</y><w>32</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;20;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>232</x><y>216</y><w>248</w><h>360</h></coordinates><panel_attributes>units</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+--
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>200</x><y>632</y><w>24</w><h>24</h></coordinates><panel_attributes>mi
+--
+--
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>88</x><y>664</y><w>32</w><h>24</h></coordinates><panel_attributes>mph
+--
+--
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>184</x><y>664</y><w>24</w><h>24</h></coordinates><panel_attributes>W
+--
+--
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>72</x><y>600</y><w>32</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;20;10</additional_attributes></element><element><id>Relation</id><coordinates><x>120</x><y>600</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>160</x><y>600</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>200</x><y>600</y><w>24</w><h>48</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>184</x><y>600</y><w>24</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>96</x><y>600</y><w>32</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=group-1</panel_attributes><additional_attributes>10;80;20;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>352</y><w>248</w><h>360</h></coordinates><panel_attributes>units
+group=group-1</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>264</x><y>192</y><w>776</w><h>568</h></coordinates><panel_attributes>scene</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>552</x><y>368</y><w>272</w><h>200</h></coordinates><panel_attributes>core
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>584</x><y>392</y><w>168</w><h>64</h></coordinates><panel_attributes>Terrain
+--
++terrainEl: HTMLElement
+--
++constructor({getElement}): Terrain
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>584</x><y>472</y><w>216</w><h>24</h></coordinates><panel_attributes>+getPos(el: HTMLElement): {x: int, y: int, z: int}
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>576</x><y>504</y><w>240</w><h>24</h></coordinates><panel_attributes>+setPos(el: HTMLElement, {x: int, y: int, z: int}): void
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>600</x><y>536</y><w>168</w><h>24</h></coordinates><panel_attributes>+sampleSideX({isBuilding}): number
+group=group-0</panel_attributes><additional_attributes></additional_attributes></element></diagram>
