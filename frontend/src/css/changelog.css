@@ -15,10 +15,12 @@ button {
 }
 .changelog {
     position: fixed;
-    top: 50%;
-    left: 50%;
+    top: 25%;
+    left: 40%;
+    height:50%;
     z-index: 1000;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    color:white;
+    color:black;
+    overflow-y:scroll;
 }
