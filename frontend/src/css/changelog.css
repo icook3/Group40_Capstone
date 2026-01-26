@@ -12,6 +12,11 @@ button {
   padding: 15px;
   border-radius: 30px;
   width: 250px;
+  margin: 0;
+  font-family: sans-serif;
+  color: #fff;
+  font-family: "Fugaz One", sans-serif;
+  font-size: 1.5em;
 }
 .changelog {
     position: fixed;
