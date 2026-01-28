@@ -316,6 +316,9 @@
   gap: 8px;
   width: 100%;
   box-sizing: border-box;
+
+  /* NEW: make the whole row NOT look editable */
+  cursor: default;
 }
 
 /* Style for input fields */
@@ -329,7 +332,11 @@
   border-radius: 8px;
   font-family: "Nunito", sans-serif;
   font-size: 0.95em;
+
+  /* NEW: keep text cursor on the actual editable inputs */
+  cursor: text;
 }
+
 
 #dev-controls-hud #pacer-speed:focus,
 #dev-controls-hud #rider-weight:focus {
@@ -373,6 +380,15 @@
 #dev-controls-hud #calories-reset-btn:focus {
   outline: none;
 }
+
+/* DEV HUD: make any buttons inside the pacer/weight rows show a hand */
+#dev-controls-hud #pacer button,
+#dev-controls-hud #weight button,
+#dev-controls-hud #pacer .arrow-btn,
+#dev-controls-hud #weight .arrow-btn {
+  cursor: pointer;
+}
+
 
 /* ========================================
    Pause overlay style

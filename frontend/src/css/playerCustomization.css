@@ -39,6 +39,9 @@ a-scene {
   font-size: xx-large;
 }
 
+#menuButton:hover {
+  filter: brightness(85%);
+}
 #genderSelector {
   display: flex;
   align-items: center;
@@ -68,6 +71,8 @@ a-scene {
   color: rgb(220, 229, 222);
   font-family: "Nunito", sans-serif;
   font-size: 1em;
+  cursor: default;
+  user-select: none;
 }
 
 #playerContainer h2,
@@ -142,3 +147,18 @@ body {
   z-index: -2;
   background: linear-gradient(to bottom, #6cb4d1 0%, #c0edff 100%);
 }
+
+input[type="color"] {
+  cursor: pointer;
+}
+
+/* Main Menu button should feel clickable */
+#menuButton {
+  cursor: pointer;
+}
+
+#menuButton:hover {
+  filter: brightness(85%);
+  transition: filter 0.15s ease;
+}
+

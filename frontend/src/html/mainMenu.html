@@ -127,7 +127,7 @@
         <label for="name-input">Name: </label>
         <input id="name-input" />
       </span>
-      <button id="clear-btn" class="hud-btn" onclick="sessionStorage.clear();">
+      <button id="clear-btn" class="hud-btn" onclick="sessionStorage.clear(); localStorage.clear();">
         Clear settings
       </button>
       <button id="testMode" class="hud-btn">Developer Testing Mode</button>
@@ -143,6 +143,9 @@
         >
           Settings
         </button>
+        <button id="github-btn" class="hud-btn" onclick="window.open('https://github.com/gioandjake/zlow/issues/new/choose', '_blank');">Report bugs!</button>
+        <button id="changelog" class="hud-btn" onclick="window.location.href = 'changelog.html'">Zlow version 1.0.0-alpha 3</button>
+
       </div>
     </div>
 

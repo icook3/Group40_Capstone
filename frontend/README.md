@@ -18,8 +18,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `index.js` — The JavaScript file defining the A-Frame Curve Follow component
 		- `aframe_parametric_curve` — Stores an A-Frame component for a parametric curve
 			- `index.js` — The JavaScript file defining the A-Frame Parametric Curve component
-		- `aframe_tube_geometry` — Stores an A-Frame component used to help with making curves
-			- `index.js` — The JavaScript file defining the A-Frame Tube Geometry component
 	- `favicons` — Stores the program favicon.
 		- `favicon.ico` — The main favicon used for the program.
 		- `ZlowFavicon-dark.svg` — A variant of the favicon used when the browser is in dark mode for better readability.
@@ -35,7 +33,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `calories.svg` — The icon used to represent calories in the hud.
 		- `center-hud.svg` — A mask to shape the center of the hud, alongside some buttons on other pages.
 		- `license.pdf` — The license for the calories and time images.
-		- `Thumbs.db` — TODO: Find who created this, and what its purpose is.
 		- `time.svg` — The icon used to represent time on the hud.
 	- `models` — Stores various 3D models.
 		- `bgmodels` — Stores 3D models that appear in the background of the scene.
@@ -53,19 +50,23 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `playermodels` — Stores the models of the player and the bike.
 			- `bikeV4.glb` — The 3D model of the bike.
 			- `femaleV6.glb` — The female character model.
+			- `helmet.glb` — The model used for the helmet.
 			- `maleV5.glb` — The male character model.
 	- `textures` — Stores image textures.
 		- `Grass.jpeg` — The image texture for the grass.
 		- `Track.jpeg` — The image texture for the track.
 - `src` — Stores all source code for the project.
 	- `css` — Stores CSS source code.
+		- `changelog.css` — Handles CSS styles for the changelog page.
 		- `hud.css` — Handles CSS styles for the modern HUD.
 		- `menu.css` — Handles CSS styles for the main menu.
-		- `peerToPeer.css` — Handles CSS styles for the peer-to-peer menu
+		- `peerToPeer.css` — Handles CSS styles for the peer-to-peer menu.
 		- `playerCustomization.css` — Handles CSS styles for the player customization screen.
-		- `strava.css` — Handles CSS styles for the strava connection screen
+		- `strava.css` — Handles CSS styles for the strava connection screen.
 		- `style.css` — Handles general CSS styles for the program.
+		- `workoutSummary.css` — Handles CSS styles for the workout summary popup.
 	- `html` — Stores HTML source code.
+		- `changelog.html` — Screen for the Zlow changelog
 		- `connectToPeers.html` — Screen for connecting via the peer-to-peer network
 		- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings.
 		- `playerCustomization.html` — Screen for customizing the player.
@@ -116,6 +117,8 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `keyboardMode.js` — Handles keyboard mode functionalities and variables.
 		- `main.js` — Main app entry point.
 		- `menu.js` — Handles event listeners on the main menu.
+		- `milestones.js` — Handles tracking for various milestones.
+		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
 		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling
 		- `simulationstate.js` — Handles tracking the state of the simulation.
@@ -149,7 +152,13 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - See each JS file for further documentation.
 - Make sure you run npm install before launching the server. Otherwise, errors will pop up.
 
-You can find a live example at https://gioandjake.com/zlow (recommend to use Chrome)
+You can find a live example at https://gioandjake.com/zlow-preview/src/html/mainMenu.html
+
+Zlow is confirmed to work on the following browsers: 
+- Google Chrome
+- Microsoft Edge
+- Safari
+- Firefox
 
 # Surviving on your donations
 [Donations help keep the server up](https://paypal.me/jsimonson2013) :smile:
