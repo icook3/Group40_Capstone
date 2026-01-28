@@ -60,3 +60,46 @@ button {
 button:disabled {
   background: #555;
 }
+
+button,
+.hud-btn,
+.summary-btn,
+.confirm-btn,
+.cancel-btn,
+.close-btn,
+.dropdown-item,
+.arrow-btn,
+.split-btn .main,
+.split-btn .toggle {
+  cursor: pointer;
+}
+
+button:hover:not(:disabled),
+.hud-btn:hover:not(:disabled),
+.summary-btn:hover:not(:disabled),
+.confirm-btn:hover:not(:disabled),
+.cancel-btn:hover:not(:disabled),
+.close-btn:hover:not(:disabled),
+.dropdown-item:hover,
+.arrow-btn:hover,
+.split-btn .main:hover,
+.split-btn .toggle:hover {
+  filter: brightness(85%);
+}
+
+button:active:not(:disabled),
+.hud-btn:active:not(:disabled),
+.summary-btn:active:not(:disabled),
+.confirm-btn:active:not(:disabled),
+.cancel-btn:active:not(:disabled),
+.close-btn:active:not(:disabled),
+.dropdown-item:active,
+.arrow-btn:active {
+  filter: brightness(75%);
+  transform: scale(0.97);
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
