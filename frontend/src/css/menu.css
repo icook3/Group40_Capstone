@@ -273,7 +273,7 @@ a-scene {
 }
 
 /* Buttons inside settings remain a hand (Connect Strava, Host, Clear, Dev Mode) */
-#menu-settings button {
+#menu-settings button.hud-btn {
   cursor: pointer;
 }
 
