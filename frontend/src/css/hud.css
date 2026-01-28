@@ -25,9 +25,11 @@
   left: 0;
   width: 100%;
 
-  /* 3-column grid: left (time), center (speed/power/distance), right (calories) */
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
+  /* Flexbox for adaptable HUD */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 
   padding: 20px 0 10px;
 
