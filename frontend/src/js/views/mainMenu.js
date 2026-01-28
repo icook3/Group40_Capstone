@@ -1,0 +1,363 @@
+import { setView } from "./viewManager.js";
+import { views } from "./viewManager.js";
+export let mainMenu = `<div>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="../js/menu.js"></script>
+
+    <h1 id="welcome-msg" class="center-item">
+      Welcome to
+      <img
+        src="../../resources/favicons/ZlowFavicon.svg"
+        alt="Z"
+        width="30"
+        height="30"
+      />low!
+    </h1>
+
+    <!-- Split Start button -->
+    <div id="start-split" class="split-btn stats-row center-item">
+      <button id="start-btn" class="main" type="button">Start</button>
+      <button
+        id="start-toggle"
+        class="toggle"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="start-menu"
+      >
+        ▾
+      </button>
+
+      <div id="start-menu" class="dropdown-content" role="menu">
+        <button class="dropdown-item" data-workout="free">Free Ride</button>
+        <button class="dropdown-item" data-workout="ramp">Ramp Test</button>
+        <button class="dropdown-item" data-workout="sprint">
+          Sprint Intervals
+        </button>
+        <button class="dropdown-item" data-workout="peerServer">Connect to peer</button>
+      </div>
+    </div>
+
+    <script defer src="../js/workoutChoice.js"></script>
+
+    <div id="menu-settings">
+      <span id="pacer" class="hud-btn">
+        <label for="pacer-speed">Pacer:</label>
+        <input
+          id="pacer-speed"
+          type="number"
+          min="5"
+          max="60"
+          value="20"
+          step="1"
+        />
+        <span class="speedUnit">km/h</span>
+      </span>
+
+      <span id="weight" class="hud-btn">
+        <label for="rider-weight">Weight:</label>
+        <input
+          id="rider-weight"
+          type="number"
+          min="40"
+          max="150"
+          value="70"
+          step="1"
+        />
+        <span class="weightUnit"> kg</span>
+      </span>
+      <button id="connect-strava-btn" class="hud-btn" disabled>
+        Connect Strava
+      </button>
+      <span id="unitsSpeed" class="hud-btn">
+        <label for="unitsSpeed">Units for speed: </label>
+        <select name="unitsSpeed" id="unitInputSpeed">
+          <option value="km/h">km/h</option>
+          <option value="mph">mph</option>
+        </select>
+      </span>
+      <span id="unitsWeight" class="hud-btn">
+        <label for="unitsWeight">Units for weight: </label>
+        <select name="unitsWeight" id="unitInputWeight">
+          <option value="kg">kg</option>
+          <option value="lb">lb</option>
+        </select>
+      </span>
+      <!-- Delete this comment if you want to add alternate options for power input 
+        <span id="unitsPower" class="hud-btn">
+            <label for="unitsPower">Units for power: </label>
+            <select name="unitsPower" id="unitInputPower">
+                <option value="W">W</option>
+            </select>
+        </span>
+        -->
+      <button id="peer-btn" class="hud-btn">Host peer-to-peer</button>
+      <span id="peer-name" class="hud-btn">
+        <label for="name-input">Name: </label>
+        <input id="name-input" />
+      </span>
+      <button id="clear-btn" class="hud-btn" onclick="sessionStorage.clear(); localStorage.clear();">
+        Clear settings
+      </button>
+      <button id="testMode" class="hud-btn">Developer Testing Mode</button>
+    </div>
+
+    <div id="menu-bottom">
+      <div class="control-buttons">
+        <button id="connect-btn" class="hud-btn">Connect Trainer</button>
+        <button
+          id="settings-btn"
+          class="hud-btn"
+          onclick="jQuery('#menu-settings').fadeToggle(500);"
+        >
+          Settings
+        </button>
+        <button id="github-btn" class="hud-btn" onclick="window.open('https://github.com/gioandjake/zlow/issues/new/choose', '_blank');">Report bugs!</button>
+        <button id="changelog" class="hud-btn" onclick="window.location.href = 'changelog.html'">Zlow version 1.0.0-alpha 3</button>
+
+      </div>
+    </div>
+
+    <div id="customize">
+      <div class="control-buttons">
+        <button
+          id="customize-btn"
+          class="hud-btn"
+          onclick="setView(views.playerCustomization);"
+        >
+          Customize Character
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Menu Avatar
+    <a-scene
+      id="mainMenuScene"
+      embedded
+      style="width: 300px; height: 600px; background: transparent"
+    >
+      <a-entity
+        camera
+        position="0 1.5 3"
+        look-controls="enabled: false"
+      ></a-entity>
+      <a-assets>
+        <a-asset-item
+          id="bikeGLB"
+          src="../../resources/models/playermodels/bikeV4.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="maleGLB"
+          src="../../resources/models/playermodels/maleV5.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="femaleGLB"
+          src="../../resources/models/playermodels/femaleV6.glb"
+        ></a-asset-item>
+      </a-assets>
+    </a-scene>
+
+    <script>
+      jQuery( document ).ready(function() {
+        console.log("Ready!");
+      });
+    </script>
+
+    <script type="module">
+      import { AvatarCreator } from "../js/avatarCreator.js";
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const scene = document.querySelector("#mainMenuScene");
+        if (!scene) {
+          console.error("Scene not found!");
+          return;
+        }
+
+        //Create the avatar immediately
+        const avatar = new AvatarCreator(
+          "menuAvatar",
+          { x: 0, y: 0, z: -1 },
+          { x: 0, y: 90, z: 0 },
+          (avatarInstance) => {
+            avatarInstance.setMenuPosition();
+            avatarInstance.enableMenuRotation();
+            avatarInstance.startRotationLoop();
+          }
+        );
+      });
+    </script> -->
+
+    <div id="sky-gradient"></div>
+
+    <!-- Main Menu 3D Background -->
+    <a-scene id="mainMenuScene" embedded>
+      <!-- Camera -->
+      <!-- Can change controls to true if other assets are added to the scene to aid in placement -->
+      <a-entity
+        camera
+        position="-3.44 0.28 2.51"
+        rotation="10 -20 0"
+        fov="45"
+        look-controls="enabled: false"
+        wasd-controls="enabled: false"
+      ></a-entity>
+
+      <a-light type="ambient" color="#FFF" intensity="0.8"></a-light>
+      <a-light
+        type="directional"
+        color="#FFF"
+        intensity="1.5"
+        position="-2 5 3"
+      ></a-light>
+
+      <a-light
+        type="point"
+        color="#FFF"
+        intensity="5.5"
+        position="-2 0 2"
+        distance="3"
+      ></a-light>
+
+      <!-- Ground plane with solid green color (it's dark to compensate for lighting) -->
+      <a-plane
+        position="0 0 0"
+        rotation="-90 0 0"
+        width="50"
+        height="50"
+        color="#2d5016"
+        roughness="1"
+      ></a-plane>
+
+      <!-- Assets (we just reuse in game models) -->
+      <a-assets>
+        <a-asset-item
+          id="tree1"
+          src="../../resources/models/bgmodels/tree1.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="bikeGLB"
+          src="../../resources/models/playermodels/bikeV4.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="bush1"
+          src="../../resources/models/bgmodels/bush1.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="cloud1"
+          src="../../resources/models/bgmodels/cloud1.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud2"
+          src="../../resources/models/bgmodels/cloud2.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="cloud3"
+          src="../../resources/models/bgmodels/cloud3.glb"
+        ></a-asset-item>
+
+        <a-asset-item
+          id="house-obj"
+          src="../../resources/models/bgmodels/House.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="tall-building-obj"
+          src="../../resources/models/bgmodels/TallBuilding.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="wide-building-obj"
+          src="../../resources/models/bgmodels/WideBuilding.glb"
+        ></a-asset-item>
+        s
+      </a-assets>
+
+      <!--  Main tree -->
+      <a-entity
+        gltf-model="#tree1"
+        position="-2.5 0.1 2"
+        rotation="0 80 0"
+        scale=".8 .8 .8"
+      ></a-entity>
+
+      <!--  Main bike -->
+      <a-entity
+        gltf-model="#bikeGLB"
+        position="-2.65 0 2"
+        rotation="0 -10 -20"
+        scale=".1 .1 .1"
+      ></a-entity>
+
+      <!-- Foreground bush -->
+      <a-entity
+        gltf-model="#bush1"
+        position="-3.8 0 2"
+        rotation="0 45 0"
+        scale=".3 .3 .3"
+      ></a-entity>
+
+      <!-- Some clouds -->
+      <a-entity
+        gltf-model="#cloud1"
+        position="-8 4 -5"
+        scale=".1 .1 .1"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud2"
+        position="-3 8 -9"
+        scale=".2 .2 .2"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud3"
+        position="-16 6 -10"
+        scale=".3 .3 .3"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud3"
+        position="60 20 -10"
+        scale=".5 .5 .5"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#cloud1"
+        position="100 40 -5"
+        scale=".4 .4 .4"
+      ></a-entity>
+
+      <!-- Some buildings and a house -->
+      <a-entity
+        gltf-model="#tall-building-obj"
+        position="-10 0 -20"
+        rotation="0 -50 10"
+        scale="1 1 1"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#house-obj"
+        position="50 0 -18"
+        rotation="0 180 0"
+        scale="2 2 2"
+      ></a-entity>
+
+      <a-entity
+        gltf-model="#wide-building-obj"
+        position="-16 -0.1 -28"
+        rotation="0 -50 10"
+        scale="1.2 1.2 1.2"
+      ></a-entity>
+    </a-scene>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        if (window.initSettings) window.initSettings();
+      });
+    </script>
+  </div>`;

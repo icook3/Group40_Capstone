@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" class="settings">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zlow: Browser Cycling Simulator</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <link rel="stylesheet" href="../css/hud.css" />
+    <link rel="stylesheet" href="../css/menu.css" />
+    <link rel="stylesheet" href="../css/playerCustomization.css" />
+    <style>
+      body {
+        #sky-gradient {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: -2;
+          background: linear-gradient(to bottom, #7cd1f3 0%, #c4eeff 100%);
+        }
+        background-color: grey;
+      }
+    </style>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/resources/favicons/ZlowFavicon.svg"
+    />
+  </head>
+  <body>
+    <script type="module" src="../js/views/initView.js"></script>
+    <script type="module" src="../js/views/viewManager.js"></script>
+    <script type="module">
+        import {setView} from "../js/views/viewManager.js";
+    </script>
+    <div id="mainDiv"></div>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        if (window.init) window.init();
+      });
+    </script>
+  </body>
+</html>
