@@ -234,8 +234,7 @@ function loop({
     // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
 
     // Apply the computed speed to the pacer avatar
-    //pacer.setSpeed(pacerSpeed);
-    pacer.setSpeed(40);
+    pacer.setSpeed(pacerSpeed);
     pacer.update(dt);
 
     // Update pacer position relative to the rider based on speed difference
@@ -349,7 +348,7 @@ function recieveData(data) {
   switch(data.name) {
     case "playerData":
       console.log("recieving player data");
-      pacer = new AvatarMovement("pacer", {
+      pacer = new AvatarMovement("pacer-entity", {
         position: { x: 0.5, y: 1, z: 0 },
         isPacer: false,
       });

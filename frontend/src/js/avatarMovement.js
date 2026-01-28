@@ -92,7 +92,7 @@ export class AvatarMovement {
 
         //Rotate crank and pedals
         if (this.creator.leftPedalBone && this.creator.rightPedalBone && this.creator.pedalCrankBone) {
-            if (this.creator.id === "pacer") {
+            if (this.creator.id === "pacer-entity") {
                 //Rotate crank
                 const pacerCrankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
                 const pacerCrankRotationAmount = pacerCrankAngularSpeed * dt;
@@ -139,6 +139,7 @@ export class AvatarMovement {
         // Emit either a start or a resume event based on worldZ
         if (constants.worldZ == 0) {
             document.getElementById('rider').emit('riderStarted');
+            document.getElementById('pacer-entity').emit('pacerStart');
         }
 
         else {

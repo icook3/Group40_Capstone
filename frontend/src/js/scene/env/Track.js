@@ -19,33 +19,29 @@ export class Track {
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
-    this.pacer = document.getElementById('pacer');
+    this.pacer = document.getElementById('pacer-entity');
 
-    // Spawn track pieces
+    // Spawn decorative track behind the rider and pacer and initial track point, then call main spawn function
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: 15`);
     track.setAttribute('material', `src: #track-texture; repeat: 1 1`);
     track.setAttribute('position', `0 0 4`);
     this.path_element.appendChild(track);
-
     constants.trackPoints.push({x: 0, y: 2, z: -1, length: 1});
     spawn_track();
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete', this.update_animation);
     this.pacer.addEventListener('animationcomplete', this.update_animation);
-    
-    this.initialize_animation();
+    setTimeout(() => this.initialize_animation(), 5000);
   }
 
   // Update animation speed and target based on current track piece
   update_animation() {
-    console.log(document.getElementById('pacer-entity'));
     constants.currentTrackPiece += 1;
     constants.pacerCurrentTrackPiece += 1;
     let avatar = document.getElementById('rider');
-    let pacer = document.getElementById('pacer');
-    
+    let pacer = document.getElementById('pacer-entity');
 
     // Calculate rider's duration and set attributes
     // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
@@ -71,12 +67,9 @@ export class Track {
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
   initialize_animation() {
-    
+    activatePacer();
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    this.pacer.setAttribute("animation__1", `property: position; to: 0 0 -500; dur: 5000; delay: 5000; easing: linear; loop: false; startEvents: riderStarted;`);
-    
-    // ADD LISTENER TO KEEP PACER FROM TAKING OFF BY ITSELF
-    setTimeout(() => activatePacer(), 5000);
+    this.pacer.setAttribute("animation__1", `property: position; to: 0 0 -500; dur: 10000; easing: linear; loop: false; startEvents: pacerStart;`);
   }
 
   // Create an append a track piece curving to the right
