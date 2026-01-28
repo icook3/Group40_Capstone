@@ -23,7 +23,7 @@ export class KeyboardMode {
       constants.riderState.speed = this.keyboardHalfSpeed;
       constants.riderState.power = 0; // Reset power when using speed keys
     }
-    activatePacer();
+    //activatePacer();
   }
   //Adding Power input for keyboard mode
   //Q will increase power by 10
@@ -43,7 +43,7 @@ export class KeyboardMode {
         0
       );
     }
-    activatePacer();
+    //activatePacer();
   }
 
   keyboardInputActive(k) {

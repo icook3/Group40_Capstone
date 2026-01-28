@@ -99,6 +99,7 @@ class Constants {
   farthestSpawn = 1;
   trackPoints = [];
   currentTrackPiece = 0;
+  pacerCurrentTrackPiece = 0;
 
   // Constants governing cloud speed
   lastCloud = Date.now();

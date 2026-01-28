@@ -237,19 +237,29 @@ function loop({
     pacer.update(dt);
 
     // Update pacer position relative to the rider based on speed difference
-    const relativeSpeed = pacerSpeed - riderSpeed;
-    const pacerPos = pacer.avatarEntity.getAttribute("position");
-    pacerPos.z -= relativeSpeed * dt;
-    pacer.setPosition(pacerPos);
-  } else if (peerState!=0&&connected&&pacer!=undefined) {
-    pacer.update(dt);
+    //const relativeSpeed = pacerSpeed - riderSpeed;
 
-    const riderSpeed = constants.riderState.speed;    
-    const pacerSpeed = pacer.speed;
-    const relativeSpeed = pacerSpeed - riderSpeed;
-    const pacerPos = pacer.avatarEntity.getAttribute("position");
-    pacerPos.z -= relativeSpeed * dt;
-    pacer.setPosition(pacerPos);
+      //console.log("Relative speed: "+relativeSpeed);
+      //console.log("Pacer speed: "+pacerSpeed);
+      //console.log("Rider speed: "+riderSpeed);
+    
+
+    
+    //const pacerPos = pacer.avatarEntity.getAttribute("position");
+    //const prevPacerPos = pacer.avatarEntity.getAttribute("position");
+    //pacerPos.z -= relativeSpeed * dt;
+
+    
+    //pacer.setPosition(pacerPos);
+  //} else if (peerState!=0&&connected&&pacer!=undefined) {
+    //pacer.update(dt);
+
+    //const riderSpeed = constants.riderState.speed;    
+    //const pacerSpeed = pacer.speed;
+    //const relativeSpeed = pacerSpeed - riderSpeed;
+    //const pacerPos = pacer.avatarEntity.getAttribute("position");
+    //pacerPos.z -= relativeSpeed * dt;
+    //pacer.setPosition(pacerPos);
   }
 
   // Let the ramp controller advance its state
@@ -552,7 +562,7 @@ export function initZlowApp({
     isPacer: false,
   });
   if (peerState == 0) {
-    pacer = new AvatarMovement("pacer", {
+    pacer = new AvatarMovement("pacer-entity", {
       position: { x: 0.5, y: 1, z: -2 },
       isPacer: true,
     });

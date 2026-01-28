@@ -4,6 +4,7 @@
 */
 import { constants } from "../../constants.js";
 import { getPos, setPos } from '../core/util.js';
+import  {activatePacer } from '../../main.js'
 
 export class Track {
 
@@ -18,6 +19,7 @@ export class Track {
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
+    this.pacer = document.getElementById('pacer');
 
     // Spawn track pieces
     const track = document.createElement('a-entity');
@@ -31,34 +33,50 @@ export class Track {
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete', this.update_animation);
+    this.pacer.addEventListener('animationcomplete', this.update_animation);
+    
     this.initialize_animation();
-
   }
 
   // Update animation speed and target based on current track piece
   update_animation() {
-
-    // Can probably fix lack of restarting bug by removing and adding back the animation property, but is not ideal
-    // Alternatively, add a function that will add a "bridge" track piece to finish the stretch the rider paused on
+    console.log(document.getElementById('pacer-entity'));
     constants.currentTrackPiece += 1;
-    let avatar = document.getElementById('rider')
-    let duration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
-    avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${duration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    constants.pacerCurrentTrackPiece += 1;
+    let avatar = document.getElementById('rider');
+    let pacer = document.getElementById('pacer');
     
-    // If you're within 40 units of the end, spawn some more track pieces
+
+    // Calculate rider's duration and set attributes
+    // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
+    let riderDuration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
+    avatar.removeAttribute("animation__1");
+    avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    
+    // Calculate pacer's duration and set attributes
+    let pacerSpeed = console.log(document.getElementById('pacer-speed').value);
+    let pacerDuration = constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed * 1000;
+
+    // If rider or pacer is within 40 units of the end, spawn some more track pieces
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
 
-    // If you're about to run out of ground, add some more tiles
+    // If rider is about to run out of ground, add some more tiles
     if (getPos(avatar).z < (-constants.gridDepth * 10) + 300) {
       add_tile();
     }
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
+  // Pacer starts when rider starts. Delay ensures pacer finishes loading
   initialize_animation() {
+    
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+    this.pacer.setAttribute("animation__1", `property: position; to: 0 0 -500; dur: 5000; delay: 5000; easing: linear; loop: false; startEvents: riderStarted;`);
+    
+    // ADD LISTENER TO KEEP PACER FROM TAKING OFF BY ITSELF
+    setTimeout(() => activatePacer(), 5000);
   }
 
   // Create an append a track piece curving to the right
