@@ -1,0 +1,510 @@
+/* ========================================
+   Custom font imports
+   ======================================== */
+@font-face {
+  font-family: "Fugaz One";
+  src: url("../../resources/fonts/FugazOne-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+/* ========================================
+   Top HUD - time [speed - power - distance] calories
+   ======================================== */
+#hud-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  /* 3-column grid: left (time), center (speed/power/distance), right (calories) */
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+
+  padding: 20px 0 10px;
+
+  /* Blur effect, can remove if needed */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  z-index: 1000;
+}
+
+.hud-section {
+  display: flex;
+  align-items: center;
+}
+
+/* ========================================
+   Left section - time
+   ======================================== */
+.hud-section.left {
+  justify-content: flex-start;
+  padding-left: 100px;
+  font-size: 1.5em;
+}
+
+/* Time text style */
+.hud-section.left .stat-value,
+.hud-section.left .stat-label {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Container for time element with icon */
+.hud-section.left .stat-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Time icon to the left of label */
+.hud-section.left .stat-item::before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  background-image: url("../../resources/images/time.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ========================================
+   Center section - speed-power-distance
+   ======================================== */
+.hud-section.center {
+  justify-content: center;
+  overflow: visible;
+}
+
+/* ========================================
+   Right section - calories
+   ======================================== */
+.hud-section.right {
+  justify-content: flex-end;
+  padding-right: 100px;
+  font-size: 1.5em;
+}
+
+/* Calories text style */
+.hud-section.right .stat-value,
+.hud-section.right .stat-unit {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Container for calories element with icon */
+.hud-section.right .stat-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Calories icon to the left of text */
+.hud-section.right .stat-item::before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  background-image: url("../../resources/images/calories.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ========================================
+   Center section - HUD background shape
+   ======================================== */
+.stats-row {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+
+  /* Gradient background */
+  background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
+  padding: 15px 100px;
+
+  /* Custom SVG shape mask */
+  mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
+    100%;
+  -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
+    100% 100%;
+}
+
+/* Individual container (speed, power, distance) */
+.stat-item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Groups values with units */
+.stat-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* ========================================
+   Text style for all top values
+   ======================================== */
+/* Base font */
+#hud-top .stat-label,
+#hud-top .stat-value,
+#hud-top .stat-unit {
+  font-family: "Fugaz One", sans-serif;
+}
+
+/* Speed and distance text colors */
+.stats-row .stat-item:nth-child(1) .stat-label,
+.stats-row .stat-item:nth-child(1) .stat-value,
+.stats-row .stat-item:nth-child(1) .stat-unit,
+.stats-row .stat-item:nth-child(3) .stat-label,
+.stats-row .stat-item:nth-child(3) .stat-value,
+.stats-row .stat-item:nth-child(3) .stat-unit {
+  color: #4d78a9;
+}
+
+/* Power text color */
+.stats-row .stat-item:nth-child(2) .stat-label,
+.stats-row .stat-item:nth-child(2) .stat-value,
+.stats-row .stat-item:nth-child(2) .stat-unit {
+  color: white;
+}
+
+/* Power text size */
+.stats-row .stat-item:nth-child(2) .stat-value {
+  font-size: 7em;
+  margin: -20px 0;
+}
+
+/* Power unit size */
+.stats-row .stat-item:nth-child(2) .stat-unit {
+  font-size: 2em;
+}
+
+/* Speed/distance value text size */
+.stats-row .stat-item:nth-child(1) .stat-value,
+.stats-row .stat-item:nth-child(3) .stat-value {
+  font-size: 2em;
+}
+
+/* Speed/distance unit text size */
+.stats-row .stat-item:nth-child(1) .stat-unit,
+.stats-row .stat-item:nth-child(3) .stat-unit {
+  font-size: 1em;
+}
+
+/* ========================================
+   Bottom part of HUD
+   ======================================== */
+#hud-bottom {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+
+  /* Background color */
+  background: rgb(53, 72, 79);
+
+  padding: 15px;
+  border-radius: 30px;
+
+  width: 180px;
+}
+
+/* Stack buttons vertically */
+.control-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+/* Style for bottom buttons */
+.hud-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+
+  /* Font style */
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+  color: rgb(220, 229, 222);
+
+  padding: 8px 12px;
+
+  /* Remove default style */
+  background: none;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+}
+
+.hud-btn:focus {
+  outline: none;
+}
+
+/* Style for disabled buttons*/
+.hud-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: none;
+}
+
+/* ========================================
+   Dev hud section
+   ======================================== */
+#dev-controls-hud {
+  position: fixed;
+  bottom: 290px;
+  left: 20px;
+  z-index: 1000;
+
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+
+  width: 180px;
+
+  /* Stack controls vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Hide when hidden attribute is on */
+#dev-controls-hud[hidden] {
+  display: none;
+}
+/* "DEV Mode" title */
+#dev-controls-hud::before {
+  content: "DEV Mode";
+  color: rgb(220, 229, 222);
+  font-family: "Fugaz One", sans-serif;
+  font-size: 1em;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* Style for dev items */
+#dev-controls-hud #pacer,
+#dev-controls-hud #weight {
+  color: rgb(220, 229, 222);
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* NEW: make the whole row NOT look editable */
+  cursor: default;
+}
+
+/* Style for input fields */
+#dev-controls-hud #pacer-speed,
+#dev-controls-hud #rider-weight {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid rgba(220, 229, 222, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  color: rgb(220, 229, 222);
+  border-radius: 8px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95em;
+
+  /* NEW: keep text cursor on the actual editable inputs */
+  cursor: text;
+}
+
+
+#dev-controls-hud #pacer-speed:focus,
+#dev-controls-hud #rider-weight:focus {
+  outline: none;
+  border-color: rgba(220, 229, 222, 0.6);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Style dev mode buttons */
+#dev-controls-hud #connect-btn,
+#dev-controls-hud #calories-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+
+  /* Dev buttons font */
+  font-family: "Nunito", sans-serif;
+  font-weight: 400;
+  font-size: 1em;
+  color: rgb(220, 229, 222);
+
+  padding: 8px 12px;
+
+  /* Remove default style */
+  background: none;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+}
+
+#dev-controls-hud #connect-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: none;
+}
+
+#dev-controls-hud #connect-btn:focus,
+#dev-controls-hud #calories-reset-btn:focus {
+  outline: none;
+}
+
+/* DEV HUD: make any buttons inside the pacer/weight rows show a hand */
+#dev-controls-hud #pacer button,
+#dev-controls-hud #weight button,
+#dev-controls-hud #pacer .arrow-btn,
+#dev-controls-hud #weight .arrow-btn {
+  cursor: pointer;
+}
+
+
+/* ========================================
+   Pause overlay style
+   ======================================== */
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#pause-overlay .pause-dialog {
+  pointer-events: none;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 50px;
+  color: rgb(220, 229, 222);
+}
+
+#milestone-notifications {
+  position: fixed;
+  top: 170px; /* below center hud stats */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.milestone-toast {
+  font-family: "Fugaz One", sans-serif;
+  background: linear-gradient(to bottom, #bae1d3, #87d8e1);
+  color: rgb(53, 72, 79);
+  padding: 20px;
+  margin: 10px;
+  font-size: 20px;
+  min-width: 400px;
+  text-align: center;
+  border-radius: 25px;
+
+  /* animate toast notification */
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.milestone-toast.visible {
+  opacity: 1;
+}
+/* reserved style for special/major milestones */
+/* simulates holographic effect */
+.milestone-toast.special {
+  background: linear-gradient(
+    135deg,
+    rgb(237, 232, 207) 0%,
+    #fee6ca 25%,
+    #ffb3ba 50%,
+    #bae1d3 75%,
+    #87d8e1 100%
+  );
+  background-size: 200% 200%;
+  animation: rainbow-shift 3s ease infinite;
+  font-size: 24px;
+  padding: 24px 36px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+}
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ========================================
+   Workout overlay style
+   ======================================== */
+#workout-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Use this when you WANT the greyed-out effect (start countdown) */
+#workout-overlay.dim {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Use this when you DON'T want dimming (warmup, ramp messages) */
+#workout-overlay.clear {
+  background: transparent;
+}
+
+#workout-overlay .workout-dialog {
+  pointer-events: none;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 50px;
+  color: rgb(220, 229, 222);
+}
+
+/* Ramp test power vs target colors */
+#power.power-above-target {
+  color: #4caf50; /* green when at/above target */
+}
+
+#power.power-below-target {
+  color: #ff5252; /* red when below target */
+}

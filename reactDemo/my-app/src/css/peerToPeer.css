@@ -1,0 +1,61 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
+button {
+    font-size: 1em;
+    cursor: pointer;
+}
+.center-item {
+    left: 40%;
+}
+
+#cancel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 250px;
+}
+
+#peerConnectMenu {
+    position: fixed;
+    top:43%;
+    left:25%;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 50%;
+    height: 15%;
+}
+
+/* Hover feedback for buttons on Connect to Peer screen */
+#cancel:hover,
+#peerConnectMenu button:hover,
+button:hover {
+  filter: brightness(85%);
+  transition: filter 0.15s ease;
+}
+
+
+/* Hover feedback for clickable option rows (if options are divs/spans/lis) */
+#peerConnectMenu [role="button"]:hover,
+#peerConnectMenu .option:hover,
+#peerConnectMenu .peer-option:hover,
+#peerConnectMenu li:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+#peerConnectMenu [role="button"],
+#peerConnectMenu .option,
+#peerConnectMenu .peer-option,
+#peerConnectMenu li {
+  cursor: pointer;
+}

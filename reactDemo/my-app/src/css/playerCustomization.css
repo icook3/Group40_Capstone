@@ -1,0 +1,164 @@
+@font-face {
+  font-family: "Fugaz One";
+  src: url("../../resources/fonts/FugazOne-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+a-scene {
+  position: fixed;
+  right: 33%;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-color: transparent !important;
+  pointer-events: none;
+}
+
+#menuButton {
+  position: fixed;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
+  padding: 15px 100px;
+  mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
+    100%;
+  -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
+    100% 100%;
+  bottom: 2%;
+  right: 2%;
+  font-size: xx-large;
+}
+
+#menuButton:hover {
+  filter: brightness(85%);
+}
+#genderSelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.arrow-btn {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: rgb(220, 229, 222);
+  width: 50px;
+  height: 50px;
+  font-size: 1.5em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.arrow-btn:hover {
+  transform: scale(1.1);
+}
+
+#genderLabel {
+  min-width: 80px;
+  text-align: center;
+  color: rgb(220, 229, 222);
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+  cursor: default;
+  user-select: none;
+}
+
+#playerContainer h2,
+#bikeContainer h2 {
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px black;
+  color: white;
+  font-size: 1.8em;
+  font-family: "Fugaz One", sans-serif;
+}
+
+#playerContainer {
+  position: fixed;
+  left: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 25px;
+  border-radius: 10px;
+}
+
+#bikeContainer {
+  position: fixed;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 25px;
+  border-radius: 10px;
+}
+
+#bikeControls,
+#playerControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 200px;
+
+  font-size: x-large;
+  gap: 8px;
+}
+
+#playerControls label,
+#bikeControls label {
+  display: flex;
+  align-items: center;
+  color: rgb(220, 229, 222);
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+  gap: 12px;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#sky-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  background: linear-gradient(to bottom, #6cb4d1 0%, #c0edff 100%);
+}
+
+input[type="color"] {
+  cursor: pointer;
+}
+
+/* Main Menu button should feel clickable */
+#menuButton {
+  cursor: pointer;
+}
+
+#menuButton:hover {
+  filter: brightness(85%);
+  transition: filter 0.15s ease;
+}
+
