@@ -7,6 +7,9 @@ export class RideHistory {
     this.maxSamples = maxSamples;
     this.samples = [];
     this.lastSecond = null;
+
+    this.startEpochMs = null;
+    this.startNowMs = null;
   }
 
   get length() {
@@ -26,20 +29,36 @@ export class RideHistory {
     return (this.last.time - this.first.time) / 1000;
   }
 
-  pushSample(time, power, speed, distance) {
-    const thisSecond = Math.floor(time);
+  pushSample(nowMs, power, speed, distance) {
+    // initialize anchors on first sample
+    if (this.startEpochMs === null) {
+      this.startEpochMs = Date.now();
+      this.startNowMs = nowMs;
+    }
 
-    if (this.lastSecond === thisSecond)
-      return false;
+    const elapsedMs = nowMs - this.startNowMs;      // works whether nowMs is performance.now() or your sim clock
+    const thisSecond = Math.floor(elapsedMs / 1000);
 
-    this.samples.push({ time, power, speed, distance });
+    if (this.lastSecond === thisSecond) return false;
+
+    this.samples.push({
+      elapsedMs,
+      epochMs: this.startEpochMs + elapsedMs,
+      power,
+      speed,
+      distance
+    });
+
     this.lastSecond = thisSecond;
 
     if (this.samples.length > this.maxSamples) {
       this.samples.splice(0, this.samples.length - this.maxSamples);
     }
+
     return true;
   }
+
+
 
   reset() {
     this.samples.length = 0;
