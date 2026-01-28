@@ -27,7 +27,7 @@ export class Track {
     track.setAttribute('material', `src: #track-texture; repeat: 1 1`);
     track.setAttribute('position', `0 0 4`);
     this.path_element.appendChild(track);
-    constants.trackPoints.push({x: 0, y: 2, z: -1, length: 1});
+    constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
     spawn_track();
 
     // As each animation completes, start the next one
@@ -35,11 +35,12 @@ export class Track {
     this.pacer.addEventListener('animationcomplete', this.update_animation);
     setTimeout(() => this.initialize_animation(), 5000);
   }
-
+  // NOTE: Pacer starts at position: { x: 0.5, y: 1, z: 0 },
   // Update animation speed and target based on current track piece
   update_animation() {
     constants.currentTrackPiece += 1;
     constants.pacerCurrentTrackPiece += 1;
+
     let avatar = document.getElementById('rider');
     let pacer = document.getElementById('pacer-entity');
 
@@ -50,11 +51,16 @@ export class Track {
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
     
     // Calculate pacer's duration and set attributes
-    let pacerSpeed = console.log(document.getElementById('pacer-speed').value);
+    let pacerSpeed = document.getElementById('pacer-speed').value;
     let pacerDuration = constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed * 1000;
+    //console.log("track piece " + constants.trackPoints[constants.pacerCurrentTrackPiece].length);
+    //console.log("Pacer Duration: " + pacerDuration);
+    //console.log("Rider Duration: " + riderDuration);
+    pacer.removeAttribute("animation__1");
+    pacer.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${pacerDuration}; easing: linear; loop: false;`);
 
     // If rider or pacer is within 40 units of the end, spawn some more track pieces
-    if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200 || getPos(pacer).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
 
@@ -69,7 +75,7 @@ export class Track {
   initialize_animation() {
     activatePacer();
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    this.pacer.setAttribute("animation__1", `property: position; to: 0 0 -500; dur: 10000; easing: linear; loop: false; startEvents: pacerStart;`);
+    this.pacer.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; startEvents: pacerStart;`);
   }
 
   // Create an append a track piece curving to the right
@@ -96,7 +102,7 @@ export class Track {
     // Adjust Z spawn position to correct for centering of the box geometry
     let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
     constants.farthestSpawn += 5;
-    constants.trackPoints.push({x: 0, y: 2, z: pointZ, length: 5});
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
 
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
