@@ -22,7 +22,8 @@ export class AvatarMovement {
         this.rider = document.getElementById('rider');
         const rig = document.createElement('a-entity');
         rig.setAttribute('id','rig');
-        const camera = document.createElement('a-entity');
+        const camera = document.createElement('a-camera');
+        camera.setAttribute('wasd-controls-enabled', 'false');
         camera.setAttribute('id','camera');
         camera.setAttribute('look-controls','');
         camera.setAttribute('position','4 5 10');
@@ -50,7 +51,6 @@ export class AvatarMovement {
         const baseLeftShinX = 12 * pi / 20;
         const baseRightFootX = -pi / 8;
         const baseLeftFootX = -pi / 6;
-
         const thighForwardSwing = 0.1;
         const shinForwardSwing = 0.3;
         const footForwardSwing = 0.25;
