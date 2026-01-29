@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependiencies in container
 RUN npm install --production
 
+# Create data directory for crash storage
+RUN mkdir -p /data
+
 # Copy the rest of project file
 COPY . .
 
