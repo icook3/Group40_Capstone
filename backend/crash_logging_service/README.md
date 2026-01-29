@@ -24,6 +24,8 @@ Clients **must not** send secrets, tokens,or personal data.
 - `src`
     - `config`
         - `env.js` - Loads and validates environment variables using dotenv
+    - `models`
+        - `crashModel.js` - Defines crash report schema
     - `routes`
         - `intakeRoutes` - Crash submission endpoints
         - `reportRoutes` - Crash query / viewing endpoints
@@ -31,8 +33,6 @@ Clients **must not** send secrets, tokens,or personal data.
         - `storageService.js` - Writes crash reports to the filesystem
         - `validationService.js` - Sanitizes and validates payloads
         - `rateLimitService.js` - In memory abuse protection
-    - `models`
-        - `crashModel.js` - Defines crash report schema
     - `util`
         - `logger.js` - Centralized structured logging for service events and errors
     - `app.js` - Configures Express application
