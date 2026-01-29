@@ -121,23 +121,38 @@ export function initSettings() {
       });
   }
   */
-
-  const strava = new Strava();
-  Strava.loadFromRedirect();
-  strava.loadToken();
-
-  const stravaBtn = document.getElementById("connect-strava-btn");
-  if (stravaBtn) {
-    if (Strava.isConnected()) {
-      stravaBtn.textContent = "Strava Connected";
-      stravaBtn.disabled = true;
-    } else {
-      stravaBtn.textContent = "Connect Strava";
-      stravaBtn.disabled = true; // TODO: Set to false once Strava app is made
-      stravaBtn.addEventListener("click", strava.startOAuth);
-    }
-  }
 }
+
+async function initStravaButton() {
+    const strava = new Strava();
+    Strava.loadFromRedirect();
+    strava.loadToken();
+
+    const stravaBtn = document.getElementById("connect-strava-btn");
+    if (!stravaBtn) {
+        return;
+    }
+
+    // Disable by default until we know backend state
+    stravaBtn.disabled = true;
+
+    const backendUp = await strava.isStravaBackendUp();
+    if (!backendUp) {
+        stravaBtn.textContent = "Strava Unavailable";
+        return;
+    }
+
+    if (Strava.isConnected()) {
+        stravaBtn.textContent = "Strava Connected";
+        stravaBtn.disabled = true;
+    } else {
+        stravaBtn.textContent = "Connect Strava";
+        stravaBtn.disabled = false;
+        stravaBtn.addEventListener("click", () => strava.startOAuth());
+    }
+}
+
+window.addEventListener("DOMContentLoaded", initStravaButton);
 
 if (typeof window !== "undefined") {
   window.initSettings = initSettings;

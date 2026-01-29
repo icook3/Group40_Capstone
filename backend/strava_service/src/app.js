@@ -1,0 +1,28 @@
+import cors from "cors";
+import express from "express";
+
+import oauthRoutes from "./routes/oauthRoutes.js";
+import stravaRoutes from "./routes/stravaRoutes.js";
+
+const app = express(); // Create express app
+app.use(express.json());
+
+// CORS setup
+app.use(cors({
+    origin: process.env.FRONTEND_URI,
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Authorization" ,"Content-Type"],
+    credentials: false
+}));
+
+// Health check
+app.get("/stravaHealth", (_req, res) => {
+    res.status(200).send("ok");
+});
+
+
+// Routes
+app.use("/oauth", oauthRoutes);
+app.use("/strava", stravaRoutes);
+
+export default app;

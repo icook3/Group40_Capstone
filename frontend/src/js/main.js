@@ -964,21 +964,12 @@ export function getWorkoutSummary() {
   };
 }
 
-// Disable exporting if Strava is not connected
-function updateStravaButtonState() {
-  const btn = document.getElementById("summary-export-strava");
-  if (!btn) return;
-  btn.disabled = !Strava.isConnected();
-}
-
-updateStravaButtonState();
-setInterval(updateStravaButtonState, 2000);
-
 export async function exportToStrava() {
   const strava = new Strava();
 
   if (!Strava.isConnected()) {
-    alert("You must connect to Strava first (from main menu).");
+    alert("You must connect to Strava first (from main menu).\n" +
+        "Please upload the TCX manually.");
     return;
   }
 
@@ -988,7 +979,38 @@ export async function exportToStrava() {
     return;
   }
 
-  await strava.uploadActivity(workout);
+  try {
+      await strava.uploadActivity(workout);
+      alert("Workout sent to Strava! It may take a few seconds to appear.");
+  } catch (err) {
+      handleStravaExportFailure(err);
+  }
+}
+
+function handleStravaExportFailure(err) {
+    // Rate limit hit
+    if (err?.status === 429) {
+        alert(
+            "Strava upload limit reached.\n" +
+            "Please download the TCX file and upload it manually to Strava."
+        );
+        return;
+    }
+
+    // Backend down / Strava unavailable
+    if (err?.status === 500 || err?.status === 503) {
+        alert(
+            "Strava service is currently unavailable.\n" +
+            "Please download the TCX file and upload it manually to Strava."
+        );
+        return;
+    }
+
+    // Fallback
+    alert(
+        "Unable to upload to Strava.\n" +
+        "Please download the TCX file and upload it manually."
+    );
 }
 
 // =====================
