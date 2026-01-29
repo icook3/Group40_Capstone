@@ -25,9 +25,9 @@ Clients **must not** send secrets, tokens,or personal data.
     - `config`
         - `env.js` - Loads and validates environment variables using dotenv
     - `routes`
-        - `oauthRoutes` - Crash submission endpoints
-        - `stravaRoutes` - Crash query / viewing endpoints
-    - `services` - 
+        - `intakeRoutes` - Crash submission endpoints
+        - `reportRoutes` - Crash query / viewing endpoints
+    - `services`
         - `storageService.js` - Writes crash reports to the filesystem
         - `validationService.js` - Sanitizes and validates payloads
         - `rateLimitService.js` - In memory abuse protection
