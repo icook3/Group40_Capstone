@@ -63,7 +63,6 @@ export class ObjectField {
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
-
     if (!this.initialized || (riderSpeed, dt) === 0) return;
 
     // Handles all objects currently part of the items array

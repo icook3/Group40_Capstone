@@ -128,10 +128,9 @@ export class AvatarMovement {
         this.power = power;
     }
 
+    // Animate avatar and emit events indicating whether rider is starting, stopping, or resuming
     update(dt) {
         if (this.speed === 0) {
-            // Emit a stop event if speed is 0
-            document.getElementById('rider').emit('riderStopped');
             return;
         }
 
@@ -141,6 +140,12 @@ export class AvatarMovement {
             document.getElementById('pacer-entity').emit('pacerStart');
         }
 
+        else if (constants.riderState.speed == 0 && constants.worldZ > 0) {
+            // Emit a stop event if speed is 0
+            document.getElementById('rider').emit('riderStopped');
+        }
+
+        // Emit a resume event if both speed and worldZ are greater than 0
         else {
             document.getElementById('rider').emit('riderResumed');
         }

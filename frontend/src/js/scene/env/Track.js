@@ -36,6 +36,7 @@ export class Track {
     setTimeout(() => this.initialize_animation(), 5000);
   }
 
+    // NOTE: Pacer starts at position: { x: 0.5, y: 1, z: 0 }
   update_pacer_animation() {
     let pacerSpeed = document.getElementById('pacer-speed').value;
     constants.pacerCurrentTrackPiece += 1;
@@ -47,14 +48,13 @@ export class Track {
     let pacerDuration = constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed * 1000;
     pacer.removeAttribute("animation__2");
     pacer.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay:true;`);
-
+    
     // If rider or pacer is within 40 units of the end, spawn some more track pieces
     if (getPos(pacer).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
-
   }
-  // NOTE: Pacer starts at position: { x: 0.5, y: 1, z: 0 },
+
   // Update animation speed and target based on current track piece
   update_rider_animation() {
     constants.currentTrackPiece += 1;
