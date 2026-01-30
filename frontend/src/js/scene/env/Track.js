@@ -40,7 +40,6 @@ export class Track {
     let pacerSpeed = document.getElementById('pacer-speed').value;
     constants.pacerCurrentTrackPiece += 1;
 
-    let avatar = document.getElementById('rider');
     let pacer = document.getElementById('pacer-entity');
 
     // Calculate rider's duration and set attributes

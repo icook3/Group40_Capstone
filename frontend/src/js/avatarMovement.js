@@ -28,7 +28,6 @@ export class AvatarMovement {
         camera.setAttribute('look-controls','');
         camera.setAttribute('position','4 5 10');
         camera.setAttribute('look-at', rider);
-        camera.setAttribute('camera', 'active', true);
         rig.appendChild(camera);
         this.rider.appendChild(rig);
     }
