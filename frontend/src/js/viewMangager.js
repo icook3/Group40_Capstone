@@ -15,4 +15,5 @@ export function setView(view) {
 
 if (typeof window !== "undefined") {
   window.initializeViews = initializeViews;
+  window.setView = setView;
 }
