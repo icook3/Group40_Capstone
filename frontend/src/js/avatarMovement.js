@@ -26,7 +26,7 @@ export class AvatarMovement {
         camera.setAttribute('wasd-controls-enabled', 'false');
         camera.setAttribute('id','camera');
         camera.setAttribute('look-controls','');
-        camera.setAttribute('position','4 5 10');
+        camera.setAttribute('position','4 5 7');
         camera.setAttribute('look-at', rider);
         rig.appendChild(camera);
         this.rider.appendChild(rig);
