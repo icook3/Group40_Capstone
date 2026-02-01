@@ -25,11 +25,9 @@
   left: 0;
   width: 100%;
 
-  /* Flexbox for adaptable HUD */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  /* 3-column grid: left (time), center (speed/power/distance), right (calories) */
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
 
   padding: 20px 0 10px;
 
@@ -38,6 +36,9 @@
   -webkit-backdrop-filter: blur(8px);
 
   z-index: 1000;
+  /* Container */
+  container-type: inline-size;
+  container-name: hud-top;
 }
 
 .hud-section {
@@ -50,8 +51,8 @@
    ======================================== */
 .hud-section.left {
   justify-content: flex-start;
-  padding-left: 100px;
-  font-size: 1.5em;
+  padding-left: clamp(20px, 8vw, 100px);
+  font-size: clamp(1em, 2.5cqi, 1.5em);
 }
 
 /* Time text style */
@@ -72,8 +73,8 @@
 /* Time icon to the left of label */
 .hud-section.left .stat-item::before {
   content: "";
-  width: 40px;
-  height: 40px;
+  width: clamp(24px, 4cqi, 40px);
+  height: clamp(24px, 4cqi, 40px);
   background-image: url("../../resources/images/time.svg");
   background-size: contain;
   background-repeat: no-repeat;
@@ -93,8 +94,8 @@
    ======================================== */
 .hud-section.right {
   justify-content: flex-end;
-  padding-right: 100px;
-  font-size: 1.5em;
+  padding-right: clamp(20px, 8vw, 100px);
+  font-size: clamp(1em, 2.5cqi, 1.5em);
 }
 
 /* Calories text style */
@@ -115,8 +116,8 @@
 /* Calories icon to the left of text */
 .hud-section.right .stat-item::before {
   content: "";
-  width: 40px;
-  height: 40px;
+  width: clamp(24px, 4cqi, 40px);
+  height: clamp(24px, 4cqi, 40px);
   background-image: url("../../resources/images/calories.svg");
   background-size: contain;
   background-repeat: no-repeat;
@@ -134,7 +135,7 @@
 
   /* Gradient background */
   background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
-  padding: 15px 100px;
+  padding: 15px clamp(20px, 8vw, 100px);
 
   /* Custom SVG shape mask */
   mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
@@ -189,25 +190,29 @@
 
 /* Power text size */
 .stats-row .stat-item:nth-child(2) .stat-value {
-  font-size: 7em;
+  /* Minimum font size: 3em, Maximum font size: 7em */
+  font-size: clamp(3em, 10cqi, 7em); 
   margin: -20px 0;
 }
 
 /* Power unit size */
 .stats-row .stat-item:nth-child(2) .stat-unit {
-  font-size: 2em;
+  /* Minimum font size: 1em, Maximum font size: 2em */
+  font-size: clamp(1em, 3cqi, 2em); 
 }
 
 /* Speed/distance value text size */
 .stats-row .stat-item:nth-child(1) .stat-value,
 .stats-row .stat-item:nth-child(3) .stat-value {
-  font-size: 2em;
+  /* Minimum font size: 1em, Maximum font size: 2em */
+  font-size: clamp(1em, 3cqi, 2em);
 }
 
 /* Speed/distance unit text size */
 .stats-row .stat-item:nth-child(1) .stat-unit,
 .stats-row .stat-item:nth-child(3) .stat-unit {
-  font-size: 1em;
+    /* Minimum font size: 0.6em, Maximum font size: 1em */
+font-size: clamp(0.8em, 1.5cqi, 1em);
 }
 
 /* ========================================
@@ -509,4 +514,52 @@
 
 #power.power-below-target {
   color: #ff5252; /* red when below target */
+}
+
+/* ========================================
+   Responsive layout for small screens
+   ======================================== */
+@media (max-width: 600px) {
+  #hud-top {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "center center"
+      "left right";
+    justify-items: center;
+    gap: 10px;
+  }
+
+  .hud-section.center {
+    grid-area: center;
+  }
+
+  .hud-section.left {
+    grid-area: left;
+    padding-left: 20px;
+  }
+
+  .hud-section.right {
+    grid-area: right;
+    padding-right: 20px;
+  }
+
+  /* This sets slightly larger minimums for center stats on narrow screens after it hits the threshold width*/
+  .stats-row .stat-item:nth-child(2) .stat-value {
+    font-size: clamp(4em, 12cqi, 7em);
+  }
+
+  .stats-row .stat-item:nth-child(1) .stat-value,
+  .stats-row .stat-item:nth-child(3) .stat-value {
+    font-size: clamp(1.5em, 4cqi, 2em);
+  }
+
+  .stats-row {
+    padding: 15px clamp(40px, 10vw, 100px);
+  }
+
+  /* This sets slightly larger minimums for time and calories after it hits the thershold width*/
+  .hud-section.left,
+  .hud-section.right {
+    font-size: clamp(1.2em, 3cqi, 1.5em);
+  }
 }
