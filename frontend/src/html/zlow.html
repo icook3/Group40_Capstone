@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="../../resources/components/aframe_tube_geometry/index.js"></script>
-    <script src="../../resources/components/aframe_curve_follow/index.js"></script>
-    <script src="../../resources/components/aframe_parametric_curve/index.js" type="module"></script>
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
     <link
       rel="stylesheet"
@@ -381,8 +378,8 @@
     </div>
 
     <!-- Generate starting scene -->
-    <a-scene id="scene">
-      <a-assets>
+    <a-scene id="scene" animation-timeline__1="timeline: #avatarMotion">
+      <a-assets id="scene_assets">
         <!-- Add textures used to create the track and grass -->
         <img id="track-texture" src="../../resources/textures/Track.jpeg" />
         <img id="grass-texture" src="../../resources/textures/Grass.jpeg" />
@@ -451,7 +448,7 @@
           src="../../resources/models/bgmodels/bush1.glb"
         ></a-asset-item>
       </a-assets>
-      <a-sky color="#87ceeb"></a-sky>
+      <a-sky color="#87ceeb" radius="5000"></a-sky>
 
       <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
       <a-entity id="checkerboard-ground">
@@ -469,8 +466,8 @@
       <!-- Use constants to generate checkerboard tiles for ground dynamically -->
       <script type="module">
         import { constants } from "../js/constants.js";
-        for (let x = 0; x < constants.gridWidth; x++) {
-          for (let z = 0; z < constants.gridDepth; z++) {
+        for (let z = 0; z < constants.gridDepth; z++) {
+          for (let x = 0; x < constants.gridWidth; x++) {
             const color =
               (x + z) % 2 === 0
                 ? constants.groundColor1
@@ -492,11 +489,6 @@
           }
         }
       </script>
-
-      <a-entity id="rig" position="0 4.5 5">
-        <a-entity id="camera" camera zoom="1" look-controls></a-entity>
-      </a-entity>
-    </a-scene>
 
     <script type="module" src="../js/main.js"></script>
     <script type="module" src="../js/trainerCalibration.js"></script>

@@ -117,12 +117,15 @@ let scene;
 let hud;
 let keyboardMode;
 let standardMode;
+
 //Avatar and Pacer
 let rider;
 let pacer;
+
 // workout session
 let workoutStorage;
 let workoutSession;
+
 // milestones
 let notificationManager;
 let milestoneTracker;
@@ -206,6 +209,7 @@ function loop({
   const riderSpeed = constants.riderState.speed || 0;
 
   rider.update(dt);
+
   if (constants.pacerStarted&&peerState==0) {
     //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
@@ -234,19 +238,29 @@ function loop({
     pacer.update(dt);
 
     // Update pacer position relative to the rider based on speed difference
-    const relativeSpeed = pacerSpeed - riderSpeed;
-    const pacerPos = pacer.avatarEntity.getAttribute("position");
-    pacerPos.z -= relativeSpeed * dt;
-    pacer.setPosition(pacerPos);
-  } else if (peerState!=0&&connected&&pacer!=undefined) {
-    pacer.update(dt);
+    //const relativeSpeed = pacerSpeed - riderSpeed;
 
-    const riderSpeed = constants.riderState.speed;    
-    const pacerSpeed = pacer.speed;
-    const relativeSpeed = pacerSpeed - riderSpeed;
-    const pacerPos = pacer.avatarEntity.getAttribute("position");
-    pacerPos.z -= relativeSpeed * dt;
-    pacer.setPosition(pacerPos);
+      //console.log("Relative speed: "+relativeSpeed);
+      //console.log("Pacer speed: "+pacerSpeed);
+      //console.log("Rider speed: "+riderSpeed);
+    
+
+    
+    //const pacerPos = pacer.avatarEntity.getAttribute("position");
+    //const prevPacerPos = pacer.avatarEntity.getAttribute("position");
+    //pacerPos.z -= relativeSpeed * dt;
+
+    
+    //pacer.setPosition(pacerPos);
+  //} else if (peerState!=0&&connected&&pacer!=undefined) {
+    //pacer.update(dt);
+
+    //const riderSpeed = constants.riderState.speed;    
+    //const pacerSpeed = pacer.speed;
+    //const relativeSpeed = pacerSpeed - riderSpeed;
+    //const pacerPos = pacer.avatarEntity.getAttribute("position");
+    //pacerPos.z -= relativeSpeed * dt;
+    //pacer.setPosition(pacerPos);
   }
 
   // Let the ramp controller advance its state
@@ -325,7 +339,7 @@ function recieveData(data) {
   switch(data.name) {
     case "playerData":
       console.log("recieving player data");
-      pacer = new AvatarMovement("pacer", {
+      pacer = new AvatarMovement("pacer-entity", {
         position: { x: 0.5, y: 1, z: 0 },
         isPacer: false,
       });
@@ -348,6 +362,12 @@ function recieveData(data) {
         const riderSyncPos = rider.avatarEntity.getAttribute("position");
         const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
         pacerSyncPos.z = riderSyncPos.z;
+        
+        // Set pacer constants to rider constants and adjust animation
+        constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+        document.getElementById('pacer-speed').value = constants.riderState.speed;
+        pacer.avatarEntity.removeAttribute("animation__2");
+        pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
         pacer.avatarEntity.setAttribute("position", pacerSyncPos);
       }
       break;
@@ -540,7 +560,7 @@ export function initZlowApp({
     isPacer: false,
   });
   if (peerState == 0) {
-    pacer = new AvatarMovement("pacer", {
+    pacer = new AvatarMovement("pacer-entity", {
       position: { x: 0.5, y: 1, z: -2 },
       isPacer: true,
     });
@@ -872,6 +892,12 @@ export function initZlowApp({
       const riderSyncPos = rider.avatarEntity.getAttribute("position");
       const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
       pacerSyncPos.z = riderSyncPos.z;
+
+      // Set pacer constants to rider constants and adjust animation
+      constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+      document.getElementById('pacer-speed').value = constants.riderState.speed;
+      pacer.avatarEntity.removeAttribute("animation__1");
+      pacer.avatarEntity.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
     }
     if (connected) {

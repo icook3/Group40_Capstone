@@ -121,7 +121,7 @@ const cfg = {
     {
       name: 'outer',
       order: 4,
-      static: true,          // <-- important: this is your fixed band
+      //static: true,          // <-- important: this is your fixed band
       laneHalfWidth: 1.2,    // thin stripe → visually one line
       spacing: 3.0,          // tight Z spacing for “very dense” look
       zExclusion: 3.0,       // one-per-side per “row”
