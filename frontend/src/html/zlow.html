@@ -250,21 +250,20 @@
         </div>
       </div>
     </div>
-
-    <div id="hud-bottom">
+  <div id="hud-bottom-container">
+        <div id="hud-bottom">
       <div class="control-buttons">
-        <button
-          id="menu-btn"
-          class="hud-btn"
-          onclick="window.location.href='./mainMenu.html'"
-        >
-          Main Menu
-        </button>
         <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
+        <button id="connect-btn" class="hud-btn">Connect Trainer</button>
         <button id="calibrate-trainer-modal-btn" class="hud-btn">Calibrate Trainer</button>
-        <button id="connect-btn">Connect Trainer</button>
+        
+        <div class="hud-divider"></div>
+        
         <button id="pause-btn" class="hud-btn">Pause</button>
         <button id="stop-btn" class="hud-btn">Stop</button>
+        <button id="menu-btn" class="hud-btn" onclick="window.location.href='./mainMenu.html'">
+          Exit to Main Menu
+        </button>
       </div>
     </div>
 
@@ -305,6 +304,8 @@
         Resuming in <span id="pause-countdown">10</span>…
       </div>
     </div>
+  </div>
+
 
     <!-- Trainer Calibration Modal -->
 <div id="calibration-modal" aria-hidden="true">

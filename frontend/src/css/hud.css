@@ -219,11 +219,6 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
    Bottom part of HUD
    ======================================== */
 #hud-bottom {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1000;
-
   /* Background color */
   background: rgb(53, 72, 79);
 
@@ -273,15 +268,17 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   background: none;
 }
 
+/* Divider between trainer and game buttons */
+.hud-divider {
+  height: 1px;
+  background: rgba(220, 229, 222, 0.3);
+  margin: 8px 0;
+}
+
 /* ========================================
    Dev hud section
    ======================================== */
 #dev-controls-hud {
-  position: fixed;
-  bottom: 290px;
-  left: 20px;
-  z-index: 1000;
-
   background: rgb(53, 72, 79);
   padding: 15px;
   border-radius: 30px;
@@ -562,4 +559,18 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   .hud-section.right {
     font-size: clamp(1.2em, 3cqi, 1.5em);
   }
+}
+
+/* ========================================
+   Bottom HUD container - wraps dev menu and main game options
+   ======================================== */
+#hud-bottom-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+  
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 15px;
 }
