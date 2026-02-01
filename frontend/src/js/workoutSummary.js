@@ -249,7 +249,7 @@ export class WorkoutSummary {
         
         <div class="export-buttons">
           <button id="summary-export-tcx" class="summary-btn">Download TCX</button>
-          <button id="summary-export-strava" class="summary-btn" disabled>Export to Strava</button>
+          <button id="summary-export-strava" class="summary-btn">Export to Strava</button>
         </div>
         
         <button id="close-summary" class="close-btn">Close</button>

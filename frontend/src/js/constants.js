@@ -30,7 +30,6 @@ class Constants {
   }
   slope = 0; // road grade (decimal)
   lastTime = Date.now();
-  historyStartTime = Date.now();
   // keyboard mode values - should go in own class for keyboard mode
   keyboardMode = false;
   keyboardSpeed = this.kmhToMs(100);
@@ -41,8 +40,6 @@ class Constants {
   aKeyDown = false;
 
   riderState = { power: 0, speed: 0, calories: 0 };
-  rideHistory = [];
-  lastHistorySecond = null;
   pacerStarted = false;
   dragCoefficient = 1.0;
   bikeWheelRadius = 0.22;
@@ -90,14 +87,16 @@ class Constants {
   // Constants governing path generation
   pathWidth = 8;
   pathHeight = 1.02;
-  pathDepth = 60;
+  pathDepth = 5;
   pathPositionX = 0;
   pathPositionY = 0;
   pathPositionZ = 0;
   dirtColor = "#a0895a";
 
-  // Constants governing circular motion
-  curveRadius = 35;
+  farthestSpawn = 1;
+  trackPoints = [];
+  currentTrackPiece = 0;
+  pacerCurrentTrackPiece = 0;
 
   // Constants governing cloud speed
   lastCloud = Date.now();

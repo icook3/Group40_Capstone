@@ -9,8 +9,22 @@ export class Strava {
 
         this.CLIENT_ID = "INPUT CLIENT ID"; // TODO
         this.BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+        this.STRAVA_BACKEND_HEALTH = "/stravaHealth"
         this.OAUTH_CALLBACK = "/oauth/callback"
         this.REFRESH = "/oauth/refresh"
+        this.UPLOAD = "/strava/upload"
+    }
+
+    async isStravaBackendUp() {
+        try {
+            const res = await fetch(`${this.BACKEND_URL}${this.STRAVA_BACKEND_HEALTH}`, {
+                method: "GET",
+            });
+
+            return res.ok;
+        } catch {
+            return false;
+        }
     }
 
     // Begin OAuth
@@ -73,8 +87,8 @@ export class Strava {
         // Call backend
         const res = await fetch (`${this.BACKEND_URL}${this.REFRESH}`, {
            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ refresh_token: this.refreshToken })
+           headers: {"Content-Type": "application/json"},
+           body: JSON.stringify({ refresh_token: this.refreshToken })
         });
 
         if (!res.ok) {
@@ -96,8 +110,12 @@ export class Strava {
         return this.accessToken;
     }
 
+    // Checks if user has been connected to Strava
+    static isConnected() {
+        return !!localStorage.getItem("strava_access_token") || !!localStorage.getItem("strava_refresh_token");
+    }
 
-    // Upload workout to Strava (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
+    // Upload workout to Strava through backend (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
     async uploadActivity({name, description}) {
         this.loadToken();
 
@@ -105,8 +123,9 @@ export class Strava {
         if (this.accessToken && this.isTokenExpired()) {
             const newToken = await this.refreshTokens();
             if (!newToken) {
-                alert("Strava session expired — please reconnect Strava.");
-                return;
+                const err = new Error("Strava session expired");
+                err.status = 401;
+                throw err;
             }
             this.loadToken();
         }
@@ -115,8 +134,9 @@ export class Strava {
         if (!this.accessToken && this.refreshToken) {
             const ok = await this.refreshTokens();
             if (!ok) {
-                alert("Error — please reconnect Strava.");
-                return;
+                const err = new Error("Strava token refresh failed");
+                err.status = 401;
+                throw err;
             }
             this.loadToken();
         }
@@ -142,7 +162,7 @@ export class Strava {
         formData.append("data_type", "tcx");
         formData.append("external_id", "zlow-" + Date.now());
 
-        const res = await fetch("https://www.strava.com/api/v3/uploads", {
+        const res = await fetch(`${this.BACKEND_URL}${this.UPLOAD}`, {
             method: "POST",
             headers: { Authorization: `Bearer ${this.accessToken}` },
             body: formData,
@@ -151,16 +171,11 @@ export class Strava {
         const json = await res.json();
         console.log("UPLOAD RESPONSE:", json);
 
-        if (json.error || json.errors) {
+        if (!res.ok || json.error || json.errors) {
             alert("Upload failed:\n" + JSON.stringify(json, null, 2));
             return;
         }
 
         alert("Upload sent! It may take 10–30 seconds to appear in Strava.");
-    }
-
-    // Checks if user has been connected to Strava
-    static isConnected() {
-        return !!localStorage.getItem("strava_access_token") || !!localStorage.getItem("strava_refresh_token");
     }
 }

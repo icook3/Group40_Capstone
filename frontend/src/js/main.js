@@ -12,7 +12,7 @@ import { simulationState } from "./simulationstate.js";
 import { PauseCountdown } from "./pause_countdown.js";
 import { units } from "./units/index.js";
 import { RampTestController } from "./workouts/RampTestController.js";
-
+import { rideHistory } from "./rideHistoryStore.js";
 import { WorkoutStorage } from "./workoutStorage.js";
 import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
@@ -117,12 +117,15 @@ let scene;
 let hud;
 let keyboardMode;
 let standardMode;
+
 //Avatar and Pacer
 let rider;
 let pacer;
+
 // workout session
 let workoutStorage;
 let workoutSession;
+
 // milestones
 let notificationManager;
 let milestoneTracker;
@@ -206,6 +209,7 @@ function loop({
   const riderSpeed = constants.riderState.speed || 0;
 
   rider.update(dt);
+
   if (constants.pacerStarted&&peerState==0) {
     //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
@@ -234,19 +238,29 @@ function loop({
     pacer.update(dt);
 
     // Update pacer position relative to the rider based on speed difference
-    const relativeSpeed = pacerSpeed - riderSpeed;
-    const pacerPos = pacer.avatarEntity.getAttribute("position");
-    pacerPos.z -= relativeSpeed * dt;
-    pacer.setPosition(pacerPos);
-  } else if (peerState!=0&&connected&&pacer!=undefined) {
-    pacer.update(dt);
+    //const relativeSpeed = pacerSpeed - riderSpeed;
 
-    const riderSpeed = constants.riderState.speed;    
-    const pacerSpeed = pacer.speed;
-    const relativeSpeed = pacerSpeed - riderSpeed;
-    const pacerPos = pacer.avatarEntity.getAttribute("position");
-    pacerPos.z -= relativeSpeed * dt;
-    pacer.setPosition(pacerPos);
+      //console.log("Relative speed: "+relativeSpeed);
+      //console.log("Pacer speed: "+pacerSpeed);
+      //console.log("Rider speed: "+riderSpeed);
+    
+
+    
+    //const pacerPos = pacer.avatarEntity.getAttribute("position");
+    //const prevPacerPos = pacer.avatarEntity.getAttribute("position");
+    //pacerPos.z -= relativeSpeed * dt;
+
+    
+    //pacer.setPosition(pacerPos);
+  //} else if (peerState!=0&&connected&&pacer!=undefined) {
+    //pacer.update(dt);
+
+    //const riderSpeed = constants.riderState.speed;    
+    //const pacerSpeed = pacer.speed;
+    //const relativeSpeed = pacerSpeed - riderSpeed;
+    //const pacerPos = pacer.avatarEntity.getAttribute("position");
+    //pacerPos.z -= relativeSpeed * dt;
+    //pacer.setPosition(pacerPos);
   }
 
   // Let the ramp controller advance its state
@@ -268,10 +282,8 @@ function loop({
     keyboardMode.keyboardMode = true;
   }
 
-  const thisSecond = Math.floor((now - constants.historyStartTime) / 1000);
-
   //set up values to push
-  let pushTime = now;
+  let pushTime = performance.now();
   let pushPower = constants.riderState.power || 0;
   let pushSpeed = units.speedUnit.convertFrom(constants.riderState.speed) || 0;
   let pushDistance =
@@ -279,15 +291,8 @@ function loop({
       parseFloat(getElement("distance").textContent)
     ) || 0;
 
-  if (constants.lastHistorySecond !== thisSecond) {
-    constants.rideHistory.push({
-      time: pushTime,
-      power: pushPower,
-      speed: pushSpeed,
-      distance: pushDistance,
-    });
-    constants.lastHistorySecond = thisSecond;
-  }
+  rideHistory.pushSample(pushTime, pushPower, pushSpeed, pushDistance);
+
   sendPeerDataOver(constants.riderState.speed);
   requestAnimationFrameFn(loop);
 }
@@ -334,7 +339,7 @@ function recieveData(data) {
   switch(data.name) {
     case "playerData":
       console.log("recieving player data");
-      pacer = new AvatarMovement("pacer", {
+      pacer = new AvatarMovement("pacer-entity", {
         position: { x: 0.5, y: 1, z: 0 },
         isPacer: false,
       });
@@ -357,6 +362,12 @@ function recieveData(data) {
         const riderSyncPos = rider.avatarEntity.getAttribute("position");
         const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
         pacerSyncPos.z = riderSyncPos.z;
+        
+        // Set pacer constants to rider constants and adjust animation
+        constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+        document.getElementById('pacer-speed').value = constants.riderState.speed;
+        pacer.avatarEntity.removeAttribute("animation__2");
+        pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
         pacer.avatarEntity.setAttribute("position", pacerSyncPos);
       }
       break;
@@ -549,7 +560,7 @@ export function initZlowApp({
     isPacer: false,
   });
   if (peerState == 0) {
-    pacer = new AvatarMovement("pacer", {
+    pacer = new AvatarMovement("pacer-entity", {
       position: { x: 0.5, y: 1, z: -2 },
       isPacer: true,
     });
@@ -764,23 +775,6 @@ export function initZlowApp({
     }
   });
 
-  /*const stopBtn = getElement("stop-btn");
-  stopBtn.addEventListener("click", () => {
-    simulationState.isPaused = false;
-    countdown.cancel();
-    constants.rideHistory = [];
-    constants.historyStartTime = Date.now();
-    constants.lastHistorySecond = null;
-    constants.riderState = { power: 0, speed: 0 };
-    hud.resetWorkOut();
-    pauseBtn.textContent = "Pause";
-
-    // Reset pacer
-    pacer.setSpeed(0);
-    const startPos = { x: 0.5, y: 1, z: -2 };
-    pacer.avatarEntity.setAttribute("position", startPos);
-    constants.pacerStarted = false;
-  });*/
   const stopBtn = getElement("stop-btn");
   stopBtn.addEventListener("click", () => {
     // Show confirmation dialog
@@ -793,7 +787,7 @@ export function initZlowApp({
         // After you compute finalStats from workoutSession / history, etc.
         if (selectedWorkout === "ramp" && rampController) {
           const result = rampController.computeFtpFromHistory(
-            constants.rideHistory
+            rideHistory.samples
           );
           if (result) {
             // Flatten FTP numbers into stats for summary + records
@@ -816,8 +810,6 @@ export function initZlowApp({
         // Reset everything
         simulationState.isPaused = false;
         countdown.cancel();
-        constants.historyStartTime = Date.now();
-        constants.lastHistorySecond = null;
         constants.riderState = { power: 0, speed: 0 };
         hud.resetWorkOut();
         pauseBtn.textContent = "Pause";
@@ -902,6 +894,12 @@ export function initZlowApp({
       const riderSyncPos = rider.avatarEntity.getAttribute("position");
       const pacerSyncPos = pacer.avatarEntity.getAttribute("position");
       pacerSyncPos.z = riderSyncPos.z;
+
+      // Set pacer constants to rider constants and adjust animation
+      constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+      document.getElementById('pacer-speed').value = constants.riderState.speed;
+      pacer.avatarEntity.removeAttribute("animation__1");
+      pacer.avatarEntity.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
     }
     if (connected) {
@@ -926,7 +924,7 @@ export function initZlowApp({
     strava,
     pacer,
     getRiderState: () => riderState,
-    getRideHistory: () => rideHistory,
+    getRideHistory: () => rideHistory.samples,
     setRiderState: (state) => {
       riderState = state;
     },
@@ -942,14 +940,9 @@ export function initZlowApp({
       lastTime = val;
     },
     getLastTime: () => lastTime,
-    setHistoryStartTime: (val) => {
-      historyStartTime = val;
-    },
-    getHistoryStartTime: () => historyStartTime,
     setLastHistorySecond: (val) => {
-      lastHistorySecond = val;
-    },
-    getLastHistorySecond: () => lastHistorySecond,
+      rideHistory.lastSecond = val; },
+    getLastHistorySecond: () => rideHistory.lastSecond,
   };
 }
 
@@ -979,7 +972,7 @@ darkMode.addEventListener("change", updateFavicon);
 
 // Gets workout summary
 export function getWorkoutSummary() {
-  const history = constants.rideHistory;
+  const history = rideHistory.samples;
   if (!history || history.length < 2) return null;
 
   const startTime = history[0].time;
@@ -999,21 +992,12 @@ export function getWorkoutSummary() {
   };
 }
 
-// Disable exporting if Strava is not connected
-function updateStravaButtonState() {
-  const btn = document.getElementById("summary-export-strava");
-  if (!btn) return;
-  btn.disabled = !Strava.isConnected();
-}
-
-updateStravaButtonState();
-setInterval(updateStravaButtonState, 2000);
-
 export async function exportToStrava() {
   const strava = new Strava();
 
   if (!Strava.isConnected()) {
-    alert("You must connect to Strava first (from main menu).");
+    alert("You must connect to Strava first (from main menu).\n" +
+        "Please upload the TCX manually.");
     return;
   }
 
@@ -1023,45 +1007,112 @@ export async function exportToStrava() {
     return;
   }
 
-  await strava.uploadActivity(workout);
+  try {
+      await strava.uploadActivity(workout);
+      alert("Workout sent to Strava! It may take a few seconds to appear.");
+  } catch (err) {
+      handleStravaExportFailure(err);
+  }
 }
 
-// Generates TCX file based old saveTCX
+function handleStravaExportFailure(err) {
+    // Rate limit hit
+    if (err?.status === 429) {
+        alert(
+            "Strava upload limit reached.\n" +
+            "Please download the TCX file and upload it manually to Strava."
+        );
+        return;
+    }
+
+    // Backend down / Strava unavailable
+    if (err?.status === 500 || err?.status === 503) {
+        alert(
+            "Strava service is currently unavailable.\n" +
+            "Please download the TCX file and upload it manually to Strava."
+        );
+        return;
+    }
+
+    // Fallback
+    alert(
+        "Unable to upload to Strava.\n" +
+        "Please download the TCX file and upload it manually."
+    );
+}
+
+// =====================
+// TCX EXPORT (RideHistory samples: { elapsedMs, epochMs, power, speed, distance })
+// =====================
+
+// Generates TCX file
 export function generateTCXFile() {
-  if (constants.rideHistory.length < 2) {
+  const history = rideHistory.samples;
+
+  // Need at least 2 points to compute duration/track
+  if (!history || history.length < 2) return null;
+
+  // Defensive: ensure required fields exist
+  const hasEpoch = history[0]?.epochMs != null && history.at(-1)?.epochMs != null;
+  const hasElapsed = history.at(-1)?.elapsedMs != null;
+  if (!hasEpoch) {
+    console.error("TCX export failed: samples missing epochMs", history[0], history.at(-1));
     return null;
   }
 
-  const startTime = new Date(constants.rideHistory[0].time);
+  const startEpochMs = history[0].epochMs;
+  const endEpochMs = history.at(-1).epochMs;
+  const startTime = new Date(startEpochMs);
+
+  // Prefer elapsedMs for total time (it’s exactly what you recorded), else fall back to epoch delta
+  const totalTimeSeconds = Math.max(
+    0,
+    Math.floor(((hasElapsed ? history.at(-1).elapsedMs : (endEpochMs - startEpochMs)) || 0) / 1000)
+  );
+
+  const distanceMeters = ((history.at(-1).distance || 0) * 1000).toFixed(1);
+
   let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
-  tcx += `  <Activities>\n    <Activity Sport="Biking">\n      <Id>${startTime.toISOString()}</Id>\n      <Lap StartTime="${startTime.toISOString()}">\n        <TotalTimeSeconds>${Math.floor(
-    (constants.rideHistory.at(-1).time - constants.rideHistory[0].time) / 1000
-  )}</TotalTimeSeconds>\n        <DistanceMeters>${(
-    constants.rideHistory.at(-1).distance * 1000
-  ).toFixed(
-    1
-  )}</DistanceMeters>\n        <Intensity>Active</Intensity>\n        <TriggerMethod>Manual</TriggerMethod>\n        <Track>\n`;
+  tcx += `  <Activities>\n`;
+  tcx += `    <Activity Sport="Biking">\n`;
+  tcx += `      <Id>${startTime.toISOString()}</Id>\n`;
+  tcx += `      <Lap StartTime="${startTime.toISOString()}">\n`;
+  tcx += `        <TotalTimeSeconds>${totalTimeSeconds}</TotalTimeSeconds>\n`;
+  tcx += `        <DistanceMeters>${distanceMeters}</DistanceMeters>\n`;
+  tcx += `        <Intensity>Active</Intensity>\n`;
+  tcx += `        <TriggerMethod>Manual</TriggerMethod>\n`;
+  tcx += `        <Track>\n`;
 
-  for (let pt of constants.rideHistory) {
+  for (const pt of history) {
+    // Guard against bad points
+    if (pt?.epochMs == null) continue;
+
+    const timeISO = new Date(pt.epochMs).toISOString();
+    const distM = ((pt.distance || 0) * 1000).toFixed(1);
+    const watts = Math.round(pt.power || 0);
+
+    // Your pt.speed is in km/h (based on your code earlier), convert to m/s for TCX extension
+    const speedMs = constants.kmhToMs(pt.speed || 0).toFixed(3);
+
     tcx += `          <Trackpoint>\n`;
-    tcx += `            <Time>${new Date(pt.time).toISOString()}</Time>\n`;
+    tcx += `            <Time>${timeISO}</Time>\n`;
     tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
-    tcx += `            <DistanceMeters>${(pt.distance * 1000).toFixed(
-      1
-    )}</DistanceMeters>\n`;
+    tcx += `            <DistanceMeters>${distM}</DistanceMeters>\n`;
     tcx += `            <Extensions>\n`;
     tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
-    tcx += `                <ns3:Watts>${Math.round(pt.power)}</ns3:Watts>\n`;
-    tcx += `                <ns3:Speed>${constants
-      .kmhToMs(pt.speed)
-      .toFixed(3)}</ns3:Speed>\n`;
+    tcx += `                <ns3:Watts>${watts}</ns3:Watts>\n`;
+    tcx += `                <ns3:Speed>${speedMs}</ns3:Speed>\n`;
     tcx += `              </ns3:TPX>\n`;
     tcx += `            </Extensions>\n`;
     tcx += `          </Trackpoint>\n`;
   }
 
-  tcx += `        </Track>\n      </Lap>\n    </Activity>\n  </Activities>\n</TrainingCenterDatabase>\n`;
+  tcx += `        </Track>\n`;
+  tcx += `      </Lap>\n`;
+  tcx += `    </Activity>\n`;
+  tcx += `  </Activities>\n`;
+  tcx += `</TrainingCenterDatabase>\n`;
 
   return new Blob([tcx], { type: "application/vnd.garmin.tcx+xml" });
 }
@@ -1069,23 +1120,27 @@ export function generateTCXFile() {
 /**
  * Save a TCX file
  */
-function saveTCX() {
-  const tcxBlob = generateTCXFile();
-  if (!tcxBlob) {
-    alert("Not enough data to export.");
-    return;
+export function saveTCX() {
+  try {
+    const tcxBlob = generateTCXFile();
+    if (!tcxBlob) {
+      alert("Not enough data to export.");
+      return;
+    }
+
+    const url = URL.createObjectURL(tcxBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "zlow-ride.tcx";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    rideHistory.reset();
+  } catch (err) {
+    console.error("TCX export error:", err);
+    alert("TCX export failed. Check the console for details.");
   }
-
-  const url = URL.createObjectURL(tcxBlob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "zlow-ride.tcx";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  constants.rideHistory = [];
-  constants.historyStartTime = Date.now();
-  constants.lastHistorySecond = null;
 }
+
