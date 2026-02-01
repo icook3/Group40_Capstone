@@ -658,6 +658,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   display: flex;
   flex-direction: column-reverse;
   gap: 15px;
+  align-items: flex-start;
 }
 
 /* ========================================
@@ -680,4 +681,125 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 
 .trainer-menu[hidden] {
   display: none;
+}
+
+/* ========================================
+   Bottom HUD style switcher - icons only on small screens
+   ======================================== */
+@media (max-width: 700px), (max-height: 700px) {
+  /* Hide button text */
+  .hud-btn .btn-text {
+    display: none;
+  }
+
+  /* Center icons when text is hidden */
+  .hud-btn {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  /* Buttons go horizontal */
+  .control-buttons {
+    flex-direction: row;
+    gap: 0;
+  }
+
+/* Divider goes vertical */
+.hud-divider {
+  width: 1px;
+  height: 24px;
+  margin: 0 8px;
+  align-self: center;
+}
+
+  /* Shrink the containers */
+  #hud-bottom {
+    min-width: auto;
+    min-height: auto;
+    width: auto;
+  }
+
+  /* Stack HUDs horizontally */
+  #hud-bottom-container {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  /* Dev HUD: hide labels and units, keep icons and inputs */
+  #dev-controls-hud {
+    min-width: auto;
+    width: auto;
+    padding: 10px;
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  #dev-controls-hud::before {
+    display: none; /* Hide "DEV Mode" title */
+  }
+
+  #dev-controls-hud #pacer,
+  #dev-controls-hud #weight {
+    padding: 10px;
+    justify-content: center;
+  }
+
+  #dev-controls-hud #pacer label,
+  #dev-controls-hud #pacer .speed-unit,
+  #dev-controls-hud #weight label,
+  #dev-controls-hud #weight .weight-unit {
+    display: none;
+  }
+}
+
+/* ========================================
+   Very small screens - shrink icons
+   ======================================== */
+@media (max-width: 600px), (max-height: 450px) {
+  /* Smaller icons */
+  .hud-btn::before {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Less padding */
+  .hud-btn {
+    padding: 6px;
+  }
+
+  /* Smaller divider */
+  .hud-divider {
+    height: 18px;
+    margin: 0 4px;
+  }
+
+  /* Tighter container padding */
+  #hud-bottom {
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  #dev-controls-hud {
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  /* Smaller dev inputs */
+  #dev-controls-hud #pacer-speed,
+  #dev-controls-hud #rider-weight {
+    width: 35px;
+    padding: 4px 6px;
+    font-size: 0.85em;
+  }
+
+  #dev-controls-hud #pacer::before,
+  #dev-controls-hud #weight::before {
+    width: 18px;
+    height: 18px;
+  }
+
+  #dev-controls-hud #pacer,
+  #dev-controls-hud #weight {
+    padding: 6px;
+  }
 }
