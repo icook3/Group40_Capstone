@@ -605,6 +605,8 @@ export function initZlowApp({
   //map the pacer speed input to the pacer speed variable
 
   hud = new HUD({ getElement });
+  hud.initTrainerToggle();
+
 
   // Map workout keys to user-facing labels
   const workoutLabels = {

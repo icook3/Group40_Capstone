@@ -23,6 +23,28 @@ export class HUD {
     this.workoutCountdownId = null;
   }
 
+  // Toggle trainer menu visibility
+initTrainerToggle() {
+  const trainerToggleBtn = document.getElementById("trainer-toggle-btn");
+  const trainerBackBtn = document.getElementById("trainer-back-btn");
+  const mainControls = document.querySelector(".main-controls");
+  const trainerControls = document.querySelector(".trainer-controls");
+  
+  if (trainerToggleBtn && trainerBackBtn && mainControls && trainerControls) {
+    // Show trainer view
+    trainerToggleBtn.addEventListener("click", () => {
+      mainControls.hidden = true;
+      trainerControls.hidden = false;
+    });
+    
+    // Back to main view
+    trainerBackBtn.addEventListener("click", () => {
+      trainerControls.hidden = true;
+      mainControls.hidden = false;
+    });
+  }
+}
+
   // 5-second pre-start countdown
   showStartCountdown({ workoutName, seconds = 5, onDone } = {}) {
       if (!this.workoutOverlay || !this.workoutDialog) {

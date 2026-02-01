@@ -226,6 +226,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   border-radius: 30px;
 
   width: 180px;
+  min-height: 230px; /* This keeps consistent heights when switching views, e.g. Trainer vs Main options */
 }
 
 /* Stack buttons vertically */
@@ -233,6 +234,10 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   display: flex;
   flex-direction: column;
   gap: 0px;
+}
+
+.control-buttons[hidden] {
+  display: none;
 }
 
 /* Style for bottom buttons */
@@ -266,6 +271,83 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   opacity: 0.5;
   cursor: not-allowed;
   background: none;
+}
+
+/* ========================================
+   Bottom HUD Button icons
+   ======================================== */
+.hud-btn::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: brightness(0) invert(0.9);
+}
+
+/* Main controls icons */
+#trainer-toggle-btn::before {
+  background-image: url("../../resources/images/trainer.svg");
+}
+
+#pacer-sync-btn::before {
+  background-image: url("../../resources/images/sync.svg");
+}
+
+#pause-btn::before {
+  background-image: url("../../resources/images/pause.svg");
+}
+
+#stop-btn::before {
+  background-image: url("../../resources/images/stop.svg");
+}
+
+#menu-btn::before {
+  background-image: url("../../resources/images/exit.svg");
+}
+
+/* Trainer controls icons */
+#trainer-back-btn::before {
+  background-image: url("../../resources/images/back.svg");
+}
+
+#connect-btn::before {
+  background-image: url("../../resources/images/connectTrainer.svg");
+}
+
+#calibrate-trainer-modal-btn::before {
+  background-image: url("../../resources/images/calibrateTrainer.svg");
+}
+
+/* Dev controls icons */
+#pacer::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background-image: url("../../resources/images/pacer.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: brightness(0) invert(0.9);
+}
+
+#weight::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background-image: url("../../resources/images/weight.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+  filter: brightness(0) invert(0.9);
+}
+
+#calories-reset-btn::before {
+  background-image: url("../../resources/images/resetCalories.svg");
 }
 
 /* Divider between trainer and game buttons */
@@ -573,4 +655,26 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   display: flex;
   flex-direction: column-reverse;
   gap: 15px;
+}
+
+/* ========================================
+   Trainer controls - expandable section
+   ======================================== */
+.trainer-controls {
+  position: relative;
+}
+
+.trainer-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 12px;
+  border-left: 2px solid rgba(220, 229, 222, 0.2);
+  margin-left: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.trainer-menu[hidden] {
+  display: none;
 }
