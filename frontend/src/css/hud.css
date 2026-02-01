@@ -225,8 +225,10 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   padding: 15px;
   border-radius: 30px;
 
-  width: 180px;
-  min-height: 230px; /* This keeps consistent heights when switching views, e.g. Trainer vs Main options */
+  width: fit-content;
+  /* This keeps consistent width heights when switching views, e.g. Trainer vs Main options */
+  min-width: 180px;
+  min-height: 230px; 
 }
 
 /* Stack buttons vertically */
@@ -365,7 +367,8 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   padding: 15px;
   border-radius: 30px;
 
-  width: 180px;
+  width: fit-content;
+  min-width: 180px;
 
   /* Stack controls vertically */
   display: flex;
@@ -410,7 +413,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 /* Style for input fields */
 #dev-controls-hud #pacer-speed,
 #dev-controls-hud #rider-weight {
-  width: 60px;
+  width: 45px;
   padding: 6px 8px;
   border: 1px solid rgba(220, 229, 222, 0.3);
   background: rgba(0, 0, 0, 0.2);
