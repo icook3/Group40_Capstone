@@ -190,11 +190,21 @@ workoutCountdownId: number
 + getCurrentStreak(): nmber
 + getCumulativeRideCount(): number
 + clearAll(): void
-+ deleteWorkout(workoutId: number): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>3180</x><y>1872</y><w>612</w><h>1224</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>490;1000;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2184</x><y>2904</y><w>192</w><h>72</h></coordinates><panel_attributes>WorkoutSession
++ deleteWorkout(workoutId: number): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>3180</x><y>1872</y><w>612</w><h>1224</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>490;1000;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2196</x><y>3000</y><w>252</w><h>156</h></coordinates><panel_attributes>WorkoutSession
 --
 
 --
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2508</x><y>864</y><w>1572</w><h>180</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;1290;130</additional_attributes></element><element><id>Relation</id><coordinates><x>2172</x><y>840</y><w>456</w><h>2112</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1740;360;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>3060</x><y>720</y><w>192</w><h>72</h></coordinates><panel_attributes>MilestoneTracker
++ constructor(): WorkoutSession
++ start(): void
++ update(currentStats: object): void
++ end(): object
++ addFTPResult(ftpResult: object): void
++ calculateStats(): object
++ calculateAverage(field: string): number
++ getTotalTime(): number
++ getCurrentStats(): object
++ isWorkoutActive(): boolean
++ cancel(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2508</x><y>864</y><w>1572</w><h>180</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;1290;130</additional_attributes></element><element><id>Relation</id><coordinates><x>2292</x><y>840</y><w>336</w><h>2184</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1800;260;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>3060</x><y>720</y><w>192</w><h>72</h></coordinates><panel_attributes>MilestoneTracker
 --
 
 --
