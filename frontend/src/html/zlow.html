@@ -247,25 +247,50 @@
         </div>
       </div>
     </div>
-
+  <div id="hud-bottom-container">
     <div id="hud-bottom">
-      <div class="control-buttons">
-        <button
-          id="menu-btn"
-          class="hud-btn"
-          onclick="if (confirm('Return to Main Menu? Gameplay data will be lost.')) {window.location.href='./mainMenu.html'}"
-        >Main Menu</button>
-        <button id="pacer-sync-btn" class="hud-btn">Sync Pacer</button>
-        <button id="calibrate-trainer-modal-btn" class="hud-btn">Calibrate Trainer</button>
-        <button id="connect-btn">Connect Trainer</button>
-        <button id="pause-btn" class="hud-btn">Pause</button>
-        <button id="stop-btn" class="hud-btn">Stop</button>
+<!-- Main controls view -->
+      <div class="control-buttons main-controls">
+        <button id="trainer-toggle-btn" class="hud-btn" title="Trainer">
+          <span class="btn-text">Trainer</span>
+        </button>
+        
+        <div class="hud-divider"></div>
+        
+        <button id="pacer-sync-btn" class="hud-btn" title="Sync Pacer">
+          <span class="btn-text">Sync Pacer</span>
+        </button>
+        <button id="pause-btn" class="hud-btn" title="Pause">
+          <span class="btn-text">Pause</span>
+        </button>
+        <button id="stop-btn" class="hud-btn" title="Stop">
+          <span class="btn-text">Stop</span>
+        </button>
+        <button id="menu-btn" class="hud-btn" title="Exit to Main Menu" onclick="if (confirm('Return to Main Menu? Gameplay data will be lost.')) {window.location.href='./mainMenu.html'}">
+          <span class="btn-text">Exit to Main Menu</span>
+        </button>
+      </div>
+
+      <!-- Trainer controls view (hidden by default) -->
+      <div class="control-buttons trainer-controls" hidden>
+        <button id="trainer-back-btn" class="hud-btn" title="Back">
+          <span class="btn-text">Back</span>
+        </button>
+        
+        <div class="hud-divider"></div>
+        
+        <button id="connect-btn" class="hud-btn" title="Connect Trainer">
+          <span class="btn-text">Connect Trainer</span>
+        </button>
+        <button id="calibrate-trainer-modal-btn" class="hud-btn" title="Calibrate Trainer">
+          <span class="btn-text">Calibrate Trainer</span>
+        </button>
       </div>
     </div>
 
     <!-- Dev hud - hidden by default -->
     <div id="dev-controls-hud" hidden>
-      <span id="pacer">
+      <span id="pacer" title="Pacer Speed">
         <label for="pacer-speed">Pacer:</label>
         <input
           id="pacer-speed"
@@ -278,7 +303,7 @@
         <span class="speed-unit">km/h</span>
       </span>
 
-      <span id="weight">
+      <span id="weight" title="Rider Weight">
         <label for="rider-weight">Weight:</label>
         <input
           id="rider-weight"
@@ -291,7 +316,10 @@
         <span class="weight-unit">kg</span>
       </span>
 
-      <button id="calories-reset-btn">Reset Calories</button>
+      <button id="calories-reset-btn" class="hud-btn" title="Reset Calories">
+        <span class="btn-text">Reset Calories</span>
+      </button>
+
     </div>
 
     <!-- Pause overlay -->
@@ -300,6 +328,8 @@
         Resuming in <span id="pause-countdown">10</span>…
       </div>
     </div>
+  </div>
+
 
     <!-- Trainer Calibration Modal -->
 <div id="calibration-modal" aria-hidden="true">
