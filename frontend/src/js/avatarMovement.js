@@ -9,6 +9,27 @@ export class AvatarMovement {
         this.speed = 0;
         this.power = 0;
         this.isPacer = options.isPacer || false;
+
+        // Fix camera to rider entity
+        if (id == "rider") {
+            this.addCamera();
+        }
+    }
+
+    // Add point-of-view camera to rider using a rig
+    addCamera() {
+        // Spawn from class rather than creating new
+        this.rider = document.getElementById('rider');
+        const rig = document.createElement('a-entity');
+        rig.setAttribute('id','rig');
+        const camera = document.createElement('a-camera');
+        camera.setAttribute('wasd-controls-enabled', 'false');
+        camera.setAttribute('id','camera');
+        camera.setAttribute('look-controls','');
+        camera.setAttribute('position','4 5 7');
+        camera.setAttribute('look-at', rider);
+        rig.appendChild(camera);
+        this.rider.appendChild(rig);
     }
 
     //Helper to interpolate smoothly between A and B
@@ -29,7 +50,6 @@ export class AvatarMovement {
         const baseLeftShinX = 12 * pi / 20;
         const baseRightFootX = -pi / 8;
         const baseLeftFootX = -pi / 6;
-
         const thighForwardSwing = 0.1;
         const shinForwardSwing = 0.3;
         const footForwardSwing = 0.25;
@@ -71,7 +91,7 @@ export class AvatarMovement {
 
         //Rotate crank and pedals
         if (this.creator.leftPedalBone && this.creator.rightPedalBone && this.creator.pedalCrankBone) {
-            if (this.creator.id === "pacer") {
+            if (this.creator.id === "pacer-entity") {
                 //Rotate crank
                 const pacerCrankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
                 const pacerCrankRotationAmount = pacerCrankAngularSpeed * dt;
@@ -108,10 +128,28 @@ export class AvatarMovement {
         this.power = power;
     }
 
+    // Animate avatar and emit events indicating whether rider is starting, stopping, or resuming
     update(dt) {
         if (this.speed === 0) {
             return;
         }
+
+        // Emit either a start or a resume event based on worldZ
+        if (constants.worldZ == 0) {
+            document.getElementById('rider').emit('riderStarted');
+            document.getElementById('pacer-entity').emit('pacerStart');
+        }
+
+        else if (constants.riderState.speed == 0 && constants.worldZ > 0) {
+            // Emit a stop event if speed is 0
+            document.getElementById('rider').emit('riderStopped');
+        }
+
+        // Emit a resume event if both speed and worldZ are greater than 0
+        else {
+            document.getElementById('rider').emit('riderResumed');
+        }
+
         this.animatePedalingBike(dt);
         this.animatePedalingPerson(dt)
     }
