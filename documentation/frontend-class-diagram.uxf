@@ -190,7 +190,7 @@ workoutCountdownId: number
 + getCurrentStreak(): nmber
 + getCumulativeRideCount(): number
 + clearAll(): void
-+ deleteWorkout(workoutId: number): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>3180</x><y>1872</y><w>612</w><h>1224</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>490;1000;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2196</x><y>3000</y><w>252</w><h>156</h></coordinates><panel_attributes>WorkoutSession
++ deleteWorkout(workoutId: number): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>3180</x><y>1872</y><w>612</w><h>1224</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>490;1000;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2196</x><y>3000</y><w>324</w><h>264</h></coordinates><panel_attributes>WorkoutSession
 --
 
 --
