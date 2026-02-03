@@ -5,7 +5,7 @@ import intakeRoutes from "./routes/intakeRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 
 const app = express(); // Create express app
-app.use(express.json({
+app.use("/intake", express.json({
     limit: process.env.MAX_PAYLOAD_SIZE || "200kb"
 }));
 
