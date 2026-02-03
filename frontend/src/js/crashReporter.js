@@ -23,12 +23,14 @@ export function initCrashReporter(getMetadata) {
                 ...meta
             };
 
-            const blob = new Blob(
-                [JSON.stringify(payload)],
-                { type: "application/json" }
-            );
+            console.log(payload);
 
-            navigator.sendBeacon(`${BACKEND_URL}${INTAKE_CRASH}`, blob);
+            await fetch(`${BACKEND_URL}${INTAKE_CRASH}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                keepalive: true,
+                body: JSON.stringify(payload),
+            });
 
         } catch (e) {
             console.error("Crash reporter failed:", e);

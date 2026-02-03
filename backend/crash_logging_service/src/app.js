@@ -14,7 +14,8 @@ app.get("/crashLoggingHealth", (_req, res) => {
 // CORS only needed for crash intake
 app.use("/intake", cors({
     origin: process.env.FRONTEND_URI,
-    methods: ["POST"],
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
 }));
 app.use("/intake", express.json({
     limit: process.env.MAX_PAYLOAD_SIZE || "200kb"
