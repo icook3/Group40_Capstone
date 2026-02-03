@@ -79,7 +79,7 @@ export class ObjectField {
         pos.x = kind.resampleX();
       }
 
-      setPos(obj, pos);
+      //setPos(obj, pos);
 
     }
 
@@ -123,7 +123,7 @@ export class ObjectField {
           pos.x = kind.resampleX();
         }
       }
-      setPos(obj, pos);
+      //setPos(obj, pos);
     }
   }
 
