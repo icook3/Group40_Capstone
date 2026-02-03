@@ -368,6 +368,17 @@ export function initZlowApp({
         const elapsedMs = lastSample ? lastSample.elapsedMs : 0;
         const workoutSeconds = Math.floor(elapsedMs / 1000);
 
+        let riderPos = null;
+        let pacerPos = null;
+
+        try {
+            const riderEl = document.getElementById("rider");
+            const pacerEl = document.getElementById("pacer");
+
+            riderPos = riderEl?.getAttribute("position") || null;
+            pacerPos = pacerEl?.getAttribute("position") || null;
+        } catch {}
+
         let aframeStats = null;
 
         try {
@@ -395,6 +406,8 @@ export function initZlowApp({
 
             speed: constants.riderState?.speed,
             power: constants.riderState?.power,
+            riderPosition: riderPos,
+            pacerPosition: pacerPos,
 
             aframe: aframeStats,
 
