@@ -5,9 +5,6 @@ import intakeRoutes from "./routes/intakeRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 
 const app = express(); // Create express app
-app.use("/intake", express.json({
-    limit: process.env.MAX_PAYLOAD_SIZE || "200kb"
-}));
 
 // Health check
 app.get("/crashLoggingHealth", (_req, res) => {
@@ -18,6 +15,9 @@ app.get("/crashLoggingHealth", (_req, res) => {
 app.use("/intake", cors({
     origin: process.env.FRONTEND_URI,
     methods: ["POST"],
+}));
+app.use("/intake", express.json({
+    limit: process.env.MAX_PAYLOAD_SIZE || "200kb"
 }));
 app.use("/intake", intakeRoutes);
 
