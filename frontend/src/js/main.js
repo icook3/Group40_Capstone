@@ -18,7 +18,7 @@ import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
-import {initCrashReporter, startMemoryWatchdog} from "./crashReporter.js";
+import {initCrashReporter} from "./crashReporter.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
