@@ -1,3 +1,6 @@
+const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+const INTAKE_CRASH = "/intake";
+
 export function initCrashReporter(getMetadata) {
     let alreadyReporting = false;
 
@@ -6,9 +9,29 @@ export function initCrashReporter(getMetadata) {
         alreadyReporting = true;
 
         try {
+            const [userEnv, meta] = await Promise.all([
+                collectEnvironmentSnapshot(),
+                Promise.resolve(getMetadata?.())
+            ]);
+
+            const payload = {
+                time: new Date().toISOString(),
+                url: location.href,
+                errorMessage,
+                stackTrace,
+                ...userEnv,
+                ...meta
+            };
+
+            const blob = new Blob(
+                [JSON.stringify(payload)],
+                { type: "application/json" }
+            );
+
+            navigator.sendBeacon(`${BACKEND_URL}${INTAKE_CRASH}`, blob);
 
         } catch (e) {
-
+            console.error("Crash reporter failed:", e);
         } finally {
             alreadyReporting = false;
         }
@@ -22,8 +45,9 @@ export function initCrashReporter(getMetadata) {
     });
 
     window.addEventListener("unhandledrejection", (event) => {
+        const reason = event.reason;
         sendCrash(
-            event.reason?.message || "unhandled promise rejection",
+            typeof reason === "string" ? reason : reason?.message || "unhandled promise rejection",
             event.reason?.stack || "no stack"
         );
     });
