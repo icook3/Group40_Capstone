@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://usa-chapel-teenage-reply.trycloudflare.com"; // TODO
+const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
 const INTAKE_CRASH = "/intake";
 
 export function initCrashReporter(getMetadata) {
