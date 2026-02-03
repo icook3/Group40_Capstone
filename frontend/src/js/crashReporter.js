@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+const BACKEND_URL = "https://usa-chapel-teenage-reply.trycloudflare.com"; // TODO
 const INTAKE_CRASH = "/intake";
 
 export function initCrashReporter(getMetadata) {
@@ -39,6 +39,24 @@ export function initCrashReporter(getMetadata) {
         }
     }
 
+    function startMemoryWatchdog() {
+        if (!performance.memory) return;
+
+        setInterval(() => {
+            const { usedJSHeapSize, jsHeapSizeLimit } = performance.memory;
+
+            const ratio = usedJSHeapSize / jsHeapSizeLimit;
+
+            // 88% of JS heap size used
+            if (ratio > 0.88) {
+                sendCrash(
+                    "Probable OOM: heap at " + Math.round(ratio * 100) + "%",
+                    "Memory watchdog triggered before renderer kill"
+                );
+            }
+        }, 3000);
+    }
+
     window.addEventListener("error", (event) => {
         sendCrash(
             event.message || "unknown error",
@@ -53,6 +71,8 @@ export function initCrashReporter(getMetadata) {
             event.reason?.stack || "no stack"
         );
     });
+
+    startMemoryWatchdog();
 }
 
 export async function collectEnvironmentSnapshot() {

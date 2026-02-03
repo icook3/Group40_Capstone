@@ -18,7 +18,7 @@ import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
-import {initCrashReporter} from "./crashReporter.js";
+import {initCrashReporter, startMemoryWatchdog} from "./crashReporter.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -368,6 +368,26 @@ export function initZlowApp({
         const elapsedMs = lastSample ? lastSample.elapsedMs : 0;
         const workoutSeconds = Math.floor(elapsedMs / 1000);
 
+        let aframeStats = null;
+
+        try {
+            const rideScene = AFRAME?.scenes?.[0];
+            const info = rideScene?.renderer?.info;
+
+            if (rideScene && info) {
+                aframeStats = {
+                    geometries: info.memory?.geometries,
+                    textures: info.memory?.textures,
+                    programs: info.programs?.length,
+                    drawCalls: info.render?.calls,
+                    triangles: info.render?.triangles,
+                    entities: rideScene.querySelectorAll('a-entity')?.length,
+                };
+            }
+        } catch (e) {
+            aframeStats = { error: "failed to read aframe stats" };
+        }
+
         return {
             workout: sessionStorage.getItem("SelectedWorkout") || "free",
             samples: rideHistory.samples?.length,
@@ -375,6 +395,8 @@ export function initZlowApp({
 
             speed: constants.riderState?.speed,
             power: constants.riderState?.power,
+
+            aframe: aframeStats,
 
             testMode: localStorage.getItem("testMode"),
             trainerConnected: !!standardMode?.trainer?.isConnected,
