@@ -1,10 +1,24 @@
 const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
 const INTAKE_CRASH = "/intake";
+const HEALTH_CHECK = "/crashLoggingHealth";
 
 let cachedWebGLInfo = null;
 let staticEnv = null;
 
+async function isCrashReporterBackendUp() {
+    try {
+        const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
+            method: "GET",
+        });
+
+        return res.ok;
+    } catch {
+        return false;
+    }
+}
+
 export function initCrashReporter(getMetadata) {
+    let backendUp = false;
     let alreadyReporting = false;
     let memoryWatchdogFired = false;
     let aframeWatchdogFired = false;
@@ -31,7 +45,7 @@ export function initCrashReporter(getMetadata) {
     }, 5000);
 
     async function sendCrash(errorMessage, stackTrace) {
-        if (alreadyReporting) return;
+        if (!backendUp || alreadyReporting) return;
         alreadyReporting = true;
 
         try {
@@ -43,7 +57,7 @@ export function initCrashReporter(getMetadata) {
                 ...lastSnapshot
             };
 
-            fetch(`${BACKEND_URL}${INTAKE_CRASH}`, {
+            await fetch(`${BACKEND_URL}${INTAKE_CRASH}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 keepalive: true,
@@ -123,8 +137,8 @@ export function initCrashReporter(getMetadata) {
         );
     });
 
-        startMemoryWatchdog();
-        startAframeRenderWatchdog();
+    startMemoryWatchdog();
+    startAframeRenderWatchdog();
 }
 
 export async function collectEnvironmentSnapshot() {

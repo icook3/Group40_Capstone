@@ -7,9 +7,15 @@ import reportRoutes from "./routes/reportRoutes.js";
 const app = express(); // Create express app
 
 // Health check
-app.get("/crashLoggingHealth", (_req, res) => {
-    res.status(200).send("ok");
-});
+app.get("/crashLoggingHealth",
+    cors({
+        origin: process.env.FRONTEND_URI,
+        methods: ["GET"],
+    }),
+    (_req, res) => {
+        res.status(200).send("ok");
+    }
+);
 
 // CORS only needed for crash intake
 app.use("/intake", cors({
