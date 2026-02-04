@@ -83,9 +83,9 @@ const cfg = {
       density: 0.18,
       jitterX: 0.35,
       zJitter: () => 0.8,
-      mix: () => ({ building: 0.30 }),
-      // Optional subtype weights (effective if you route them in BuildingKind.spawn)
-      buildingSubtype: () => ({ tall: 0.00, wide: 0.10, house: 0.20 })
+      mix: () => ({ building: 1.0 }),
+      // Subtype weights (now routed in BuildingKind.spawn)
+      buildingSubtype: () => ({ tall: 0.00, wide: 0.00, house: 1.0 })
     },
 
     // 2) MID1 — mid density, balanced (approx: 10% tall, 20% wide, 30% house, 40% tree)
