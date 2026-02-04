@@ -7,10 +7,10 @@ const cfg = {
   // ------- GLOBALS -------
   globals: {
     // Lane planner
-    innerStartX: 30,
-    laneGap: 0.6,
-    laneHalfWidth: 1.4,
-    maxX: 85,
+    innerStartX: 8,
+    laneGap: 6,
+    laneHalfWidth: 2,
+    maxX: 60,
 
     // Defaults (bands may override)
     spacing: 6,          // meters between rows
@@ -64,7 +64,7 @@ const cfg = {
       name: 'inner',
       order: 0,
       laneHalfWidth: 1.6,
-      spacing: 7.5,
+      spacing: 25,
       zExclusion: 7.5,
       density: 0.10,
       jitterX: 0.35,
