@@ -106,6 +106,18 @@ export class Track {
     constants.farthestSpawn += 5;
     constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
 
+    // ---- CAP TRACK POINTS (PREVENT HEAP LEAK) ----
+    const MAX_TRACK_POINTS = 2000;
+
+    if (constants.trackPoints.length > MAX_TRACK_POINTS) {
+      const drop = constants.trackPoints.length - MAX_TRACK_POINTS;
+
+      constants.trackPoints.splice(0, drop);
+
+      constants.currentTrackPiece = Math.max(0, constants.currentTrackPiece - drop);
+      constants.pacerCurrentTrackPiece = Math.max(0, constants.pacerCurrentTrackPiece - drop);
+    }
+
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
     track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
