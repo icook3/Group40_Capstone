@@ -60,13 +60,14 @@ PORT=9000
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
 7. Go back to the backend folder, and open up the command line in it.
 8. On the command line, type in ```docker-compose up``` (Leave this terminal window running)
-9. The next steps are only if you want to be able to connect and upload to Strava. Strava requires a **secure public address (HTTPS)**
+9. Go into the frontend code, go to `src/js/crashReporter.js`, and change the value of BACKEND_URL to the URL that you are running the crash reporter on, without any paths. 
+10. The next steps are only if you want to be able to connect and upload to Strava. Strava requires a **secure public address (HTTPS)**
     1. This will require some technical knowledge, you can still upload through Strava manually downloading a TCX
-10. Download ngrok at https://ngrok.com/download/windows if not downloaded (downloading from the Microsoft Store is OK)
-11. Setup ngrok if not set up
+11. Download ngrok at https://ngrok.com/download/windows if not downloaded (downloading from the Microsoft Store is OK)
+12. Setup ngrok if not set up
     1. Sign up if you don't already have a login https://dashboard.ngrok.com/signup
     2. Install your authtoken https://dashboard.ngrok.com/get-started/your-authtoken
-12. Run ngrok in powershell or command line terminal `ngrok http 8080` (Leave this terminal window running)
+13. Run ngrok in powershell or command line terminal `ngrok http 8080` (Leave this terminal window running)
     1. You will see something like : `Forwarding https://jacoby-vitriolic-unruly.ngrok-free.dev -> http://localhost:8080`
 14. Copy the domain from your ngrok URL into Strava’s Authorization Callback Domain field https://www.strava.com/settings/api
 15. Go into your frontend code, go to `src/js/strava.js`, and replace the 2 following lines with your Strava Client ID and the https ngrok URL:
