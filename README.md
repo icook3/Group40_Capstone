@@ -40,9 +40,9 @@ To run Zlow, you will need to set up a local server for it.
 ## Important note about running the frontend
 Some installations of python use a different name. If this is the case, you might have to replace python3 in the command prompt above with python or py. If this is the case, the .bat script won't work either, and will also require modification. 
 
-# Running the backend (Strava and Multiplayer)
+# Running the backend (Strava, Multiplayer, crashlogs)
 
-To run multiplayer and Strava, you need a custom server. You will also need your own Strava API application created.
+To run multiplayer, Strava, and crash logging, you need a custom server. You will also need your own Strava API application created.
 
 1. Go the the Zlow folder, and navigate to backend. 
 2. Under the peer_service folder is a file called .env.example. Copy it, and name it .env.
@@ -52,14 +52,7 @@ PATH=/peerServer
 PORT=9000
 ```
 4. Go to frontend/src/js/constants.js, and at the bottom, change the values of the variables peerHost, peerPath, and peerPort to match what is in .env. 
-5. Do steps 2 and 3 in the strava_service folder. Below are the values to put in .env.
-```
-STRAVA_CLIENT_ID=your_client_id
-STRAVA_CLIENT_SECRET=your_client_secret
-FRONTEND_URI=http://localhost:8000 
-FRONTEND_REDIRECT_URI=http://localhost:8000/src/html/mainMenu.html
-PORT=8080
-```
+5. Do steps 2 and 3 in the strava_service folder and the crash_logging_service folder.
 6. Download and install Docker at https://www.docker.com/products/docker-desktop/
     - You can check that you have it installed by typing in ```docker -v```
     - To access the terminal/command line: 
@@ -94,7 +87,7 @@ If you simply close the browser window, you will just have to enter ```localhost
 
 To update Zlow, follow these steps: 
 
-1. In the file explorer, go to the folder you want to download Zlow to, and open the command line in it.
+1. In the file explorer, go to the folder you downloaded Zlow to, and open the command line in it.
     - To access the terminal/command line: 
         - On Windows 11, hold shift, right-click on a folder area in Windows explorer, and select "Open in Terminal". 
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
