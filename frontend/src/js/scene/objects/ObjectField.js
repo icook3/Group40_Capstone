@@ -23,19 +23,13 @@ export class ObjectField {
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
 
-    this.path_element = document.getElementById('track');
-
-    // Add track pieces for initial testing. You need about 5 pieces to get to the horizon
-    // NOTE: Be sure to create the array from smallest to largest or else track respawning will break!!
-    this.spawnScenery(this.track.straightPiece(0), 0);
-    this.spawnScenery(this.track.straightPiece(-60), -160);
-    this.spawnScenery(this.track.straightPiece(-120), -120);
-    this.spawnScenery(this.track.straightPiece(-180), -180);
-    this.spawnScenery(this.track.straightPiece(-240), -240);
+    // Rotate rig to face forwards relative to the rider
+    this.rig = document.getElementById('rig');
+    this.rig.setAttribute('rotation', '0 -105 0'); 
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
-  // Not currently used
+  // Not currently used?
   attachExternalBands(groups) {
     for (const g of groups) {
       if (!g || !Array.isArray(g.items)) continue;
@@ -61,6 +55,7 @@ export class ObjectField {
   }
 
   // Initializes items that move with the rider (buildings and trees)
+  // May not do anything
   init() {
     if (this.initialized) return;
     this.initialized = true;
@@ -70,30 +65,11 @@ export class ObjectField {
   advance(riderSpeed, dt) {
     if (!this.initialized || (riderSpeed, dt) === 0) return;
 
-    let dx = 0;
-    let dz = 0;
-    let tempZ = 0;
-
-    // Advance scenery on z axis unless on a curve
-    if (this.path_element.children[1].getAttribute("configuration") == "straight_vertical" && this.path_element.children[1].getAttribute("position").z > -25 && constants.worldZ > 0) {
-      dz = riderSpeed * dt;
-    }
-
-    if (((this.path_element.children[1].getAttribute("configuration") == "curve_right_180" && this.path_element.children[1].getAttribute("position").z > -25) || (this.path_element.children[0].getAttribute("configuration") == "curve_right_180" && this.path_element.children[0].getAttribute("position").z < 30)) && constants.worldZ > 0) {
-     dz = (riderSpeed * dt);
-    }
-
-    // If something goes wrong, default to original dz
-    else {
-      dz = riderSpeed * dt;
-    }
-
     // Handles all objects currently part of the items array
     for (const obj of this.items) {
       const pos = getPos(obj);
-      pos.z += dz;
-
-      if (pos.z > 10) {
+      
+      if (pos.z > getPos(document.getElementById('rider')).z + 20) {
         // recycle in front of farthest
         const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
@@ -101,19 +77,21 @@ export class ObjectField {
         // resample X per-kind (keeps trees closer than buildings)
         const kind = detectKind(obj);
         pos.x = kind.resampleX();
-
       }
-        setPos(obj, pos);
+
+      setPos(obj, pos);
+
     }
 
     for (const band of this.externalGroups) {
     if (band?.policy?.isStatic()) continue;
     if (!band?.items?.length) continue;
+    
     for (const obj of band.items) {
       const pos = getPos(obj);
-      pos.z += dz;
 
-      if (pos.z > 10) {
+      if (pos.z > getPos(document.getElementById('rider')).z + 20) {
+
         // recycle within THIS band independently
         const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
         pos.z = farthestZ - 5;
@@ -133,10 +111,12 @@ export class ObjectField {
             ? band.policy.jitterX()
             : 0;
           let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
+          
           if (typeof band.policy.clampX === 'function') {
             newX = band.policy.clampX(kindName, side, newX);
           }
           pos.x = newX;            
+        
         } else {
           // fallback: detect and use kind’s own resample
           const kind = this._detectKind(obj);
@@ -145,27 +125,6 @@ export class ObjectField {
       }
       setPos(obj, pos);
     }
-  }
-
-  // Advance track
-  for (let segment of this.path_element.children) {
-    const pos = getPos(segment);
-    pos.z += dz;
-    setPos(segment, pos);
-
-    // Not sure why rotation reverts to 0 0 0 in case of curved pieces? Probably inheritance
-    if (segment.getAttribute("configuration") == "curve_right_180") {
-      segment.setAttribute('rotation', '-90 0 0');
-    }
-  }
-
-  // Spawn new track section if the farthest piece of track is under 240 units in front of worldZ
-  if (constants.worldZ > constants.trackLastUpdate + 60) {
-    constants.trackLastUpdate += 60;
-    // Get location of the last piece in the chain and spawn the next piece 60 units in front of it; delete completed section
-    const lastPiece = getPos(this.path_element.children[this.path_element.children.length-1]).z - 60
-    this.spawnScenery(this.track.straightPiece(lastPiece), lastPiece);
-    this.path_element.removeChild(this.path_element.children[0]);
   }
 
     // Advance clouds
@@ -177,7 +136,7 @@ export class ObjectField {
           const pos = getPos(cloud);
           
           // If the cloud is still in visible range, move it forward
-          if ((pos.z + 1) < -20) {
+          if (pos.z < getPos(document.getElementById('rider')).z) {
             pos.z += 1;
             setPos(cloud, pos);
           }
@@ -193,7 +152,6 @@ export class ObjectField {
   }
 
   spawnScenery(trackPiece, initialZ) {
-    // initialz refers to the central point of a 60-unit segment
     if (trackPiece == "straight_vertical") {
       for (let z = initialZ+30; z > initialZ-30; z -= 5) {
         this._spawnAtZ(z);

@@ -1,11 +1,8 @@
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 
 import oauthRoutes from "./routes/oauthRoutes.js";
 import stravaRoutes from "./routes/stravaRoutes.js";
-
-dotenv.config();
 
 const app = express(); // Create express app
 app.use(express.json());

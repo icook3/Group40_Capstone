@@ -69,7 +69,7 @@ docker build -t strava-oauth-service .
 
 ### 4. Run the Service in Docker
 ```bash
-docker run --rm -p 8080:8080 --env-file .env strava-oauth-service
+docker run --rm -p 8080:8080 --env-file .env strava-service
 ```
 You can verify if it is running at `http://localhost:8080/health` or `http://your-backend-example.com/health`
 You should get back `ok`
