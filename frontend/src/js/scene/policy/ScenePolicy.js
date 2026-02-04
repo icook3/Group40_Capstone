@@ -161,7 +161,14 @@ constructor(cfg) {
           r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
           return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
         };
-      }
+      },
+      buildingSubtype(z) {
+        const f = band.buildingSubtype;
+        if (typeof f === 'function') {
+          try { return f(z); } catch { return f(); }
+        }
+        return f ?? null;
+      },
     };
     bandPolicy.scenePolicy = this;
 
