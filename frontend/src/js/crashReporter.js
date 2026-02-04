@@ -1,45 +1,37 @@
-const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+const BACKEND_URL = "https://usa-chapel-teenage-reply.trycloudflare.com"; // TODO
 const INTAKE_CRASH = "/intake";
-const HEALTH_CHECK = "/crashLoggingHealth"
 
 let cachedWebGLInfo = null;
-
-async function isCrashReporterBackendUp() {
-    try {
-        const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
-            method: "GET",
-        });
-
-        return res.ok;
-    } catch {
-        return false;
-    }
-}
+let staticEnv = null;
 
 export function initCrashReporter(getMetadata) {
-    let backendUp = false;
     let alreadyReporting = false;
     let memoryWatchdogFired = false;
     let aframeWatchdogFired = false;
     let lastSnapshot = {};
 
-    // check once at startup
     (async () => {
-        backendUp = await isCrashReporterBackendUp();
+        staticEnv = await collectEnvironmentSnapshot();
     })();
 
-    // Get snapshot data every 5s
+    // Get snapshot data every 5REws
     setInterval(async () => {
         try {
             lastSnapshot = {
-                ...(await collectEnvironmentSnapshot()),
+                ...staticEnv,
+                memory: {
+                    used: performance.memory?.usedJSHeapSize,
+                    total: performance.memory?.totalJSHeapSize,
+                    limit: performance.memory?.jsHeapSizeLimit
+                },
+                visibility: document.visibilityState,
                 ...(await getMetadata?.())
             };
         } catch {}
     }, 5000);
 
     async function sendCrash(errorMessage, stackTrace) {
-        if (!backendUp || alreadyReporting) return;
+        if (alreadyReporting) return;
         alreadyReporting = true;
 
         try {
@@ -51,7 +43,7 @@ export function initCrashReporter(getMetadata) {
                 ...lastSnapshot
             };
 
-            await fetch(`${BACKEND_URL}${INTAKE_CRASH}`, {
+            fetch(`${BACKEND_URL}${INTAKE_CRASH}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 keepalive: true,
@@ -145,13 +137,6 @@ export async function collectEnvironmentSnapshot() {
             height: innerHeight,
             devicePixelRatio: devicePixelRatio
         },
-        memory: {
-            used: performance.memory?.usedHeapSize,
-            total: performance.memory?.totalJSHeapSize,
-            limit: performance.memory?.jsHeapSizeLimit
-        },
-
-        visibility: document.visibilityState,
 
         network: {
             downlink: navigator.connection?.downlink,
