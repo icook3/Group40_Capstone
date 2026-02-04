@@ -2,6 +2,8 @@ const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
 const INTAKE_CRASH = "/intake";
 const HEALTH_CHECK = "/crashLoggingHealth"
 
+let cachedWebGLInfo = null;
+
 async function isCrashReporterBackendUp() {
     try {
         const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
@@ -168,6 +170,8 @@ async function getPlatformInfo() {
 }
 
 function getWebGLInfo() {
+    if (cachedWebGLInfo) return cachedWebGLInfo;
+
     const canvas = document.createElement("canvas");
     const gl =
         canvas.getContext("webgl2") ||
@@ -179,11 +183,15 @@ function getWebGLInfo() {
     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
     const attributes = gl.getContextAttributes() || {};
 
-    return {
+    cachedWebGLInfo = {
         webglVendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : null,
         webglRenderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null,
         webglVersion: gl.getParameter(gl.VERSION),
         shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
         contextAttributes: attributes
     };
+
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+
+    return cachedWebGLInfo;
 }
