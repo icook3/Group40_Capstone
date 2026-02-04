@@ -1,29 +1,53 @@
 const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
 const INTAKE_CRASH = "/intake";
+const HEALTH_CHECK = "/crashLoggingHealth"
+
+async function isCrashReporterBackendUp() {
+    try {
+        const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
+            method: "GET",
+        });
+
+        return res.ok;
+    } catch {
+        return false;
+    }
+}
 
 export function initCrashReporter(getMetadata) {
+    let backendUp = false;
     let alreadyReporting = false;
+    let memoryWatchdogFired = false;
+    let aframeWatchdogFired = false;
+    let lastSnapshot = {};
+
+    // check once at startup
+    (async () => {
+        backendUp = await isCrashReporterBackendUp();
+    })();
+
+    // Get snapshot data every 5s
+    setInterval(async () => {
+        try {
+            lastSnapshot = {
+                ...(await collectEnvironmentSnapshot()),
+                ...(await getMetadata?.())
+            };
+        } catch {}
+    }, 5000);
 
     async function sendCrash(errorMessage, stackTrace) {
-        if (alreadyReporting) return;
+        if (!backendUp || alreadyReporting) return;
         alreadyReporting = true;
 
         try {
-            const [userEnv, meta] = await Promise.all([
-                collectEnvironmentSnapshot(),
-                Promise.resolve(getMetadata?.())
-            ]);
-
             const payload = {
                 time: new Date().toISOString(),
                 url: location.href,
                 errorMessage,
                 stackTrace,
-                ...userEnv,
-                ...meta
+                ...lastSnapshot
             };
-
-            console.log(payload);
 
             await fetch(`${BACKEND_URL}${INTAKE_CRASH}`, {
                 method: "POST",
@@ -34,25 +58,58 @@ export function initCrashReporter(getMetadata) {
 
         } catch (e) {
             console.error("Crash reporter failed:", e);
-        } finally {
-            alreadyReporting = false;
         }
+
+        alreadyReporting = false;
     }
 
     function startMemoryWatchdog() {
         if (!performance.memory) return;
 
         setInterval(() => {
-            const { usedJSHeapSize, jsHeapSizeLimit } = performance.memory;
+            const mem = performance.memory;
+            if (!mem) return;
 
-            const ratio = usedJSHeapSize / jsHeapSizeLimit;
+            const used = mem.usedJSHeapSize;
+            const limit = mem.jsHeapSizeLimit;
 
-            // 88% of JS heap size used
-            if (ratio > 0.88) {
+            if (!used || !limit) return;
+
+            const ratio = used / limit;
+
+            if (ratio > 0.75 && !memoryWatchdogFired) { // 75% heap used
+                memoryWatchdogFired = true;
                 sendCrash(
-                    "Probable OOM: heap at " + Math.round(ratio * 100) + "%",
+                    `Probable OOM: heap at ${Math.round(ratio * 100)}%`,
                     "Memory watchdog triggered before renderer kill"
                 );
+            }
+        }, 2000);
+    }
+
+    function startAframeRenderWatchdog() {
+        setInterval(() => {
+            if (aframeWatchdogFired) return;
+
+            try {
+                const info = AFRAME?.scenes?.[0]?.renderer?.info;
+                if (!info) return;
+
+                const geom = info.memory?.geometries || 0;
+                const tex = info.memory?.textures || 0;
+                const calls = info.render?.calls || 0;
+                const tris = info.render?.triangles || 0;
+
+                // These should roughly plateau after the scene loads
+                if (calls > 1500 || tris > 400000 || geom > 1500) {
+                    aframeWatchdogFired = true;
+
+                    sendCrash(
+                        `Renderer pressure detected: calls=${calls}, tris=${tris}, geom=${geom}, tex=${tex}`,
+                        "A-Frame render watchdog"
+                    );
+                }
+            } catch {
             }
         }, 3000);
     }
@@ -72,7 +129,8 @@ export function initCrashReporter(getMetadata) {
         );
     });
 
-    startMemoryWatchdog();
+        startMemoryWatchdog();
+        startAframeRenderWatchdog();
 }
 
 export async function collectEnvironmentSnapshot() {

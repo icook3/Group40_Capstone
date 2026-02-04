@@ -404,8 +404,8 @@ export function initZlowApp({
             samples: rideHistory.samples?.length,
             workoutSeconds: workoutSeconds,
 
-            speed: constants.riderState?.speed,
-            power: constants.riderState?.power,
+            speed: lastSample?.speed ?? 0,
+            power: lastSample?.power ?? 0,
             riderPosition: riderPos,
             pacerPosition: pacerPos,
 
