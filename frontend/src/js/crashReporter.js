@@ -25,6 +25,10 @@ export function initCrashReporter(getMetadata) {
     let lastSnapshot = {};
 
     (async () => {
+        backendUp = await isCrashReporterBackendUp();
+    })();
+
+    (async () => {
         staticEnv = await collectEnvironmentSnapshot();
     })();
 
@@ -109,7 +113,7 @@ export function initCrashReporter(getMetadata) {
                 const tris = info.render?.triangles || 0;
 
                 // These should roughly plateau after the scene loads
-                if (calls > 1500 || tris > 400000 || geom > 1500) {
+                if (calls > 1500 || tris > 1000000 || geom > 1500 || tex > 400) {
                     aframeWatchdogFired = true;
 
                     sendCrash(
