@@ -13,11 +13,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 
 ## Structure
 - `resources` — Contains various resources.
-	- `components` — Stores custom A-Frame components used in the program
-		- `aframe_curve_follow` — Stores an A-Frame component for following a curve
-			- `index.js` — The JavaScript file defining the A-Frame Curve Follow component
-		- `aframe_parametric_curve` — Stores an A-Frame component for a parametric curve
-			- `index.js` — The JavaScript file defining the A-Frame Parametric Curve component
 	- `favicons` — Stores the program favicon.
 		- `favicon.ico` — The main favicon used for the program.
 		- `ZlowFavicon-dark.svg` — A variant of the favicon used when the browser is in dark mode for better readability.
@@ -29,11 +24,22 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `OFL 2.txt` — The license for the font Nunito.
 		- `OFL.txt` — The license for the font Fugaz One.
 	- `images` — Contains a number of important images for different pages.
-		- `backgroung.png` — The background for the peer menu (temporary).
+		- `back.svg` — An icon to indicate going back to a previous page.
+		- `background.png` — The background for the peer menu and the changelog (temporary).
+		- `calibrateTrainer.svg` — An icon used for the calibrate trainer button.
 		- `calories.svg` — The icon used to represent calories in the hud.
 		- `center-hud.svg` — A mask to shape the center of the hud, alongside some buttons on other pages.
+		- `connectTrainer.svg` — An icon used for the connect to peer button.
+		- `exit.svg` — An icon used for the exit to main menu button.
 		- `license.pdf` — The license for the calories and time images.
+		- `pacer.svg` — An icon used for the pacer speed input.
+		- `pause.svg` — An icon used for the pause button.
+		- `resetCalories.svg` — An icon used for the Reset Calories button.
+		- `stop.svg` — An icon used for the stop workout button.
+		- `sync.svg` — An icon used for the Sync Pacer button.
 		- `time.svg` — The icon used to represent time on the hud.
+		- `trainer.svg` — An icon used for the connect trainer button.
+		- `weight.svg` — An icon used for the weight input. 
 	- `models` — Stores various 3D models.
 		- `bgmodels` — Stores 3D models that appear in the background of the scene.
 			- `bush1.glb` — A bush that can appear in the background.
@@ -120,7 +126,9 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `milestones.js` — Handles tracking for various milestones.
 		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
-		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling
+		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling.
+		- `rideHistory.js` — Handles storing past ride data.
+		- `rideHistoryStore.js` — Creates a singleton rideHistory object for other objects to access. 
 		- `simulationstate.js` — Handles tracking the state of the simulation.
 		- `standardMode.js` — Handles standard mode functionalities and variables.
 		- `strava.js` — Handles Strava OAuth and activity upload.
@@ -150,7 +158,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 ## Development Notes
 - Modular ES6 code, no build step required.
 - See each JS file for further documentation.
-- Make sure you run npm install before launching the server. Otherwise, errors will pop up.
 
 You can find a live example at https://gioandjake.com/zlow-preview/src/html/mainMenu.html
 
