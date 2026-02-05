@@ -77,8 +77,8 @@ const cfg = {
       name: 'near',
       order: 1,
       laneHalfWidth: 4,
-      spacing: 5,
-      zExclusion: 7.0,
+      spacing: 8,
+      zExclusion: 10.0,
       density: 0.18,
       jitterX: 0.35,
       zJitter: () => 0.8,
@@ -93,8 +93,8 @@ const cfg = {
       name: 'mid1',
       order: 2,
       laneHalfWidth: 3,
-      spacing: 6.5,
-      zExclusion: 6.5,
+      spacing: 9,
+      zExclusion: 9,
       density: 0.40,
       jitterX: 0.35,
       zJitter: () => 0.7,
@@ -106,12 +106,12 @@ const cfg = {
     {
       name: 'mid2',
       order: 3,
-      laneHalfWidth: 1.8,
-      spacing: 6.0,
-      zExclusion: 6.0,
-      density: 0.50,
-      jitterX: 0.35,
-      zJitter: () => 0.9,
+      laneHalfWidth: 30,
+      spacing: 100,
+      zExclusion: 100.0,
+      density: 0.00,
+      jitterX: 20,
+      zJitter: () => 0,
       mix: () => ({ building: 1.0 }),
       buildingSubtype: () => ({ tall: 0.0, wide: 1.0, house: 0.0 })
     },
@@ -122,8 +122,8 @@ const cfg = {
       order: 4,
       //static: true,          // <-- important: this is your fixed band
       laneHalfWidth: 1.2,    // thin stripe → visually one line
-      spacing: 3.0,          // tight Z spacing for “very dense” look
-      zExclusion: 3.0,       // one-per-side per “row”
+      spacing: 10.0,          // tight Z spacing for “very dense” look
+      zExclusion: 5.0,       // one-per-side per “row”
       density: 0.0,          // no doubles → truly one line
       jitterX: 0.05,         // crisp edge
       zJitter: () => 0.4,
