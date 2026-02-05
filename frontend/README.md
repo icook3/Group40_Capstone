@@ -113,6 +113,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `bluetooth.js` — Handles Bluetooth device connection and data polling.
 		- `connectionProtocol.md` — Documentation on the protocol for peer-to-peer connection
 		- `constants.js` — Stores important constants for the program execution.
+		- `crashReporter.js` — Handles checking for crashes, and reporting them to the backend. 
 		- `hud.js` — Renders the heads-up display overlay.
 		- `keyboardMode.js` — Handles keyboard mode functionalities and variables.
 		- `main.js` — Main app entry point.

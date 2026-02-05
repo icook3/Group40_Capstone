@@ -18,6 +18,7 @@ import { WorkoutSession } from "./workoutSession.js";
 import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
+import {initCrashReporter} from "./crashReporter.js";
 
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
@@ -380,6 +381,66 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+    // Initialize crash reporter to collect game related data
+    initCrashReporter(async () => {
+        const rideSamples = rideHistory.samples || [];
+        const lastSample = rideSamples.at(-1);
+        const elapsedMs = lastSample ? lastSample.elapsedMs : 0;
+        const workoutSeconds = Math.floor(elapsedMs / 1000);
+
+        let riderPos = null;
+        let pacerPos = null;
+
+        try {
+            const riderEl = document.getElementById("rider");
+            const pacerEl = document.getElementById("pacer");
+
+            riderPos = riderEl?.getAttribute("position") || null;
+            pacerPos = pacerEl?.getAttribute("position") || null;
+        } catch {}
+
+        let aframeStats = null;
+
+        try {
+            const rideScene = AFRAME?.scenes?.[0];
+            const info = rideScene?.renderer?.info;
+
+            if (rideScene && info) {
+                aframeStats = {
+                    geometries: info.memory?.geometries,
+                    textures: info.memory?.textures,
+                    programs: info.programs?.length,
+                    drawCalls: info.render?.calls,
+                    triangles: info.render?.triangles,
+                    entities: rideScene.querySelectorAll('a-entity')?.length,
+                };
+            }
+        } catch (e) {
+            aframeStats = { error: "failed to read aframe stats" };
+        }
+
+        return {
+            workout: sessionStorage.getItem("SelectedWorkout") || "free",
+            samples: rideHistory.samples?.length,
+            workoutSeconds: workoutSeconds,
+
+            speed: lastSample?.speed ?? 0,
+            power: lastSample?.power ?? 0,
+            riderPosition: riderPos,
+            pacerPosition: pacerPos,
+
+            aframe: aframeStats,
+
+            testMode: localStorage.getItem("testMode"),
+            trainerConnected: !!standardMode?.trainer?.isConnected,
+
+            peerState,
+            peerConnected: connected,
+            peerOpen: conn?.open,
+            peerId: peer?.id,
+        };
+    });
+
   // initialize peer-to-peer connection
   // if you are the peer
   if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
