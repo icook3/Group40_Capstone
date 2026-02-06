@@ -138,9 +138,7 @@ export class Track {
     // Subract an additional 30 to compensate for centering mismatches
     track.setAttribute('position', `-3.5 ${constants.pathHeight} ${pointZ-30}`);
     track.setAttribute('rotation', '-90 0 0');
-    console.log(track.getAttribute("position"))
     path_element.appendChild(track);
-    //return track.getAttribute("configuration");
   }
 
   // Add more ground tiles as the rider moves forward
@@ -260,7 +258,6 @@ export class Track {
     for (let i = 0; i < 80; i++) {
       // Spawn straight pieces in sets of three and more often than curved pieces
       let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
-      console.log(random)
 
       if (random % 15 == 0) {
         straightPiece();
