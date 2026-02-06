@@ -5,8 +5,44 @@ const STORAGE_KEY = "zlowWorkoutData";
 export class WorkoutStorage {
   constructor() {
     this.data = this.load();
-  }
+    //clear out unneeded data
+    if (localStorage.getItem("autoClearWorkoutStorage") === "true") {
+      for (let i=0;i<this.data.workouts.length;i++) {
+        //check for various properties
+        //if it meets none of them, delete it
+        //over 10 minutes
+        if (this.data.workouts[i].stats.totalTime>=600) {
 
+        }
+        //its workout ID appears in a record
+        else if (this.isInRecord(this.data.workouts[i])) {
+
+        }
+        //otherwise, delete 
+        else {
+          this.deleteWorkout(this.data.workouts[i].id);
+        }
+      }
+    }
+  }
+  //go through each record, find the workout
+  isInRecord(workout) {
+    if (this.data.highestAvgPower!=null&&this.data.highestAvgPower.workoutId==workout.id) {
+      return true;
+    } else if (this.data.highestAvgSpeed!=null&&this.data.highestAvgSpeed.workoutId==workout.id) {
+      return true;
+    } else if (this.data.highestMaxPower!=null&&this.data.highestMaxPower.workoutId==workout.id) {
+      return true;
+    } else if (this.data.highestMaxSpeed!=null&&this.data.highestMaxSpeed.workoutId==workout.id) {
+      return true;
+    } else if (this.data.longestDistance!=null&&this.data.longestDistance.workoutId==workout.id) {
+      return true;
+    } else if (this.data.longestTime!=null&&this.data.longestTime.workoutId==workout.id) {
+      return true;
+    } else if (this.data.mostCalories!=null&&this.data.mostCalories.workoutId==workout.id) {
+      return true;
+    }
+  }
   //Load data
 
   load() {
