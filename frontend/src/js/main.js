@@ -386,7 +386,12 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
-
+  if (window.__zlowAppStarted) {
+    console.warn("initZlowApp already ran — preventing duplicate init");
+    return window.__zlowApp; 
+  }
+  window.__zlowAppStarted = true;
+  
     // Make constants available to non-module A-Frame components (e.g., ground-instanced)
     window.__zlow = window.__zlow || {};
     window.__zlow.constants = constants;

@@ -100,30 +100,26 @@ AFRAME.registerComponent("ground-instanced", {
     this.el.object3D.position.z = snappedZ;
   },
 
-  remove() {
-    clearInterval(this._interval);
+remove() {
+  clearInterval(this._interval);
+  this.el.sceneEl?.removeEventListener("loaded", this._tryBuild);
+  this._tryBuild = null;
 
-    // Dispose resources
-    if (this.mesh) {
-      this.mesh.geometry?.dispose();
-      this.mesh.material?.dispose();
-      this.el.removeObject3D("mesh");
-      this.mesh = null;
-    }
+  const mesh = this.mesh;
+  if (!mesh) return;
 
-    this.el.sceneEl?.removeEventListener("loaded", this._tryBuild);
-    this._tryBuild = null;
+  // dispose texture first
+  const mat = mesh.material;
+  mat?.map?.dispose?.();
 
-    if (this.mesh) {
-      // dispose texture FIRST
-      this.mesh.material?.map?.dispose?.();   // or this.tex?.dispose?.()
-      this.tex = null;
+  mesh.geometry?.dispose?.();
+  mat?.dispose?.();
 
-      this.mesh.geometry?.dispose();
-      this.mesh.material?.dispose();
-      this.el.removeObject3D("mesh");
-      this.mesh = null;
-    }
-  }
+  this.el.removeObject3D("mesh");
+
+  this.mesh = null;
+  this.tex = null;
+}
+
 });
 

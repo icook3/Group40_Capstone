@@ -37,30 +37,61 @@ export class Track {
     setTimeout(() => this.initialize_animation(), 5000);
   }
 
-  // Update animation speed and target based on current track piece
-  update_rider_animation() {
-    constants.currentTrackPiece += 1;
+// Update animation speed and target based on current track piece
+update_rider_animation() {
+  constants.currentTrackPiece += 1;
 
-    let avatar = document.getElementById('rider');
-    let pacer = document.getElementById('pacer-entity');
+  const avatar = document.getElementById('rider');
+  const pacer = document.getElementById('pacer-entity');
 
-    // Calculate rider's duration and set attributes
-    // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-    let riderDuration = Math.round(constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1500);
-    avatar.removeAttribute("animation__1");
-    avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    //move the sky properly
-    setPos(document.getElementById("sky"),{x:0, y:0, z:constants.trackPoints[constants.currentTrackPiece].z});
-    let pacerSpeed = document.getElementById('pacer-speed').value;
-    let pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
-    pacer.removeAttribute("animation__1");
-    pacer.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${pacerEndpoint}; dur: ${riderDuration}; easing: linear; loop: false; autoplay:true;`);
-
-    // If rider or pacer is within 40 units of the end, spawn some more track pieces
-    if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-      spawn_track();
-    }
+  // ---- NEW: ensure we have enough track points before reading the next one ----
+  // If we're close to the end of the array, spawn more now (before indexing).
+  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
+  if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+    spawn_track();
   }
+
+  // ---- NEW: guard against out-of-range / undefined ----
+  const tp = constants.trackPoints[constants.currentTrackPiece];
+  if (!tp) {
+    console.warn(
+      "[Track] Missing track point:",
+      constants.currentTrackPiece,
+      "trackPoints length:",
+      constants.trackPoints.length
+    );
+    return;
+  }
+
+  // Calculate rider's duration and set attributes
+  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
+  const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
+
+  avatar.removeAttribute("animation__1");
+  avatar.setAttribute(
+    "animation__1",
+    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
+  );
+
+  // move the sky properly
+  setPos(document.getElementById("sky"), { x: 0, y: 0, z: tp.z });
+
+  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
+  const pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
+
+  pacer.removeAttribute("animation__1");
+  pacer.setAttribute(
+    "animation__1",
+    `property: position; to: ${tp.x + 0.5} ${tp.y} ${pacerEndpoint}; dur: ${riderDuration}; easing: linear; loop: false; autoplay:true;`
+  );
+
+  // If rider is within 200 units of the end, spawn some more track pieces
+  // (this can stay as-is; it’s your "keep ahead" logic)
+  if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    spawn_track();
+  }
+}
+
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
@@ -111,62 +142,73 @@ function disposeAFrameEl(el) {
   });
 }
 
+const STRAIGHT_POOL_SIZE = 220;   // keep > 200 since you cap children at 200
+let straightPool = [];
+let straightPoolIndex = 0;
+let poolReady = false;
 
-// Create and append track straight track piece
-  function straightPiece() {
-    let path_element = document.getElementById('track');
-    // Spawn track pieces in 5 unit increments
-    let pointZ = -1 * (constants.farthestSpawn + 5);
+function initStraightPool() {
+  if (poolReady) return;
+  const pathEl = document.getElementById("track");
+  if (!pathEl) return;
 
-    // Adjust Z spawn position to correct for centering of the box geometry
-    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-    constants.farthestSpawn += 5;
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
+  for (let i = 0; i < STRAIGHT_POOL_SIZE; i++) {
+    const track = document.createElement("a-entity");
+    track.setAttribute(
+      "geometry",
+      `primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`
+    );
+    track.setAttribute("material", `src: #track-texture; repeat: 1 0.25`);
+    track.setAttribute("configuration", `straight_vertical`);
 
-    // ---- CAP TRACK POINTS (PREVENT HEAP LEAK) ----
-    const MAX_TRACK_POINTS = 2000;
+    // put them somewhere harmless initially
+    track.setAttribute("position", `0 -9999 0`);
 
-    if (constants.trackPoints.length > MAX_TRACK_POINTS) {
-      const drop = constants.trackPoints.length - MAX_TRACK_POINTS;
-
-      constants.trackPoints.splice(0, drop);
-
-      constants.currentTrackPiece = Math.max(0, constants.currentTrackPiece - drop);
-      constants.pacerCurrentTrackPiece = Math.max(0, constants.pacerCurrentTrackPiece - drop);
-    }
-
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
-    track.setAttribute('configuration', `straight_vertical`);
-    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
-    path_element.appendChild(track);
+    pathEl.appendChild(track);
+    straightPool.push(track);
   }
+
+  poolReady = true;
+}
+
+
+function straightPiece() {
+  initStraightPool();
+
+  // Spawn track pieces in 5 unit increments
+  const pointZ = -1 * (constants.farthestSpawn + 5);
+
+  // Adjust Z spawn position to correct for centering of the box geometry
+  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+
+  constants.farthestSpawn += 5;
+  constants.trackPoints.push({ x: 0, y: 1, z: pointZ, length: 5 });
+
+  // ---- CAP TRACK POINTS (PREVENT HEAP LEAK) ----
+  const MAX_TRACK_POINTS = 2000;
+  if (constants.trackPoints.length > MAX_TRACK_POINTS) {
+    const drop = constants.trackPoints.length - MAX_TRACK_POINTS;
+    constants.trackPoints.splice(0, drop);
+    constants.currentTrackPiece = Math.max(0, constants.currentTrackPiece - drop);
+    constants.pacerCurrentTrackPiece = Math.max(0, constants.pacerCurrentTrackPiece - drop);
+  }
+
+  // ---- REUSE ENTITY FROM POOL ----
+  const el = straightPool[straightPoolIndex];
+  straightPoolIndex = (straightPoolIndex + 1) % straightPool.length;
+
+  // move it to new Z
+  el.setAttribute("position", `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
+}
+
 
   // Spawn track pieces in
   export function spawn_track() {
-    for (let i = 0; i < 80; i++) {
-      straightPiece();
-    }
+  // make sure pool exists
+  initStraightPool();
 
-    // Shorten track element array every time it exceeds 200 elements
-    let track_elements = document.getElementById('track').children;
-    const trackEl = document.getElementById("track");
-    const riderZ = getPos(document.getElementById("rider")).z;
-
-    while (trackEl.children.length > 200) {
-      const first = trackEl.children[0];
-      if (!first) break;
-
-      const firstZ = first.getAttribute("position")?.z ?? 0;
-
-      // only remove if safely behind rider
-      if (firstZ > riderZ + 20) {
-        disposeAFrameEl(first);
-        first.parentNode.removeChild(first);
-      } else {
-        // If the first element isn't removable yet, stop so we don't spin.
-        break;
-      }
-    }
+  // spawn a smaller batch; you're just repositioning now, so this is cheap
+  for (let i = 0; i < 80; i++) {
+    straightPiece();
   }
+}
