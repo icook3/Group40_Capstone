@@ -28,18 +28,7 @@ export class Track {
     track.setAttribute('position', `0 0 4`);
     this.path_element.appendChild(track);
     constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
-    straightPiece();
-    //straightPiece();
-    //straightPiece();
-    
-    
-    this.curve_180_right(-2);
-    straightPiece();
-    straightPiece();
-    
-    
-    
-    //spawn_track();
+    spawn_track();
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
@@ -47,56 +36,9 @@ export class Track {
     setTimeout(() => this.initialize_animation(), 5000);
   }
 
-
-  // Create an append a track piece curving to the right
-  curve_180_right(spawnZ) {
-    const track = document.createElement('a-entity');
-    let pointZ = -1 * (constants.farthestSpawn);
-    console.log(pointZ)
-
-    // INITIAL CURVATURE TESTING
-    constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 8});
-    // INITIAL CURVATURE TESTING
-    constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 8});
-
-    // CENTER
-    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 15.7});
-
-    // TOP RETURN
-    constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 8});
-
-
-    constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 8});
-
-    //EXIT
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 15.7});
-
-
-    // PLUS 5 GETS YOU EXACTLY TO THE TOP EDGE
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-66, length: 5});
-    console.log(constants.trackPoints)
-    // Update farthestSpan
-    constants.farthestSpawn += 68.4;
-
-
-    track.setAttribute('id', 'curve')
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
-    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
-    track.setAttribute('configuration', `curve_right_180`);
-
-    // Subract an additional 15 to compensate for goofy centering
-    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${pointZ-30}`);
-    track.setAttribute('rotation', '-90 0 0');
-    console.log(track.getAttribute("position"))
-
-    this.path_element.appendChild(track);
-    //return track.getAttribute("configuration");
-  }
-
   // Update animation speed and target based on current track piece
   update_rider_animation() {
     constants.currentTrackPiece += 1;
-
     let avatar = document.getElementById('rider');
 
     // Calculate rider's duration and set attributes
@@ -105,9 +47,9 @@ export class Track {
     avatar.removeAttribute("animation__1");
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
 
-    // If rider or pacer is within 40 units of the end, spawn some more track pieces
+    // If rider is within 40 units of the end, spawn some more track pieces
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-      //spawn_track();
+      spawn_track();
     }
 
     // If rider is about to run out of ground, add some more tiles
@@ -122,22 +64,16 @@ export class Track {
 
     let pacer = document.getElementById('pacer-entity');
 
-    // Calculate rider's duration and set attributes
-    // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
+    // Calculate pacer's duration and set attributes
     let pacerDuration = constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed * 1000;
     pacer.removeAttribute("animation__2");
     pacer.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay:true;`);
-    
-    // If pacer is within 40 units of the end, spawn some more track pieces
-    //if (getPos(pacer).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-      //spawn_track();
-    //}
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
   initialize_animation() {
-  activatePacer();
+    activatePacer();
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
     this.pacer.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; startEvents: pacerStart;`);  
   }
@@ -160,6 +96,40 @@ export class Track {
     track.setAttribute('configuration', `straight_vertical`);
     track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
     path_element.appendChild(track);
+  }
+
+  // Create and append a track piece curving to the right
+  function curve_180_right() {
+    let path_element = document.getElementById('track');
+    const track = document.createElement('a-entity');
+    let pointZ = -1 * (constants.farthestSpawn);
+
+    // Add necessary points based on current farthest spawn
+    constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 8});
+    constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 8});
+    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 15.7});
+    constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 8});
+    constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 8});
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 15.7});
+
+    // Add five units to get to the top edge of the curved track graphic
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-66, length: 5});
+
+    // Update farthestSpan
+    constants.farthestSpawn += 62;
+
+    // Add graphical track representation
+    track.setAttribute('id', 'curve')
+    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
+    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
+    track.setAttribute('configuration', `curve_right_180`);
+
+    // Subract an additional 30 to compensate for centering mismatches
+    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${pointZ-30}`);
+    track.setAttribute('rotation', '-90 0 0');
+    console.log(track.getAttribute("position"))
+    path_element.appendChild(track);
+    //return track.getAttribute("configuration");
   }
 
   // Add more ground tiles as the rider moves forward
@@ -194,7 +164,21 @@ export class Track {
   // Spawn track pieces in
   export function spawn_track() {
     for (let i = 0; i < 80; i++) {
-      straightPiece();
+      // Spawn straight pieces in sets of three and more often than curved pieces
+      let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+      console.log(random)
+
+      if (random % 15 == 0) {
+        straightPiece();
+        curve_180_right()
+        straightPiece();
+      }
+
+      else {
+        straightPiece();
+        straightPiece();
+        straightPiece();
+      }
     }
 
     // Shorten track element array every time it exceeds 200 elements
