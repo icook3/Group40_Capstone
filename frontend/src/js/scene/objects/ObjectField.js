@@ -177,7 +177,30 @@ advance(riderSpeed, dt) {
       setPos(obj, pos);
     }
   }
-}
+
+    // Advance clouds
+    if (Date.now() > constants.lastCloud + constants.updateEvery) {
+      constants.lastCloud = Date.now();
+
+      if (this.clouds.clouds.children.length) {
+        for (let cloud of this.clouds.clouds.children) {
+          const pos = getPos(cloud);
+          
+          // If the cloud is still in visible range, move it forward
+          if (pos.z < getPos(document.getElementById('rider')).z) {
+            pos.z += 1;
+            setPos(cloud, pos);
+          }
+
+          // Otherwise, remove it from the array and respawn in zone 4
+          else {
+            this.clouds.clouds.removeChild(cloud);
+            this.clouds.clouds.appendChild(spawnCloud(4));
+          }
+        }
+      }
+    }
+  }
 
 
   spawnScenery(trackPiece, initialZ) {

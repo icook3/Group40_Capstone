@@ -114,15 +114,6 @@ update_rider_animation() {
     `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
   );
 
-  // move the sky properly (guard for null / not-yet-loaded)
-  const skyEl = document.getElementById("sky");
-  if (skyEl && skyEl.object3D) {
-    setPos(skyEl, { x: 0, y: 0, z: tp.z });
-  } else if (skyEl) {
-    // fallback if A-Frame hasn't attached object3D yet
-    skyEl.setAttribute("position", `0 0 ${tp.z}`);
-  }
-
   const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
   const pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
 
