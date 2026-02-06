@@ -9,13 +9,24 @@ import  {activatePacer } from '../../main.js'
 export class Track {
 
   constructor({ sceneEl }) {
+    // ---- SINGLETON GUARD / CLEANUP PREVIOUS INSTANCE ----
+    if (window.__zlowTrackInstance) {
+      window.__zlowTrackInstance.destroy?.();
+    }
+    window.__zlowTrackInstance = this;
     this.sceneEl = sceneEl;
 
     // Create a-entity for the path and set ID
-    const path_element = document.createElement('a-entity');
-    path_element.setAttribute('id','track');
+    let path_element = document.getElementById('track');
+    this._ownsPath = !path_element;
+
+    if (!path_element) {
+      path_element = document.createElement('a-entity');
+      path_element.setAttribute('id','track');
+      sceneEl.appendChild(path_element);
+    }
     this.path_element = path_element;
-    sceneEl.appendChild(path_element);
+
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
@@ -34,8 +45,35 @@ export class Track {
     this.update_rider_animation = this.update_rider_animation.bind(this);
     this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
 
-    setTimeout(() => this.initialize_animation(), 5000);
+  this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
+
+  destroy() {
+  // 1) Remove event listener we added
+  if (this.rider && this.update_rider_animation) {
+    this.rider.removeEventListener("animationcomplete__1", this.update_rider_animation);
+  }
+
+  // 2) Clear the delayed init timer
+  if (this._initTimer) {
+    clearTimeout(this._initTimer);
+    this._initTimer = null;
+  }
+
+  // 3) If you want to fully remove the track entity from DOM, do it here.
+  //    Only do this if THIS instance owns it; otherwise you might break others.
+  //    (See “ownsPath” note below.)
+  if (this._ownsPath && this.path_element) {
+    disposeAFrameEl(this.path_element);
+    this.path_element.parentNode?.removeChild(this.path_element);
+  }
+
+  // 4) Clear singleton pointer if it's us
+  if (window.__zlowTrackInstance === this) {
+    window.__zlowTrackInstance = null;
+  }
+}
+
 
 // Update animation speed and target based on current track piece
 update_rider_animation() {
@@ -43,6 +81,9 @@ update_rider_animation() {
 
   const avatar = document.getElementById('rider');
   const pacer = document.getElementById('pacer-entity');
+
+  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
+  if (!avatar || !pacer) return; 
 
   // ---- NEW: ensure we have enough track points before reading the next one ----
   // If we're close to the end of the array, spawn more now (before indexing).
@@ -73,8 +114,14 @@ update_rider_animation() {
     `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
   );
 
-  // move the sky properly
-  setPos(document.getElementById("sky"), { x: 0, y: 0, z: tp.z });
+  // move the sky properly (guard for null / not-yet-loaded)
+  const skyEl = document.getElementById("sky");
+  if (skyEl && skyEl.object3D) {
+    setPos(skyEl, { x: 0, y: 0, z: tp.z });
+  } else if (skyEl) {
+    // fallback if A-Frame hasn't attached object3D yet
+    skyEl.setAttribute("position", `0 0 ${tp.z}`);
+  }
 
   const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
   const pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
