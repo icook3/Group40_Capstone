@@ -10,7 +10,7 @@ const cfg = {
     innerStartX: 6,
     laneGap: 6,
     laneHalfWidth: 2,
-    maxX: 60,
+    maxX: 70,
 
     // Defaults (bands may override)
     spacing: 6,          // meters between rows
@@ -105,13 +105,12 @@ const cfg = {
     // 3) MID2 — mid/high density, all wide buildings no trees (eases into skyline)
     {
       name: 'mid2',
-      order: 3,
-      laneHalfWidth: 30,
-      spacing: 100,
-      zExclusion: 100.0,
-      density: 0.00,
-      jitterX: 20,
-      zJitter: () => 0,
+      laneHalfWidth: 6,
+      spacing: 15,
+      zExclusion: 15,
+      density: 0.0,
+      jitterX: 4,
+      zJitter: () => 0.9,
       mix: () => ({ building: 1.0 }),
       buildingSubtype: () => ({ tall: 0.0, wide: 1.0, house: 0.0 })
     },
