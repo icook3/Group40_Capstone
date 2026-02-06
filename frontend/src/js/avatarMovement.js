@@ -155,12 +155,20 @@ export class AvatarMovement {
     }
 
     setPosition(pos) {
+        console.log("SETTING position of "+(isPacer)?"pacer":"rider");
         this.avatarEntity.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+        if (!isPacer) {
+            document.getElementById("sky").setAttribute('position', `0 0 ${pos.z}`);
+        }
     }
     setHorizontalPosition(pos) {
+        console.log("SETTING position of "+(isPacer)?"pacer":"rider");
         let val = this.avatarEntity.getAttribute('position');
         if (typeof val === 'string') val = AFRAME.utils.coordinates.parse(val);
         this.avatarEntity.setAttribute('position', `${pos.x} ${val.y} ${pos.z}`);
+        if (!isPacer) {
+            document.getElementById("sky").setAttribute('position', `0 0 ${pos.z}`);
+        }
     }
 
     setRotation(rot) {
