@@ -47,7 +47,8 @@ export class Track {
     let riderDuration = Math.round(constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1500);
     avatar.removeAttribute("animation__1");
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-
+    //move the sky properly
+    setPos(document.getElementById("sky"),{x:0, y:0, z:constants.trackPoints[constants.currentTrackPiece].z});
     let pacerSpeed = document.getElementById('pacer-speed').value;
     let pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
     pacer.removeAttribute("animation__1");

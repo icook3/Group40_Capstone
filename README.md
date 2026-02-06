@@ -40,9 +40,9 @@ To run Zlow, you will need to set up a local server for it.
 ## Important note about running the frontend
 Some installations of python use a different name. If this is the case, you might have to replace python3 in the command prompt above with python or py. If this is the case, the .bat script won't work either, and will also require modification. 
 
-# Running the backend (Strava and Multiplayer)
+# Running the backend (Strava, Multiplayer, crashlogs)
 
-To run multiplayer and Strava, you need a custom server. You will also need your own Strava API application created.
+To run multiplayer, Strava, and crash logging, you need a custom server. You will also need your own Strava API application created.
 
 1. Go the the Zlow folder, and navigate to backend. 
 2. Under the peer_service folder is a file called .env.example. Copy it, and name it .env.
@@ -52,14 +52,7 @@ PATH=/peerServer
 PORT=9000
 ```
 4. Go to frontend/src/js/constants.js, and at the bottom, change the values of the variables peerHost, peerPath, and peerPort to match what is in .env. 
-5. Do steps 2 and 3 in the strava_service folder. Below are the values to put in .env.
-```
-STRAVA_CLIENT_ID=your_client_id
-STRAVA_CLIENT_SECRET=your_client_secret
-FRONTEND_URI=http://localhost:8000 
-FRONTEND_REDIRECT_URI=http://localhost:8000/src/html/mainMenu.html
-PORT=8080
-```
+5. Do steps 2 and 3 in the strava_service folder and the crash_logging_service folder.
 6. Download and install Docker at https://www.docker.com/products/docker-desktop/
     - You can check that you have it installed by typing in ```docker -v```
     - To access the terminal/command line: 
@@ -67,13 +60,14 @@ PORT=8080
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
 7. Go back to the backend folder, and open up the command line in it.
 8. On the command line, type in ```docker-compose up``` (Leave this terminal window running)
-9. The next steps are only if you want to be able to connect and upload to Strava. Strava requires a **secure public address (HTTPS)**
+9. Go into the frontend code, go to `src/js/crashReporter.js`, and change the value of BACKEND_URL to the URL that you are running the crash reporter on, without any paths. 
+10. The next steps are only if you want to be able to connect and upload to Strava. Strava requires a **secure public address (HTTPS)**
     1. This will require some technical knowledge, you can still upload through Strava manually downloading a TCX
-10. Download ngrok at https://ngrok.com/download/windows if not downloaded (downloading from the Microsoft Store is OK)
-11. Setup ngrok if not set up
+11. Download ngrok at https://ngrok.com/download/windows if not downloaded (downloading from the Microsoft Store is OK)
+12. Setup ngrok if not set up
     1. Sign up if you don't already have a login https://dashboard.ngrok.com/signup
     2. Install your authtoken https://dashboard.ngrok.com/get-started/your-authtoken
-12. Run ngrok in powershell or command line terminal `ngrok http 8080` (Leave this terminal window running)
+13. Run ngrok in powershell or command line terminal `ngrok http 8080` (Leave this terminal window running)
     1. You will see something like : `Forwarding https://jacoby-vitriolic-unruly.ngrok-free.dev -> http://localhost:8080`
 14. Copy the domain from your ngrok URL into Strava’s Authorization Callback Domain field https://www.strava.com/settings/api
 15. Go into your frontend code, go to `src/js/strava.js`, and replace the 2 following lines with your Strava Client ID and the https ngrok URL:
@@ -94,7 +88,7 @@ If you simply close the browser window, you will just have to enter ```localhost
 
 To update Zlow, follow these steps: 
 
-1. In the file explorer, go to the folder you want to download Zlow to, and open the command line in it.
+1. In the file explorer, go to the folder you downloaded Zlow to, and open the command line in it.
     - To access the terminal/command line: 
         - On Windows 11, hold shift, right-click on a folder area in Windows explorer, and select "Open in Terminal". 
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 

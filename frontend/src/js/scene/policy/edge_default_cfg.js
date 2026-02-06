@@ -7,10 +7,10 @@ const cfg = {
   // ------- GLOBALS -------
   globals: {
     // Lane planner
-    innerStartX: 30,
-    laneGap: 0.6,
-    laneHalfWidth: 1.4,
-    maxX: 85,
+    innerStartX: 6,
+    laneGap: 6,
+    laneHalfWidth: 2,
+    maxX: 70,
 
     // Defaults (bands may override)
     spacing: 6,          // meters between rows
@@ -63,8 +63,8 @@ const cfg = {
     {
       name: 'inner',
       order: 0,
-      laneHalfWidth: 1.6,
-      spacing: 7.5,
+      laneHalfWidth: 4,
+      spacing: 10,
       zExclusion: 7.5,
       density: 0.10,
       jitterX: 0.35,
@@ -72,64 +72,62 @@ const cfg = {
       mix: () => ({ building: 0.0 }) // trees only
     },
 
-    // 1) NEAR — trees-heavy mix (approx: 10% wide, 20% house, 70% tree)
-    // Building total = 30% (wide:house ≈ 1:2 if you wire buildingSubtype)
+    // 1) NEAR — trees only still, less spacing in between them
     {
       name: 'near',
       order: 1,
-      laneHalfWidth: 1.5,
-      spacing: 7.0,
-      zExclusion: 7.0,
+      laneHalfWidth: 4,
+      spacing: 8,
+      zExclusion: 10.0,
       density: 0.18,
       jitterX: 0.35,
       zJitter: () => 0.8,
-      mix: () => ({ building: 0.30 }),
-      // Optional subtype weights (effective if you route them in BuildingKind.spawn)
-      buildingSubtype: () => ({ tall: 0.00, wide: 0.10, house: 0.20 })
+      mix: () => ({ building: 0.0 }),
+      // Subtype weights (now routed in BuildingKind.spawn)
+      buildingSubtype: () => ({ tall: 0.00, wide: 0.00, house: 0.0 })
     },
 
-    // 2) MID1 — mid density, balanced (approx: 10% tall, 20% wide, 30% house, 40% tree)
+    // 2) MID1 — mid density, balanced - 85% houses, 15% trees
     // Building total = 60%
     {
       name: 'mid1',
       order: 2,
-      laneHalfWidth: 1.6,
-      spacing: 6.5,
-      zExclusion: 6.5,
+      laneHalfWidth: 3,
+      spacing: 9,
+      zExclusion: 9,
       density: 0.40,
       jitterX: 0.35,
-      zJitter: () => 0.8,
-      mix: () => ({ building: 0.60 }),
-      buildingSubtype: () => ({ tall: 0.10, wide: 0.20, house: 0.30 })
+      zJitter: () => 0.7,
+      mix: () => ({ building: 0.85 }),
+      buildingSubtype: () => ({ tall: 0.00, wide: 0.00, house: 1 })
     },
 
-    // 3) MID2 — mid/high density, more buildings than trees (eases into skyline)
+    // 3) MID2 — mid/high density, all wide buildings no trees (eases into skyline)
     {
       name: 'mid2',
-      order: 3,
-      laneHalfWidth: 1.8,
-      spacing: 6.0,
-      zExclusion: 6.0,
-      density: 0.50,
-      jitterX: 0.35,
+      laneHalfWidth: 6,
+      spacing: 15,
+      zExclusion: 15,
+      density: 0.0,
+      jitterX: 4,
       zJitter: () => 0.9,
-      mix: () => ({ building: 0.70 }),
-      buildingSubtype: () => ({ tall: 0.25, wide: 0.25, house: 0.20 })
+      mix: () => ({ building: 1.0 }),
+      buildingSubtype: () => ({ tall: 0.0, wide: 1.0, house: 0.0 })
     },
 
-    // 4) OUTER — STATIC skyline, one clean line, mainly tall buildings
+    // 4) OUTER — STATIC skyline, one clean line, all tall buildings
     {
       name: 'outer',
       order: 4,
       //static: true,          // <-- important: this is your fixed band
       laneHalfWidth: 1.2,    // thin stripe → visually one line
-      spacing: 3.0,          // tight Z spacing for “very dense” look
-      zExclusion: 3.0,       // one-per-side per “row”
+      spacing: 10.0,          // tight Z spacing for “very dense” look
+      zExclusion: 5.0,       // one-per-side per “row”
       density: 0.0,          // no doubles → truly one line
       jitterX: 0.05,         // crisp edge
       zJitter: () => 0.4,
       mix: () => ({ building: 1.0 }), // buildings only
-      buildingSubtype: () => ({ tall: 0.9, wide: 0.1, house: 0.0 }),
+      buildingSubtype: () => ({ tall: 1, wide: 0.0, house: 0.0 }),
       // Extra outward nudge so skyline sits farther from trees
       kindOffset: { tree: 0, building: 18 },
       yOffset: (_b, k) => (k === 'building' ? 0.15 : 0)

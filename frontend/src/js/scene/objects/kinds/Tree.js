@@ -59,9 +59,9 @@ export const TreeKind = {
     // bushes from 200-220%
     let scale;
     if (modelId === "tree-bush1") {
-      scale = 2 + Math.random() * 0.2;
+      scale = 1.2 + Math.random() * 0.8;
     } else {
-      scale = 4.5 + Math.random() * 0.4;
+      scale = 4 + Math.random() * 4;
     }
 
     obj.setAttribute("scale", `${scale} ${scale} ${scale}`);
