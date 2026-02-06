@@ -146,6 +146,7 @@ group=group-0</panel_attributes><additional_attributes></additional_attributes><
 workoutCountdownId: number
 --
 +constructor({getElement: function): HUD
++initTrainerToggle(): void
 +showStartCountdown({workoutName, seconds, onDone}: void
 +skipWarmupCountdownEarly(): void
 +showWarmupCountdown({seconds, onDone}): void
