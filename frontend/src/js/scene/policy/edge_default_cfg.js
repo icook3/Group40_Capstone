@@ -7,7 +7,7 @@ const cfg = {
   // ------- GLOBALS -------
   globals: {
     // Lane planner
-    innerStartX: 6,
+    innerStartX: 30,
     laneGap: 6,
     laneHalfWidth: 2,
     maxX: 70,

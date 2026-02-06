@@ -3,8 +3,9 @@
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
 import { constants } from "../../constants.js";
-import { getPos, setPos } from '../core/util.js';
+import { getPos, setPos, getSign } from '../core/util.js';
 import  {activatePacer } from '../../main.js'
+
 
 export class Track {
 
@@ -118,10 +119,12 @@ export class Track {
     // Add necessary points based on current farthest spawn
     constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 8});
     constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 8});
-    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 15.7});
+    constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 8});
+    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 8});
     constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 8});
     constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 8});
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 15.7});
+    constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8});
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 8});
 
     // Add five units to get to the top edge of the curved track graphic
     constants.trackPoints.push({x: 0, y: 1, z: pointZ-66, length: 5});
@@ -137,6 +140,40 @@ export class Track {
 
     // Subract an additional 30 to compensate for centering mismatches
     track.setAttribute('position', `-3.5 ${constants.pathHeight} ${pointZ-30}`);
+    track.setAttribute('rotation', '-90 0 0');
+    path_element.appendChild(track);
+  }
+
+  // Create and append a track piece curving to the left
+  function curve_180_left() {
+    let path_element = document.getElementById('track');
+    const track = document.createElement('a-entity');
+    let pointZ = -1 * (constants.farthestSpawn);
+
+    // Add necessary points based on current farthest spawn
+    constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 8});
+    constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 8});
+    constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 8});
+    constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 8});
+    constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 8});
+    constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 8});
+    constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8});
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 8});
+
+    // Add five units to get to the top edge of the curved track graphic
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-66, length: 5});
+
+    // Update farthestSpan
+    constants.farthestSpawn += 62;
+
+    // Add graphical track representation
+    track.setAttribute('id', 'curve')
+    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 90`);
+    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
+    track.setAttribute('configuration', `curve_right_180`);
+
+    // Subract an additional 30 to compensate for centering mismatches
+    track.setAttribute('position', `3.5 ${constants.pathHeight} ${pointZ-30}`);
     track.setAttribute('rotation', '-90 0 0');
     path_element.appendChild(track);
   }
@@ -259,9 +296,15 @@ export class Track {
       // Spawn straight pieces in sets of three and more often than curved pieces
       let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
 
-      if (random % 15 == 0) {
+      if (random % 15 == 0 && getSign()) {
         straightPiece();
-        curve_180_right()
+        curve_180_right();
+        straightPiece();
+      }
+
+      else if (random % 15 == 0 && !getSign()) {
+        straightPiece();
+        curve_180_left();
         straightPiece();
       }
 
