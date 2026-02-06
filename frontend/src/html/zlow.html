@@ -480,20 +480,21 @@
         ></a-asset-item>
       </a-assets>
       <a-sky color="#87ceeb" radius="5000"></a-sky>
-
       <a-entity id="tiles" ground-instanced></a-entity>
+    </a-scene>
 
     <script type="module" src="../js/main.js"></script>
     <script type="module" src="../js/trainerCalibration.js"></script>
+
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         if (window.initZlowApp) window.initZlowApp();
       });
     </script>
+
     <script type="module">
       import { NotificationManager } from "../js/notifications.js";
       window.testNotifications = new NotificationManager();
     </script>
-</script>
   </body>
 </html>

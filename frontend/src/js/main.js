@@ -20,6 +20,11 @@ import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
 import {initCrashReporter} from "./crashReporter.js";
 
+if (typeof window !== "undefined") {
+  window.__zlow = window.__zlow || {};
+  window.__zlow.constants = constants;
+}
+
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -381,6 +386,11 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+
+    // Make constants available to non-module A-Frame components (e.g., ground-instanced)
+    window.__zlow = window.__zlow || {};
+    window.__zlow.constants = constants;
+
     // Initialize crash reporter to collect game related data
     initCrashReporter(async () => {
         const rideSamples = rideHistory.samples || [];

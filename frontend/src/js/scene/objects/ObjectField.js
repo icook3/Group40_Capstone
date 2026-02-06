@@ -52,6 +52,19 @@ export class ObjectField {
     const kind = this._pickKind();
     const entity = kind.spawn(this.sceneEl, z);
     this.items.push(entity);
+
+    // CAP HERE (right after push)
+    const MAX_ITEMS = 1200; // start high; tune later
+
+    if (this.items.length > MAX_ITEMS) {
+      // remove oldest items first (front of array)
+      const extra = this.items.length - MAX_ITEMS;
+      const removed = this.items.splice(0, extra);
+
+      for (const el of removed) {
+        el?.parentNode?.removeChild(el);
+      }
+    }
   }
 
   // Initializes items that move with the rider (buildings and trees)
@@ -63,7 +76,7 @@ export class ObjectField {
 
   // Advances the scene. Recycles items more than 10 units in front of the rider
   advance(riderSpeed, dt) {
-    if (!this.initialized || (riderSpeed, dt) === 0) return;
+    if (!this.initialized || riderSpeed === 0 || dt === 0) return;
 
     // Handles all objects currently part of the items array
     for (const obj of this.items) {
