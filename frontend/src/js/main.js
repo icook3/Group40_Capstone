@@ -956,7 +956,14 @@ export function initZlowApp({
     }
   };*/
 
-  loop();
+  // Prevent multiple loop chains (critical for memory stability)
+  if (!window.__zlowLoopStarted) {
+    window.__zlowLoopStarted = true;
+    console.warn("STARTING MAIN LOOP", new Error().stack);
+    loop();
+  } else {
+    console.warn("Loop already running — prevented duplicate start");
+  }
 
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {

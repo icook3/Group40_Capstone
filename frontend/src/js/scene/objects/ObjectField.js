@@ -74,95 +74,111 @@ export class ObjectField {
     this.initialized = true;
   }
 
-  // Advances the scene. Recycles items more than 10 units in front of the rider
-  advance(riderSpeed, dt) {
-    if (!this.initialized || riderSpeed === 0 || dt === 0) return;
+// Advances the scene. Recycles items more than 20 units in front of the rider
+advance(riderSpeed, dt) {
+  if (!this.initialized || riderSpeed === 0 || dt === 0) return;
 
-    // Handles all objects currently part of the items array
-    for (const obj of this.items) {
-      const pos = getPos(obj);
-      
-      if (pos.z > getPos(document.getElementById('rider')).z + 20) {
-        // recycle in front of farthest
-        const farthestZ = Math.min(...this.items.map(o => getPos(o).z));
-        pos.z = farthestZ - 5;
+  const riderEl = document.getElementById('rider');
+  const riderZ = getPos(riderEl).z;
+  const recycleZ = riderZ + 20;
 
-        // resample X per-kind (keeps trees closer than buildings)
-        const kind = detectKind(obj);
-        pos.x = kind.resampleX();
-      }
+  // ---------------------------
+  // MAIN ITEMS (this.items)
+  // ---------------------------
 
-      setPos(obj, pos);
+  // Compute the "farthest behind" Z (min Z) ONCE per frame
+  let minZ = Infinity;
+  for (const o of this.items) {
+    const z = getPos(o).z;
+    if (z < minZ) minZ = z;
+  }
 
+  for (const obj of this.items) {
+    const pos = getPos(obj);
+
+    if (pos.z > recycleZ) {
+      // recycle in front of farthest-behind (minZ)
+      pos.z = minZ - 5;
+
+      // resample X per-kind (keeps trees closer than buildings)
+      const kind = detectKind(obj);
+      pos.x = kind.resampleX();
+
+      // update minZ so multiple recycled objects don't stack
+      minZ = pos.z;
     }
 
-    for (const band of this.externalGroups) {
+    setPos(obj, pos);
+  }
+
+  // ---------------------------
+  // EXTERNAL BANDS (band.items)
+  // ---------------------------
+
+  for (const band of this.externalGroups) {
     if (band?.policy?.isStatic()) continue;
     if (!band?.items?.length) continue;
-    
+
+    // Compute band minZ ONCE per frame
+    let bandMinZ = Infinity;
+    for (const o of band.items) {
+      const z = getPos(o).z;
+      if (z < bandMinZ) bandMinZ = z;
+    }
+
     for (const obj of band.items) {
       const pos = getPos(obj);
 
-      if (pos.z > getPos(document.getElementById('rider')).z + 20) {
-
+      if (pos.z > recycleZ) {
         // recycle within THIS band independently
-        const farthestZ = Math.min(...band.items.map(o => getPos(o).z));
-        pos.z = farthestZ - 5;
-        
+        pos.z = bandMinZ - 5;
+
         // re-roll kind by band policy mix (keeps long-run ratios)
         if (band.policy && typeof band.policy.xAnchor === 'function') {
-          const mix = typeof band.policy.mix === 'function' ? band.policy.mix() : { tree: 0.5, building: 0.5 };
+          const mix =
+            typeof band.policy.mix === 'function'
+              ? band.policy.mix()
+              : { tree: 0.5, building: 0.5 };
+
           const roll = Math.random();
-          const nextIsBuilding = roll < (typeof mix.building === 'number' ? mix.building : 0.5);
+          const nextIsBuilding =
+            roll < (typeof mix.building === 'number' ? mix.building : 0.5);
+
           const kindName = nextIsBuilding ? 'building' : 'tree';
           obj.setAttribute('zlow-kind', kindName);
 
           const sideAttr = obj.getAttribute('zlow-side'); // 'left' | 'right'
           const side = sideAttr === 'left' ? -1 : 1;
+
           const anchorX = band.policy.xAnchor(kindName, side);
-          const jitterAmp = typeof band.policy.jitterX === 'function'
-            ? band.policy.jitterX()
-            : 0;
+
+          const jitterAmp =
+            typeof band.policy.jitterX === 'function'
+              ? band.policy.jitterX()
+              : 0;
+
           let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
-          
+
           if (typeof band.policy.clampX === 'function') {
             newX = band.policy.clampX(kindName, side, newX);
           }
-          pos.x = newX;            
-        
+
+          pos.x = newX;
         } else {
           // fallback: detect and use kind’s own resample
           const kind = this._detectKind(obj);
           pos.x = kind.resampleX();
         }
+
+        // update bandMinZ so recycled objects don't stack
+        bandMinZ = pos.z;
       }
+
       setPos(obj, pos);
     }
   }
+}
 
-    // Advance clouds
-    if (Date.now() > constants.lastCloud + constants.updateEvery) {
-      constants.lastCloud = Date.now();
-
-      if (this.clouds.clouds.children.length) {
-        for (let cloud of this.clouds.clouds.children) {
-          const pos = getPos(cloud);
-          
-          // If the cloud is still in visible range, move it forward
-          if (pos.z < getPos(document.getElementById('rider')).z) {
-            pos.z += 1;
-            setPos(cloud, pos);
-          }
-
-          // Otherwise, remove it from the array and respawn in zone 4
-          else {
-            this.clouds.clouds.removeChild(cloud);
-            this.clouds.clouds.appendChild(spawnCloud(4));
-          }
-        }
-      }
-    }
-  }
 
   spawnScenery(trackPiece, initialZ) {
     if (trackPiece == "straight_vertical") {
