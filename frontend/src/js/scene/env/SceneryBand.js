@@ -122,6 +122,7 @@ export class SceneryBand {
         })();
         const buildingP =
           typeof mix.building === 'number' ? mix.building : this.buildingChance;
+
         const isBuilding = rand() < buildingP;
         const kindName = isBuilding ? 'building' : 'tree';
 
@@ -132,7 +133,7 @@ export class SceneryBand {
 
         // Spawn
         const obj = isBuilding
-          ? BuildingKind.spawn(this.sceneEl, zPlace)
+          ? BuildingKind.spawn(this.sceneEl, zPlace, this.policy)
           : TreeKind.spawn(this.sceneEl, zPlace);
 
         obj.setAttribute('zlow-band', 'edge-line');
@@ -202,7 +203,7 @@ export class SceneryBand {
               : (isBuilding2 ? this.buildingX : this.treeX) * secondSide;
 
             const obj2 = isBuilding2
-              ? BuildingKind.spawn(this.sceneEl, zPlace2)
+              ? BuildingKind.spawn(this.sceneEl, zPlace2, this.policy)
               : TreeKind.spawn(this.sceneEl, zPlace2);
 
             obj2.setAttribute('zlow-band', 'edge-line');
