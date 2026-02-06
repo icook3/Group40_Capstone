@@ -31,7 +31,9 @@ export class Track {
     spawn_track();
 
     // As each animation completes, start the next one
+    this.update_rider_animation = this.update_rider_animation.bind(this);
     this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
+
     setTimeout(() => this.initialize_animation(), 5000);
   }
 
@@ -57,19 +59,6 @@ export class Track {
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
-
-    // If rider is close to the "front" of the pooled tiles, recycle more rows forward
-    const TILE_BUFFER = 300; // tune if needed (bigger = recycles earlier)
-
-    // Ensure pool exists (otherwise this condition never fires)
-    if (!window.__tilePool) {
-      __initTilePool(); // creates pool + sets window.__tilePool + frontZ
-    }
-
-    // Advance when rider approaches front edge
-    if (window.__tilePool && getPos(avatar).z < (window.__tilePool.frontZ + TILE_BUFFER)) {
-      add_tile();
-    }
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
@@ -94,6 +83,33 @@ export class Track {
     return track.getAttribute("configuration");
   }
 }
+
+function disposeAFrameEl(el) {
+  if (!el) return;
+
+  // A-Frame keeps the THREE object tree at el.object3D
+  const root = el.object3D;
+  if (!root) return;
+
+  root.traverse((obj) => {
+    if (obj.geometry) obj.geometry.dispose?.();
+
+    if (obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const m of mats) {
+        // dispose common texture slots
+        m.map?.dispose?.();
+        m.normalMap?.dispose?.();
+        m.roughnessMap?.dispose?.();
+        m.metalnessMap?.dispose?.();
+        m.aoMap?.dispose?.();
+        m.emissiveMap?.dispose?.();
+        m.dispose?.();
+      }
+    }
+  });
+}
+
 
 // Create and append track straight track piece
   function straightPiece() {
@@ -126,118 +142,6 @@ export class Track {
     path_element.appendChild(track);
   }
 
-  // Add more ground tiles as the rider moves forward
-  function add_tile() {
-    // This is replaced by a helper that uses a tile pool to minimize churn
-    __advanceTilePool(80);
-  }
-
-  // Creating Tile Pool to keep bounded and minimize churn
-
-  let __tilePool = null;
-
-  function __tileWorldZ(zIndex) {
-    return (-zIndex + (constants.startZ / constants.tileSize)) * constants.tileSize;
-  } 
-  
-  function __initTilePool() {
-    const tilesEntity = document.getElementById('tiles');
-    if (!tilesEntity) return;
-
-    const width = constants.gridWidth;
-
-    // Choose a fixed pool size roughly matching your cap.
-    // Must be a multiple of gridWidth to keep clean rows.
-    const MAX_TILES = 1500;
-    const rows = Math.max(1, Math.floor(MAX_TILES / width));
-    const poolTiles = rows * width;
-
-    const startZ = constants.gridDepth;
-
-    const rowTiles = new Array(rows);
-    const frag = document.createDocumentFragment();
-
-    for (let r = 0; r < rows; r++) {
-      rowTiles[r] = new Array(width);
-
-      const zIndex = startZ + r;
-      const wz = __tileWorldZ(zIndex);
-
-      for (let x = 0; x < width; x++) {
-        const tile = document.createElement('a-entity');
-        tile.setAttribute(
-          'geometry',
-          `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
-        );
-        tile.setAttribute('material', 'src: #grass-texture');
-
-        // Helpful for debugging:
-        tile.setAttribute('zlow-kind', 'tile');
-
-        tile.setAttribute(
-          'position',
-          `${constants.startX + x * constants.tileSize} 0 ${wz}`
-        );
-
-        rowTiles[r][x] = tile;
-        frag.appendChild(tile);
-      }
-    }
-
-    tilesEntity.appendChild(frag);
-
-    // Advance gridDepth to reflect that these rows now exist.
-    constants.gridDepth = startZ + rows;
-
-    __tilePool = {
-      tilesEntity,
-      width,
-      rows,
-      rowTiles,
-      nextRecycleRow: 0,          // ring pointer: which row to reuse next
-      nextZIndex: constants.gridDepth // next new zIndex to assign when “extending”
-    };
-
-    //Store "front edge" Z for trigger + expose pool for update_rider_animation()
-    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
-    window.__tilePool = __tilePool;
-
-    console.log(`[tilePool] initialized rows=${rows}, tiles=${poolTiles}`);
-  }
-
-  function __advanceTilePool(rowsToAdvance) {
-    if (!__tilePool || !__tilePool.rowTiles) __initTilePool(); 
-    if (!__tilePool) return;
-
-    const { width, rows, rowTiles } = __tilePool;
-
-    // Reuse N rows by moving them to the “front” (new zIndex values).
-    const n = Math.min(rowsToAdvance, rows);
-
-    for (let i = 0; i < n; i++) {
-      const r = __tilePool.nextRecycleRow;
-      const zIndex = __tilePool.nextZIndex++;
-      const wz = __tileWorldZ(zIndex);
-
-      for (let x = 0; x < width; x++) {
-        // Only update Z (X stays consistent per column)
-        rowTiles[r][x].setAttribute(
-          'position',
-          `${constants.startX + x * constants.tileSize} 0 ${wz}`
-        );
-      }
-
-      __tilePool.nextRecycleRow = (r + 1) % rows;
-    }
-
-    // Keep gridDepth consistent with the old logic (it’s used in the trigger)
-    constants.gridDepth += n;
-
-    // Update front edge after recycling rows
-    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
-    window.__tilePool = __tilePool;
-  }
-
   // Spawn track pieces in
   export function spawn_track() {
     for (let i = 0; i < 80; i++) {
@@ -246,11 +150,22 @@ export class Track {
 
     // Shorten track element array every time it exceeds 200 elements
     let track_elements = document.getElementById('track').children;
-    if (track_elements.length > 200) {
-      for (let i = 0; i < 100; i++) {
-        if (track_elements[0].getAttribute('position').z > getPos(document.getElementById('rider')).z + 20) {
-          track_elements[0].parentNode.removeChild(track_elements[0]);
-        }
+    const trackEl = document.getElementById("track");
+    const riderZ = getPos(document.getElementById("rider")).z;
+
+    while (trackEl.children.length > 200) {
+      const first = trackEl.children[0];
+      if (!first) break;
+
+      const firstZ = first.getAttribute("position")?.z ?? 0;
+
+      // only remove if safely behind rider
+      if (firstZ > riderZ + 20) {
+        disposeAFrameEl(first);
+        first.parentNode.removeChild(first);
+      } else {
+        // If the first element isn't removable yet, stop so we don't spin.
+        break;
       }
     }
   }
