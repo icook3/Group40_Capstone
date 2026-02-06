@@ -47,13 +47,24 @@ export class Track {
     avatar.removeAttribute("animation__1");
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
 
+    // move the sky properly
+    setPos(document.getElementById("sky"),{x:0, y:0, z:constants.trackPoints[constants.currentTrackPiece].z});
+
     // If rider is within 40 units of the end, spawn some more track pieces
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
 
-    // If rider is about to run out of ground, add some more tiles
-    if (getPos(avatar).z < (-constants.gridDepth * 10) + 300) {
+    // If rider is close to the "front" of the pooled tiles, recycle more rows forward
+    const TILE_BUFFER = 300; // tune if needed (bigger = recycles earlier)
+
+    // Ensure pool exists (otherwise this condition never fires)
+    if (!window.__tilePool) {
+      __initTilePool(); // creates pool + sets window.__tilePool + frontZ
+    }
+
+    // Advance when rider approaches front edge
+    if (window.__tilePool && getPos(avatar).z < (window.__tilePool.frontZ + TILE_BUFFER)) {
       add_tile();
     }
   }
@@ -134,32 +145,115 @@ export class Track {
 
   // Add more ground tiles as the rider moves forward
   function add_tile() {
-    let tilesEntity = document.getElementById('tiles');
-    let delete_tiles = tilesEntity.children;
-    let start = constants.gridDepth;
-    constants.gridDepth += 80;
-
-    for (let z = start; z < constants.gridDepth; z++) {
-      for (let x = 0; x < constants.gridWidth; x++) {
-        const tile = document.createElement("a-entity");
-        tile.setAttribute("geometry", `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`);
-            tile.setAttribute("material", "src: #grass-texture");
-            tile.setAttribute("position",
-              `${constants.startX + x * constants.tileSize} 0 ${
-                (-z + (constants.startZ/constants.tileSize)) * constants.tileSize
-              }`
-            );
-            tilesEntity.appendChild(tile);
-          }
-        }
-    
-    // Delete tiles behind the rider
-    if (delete_tiles.length > 1500) {
-      for (let i = 0; i < 500; i++) {
-        delete_tiles[0].parentNode.removeChild(delete_tiles[0]);
-      }
+    // This is replaced by a helper that uses a tile pool to minimize churn
+    __advanceTilePool(80);
   }
-}
+
+  // Creating Tile Pool to keep bounded and minimize churn
+
+  let __tilePool = null;
+
+  function __tileWorldZ(zIndex) {
+    return (-zIndex + (constants.startZ / constants.tileSize)) * constants.tileSize;
+  } 
+  
+  function __initTilePool() {
+    const tilesEntity = document.getElementById('tiles');
+    if (!tilesEntity) return;
+
+    const width = constants.gridWidth;
+
+    // Choose a fixed pool size roughly matching your cap.
+    // Must be a multiple of gridWidth to keep clean rows.
+    const MAX_TILES = 1500;
+    const rows = Math.max(1, Math.floor(MAX_TILES / width));
+    const poolTiles = rows * width;
+
+    const startZ = constants.gridDepth;
+
+    const rowTiles = new Array(rows);
+    const frag = document.createDocumentFragment();
+
+    for (let r = 0; r < rows; r++) {
+      rowTiles[r] = new Array(width);
+
+      const zIndex = startZ + r;
+      const wz = __tileWorldZ(zIndex);
+
+      for (let x = 0; x < width; x++) {
+        const tile = document.createElement('a-entity');
+        tile.setAttribute(
+          'geometry',
+          `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
+        );
+        tile.setAttribute('material', 'src: #grass-texture');
+
+        // Helpful for debugging:
+        tile.setAttribute('zlow-kind', 'tile');
+
+        tile.setAttribute(
+          'position',
+          `${constants.startX + x * constants.tileSize} 0 ${wz}`
+        );
+
+        rowTiles[r][x] = tile;
+        frag.appendChild(tile);
+      }
+    }
+
+    tilesEntity.appendChild(frag);
+
+    // Advance gridDepth to reflect that these rows now exist.
+    constants.gridDepth = startZ + rows;
+
+    __tilePool = {
+      tilesEntity,
+      width,
+      rows,
+      rowTiles,
+      nextRecycleRow: 0,          // ring pointer: which row to reuse next
+      nextZIndex: constants.gridDepth // next new zIndex to assign when “extending”
+    };
+
+    //Store "front edge" Z for trigger + expose pool for update_rider_animation()
+    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
+    window.__tilePool = __tilePool;
+
+    console.log(`[tilePool] initialized rows=${rows}, tiles=${poolTiles}`);
+  }
+
+  function __advanceTilePool(rowsToAdvance) {
+    if (!__tilePool || !__tilePool.rowTiles) __initTilePool(); 
+    if (!__tilePool) return;
+
+    const { width, rows, rowTiles } = __tilePool;
+
+    // Reuse N rows by moving them to the “front” (new zIndex values).
+    const n = Math.min(rowsToAdvance, rows);
+
+    for (let i = 0; i < n; i++) {
+      const r = __tilePool.nextRecycleRow;
+      const zIndex = __tilePool.nextZIndex++;
+      const wz = __tileWorldZ(zIndex);
+
+      for (let x = 0; x < width; x++) {
+        // Only update Z (X stays consistent per column)
+        rowTiles[r][x].setAttribute(
+          'position',
+          `${constants.startX + x * constants.tileSize} 0 ${wz}`
+        );
+      }
+
+      __tilePool.nextRecycleRow = (r + 1) % rows;
+    }
+
+    // Keep gridDepth consistent with the old logic (it’s used in the trigger)
+    constants.gridDepth += n;
+
+    // Update front edge after recycling rows
+    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
+    window.__tilePool = __tilePool;
+  }
 
   // Spawn track pieces in
   export function spawn_track() {
