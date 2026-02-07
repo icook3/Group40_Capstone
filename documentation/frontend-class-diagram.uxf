@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="15.0.0">
+<diagram program="umlet" version="15.1">
   <zoom_level>7</zoom_level>
   <element>
     <id>UMLClass</id>
@@ -250,7 +250,7 @@ group=group-1</panel_attributes>
       <x>364</x>
       <y>735</y>
       <w>679</w>
-      <h>994</h>
+      <h>1267</h>
     </coordinates>
     <panel_attributes>scene</panel_attributes>
     <additional_attributes/>
@@ -405,7 +405,10 @@ group=group-0</panel_attributes>
 +pathPositionY: number
 +pathPositionZ: number
 +dirtColor: string
-+curveRadius: number
++farthestSpawn: number
++trackPoints: array
++currentTrackPiece: number
++pacerCurrentTrackPiece: number
 +lastCloud: number
 +cloudSpeed: number
 +updateEvery: number
@@ -2385,34 +2388,23 @@ group=group-4</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>378</x>
-      <y>1113</y>
-      <w>168</w>
-      <h>210</h>
+      <y>1729</y>
+      <w>651</w>
+      <h>266</h>
     </coordinates>
     <panel_attributes>env</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>385</x>
-      <y>1127</y>
-      <w>154</w>
-      <h>21</h>
-    </coordinates>
-    <panel_attributes>+ spawnCloud(zone: number): void</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
     <id>Relation</id>
     <coordinates>
-      <x>448</x>
-      <y>1141</y>
-      <w>49</w>
-      <h>427</h>
+      <x>637</x>
+      <y>1659</y>
+      <w>224</w>
+      <h>105</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;50.0;590.0</additional_attributes>
+    <additional_attributes>300.0;130.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -2485,80 +2477,93 @@ group=group-4</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>385</x>
-      <y>1162</y>
-      <w>154</w>
-      <h>35</h>
+      <x>756</x>
+      <y>1820</y>
+      <w>245</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>Track
 --
 
 --
-</panel_attributes>
++ constructor({ sceneEl }): Track
++ update_rider_animation(): void
++ update_pacer_animation(): void
++ initialize_animation(): void
++ straightPiece(): void
++ curve_180_right(): void
++ curve_180_left(): void
++ add_tile(): void
+- __tileWorldZ(zIndex: number): number
+- __initTilePool(): void
+- __advanceTilePool(rowsToAdvance: number): void
++ spawn_track(): void</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>532</x>
+      <x>896</x>
       <y>805</y>
-      <w>385</w>
-      <h>385</h>
+      <w>119</w>
+      <h>1043</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;530.0;530.0;10.0</additional_attributes>
+    <additional_attributes>150.0;1470.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>385</x>
-      <y>1204</y>
-      <w>154</w>
-      <h>35</h>
+      <x>749</x>
+      <y>1750</y>
+      <w>252</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>Cloud
 --
 
 --
-</panel_attributes>
++ constructor({ sceneEl }): Cloud
++ spawnCloud(zone: number): object</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>532</x>
+      <x>910</x>
       <y>805</y>
-      <w>399</w>
-      <h>420</h>
+      <w>105</w>
+      <h>959</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;580.0;550.0;10.0</additional_attributes>
+    <additional_attributes>130.0;1350.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>385</x>
-      <y>1246</y>
-      <w>154</w>
-      <h>35</h>
+      <y>1883</y>
+      <w>343</w>
+      <h>63</h>
     </coordinates>
     <panel_attributes>SceneryManager
 --
 
 --
-</panel_attributes>
++ constructor({ sceneEl }): SceneryManager
++ get defaultPolicy(): ScenePolicy</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>532</x>
+      <x>721</x>
       <y>805</y>
-      <w>406</w>
-      <h>483</h>
+      <w>217</w>
+      <h>1120</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>10.0;670.0;560.0;10.0</additional_attributes>
+    <additional_attributes>10.0;1580.0;290.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
@@ -3150,5 +3155,36 @@ isRunning(): boolean
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;540.0;1420.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>385</x>
+      <y>1750</y>
+      <w>343</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>SceneryBand
+--
++ SCENERY_BAND_DEFAULTS: const
+--
++ constructor({sceneEl, policy, name, treeX, buildingX, zStart, zEnd, step,
+    buildingChance, jitter}): SceneryBand
+- clampXBound(kindName: string, side: number, x: number): number
+- zExclusionVal(z: number): number
+- canPlaceAtZ(side: number, z: number): boolean
+- recordZ(side: number, z: number): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>546</x>
+      <y>1848</y>
+      <w>21</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
   </element>
 </diagram>
