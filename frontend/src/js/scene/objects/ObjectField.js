@@ -72,6 +72,12 @@ export class ObjectField {
   init() {
     if (this.initialized) return;
     this.initialized = true;
+
+      const rig = document.getElementById('rig');
+      const sky = document.querySelector('a-sky');
+      if (rig && sky && sky.parentNode !== rig) {
+        rig.appendChild(sky); // sky now follows rig automatically
+      }
   }
 
 // Advances the scene. Recycles items more than 20 units in front of the rider
