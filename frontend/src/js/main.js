@@ -20,6 +20,11 @@ import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
 import {initCrashReporter} from "./crashReporter.js";
 
+if (typeof window !== "undefined") {
+  window.__zlow = window.__zlow || {};
+  window.__zlow.constants = constants;
+}
+
 // Physics-based power-to-speed conversion
 // Returns speed in m/s for given power (watts)
 export function powerToSpeed({ power } = {}) {
@@ -381,6 +386,16 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+  if (window.__zlowAppStarted) {
+    console.warn("initZlowApp already ran — preventing duplicate init");
+    return window.__zlowApp; 
+  }
+  window.__zlowAppStarted = true;
+  
+    // Make constants available to non-module A-Frame components (e.g., ground-instanced)
+    window.__zlow = window.__zlow || {};
+    window.__zlow.constants = constants;
+
     // Initialize crash reporter to collect game related data
     initCrashReporter(async () => {
         const rideSamples = rideHistory.samples || [];
@@ -946,7 +961,14 @@ export function initZlowApp({
     }
   };*/
 
-  loop();
+  // Prevent multiple loop chains (critical for memory stability)
+  if (!window.__zlowLoopStarted) {
+    window.__zlowLoopStarted = true;
+    console.warn("STARTING MAIN LOOP", new Error().stack);
+    loop();
+  } else {
+    console.warn("Loop already running — prevented duplicate start");
+  }
 
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {

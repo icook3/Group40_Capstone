@@ -9,13 +9,24 @@ import  {activatePacer } from '../../main.js'
 export class Track {
 
   constructor({ sceneEl }) {
+    // ---- SINGLETON GUARD / CLEANUP PREVIOUS INSTANCE ----
+    if (window.__zlowTrackInstance) {
+      window.__zlowTrackInstance.destroy?.();
+    }
+    window.__zlowTrackInstance = this;
     this.sceneEl = sceneEl;
 
     // Create a-entity for the path and set ID
-    const path_element = document.createElement('a-entity');
-    path_element.setAttribute('id','track');
+    let path_element = document.getElementById('track');
+    this._ownsPath = !path_element;
+
+    if (!path_element) {
+      path_element = document.createElement('a-entity');
+      path_element.setAttribute('id','track');
+      sceneEl.appendChild(path_element);
+    }
     this.path_element = path_element;
-    sceneEl.appendChild(path_element);
+
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
@@ -31,47 +42,94 @@ export class Track {
     spawn_track();
 
     // As each animation completes, start the next one
+    this.update_rider_animation = this.update_rider_animation.bind(this);
     this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-    setTimeout(() => this.initialize_animation(), 5000);
+
+  this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
-  // Update animation speed and target based on current track piece
-  update_rider_animation() {
-    constants.currentTrackPiece += 1;
-
-    let avatar = document.getElementById('rider');
-    let pacer = document.getElementById('pacer-entity');
-
-    // Calculate rider's duration and set attributes
-    // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-    let riderDuration = Math.round(constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1500);
-    avatar.removeAttribute("animation__1");
-    avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    //move the sky properly
-    setPos(document.getElementById("sky"),{x:0, y:0, z:constants.trackPoints[constants.currentTrackPiece].z});
-    let pacerSpeed = document.getElementById('pacer-speed').value;
-    let pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
-    pacer.removeAttribute("animation__1");
-    pacer.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${pacerEndpoint}; dur: ${riderDuration}; easing: linear; loop: false; autoplay:true;`);
-
-    // If rider or pacer is within 40 units of the end, spawn some more track pieces
-    if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-      spawn_track();
-    }
-
-    // If rider is close to the "front" of the pooled tiles, recycle more rows forward
-    const TILE_BUFFER = 300; // tune if needed (bigger = recycles earlier)
-
-    // Ensure pool exists (otherwise this condition never fires)
-    if (!window.__tilePool) {
-      __initTilePool(); // creates pool + sets window.__tilePool + frontZ
-    }
-
-    // Advance when rider approaches front edge
-    if (window.__tilePool && getPos(avatar).z < (window.__tilePool.frontZ + TILE_BUFFER)) {
-      add_tile();
-    }
+  destroy() {
+  // 1) Remove event listener we added
+  if (this.rider && this.update_rider_animation) {
+    this.rider.removeEventListener("animationcomplete__1", this.update_rider_animation);
   }
+
+  // 2) Clear the delayed init timer
+  if (this._initTimer) {
+    clearTimeout(this._initTimer);
+    this._initTimer = null;
+  }
+
+  // 3) If you want to fully remove the track entity from DOM, do it here.
+  //    Only do this if THIS instance owns it; otherwise you might break others.
+  //    (See “ownsPath” note below.)
+  if (this._ownsPath && this.path_element) {
+    disposeAFrameEl(this.path_element);
+    this.path_element.parentNode?.removeChild(this.path_element);
+  }
+
+  // 4) Clear singleton pointer if it's us
+  if (window.__zlowTrackInstance === this) {
+    window.__zlowTrackInstance = null;
+  }
+}
+
+
+// Update animation speed and target based on current track piece
+update_rider_animation() {
+  constants.currentTrackPiece += 1;
+
+  const avatar = document.getElementById('rider');
+  const pacer = document.getElementById('pacer-entity');
+
+  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
+  if (!avatar || !pacer) return; 
+
+  // ---- NEW: ensure we have enough track points before reading the next one ----
+  // If we're close to the end of the array, spawn more now (before indexing).
+  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
+  if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+    spawn_track();
+  }
+
+  // ---- NEW: guard against out-of-range / undefined ----
+  const tp = constants.trackPoints[constants.currentTrackPiece];
+  if (!tp) {
+    console.warn(
+      "[Track] Missing track point:",
+      constants.currentTrackPiece,
+      "trackPoints length:",
+      constants.trackPoints.length
+    );
+    return;
+  }
+
+  // Calculate rider's duration and set attributes
+  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
+  const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
+
+  avatar.removeAttribute("animation__1");
+  avatar.setAttribute(
+    "animation__1",
+    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
+  );
+
+  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
+  const pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
+
+  pacer.removeAttribute("animation__1");
+  pacer.setAttribute(
+    "animation__1",
+    `property: position; to: ${tp.x + 0.5} ${tp.y} ${pacerEndpoint}; dur: ${riderDuration}; easing: linear; loop: false; autoplay:true;`
+  );
+
+  // If rider is within 200 units of the end, spawn some more track pieces
+  // (this can stay as-is; it’s your "keep ahead" logic)
+  if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    spawn_track();
+  }
+}
+
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
@@ -96,150 +154,99 @@ export class Track {
   }
 }
 
-// Create and append track straight track piece
-  function straightPiece() {
-    let path_element = document.getElementById('track');
-    // Spawn track pieces in 5 unit increments
-    let pointZ = -1 * (constants.farthestSpawn + 5);
+function disposeAFrameEl(el) {
+  if (!el) return;
 
-    // Adjust Z spawn position to correct for centering of the box geometry
-    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-    constants.farthestSpawn += 5;
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
+  // A-Frame keeps the THREE object tree at el.object3D
+  const root = el.object3D;
+  if (!root) return;
 
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
-    track.setAttribute('configuration', `straight_vertical`);
-    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
-    path_element.appendChild(track);
-  }
+  root.traverse((obj) => {
+    if (obj.geometry) obj.geometry.dispose?.();
 
-  // Add more ground tiles as the rider moves forward
-  function add_tile() {
-    // This is replaced by a helper that uses a tile pool to minimize churn
-    __advanceTilePool(80);
-  }
-
-  // Creating Tile Pool to keep bounded and minimize churn
-
-  let __tilePool = null;
-
-  function __tileWorldZ(zIndex) {
-    return (-zIndex + (constants.startZ / constants.tileSize)) * constants.tileSize;
-  } 
-  
-  function __initTilePool() {
-    const tilesEntity = document.getElementById('tiles');
-    if (!tilesEntity) return;
-
-    const width = constants.gridWidth;
-
-    // Choose a fixed pool size roughly matching your cap.
-    // Must be a multiple of gridWidth to keep clean rows.
-    const MAX_TILES = 1500;
-    const rows = Math.max(1, Math.floor(MAX_TILES / width));
-    const poolTiles = rows * width;
-
-    const startZ = constants.gridDepth;
-
-    const rowTiles = new Array(rows);
-    const frag = document.createDocumentFragment();
-
-    for (let r = 0; r < rows; r++) {
-      rowTiles[r] = new Array(width);
-
-      const zIndex = startZ + r;
-      const wz = __tileWorldZ(zIndex);
-
-      for (let x = 0; x < width; x++) {
-        const tile = document.createElement('a-entity');
-        tile.setAttribute(
-          'geometry',
-          `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
-        );
-        tile.setAttribute('material', 'src: #grass-texture');
-
-        // Helpful for debugging:
-        tile.setAttribute('zlow-kind', 'tile');
-
-        tile.setAttribute(
-          'position',
-          `${constants.startX + x * constants.tileSize} 0 ${wz}`
-        );
-
-        rowTiles[r][x] = tile;
-        frag.appendChild(tile);
+    if (obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const m of mats) {
+        // dispose common texture slots
+        m.map?.dispose?.();
+        m.normalMap?.dispose?.();
+        m.roughnessMap?.dispose?.();
+        m.metalnessMap?.dispose?.();
+        m.aoMap?.dispose?.();
+        m.emissiveMap?.dispose?.();
+        m.dispose?.();
       }
     }
+  });
+}
 
-    tilesEntity.appendChild(frag);
+const STRAIGHT_POOL_SIZE = 220;   // keep > 200 since you cap children at 200
+let straightPool = [];
+let straightPoolIndex = 0;
+let poolReady = false;
 
-    // Advance gridDepth to reflect that these rows now exist.
-    constants.gridDepth = startZ + rows;
+function initStraightPool() {
+  if (poolReady) return;
+  const pathEl = document.getElementById("track");
+  if (!pathEl) return;
 
-    __tilePool = {
-      tilesEntity,
-      width,
-      rows,
-      rowTiles,
-      nextRecycleRow: 0,          // ring pointer: which row to reuse next
-      nextZIndex: constants.gridDepth // next new zIndex to assign when “extending”
-    };
+  for (let i = 0; i < STRAIGHT_POOL_SIZE; i++) {
+    const track = document.createElement("a-entity");
+    track.setAttribute(
+      "geometry",
+      `primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`
+    );
+    track.setAttribute("material", `src: #track-texture; repeat: 1 0.25`);
+    track.setAttribute("configuration", `straight_vertical`);
 
-    //Store "front edge" Z for trigger + expose pool for update_rider_animation()
-    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
-    window.__tilePool = __tilePool;
+    // put them somewhere harmless initially
+    track.setAttribute("position", `0 -9999 0`);
 
-    console.log(`[tilePool] initialized rows=${rows}, tiles=${poolTiles}`);
+    pathEl.appendChild(track);
+    straightPool.push(track);
   }
 
-  function __advanceTilePool(rowsToAdvance) {
-    if (!__tilePool || !__tilePool.rowTiles) __initTilePool(); 
-    if (!__tilePool) return;
+  poolReady = true;
+}
 
-    const { width, rows, rowTiles } = __tilePool;
 
-    // Reuse N rows by moving them to the “front” (new zIndex values).
-    const n = Math.min(rowsToAdvance, rows);
+function straightPiece() {
+  initStraightPool();
 
-    for (let i = 0; i < n; i++) {
-      const r = __tilePool.nextRecycleRow;
-      const zIndex = __tilePool.nextZIndex++;
-      const wz = __tileWorldZ(zIndex);
+  // Spawn track pieces in 5 unit increments
+  const pointZ = -1 * (constants.farthestSpawn + 5);
 
-      for (let x = 0; x < width; x++) {
-        // Only update Z (X stays consistent per column)
-        rowTiles[r][x].setAttribute(
-          'position',
-          `${constants.startX + x * constants.tileSize} 0 ${wz}`
-        );
-      }
+  // Adjust Z spawn position to correct for centering of the box geometry
+  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
 
-      __tilePool.nextRecycleRow = (r + 1) % rows;
-    }
+  constants.farthestSpawn += 5;
+  constants.trackPoints.push({ x: 0, y: 1, z: pointZ, length: 5 });
 
-    // Keep gridDepth consistent with the old logic (it’s used in the trigger)
-    constants.gridDepth += n;
-
-    // Update front edge after recycling rows
-    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
-    window.__tilePool = __tilePool;
+  // ---- CAP TRACK POINTS (PREVENT HEAP LEAK) ----
+  const MAX_TRACK_POINTS = 2000;
+  if (constants.trackPoints.length > MAX_TRACK_POINTS) {
+    const drop = constants.trackPoints.length - MAX_TRACK_POINTS;
+    constants.trackPoints.splice(0, drop);
+    constants.currentTrackPiece = Math.max(0, constants.currentTrackPiece - drop);
+    constants.pacerCurrentTrackPiece = Math.max(0, constants.pacerCurrentTrackPiece - drop);
   }
+
+  // ---- REUSE ENTITY FROM POOL ----
+  const el = straightPool[straightPoolIndex];
+  straightPoolIndex = (straightPoolIndex + 1) % straightPool.length;
+
+  // move it to new Z
+  el.setAttribute("position", `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
+}
+
 
   // Spawn track pieces in
   export function spawn_track() {
-    for (let i = 0; i < 80; i++) {
-      straightPiece();
-    }
+  // make sure pool exists
+  initStraightPool();
 
-    // Shorten track element array every time it exceeds 200 elements
-    let track_elements = document.getElementById('track').children;
-    if (track_elements.length > 200) {
-      for (let i = 0; i < 100; i++) {
-        if (track_elements[0].getAttribute('position').z > getPos(document.getElementById('rider')).z + 20) {
-          track_elements[0].parentNode.removeChild(track_elements[0]);
-        }
-      }
-    }
+  // spawn a smaller batch; you're just repositioning now, so this is cheap
+  for (let i = 0; i < 80; i++) {
+    straightPiece();
   }
+}

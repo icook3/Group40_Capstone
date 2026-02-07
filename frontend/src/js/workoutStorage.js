@@ -22,16 +22,27 @@ export class WorkoutStorage {
     }
   }
 
-  // save workout data
+  // save workout data - Changed to debounce saves and avoid blocking main thread with large data or slow storage
 
   save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
-    } catch (error) {
-      console.error("Error saving workout data:", error);
-      // in case unable to save data
-      alert("Could not save workout data, please restart and try again.");
-    }
+    // mark pending
+    this._pendingSave = true;
+
+    // debounce: reset timer on repeated calls
+    if (this._saveTimer) clearTimeout(this._saveTimer);
+
+    this._saveTimer = setTimeout(() => {
+      // if nothing pending, skip
+      if (!this._pendingSave) return;
+      this._pendingSave = false;
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+      } catch (error) {
+        console.error("Error saving workout data:", error);
+        alert("Could not save workout data, please restart and try again.");
+      }
+    }, 2000); // 2s after the last change (tune: 1–10s)
   }
 
   //Start with empty data
