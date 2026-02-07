@@ -80,128 +80,143 @@ export class ObjectField {
       }
   }
 
-// Advances the scene. Recycles items more than 20 units in front of the rider
-advance(riderSpeed, dt) {
-  if (!this.initialized || riderSpeed === 0 || dt === 0) return;
+  // Advances the scene. Recycles items more than 20 units in front of the rider
+  advance(riderSpeed, dt) {
+    if (!this.initialized || riderSpeed === 0 || dt === 0) return;
 
-  const riderEl = document.getElementById('rider');
-  const riderZ = getPos(riderEl).z;
-  const recycleZ = riderZ + 20;
+    const riderEl = document.getElementById('rider');
+    const riderZ = getPos(riderEl).z;
+    const recycleZ = riderZ + 20;
 
-  // ---------------------------
-  // MAIN ITEMS (this.items)
-  // ---------------------------
+    // Cache Date.now once
+    const now = Date.now();
 
-  // Compute the "farthest behind" Z (min Z) ONCE per frame
-  let minZ = Infinity;
-  for (const o of this.items) {
-    const z = getPos(o).z;
-    if (z < minZ) minZ = z;
-  }
+    // ---------------------------
+    // MAIN ITEMS (this.items)
+    // ---------------------------
 
-  for (const obj of this.items) {
-    const pos = getPos(obj);
-
-    if (pos.z > recycleZ) {
-      // recycle in front of farthest-behind (minZ)
-      pos.z = minZ - 5;
-
-      // resample X per-kind (keeps trees closer than buildings)
-      const kind = detectKind(obj);
-      pos.x = kind.resampleX();
-
-      // update minZ so multiple recycled objects don't stack
-      minZ = pos.z;
-    }
-
-    setPos(obj, pos);
-  }
-
-  // ---------------------------
-  // EXTERNAL BANDS (band.items)
-  // ---------------------------
-
-  for (const band of this.externalGroups) {
-    if (band?.policy?.isStatic()) continue;
-    if (!band?.items?.length) continue;
-
-    // Compute band minZ ONCE per frame
-    let bandMinZ = Infinity;
-    for (const o of band.items) {
+    // Compute the "farthest behind" Z (min Z) ONCE per frame
+    let minZ = Infinity;
+    for (const o of this.items) {
       const z = getPos(o).z;
-      if (z < bandMinZ) bandMinZ = z;
+      if (z < minZ) minZ = z;
     }
 
-    for (const obj of band.items) {
+    for (const obj of this.items) {
       const pos = getPos(obj);
 
       if (pos.z > recycleZ) {
-        // recycle within THIS band independently
-        pos.z = bandMinZ - 5;
+        // recycle in front of farthest-behind (minZ)
+        pos.z = minZ - 5;
 
-        // re-roll kind by band policy mix (keeps long-run ratios)
-        if (band.policy && typeof band.policy.xAnchor === 'function') {
-          const mix =
-            typeof band.policy.mix === 'function'
-              ? band.policy.mix()
-              : { tree: 0.5, building: 0.5 };
+        // resample X per-kind (keeps trees closer than buildings)
+        const kind = detectKind(obj);
+        pos.x = kind.resampleX();
 
-          const roll = Math.random();
-          const nextIsBuilding =
-            roll < (typeof mix.building === 'number' ? mix.building : 0.5);
+        // update minZ so multiple recycled objects don't stack
+        minZ = pos.z;
 
-          const kindName = nextIsBuilding ? 'building' : 'tree';
-          obj.setAttribute('zlow-kind', kindName);
+        // ✅ only update when it changed
+        setPos(obj, pos);
+      }
+      // else: do nothing; unchanged objects don't need setPos()
+    }
 
-          const sideAttr = obj.getAttribute('zlow-side'); // 'left' | 'right'
-          const side = sideAttr === 'left' ? -1 : 1;
+    // ---------------------------
+    // EXTERNAL BANDS (band.items)
+    // ---------------------------
 
-          const anchorX = band.policy.xAnchor(kindName, side);
+    for (const band of this.externalGroups) {
+      if (band?.policy?.isStatic()) continue;
+      if (!band?.items?.length) continue;
 
-          const jitterAmp =
-            typeof band.policy.jitterX === 'function'
-              ? band.policy.jitterX()
-              : 0;
-
-          let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
-
-          if (typeof band.policy.clampX === 'function') {
-            newX = band.policy.clampX(kindName, side, newX);
-          }
-
-          pos.x = newX;
-        } else {
-          // fallback: detect and use kind’s own resample
-          const kind = this._detectKind(obj);
-          pos.x = kind.resampleX();
-        }
-
-        // update bandMinZ so recycled objects don't stack
-        bandMinZ = pos.z;
+      // Compute band minZ ONCE per frame
+      let bandMinZ = Infinity;
+      for (const o of band.items) {
+        const z = getPos(o).z;
+        if (z < bandMinZ) bandMinZ = z;
       }
 
-      setPos(obj, pos);
+      for (const obj of band.items) {
+        const pos = getPos(obj);
+
+        if (pos.z > recycleZ) {
+          // recycle within THIS band independently
+          pos.z = bandMinZ - 5;
+
+          // re-roll kind by band policy mix (keeps long-run ratios)
+          if (band.policy && typeof band.policy.xAnchor === 'function') {
+            const mix =
+              typeof band.policy.mix === 'function'
+                ? band.policy.mix()
+                : { tree: 0.5, building: 0.5 };
+
+            const roll = Math.random();
+            const nextIsBuilding =
+              roll < (typeof mix.building === 'number' ? mix.building : 0.5);
+
+            const kindName = nextIsBuilding ? 'building' : 'tree';
+            obj.setAttribute('zlow-kind', kindName);
+
+            const sideAttr = obj.getAttribute('zlow-side'); // 'left' | 'right'
+            const side = sideAttr === 'left' ? -1 : 1;
+
+            const anchorX = band.policy.xAnchor(kindName, side);
+
+            const jitterAmp =
+              typeof band.policy.jitterX === 'function'
+                ? band.policy.jitterX()
+                : 0;
+
+            let newX = anchorX + (Math.random() - 0.5) * jitterAmp;
+
+            if (typeof band.policy.clampX === 'function') {
+              newX = band.policy.clampX(kindName, side, newX);
+            }
+
+            pos.x = newX;
+          } else {
+            // fallback: detect and use kind’s own resample
+            const kind = this._detectKind(obj);
+            pos.x = kind.resampleX();
+          }
+
+          // update bandMinZ so recycled objects don't stack
+          bandMinZ = pos.z;
+
+          // ✅ only update when it changed
+          setPos(obj, pos);
+        }
+        // else: unchanged; skip setPos()
+      }
     }
-  }
 
-    // Advance clouds
-    if (Date.now() > constants.lastCloud + constants.updateEvery) {
-      constants.lastCloud = Date.now();
+    // ---------------------------
+    // CLOUDS
+    // ---------------------------
 
-      if (this.clouds.clouds.children.length) {
-        for (let cloud of this.clouds.clouds.children) {
+    if (now > constants.lastCloud + constants.updateEvery) {
+      constants.lastCloud = now;
+
+      const cloudRoot = this.clouds?.clouds;
+      const riderZNow = riderZ;
+
+      if (cloudRoot?.children?.length) {
+        // Copy to array so removing doesn't mess up iteration
+        const children = Array.from(cloudRoot.children);
+
+        for (const cloud of children) {
           const pos = getPos(cloud);
-          
+
           // If the cloud is still in visible range, move it forward
-          if (pos.z < getPos(document.getElementById('rider')).z) {
+          if (pos.z < riderZNow) {
             pos.z += 1;
             setPos(cloud, pos);
           }
-
-          // Otherwise, remove it from the array and respawn in zone 4
+          // Otherwise, remove it and respawn in zone 4
           else {
-            this.clouds.clouds.removeChild(cloud);
-            this.clouds.clouds.appendChild(spawnCloud(4));
+            cloudRoot.removeChild(cloud);
+            cloudRoot.appendChild(spawnCloud(4));
           }
         }
       }
