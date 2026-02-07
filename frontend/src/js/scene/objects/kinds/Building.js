@@ -9,37 +9,41 @@ function sampleBuildingX() {
 
 export const BuildingKind = {
     name: 'building',
-  spawn(sceneEl, z) {
+  spawn(sceneEl, z, policy = null) {
     const x = sampleBuildingX();
-    const building = Math.random() * 3;
-    const w = 2 + Math.random() * 4;
-    const h = 4 + Math.random() * 6;
-    const d = 2 + Math.random() * 4;
-    const size = 4;
-    //NOT a constant - will be different for different buildings
     let y = 1.5;
 
     const obj = document.createElement('a-entity');
-    obj.setAttribute('zlow-kind', 'building'); // mark kind explicitly
-    //old behavior
-      //obj.setAttribute('geometry', `primitive: box; width: ${w}; height: ${h}; depth: ${d}`);
-      if (Math.round(building) == 1) {
-          obj.setAttribute('zlow-building-type', 'house');
-          obj.setAttribute('gltf-model', '#house-obj');
-          y = 1.5;
-      } else if (Math.round(building) == 2) {
-          obj.setAttribute('zlow-building-type', 'tall-building');
-          obj.setAttribute('gltf-model', '#tall-building-obj');
-          y = 0.5;
-      } else {
-          obj.setAttribute('zlow-building-type', 'wide-building');
-          obj.setAttribute('gltf-model', '#wide-building-obj');
-          y = 0.5;
-      }
-    //obj.setAttribute('gltf-model', '#house-obj');
-    obj.setAttribute('scale', size+" "+size+" "+size);
-    const gray = Math.floor(128 + Math.random() * 80);
-    //obj.setAttribute('material', `color: rgb(${gray},${gray},${gray})`);
+    obj.setAttribute('zlow-kind', 'building');
+
+    // Get building subtype weights from policy, or use defaults
+    const subtypes = policy?.buildingSubtype?.() || { tall: 0.33, wide: 0.33, house: 0.34 };
+    
+    // Weighted random selection
+    const roll = Math.random();
+    let buildingType;
+    
+  if (roll < (subtypes.house || 0)) {
+    buildingType = 'house';
+    obj.setAttribute('gltf-model', '#house-obj');
+    const scale = 6 + Math.random() * 2;  // 5.5-7
+    obj.setAttribute('scale', `${scale} ${scale} ${scale}`);
+    y = 1.5;
+  } else if (roll < (subtypes.house || 0) + (subtypes.wide || 0)) {
+    buildingType = 'wide';
+    obj.setAttribute('gltf-model', '#wide-building-obj');
+    const scale = 8 + Math.random() * 5;  // 7-12
+    obj.setAttribute('scale', `${scale} ${scale} ${scale}`);
+    y = 0.5;
+  } else {
+    buildingType = 'tall';
+    obj.setAttribute('gltf-model', '#tall-building-obj');
+    const scale = 6 + Math.random() * 3;  // 5-8
+    obj.setAttribute('scale', `${scale} ${scale} ${scale}`);
+    y = 0.5;
+  }
+    
+    obj.setAttribute('zlow-building-type', buildingType);
     setPos(obj, { x, y, z });
     sceneEl.appendChild(obj);
     return obj;
