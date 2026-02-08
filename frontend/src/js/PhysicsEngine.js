@@ -3,15 +3,28 @@ import { constants } from "./constants.js";
 export class PhysicsEngine {
     constructor() {
         this.speed = 0; // kph
+        this.isCoasting = false;
     }
 
     update(power, dt) {
         if (power > 0) {
             this.speed = calculateAccelerationSpeed(this.speed, power, dt);
+            this.isCoasting = false;
         } else {
             this.speed = calculateCoastingSpeed(this.speed, dt)
+            this.isCoasting = true;
         }
 
+        return this.getTrackFriendlySpeed();
+    }
+
+    getTrackFriendlySpeed() {
+        // Track animation samples a single speed to build movement.
+        // Very low speeds from the new physics model make the start look like lag.
+        // This provides a small floor for the track's sampling behavior.
+        if (this.speed !== 0 && this.speed < 1.5 && !this.isCoasting) {
+            return 1.5;
+        }
         return this.speed;
     }
 
