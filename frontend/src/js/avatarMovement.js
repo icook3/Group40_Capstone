@@ -1,7 +1,7 @@
-import {powerToSpeed} from "./main.js";
 import { AvatarCreator } from "./avatarCreator.js";
 import { constants } from "./constants.js";
 import { units } from "./units/index.js";
+
 export class AvatarMovement {
     constructor(id, options = {}) {
         this.creator = new AvatarCreator(id, options.position);
@@ -102,8 +102,7 @@ export class AvatarMovement {
                 this.creator.rightPedalBone.rotation.y = -this.creator.pedalCrankBone.rotation.x;
             } else {
                 //Rotate crank
-                const speedKmh = powerToSpeed({power: this.power});
-                const crankAngularSpeed = ((speedKmh * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
+                const crankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
                 const crankRotationAmount = crankAngularSpeed * dt;
                 this.creator.pedalCrankBone.rotation.x -= crankRotationAmount;
 
@@ -135,12 +134,12 @@ export class AvatarMovement {
         }
 
         // Emit either a start or a resume event based on worldZ
-        if (constants.worldZ == 0) {
+        if (constants.worldZ === 0) {
             document.getElementById('rider').emit('riderStarted');
             document.getElementById('pacer-entity').emit('pacerStart');
         }
 
-        else if (constants.riderState.speed == 0 && constants.worldZ > 0) {
+        else if (this.speed === 0 && constants.worldZ > 0) {
             // Emit a stop event if speed is 0
             document.getElementById('rider').emit('riderStopped');
         }
