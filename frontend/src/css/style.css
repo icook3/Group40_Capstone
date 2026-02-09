@@ -5,7 +5,7 @@
   bottom: 0;
   right: 0;
 }
-body {
+body.otherBody {
   margin: 0;
   font-family: sans-serif;
   background: #111;
@@ -47,54 +47,50 @@ body {
   width: 50px;
 }
 
-button {
+button.zlowBtn {
   font-size: 1em;
   padding: 6px 12px;
   border-radius: 4px;
   border: none;
-  background: #0af;
+  /*background: #0af;*/
   color: #fff;
   cursor: pointer;
 }
 
-button:disabled {
+button.zlowBtn:disabled {
   background: #555;
 }
 
-button,
+button.zlowBtn,
 .hud-btn,
 .summary-btn,
 .confirm-btn,
 .cancel-btn,
 .close-btn,
 .dropdown-item,
-.arrow-btn,
-.split-btn .main,
-.split-btn .toggle {
+.arrow-btnZlow {
   cursor: pointer;
 }
 
-button:hover:not(:disabled),
+button.zlowBtn:hover:not(:disabled),
 .hud-btn:hover:not(:disabled),
 .summary-btn:hover:not(:disabled),
 .confirm-btn:hover:not(:disabled),
 .cancel-btn:hover:not(:disabled),
 .close-btn:hover:not(:disabled),
 .dropdown-item:hover,
-.arrow-btn:hover,
-.split-btn .main:hover,
-.split-btn .toggle:hover {
+.arrow-btnZlow:hover {
   filter: brightness(85%);
 }
 
-button:active:not(:disabled),
+button.zlowBtn:active:not(:disabled),
 .hud-btn:active:not(:disabled),
 .summary-btn:active:not(:disabled),
 .confirm-btn:active:not(:disabled),
 .cancel-btn:active:not(:disabled),
 .close-btn:active:not(:disabled),
 .dropdown-item:active,
-.arrow-btn:active {
+.arrow-btnZlow:active {
   filter: brightness(75%);
   transform: scale(0.97);
 }
@@ -102,4 +98,184 @@ button:active:not(:disabled),
 .dropdown-item:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+/* Trainer Calibration Modal Styles */
+      #calibration-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
 
+      #calibration-modal.show {
+        display: flex;
+      }
+
+      .calibration-modal-content {
+        background: white;
+        border-radius: 10px;
+        padding: 40px;
+        max-width: 600px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .calibration-modal-content h2 {
+        color: #333;
+        margin-top: 0;
+        font-size: 1.8em;
+      }
+
+      .calibration-status {
+        font-size: 1.2em;
+        color: #666;
+        margin: 20px 0;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .status-connected {
+        color: #27ae60;
+        font-weight: bold;
+      }
+
+      .status-error {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .status-in-progress {
+        color: #f39c12;
+        font-weight: bold;
+      }
+
+      .calibration-steps {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .calibration-steps h3 {
+        margin-top: 0;
+        color: #333;
+      }
+
+      .step {
+        margin: 10px 0;
+        padding: 10px;
+        background: white;
+        border-left: 4px solid #3498db;
+        border-radius: 4px;
+      }
+
+      .step.completed {
+        border-left-color: #27ae60;
+        background: #f0fdf4;
+      }
+
+      .step.active {
+        border-left-color: #f39c12;
+        background: #fffbf0;
+      }
+
+      .step-title {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .step-description {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .calibration-button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+
+      /* Override hud-btn styling for modal context */
+      .calibration-button-group .hud-btn {
+        background: #3498db;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 1.1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid #3498db;
+      }
+
+      .calibration-button-group .hud-btn:hover:not(:disabled) {
+        background: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .calibration-button-group .hud-btn:disabled {
+        background: #95a5a6;
+        border-color: #95a5a6;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* Specific button colors */
+      #calibration-skip-btn {
+        background: #95a5a6 !important;
+        border-color: #95a5a6 !important;
+      }
+
+      #calibration-skip-btn:hover:not(:disabled) {
+        background: #7f8c8d !important;
+        border-color: #7f8c8d !important;
+      }
+
+      #calibration-close-btn {
+        background: #e74c3c !important;
+        border-color: #e74c3c !important;
+      }
+
+      #calibration-close-btn:hover:not(:disabled) {
+        background: #c0392b !important;
+        border-color: #c0392b !important;
+      }
+
+      .calibration-data-display {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        font-family: monospace;
+        color: #333;
+      }
+
+      .data-item {
+        margin: 8px 0;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .data-label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .data-value {
+        color: #27ae60;
+      }

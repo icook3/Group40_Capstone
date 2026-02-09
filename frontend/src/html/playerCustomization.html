@@ -6,24 +6,26 @@
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="../../resources/favicons/ZlowFavicon.svg"
-    />
-    <link rel="stylesheet" href="../css/playerCustomization.css" />
-    <style>
-      body {
-        background-color: grey;
-      }
-    </style>
+        <link rel="stylesheet" href="../css/hud.css" />
+        <link rel="stylesheet" href="../css/peerToPeer.css" />
+        <link rel="stylesheet" href="../css/changelog.css" />
+        <link rel="stylesheet" href="../css/menu.css" />
+        <link rel="stylesheet" href="../css/generalCSS.css" />
+        <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+        <link rel="stylesheet" href="../css/playerCustomization.css" />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="../css/style.css?version=1.0"
+        />
+        <link rel="stylesheet" href="../css/workoutSummary.css" />
   </head>
-  <body>
+  <body class="customizeBody">
     <div id="sky-gradient"></div>
 
     <!-- Avatar -->
-    <a-scene
-      id="mainMenuScene"
+    <a-scene class="customizationScene"
+      id="playerCustomizerScene"
       embedded
       style="
         position: fixed;
@@ -114,7 +116,7 @@
       import { AvatarCreator } from "../js/avatarCreator.js";
 
       window.addEventListener("DOMContentLoaded", () => {
-        const scene = document.querySelector("#mainMenuScene");
+        const scene = document.querySelector("#playerCustomizerScene");
         if (!scene) {
           console.error("Scene not found!");
           return;
