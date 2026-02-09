@@ -20,6 +20,8 @@ import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
 import {initCrashReporter} from "./crashReporter.js";
 import { PhysicsEngine } from "./PhysicsEngine.js";
+import {buildTCX, tcxToBlob} from "./rideFile.js";
+import {downloadBlob} from "./download.js";
 
 // Prevent meshes from disappearing due to frustum culling
 AFRAME.registerComponent("no-cull", {
@@ -867,8 +869,18 @@ export async function exportToStrava() {
     return;
   }
 
+  const tcxString = buildTCX({
+    samples: rideHistory.samples,
+    kmhToMs: (kmh) => constants.kmhToMs(kmh),
+  })
+  const tcxBlob = tcxToBlob(tcxString);
+
   try {
-      await strava.uploadActivity(workout);
+      await strava.uploadActivity({
+          tcxBlob: tcxBlob,
+          name: workout.name,
+          description: workout.description,
+      });
       alert("Workout sent to Strava! It may take a few seconds to appear.");
   } catch (err) {
       handleStravaExportFailure(err);
@@ -901,106 +913,23 @@ function handleStravaExportFailure(err) {
     );
 }
 
-// =====================
-// TCX EXPORT (RideHistory samples: { elapsedMs, epochMs, power, speed, distance })
-// =====================
-
-// Generates TCX file
-export function generateTCXFile() {
-  const history = rideHistory.samples;
-
-  // Need at least 2 points to compute duration/track
-  if (!history || history.length < 2) return null;
-
-  // Defensive: ensure required fields exist
-  const hasEpoch = history[0]?.epochMs != null && history.at(-1)?.epochMs != null;
-  const hasElapsed = history.at(-1)?.elapsedMs != null;
-  if (!hasEpoch) {
-    console.error("TCX export failed: samples missing epochMs", history[0], history.at(-1));
-    return null;
-  }
-
-  const startEpochMs = history[0].epochMs;
-  const endEpochMs = history.at(-1).epochMs;
-  const startTime = new Date(startEpochMs);
-
-  // Prefer elapsedMs for total time (it’s exactly what you recorded), else fall back to epoch delta
-  const totalTimeSeconds = Math.max(
-    0,
-    Math.floor(((hasElapsed ? history.at(-1).elapsedMs : (endEpochMs - startEpochMs)) || 0) / 1000)
-  );
-
-  const distanceMeters = ((history.at(-1).distance || 0) * 1000).toFixed(1);
-
-  let tcx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-  tcx += `<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">\n`;
-  tcx += `  <Activities>\n`;
-  tcx += `    <Activity Sport="Biking">\n`;
-  tcx += `      <Id>${startTime.toISOString()}</Id>\n`;
-  tcx += `      <Lap StartTime="${startTime.toISOString()}">\n`;
-  tcx += `        <TotalTimeSeconds>${totalTimeSeconds}</TotalTimeSeconds>\n`;
-  tcx += `        <DistanceMeters>${distanceMeters}</DistanceMeters>\n`;
-  tcx += `        <Intensity>Active</Intensity>\n`;
-  tcx += `        <TriggerMethod>Manual</TriggerMethod>\n`;
-  tcx += `        <Track>\n`;
-
-  for (const pt of history) {
-    // Guard against bad points
-    if (pt?.epochMs == null) continue;
-
-    const timeISO = new Date(pt.epochMs).toISOString();
-    const distM = ((pt.distance || 0) * 1000).toFixed(1);
-    const watts = Math.round(pt.power || 0);
-
-    // Your pt.speed is in km/h (based on your code earlier), convert to m/s for TCX extension
-    const speedMs = constants.kmhToMs(pt.speed || 0).toFixed(3);
-
-    tcx += `          <Trackpoint>\n`;
-    tcx += `            <Time>${timeISO}</Time>\n`;
-    tcx += `            <Position><LatitudeDegrees>0</LatitudeDegrees><LongitudeDegrees>0</LongitudeDegrees></Position>\n`;
-    tcx += `            <DistanceMeters>${distM}</DistanceMeters>\n`;
-    tcx += `            <Extensions>\n`;
-    tcx += `              <ns3:TPX xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">\n`;
-    tcx += `                <ns3:Watts>${watts}</ns3:Watts>\n`;
-    tcx += `                <ns3:Speed>${speedMs}</ns3:Speed>\n`;
-    tcx += `              </ns3:TPX>\n`;
-    tcx += `            </Extensions>\n`;
-    tcx += `          </Trackpoint>\n`;
-  }
-
-  tcx += `        </Track>\n`;
-  tcx += `      </Lap>\n`;
-  tcx += `    </Activity>\n`;
-  tcx += `  </Activities>\n`;
-  tcx += `</TrainingCenterDatabase>\n`;
-
-  return new Blob([tcx], { type: "application/vnd.garmin.tcx+xml" });
-}
-
 /**
  * Save a TCX file
  */
 export function saveTCX() {
-  try {
-    const tcxBlob = generateTCXFile();
-    if (!tcxBlob) {
-      alert("Not enough data to export.");
-      return;
-    }
+  const tcxString = buildTCX({
+    samples: rideHistory.samples,
+    kmhToMs: (kmh) => constants.kmhToMs(kmh),
+  })
 
-    const url = URL.createObjectURL(tcxBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "zlow-ride.tcx";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    rideHistory.reset();
-  } catch (err) {
-    console.error("TCX export error:", err);
-    alert("TCX export failed. Check the console for details.");
+  if (!tcxString) {
+    alert("Not enough data to export.");
+    return;
   }
+
+  const blob = tcxToBlob(tcxString);
+  downloadBlob(blob, "zlow-ride.tcx");
 }
+
+
 
