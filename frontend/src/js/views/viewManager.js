@@ -1,5 +1,9 @@
+/**
+ * Initializes different views
+ */
 export function initViews() {
-    
+    console.log("Initializing views");
+    setView(views.mainMenu);
 }
 
 export function setView(view) {

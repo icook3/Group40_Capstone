@@ -23,7 +23,7 @@
         />
         <link rel="stylesheet" href="../css/workoutSummary.css" />
     </head>
-    <body class="bodyImg">
+    <body>
         <script
             src="https://code.jquery.com/jquery-3.7.1.min.js"
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -32,5 +32,11 @@
         <div id="mainDiv">
             <!--Gets filled in by the viewManager with whatever is needed-->
         </div>
+        <script type="module" src="../js/views/viewManager.js"></script>
+        <script>
+            window.addEventListener("DOMContentLoaded", () => {
+                if (window.initViews) window.initViews();
+            });
+        </script>
     </body>
 </html>
