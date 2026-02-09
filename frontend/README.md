@@ -64,6 +64,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - `src` — Stores all source code for the project.
 	- `css` — Stores CSS source code.
 		- `changelog.css` — Handles CSS styles for the changelog page.
+		- `generalCSS.css` — A set of useful CSS styles used throughout Zlow
 		- `hud.css` — Handles CSS styles for the modern HUD.
 		- `menu.css` — Handles CSS styles for the main menu.
 		- `peerToPeer.css` — Handles CSS styles for the peer-to-peer menu.
@@ -74,6 +75,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `html` — Stores HTML source code.
 		- `changelog.html` — Screen for the Zlow changelog
 		- `connectToPeers.html` — Screen for connecting via the peer-to-peer network
+		- `index.html` — The page that is loaded, and is filled in by the other pages to create a Single-Page application. 
 		- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings.
 		- `playerCustomization.html` — Screen for customizing the player.
 		- `zlow.html` — Loads A-Frame scene and UI.
