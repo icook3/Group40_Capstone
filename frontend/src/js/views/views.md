@@ -1,0 +1,22 @@
+# Views Interface
+
+A class using the **Views** interface represents a possible HTML view. 
+
+## Required methods/fields
+
+- **constructor()** → self
+    - Uses fetch to get the corresponding HTML file, and store it in a constant.
+- **content** → `string`
+    - Returns a string that is empty, but gets set in the constructor. This contains the entire body of the HTML file.
+- **setPage()** → `void`
+    - Sets the innerHTML of the element with the id `mainDiv` to the content in `content`, and runs any initializing JavaScript code.
+
+## Notes
+- To add new views, first create view.html in the html folder. 
+    - Start by creating a valid HTML file that looks how you want it to look, then remove the head and the body tags. 
+    - Ensure that any JS is in external files. 
+- To set up a new view, afterwards, create your view.js file, implementing this interface, then change viewManager.js.
+    - In initViews, create a new instance of your specified view.
+    - In the object views, add a value for your view.
+    - In setView(view), add a condition for if view is equal to your new, view, then call the setPage method.
+- To switch between views, call setView(view), passing in the view you want to switch to. 
