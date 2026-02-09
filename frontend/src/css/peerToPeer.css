@@ -1,16 +1,8 @@
-body.peerBody {
-    margin: 0;
-    font-family: sans-serif;
-    color: #fff;
-    font-family: "Fugaz One", sans-serif;
-    font-size: 1.5em;
-    background-image: url("../../resources/images/background.png");
-}
 button.peerBtn {
     font-size: 1em;
     cursor: pointer;
 }
-.center-item {
+.center-itemPeer {
     left: 40%;
 }
 

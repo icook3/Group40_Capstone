@@ -8,26 +8,14 @@
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="../css/hud.css" />
     <link rel="stylesheet" href="../css/menu.css" />
-    <style>
-      body {
-        #sky-gradient {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          z-index: -2;
-          background: linear-gradient(to bottom, #7cd1f3 0%, #c4eeff 100%);
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="../css/generalCSS.css" />
     <link
       rel="icon"
       type="image/svg+xml"
       href="/resources/favicons/ZlowFavicon.svg"
     />
   </head>
-  <body>
+  <body class="menuBody bodyStyle">
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
@@ -35,7 +23,7 @@
     ></script>
     <script type="module" src="../js/menu.js"></script>
 
-    <h1 id="welcome-msg" class="center-item">
+    <h1 id="welcome-msg" class="center-itemMenu">
       Welcome to
       <img
         src="../../resources/favicons/ZlowFavicon.svg"
@@ -46,7 +34,7 @@
     </h1>
 
     <!-- Split Start button -->
-    <div id="start-split" class="split-btn stats-row center-item">
+    <div id="start-split" class="split-btn stats-row center-itemMenu">
       <button id="start-btn" class="main" type="button">Start</button>
       <button
         id="start-toggle"
@@ -221,7 +209,7 @@
     <div id="sky-gradient"></div>
 
     <!-- Main Menu 3D Background -->
-    <a-scene id="mainMenuScene" embedded>
+    <a-scene id="mainMenuScene" class="menuScene" embedded>
       <!-- Camera -->
       <!-- Can change controls to true if other assets are added to the scene to aid in placement -->
       <a-entity

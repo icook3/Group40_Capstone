@@ -1,0 +1,11 @@
+.bodyImg {
+    background-image: url("../../resources/images/background.png");
+}
+
+.bodyStyle {
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}

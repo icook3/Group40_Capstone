@@ -2,9 +2,6 @@ button.changelogBtn {
   font-size: 1em;
   cursor: pointer;
 }
-body.changelogBody {
-  background-image: url("../../resources/images/background.png");
-}
 #menu {
   position: fixed;
   top: 20px;
