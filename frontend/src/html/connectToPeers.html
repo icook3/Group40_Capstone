@@ -8,16 +8,11 @@
         />
         <link rel="stylesheet" href="../css/hud.css" />
         <link rel="stylesheet" href="../css/peerToPeer.css" />
-        <style>
-            body {
-                background-image: url("../../resources/images/background.png");
-            }
-        </style>
     </head>
-    <body>
+    <body class="peerBody">
         <div id="cancel">
             <div class="control-buttons">
-                <button id="cancelButton" onclick="window.location.href='mainMenu.html'" class="hud-btn">Cancel</button>
+                <button id="cancelButton" onclick="window.location.href='mainMenu.html'" class="hud-btn peerBtn">Cancel</button>
             </div>
         </div>
         <div id="peerConnectMenu" class="control-buttons">
@@ -25,7 +20,7 @@
                 <label for="name-input">Peer Name: </label>
                 <input id="name-input" />
             </span>
-            <button class="hud-btn" id="connect-btn">Connect!</button>
+            <button class="hud-btn peerBtn" id="connect-btn">Connect!</button>
             
         </div>
         <script type="module" src="../js/peerConnector.js"></script>
