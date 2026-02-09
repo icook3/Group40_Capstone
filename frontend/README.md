@@ -115,6 +115,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `units.md` — Documentation on different units.
 			- `W.js` — Handles unit conversions for Watts - the default power unit.
 		- `views` — Stores different views, and switching between them.
+			- `mainMenu.js` — Stores the main menu, and handles setting it up. 
 			- `viewManager.js` — Handles switching between different views. 
 			- `views.md` — Documentation of how to switch between views, and how views are laid out. 
 		- `workouts` — Stores different workouts
@@ -128,7 +129,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `hud.js` — Renders the heads-up display overlay.
 		- `keyboardMode.js` — Handles keyboard mode functionalities and variables.
 		- `main.js` — Main app entry point.
-		- `menu.js` — Handles event listeners on the main menu.
 		- `milestones.js` — Handles tracking for various milestones.
 		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.

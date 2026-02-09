@@ -2,7 +2,7 @@
 // Drives menu with pointerdown (single fire), swallows the follow-up click,
 // robust outside-click closer, default "free" workout label.
 
-(function () {
+export function workoutChoice() {
   const ready = (fn) =>
     document.readyState === "loading"
       ? document.addEventListener("DOMContentLoaded", fn, { once: true })
@@ -201,8 +201,4 @@
 
     console.log("[mainMenu] ready");
   });
-})();
-
-
-
-
+};

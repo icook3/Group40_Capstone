@@ -4,8 +4,9 @@ A class using the **Views** interface represents a possible HTML view.
 
 ## Required methods/fields
 
-- **constructor()** → self
+- **constructor(boolean)** → self
     - Uses fetch to get the corresponding HTML file, and store it in a constant.
+    - If the boolean parameter is true, also call setPage once it is done loading - this should only be true the first time a page is loaded. 
 - **content** → `string`
     - Returns a string that is empty, but gets set in the constructor. This contains the entire body of the HTML file.
 - **setPage()** → `void`
@@ -18,5 +19,6 @@ A class using the **Views** interface represents a possible HTML view.
 - To set up a new view, afterwards, create your view.js file, implementing this interface, then change viewManager.js.
     - In initViews, create a new instance of your specified view.
     - In the object views, add a value for your view.
-    - In setView(view), add a condition for if view is equal to your new, view, then call the setPage method.
+    - In setView(view), add a condition for if view is equal to your new view, then call the setPage method.
+    - In the class ViewStorage, add the view to it. 
 - To switch between views, call setView(view), passing in the view you want to switch to. 
