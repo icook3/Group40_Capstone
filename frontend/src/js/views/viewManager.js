@@ -18,8 +18,8 @@ export class ViewManager {
     */
     initViews() {
         console.log("Initializing views");
-        this.viewStorage.mainMenu = new mainMenuView(false);
-        this.viewStorage.zlowScreen = new zlowScreen(true);
+        this.viewStorage.mainMenu = new mainMenuView(true);
+        this.viewStorage.zlowScreen = new zlowScreen(false);
     }
 
     setView(view) {
@@ -27,6 +27,12 @@ export class ViewManager {
             case this.views.mainMenu:
                 if (this.viewStorage.mainMenu.ready) {
                     this.viewStorage.mainMenu.setPage();
+                    this.viewStorage.zlowScreen.loopRunning=false;
+                }
+                break;
+            case this.views.mainZlow: 
+                if (this.viewStorage.zlowScreen.ready) {
+                    this.viewStorage.zlowScreen.setPage();
                 }
                 break;
             default: 

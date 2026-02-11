@@ -44,6 +44,8 @@ export class zlowScreen {
     peerState=0;
     connected = false;
 
+    loopRunning=false;
+
     constructor(setWhenDone) {
         fetch("../html/zlow.html").then((content)=> {
             return content.text();
@@ -196,6 +198,9 @@ export class zlowScreen {
       requestAnimationFrameFn = window.requestAnimationFrame,
       owner = this
     } = {}) {
+      if (!owner.loopRunning) {
+        return;
+      }
       const now = Date.now();
       if (simulationState.isPaused) {
         requestAnimationFrameFn(() =>
@@ -318,6 +323,9 @@ export class zlowScreen {
       getElement = (id) => document.getElementById(id),
       requestAnimationFrameFn = window.requestAnimationFrame,
     } = {}) {
+        this.peerState=0;
+        this.loopRunning=false;
+        this.connected=false;
         this.initializeTiles();
         /*AFRAME.registerComponent("no-cull", {
           init() {
@@ -407,7 +415,7 @@ export class zlowScreen {
                     alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
                     try { conn.close(); } catch {}
                     this.peerState = 0;
-                    window.location.href="mainMenu.html"
+                    viewManager.setView(viewManager.views.mainMenu)
                 }
             }, 1500);
     
@@ -496,7 +504,7 @@ export class zlowScreen {
             if (err.type === "unavailable-id") {
                 alert("This name is already being used. Please choose a different one.");
                 this.peerState = 0;
-                window.location.href="mainMenu.html"
+                viewManager.setView(viewManager.views.mainMenu);
                 return;
             }
     
@@ -516,7 +524,7 @@ export class zlowScreen {
                     console.log("PeerJS not supported by this browser.");
                     break;
                 case "invalid-id":
-                    window.location.href = "./mainMenu.html";
+                    viewManager.setView(viewManager.views.mainMenu);
                     break;
             }
     
@@ -545,7 +553,7 @@ export class zlowScreen {
       const workoutSummary = new WorkoutSummary({
         tempWorkoutStorage,
         onClose: () => {
-          window.location.href = 'mainMenu.html';
+          viewManager.setView(viewManager.views.mainMenu);
         },
       });
     
@@ -816,7 +824,7 @@ export class zlowScreen {
         });
       }
       this.standardMode.init();
-    
+      this.loopRunning=true;
       this.loop();
     
       const pacerSyncBtn = getElement("pacer-sync-btn");

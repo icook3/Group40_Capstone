@@ -59,7 +59,7 @@
         <button id="stop-btn" class="hud-btn zlowBtn" title="Stop">
           <span class="btn-text">Stop</span>
         </button>
-        <button id="menu-btn" class="hud-btn zlowBtn" title="Exit to Main Menu" onclick="if (confirm('Return to Main Menu? Gameplay data will be lost.')) {window.location.href='./mainMenu.html'}">
+        <button id="menu-btn" class="hud-btn zlowBtn" title="Exit to Main Menu" onclick="if (confirm('Return to Main Menu? Gameplay data will be lost.')) {viewManager.setView(viewManager.views.mainMenu);}">
           <span class="btn-text">Exit to Main Menu</span>
         </button>
       </div>

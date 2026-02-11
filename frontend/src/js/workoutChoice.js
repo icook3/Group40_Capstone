@@ -179,7 +179,7 @@ export function workoutChoice() {
       if (sessionStorage.getItem("SelectedWorkout")==='peerServer') {
           window.location.href = "../html/connectToPeers.html";
       } else {
-          window.location.href = "../html/zlow.html";
+          viewManager.setView(viewManager.views.mainZlow);
       }
     });
 
