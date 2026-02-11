@@ -10,36 +10,34 @@ class ViewStorage {
     playerCustomizationScreen;
     zlowScreen;
 }
+export class ViewManager {
+    viewStorage = new ViewStorage();
 
-let viewStorage = new ViewStorage;
-
-/**
- * Initializes different views
- */
-export function initViews() {
-    console.log("Initializing views");
-    viewStorage.mainMenu = new mainMenuView(true);
-    viewStorage.zlowScreen = new zlowScreen(false);
-}
-
-export function setView(view) {
-    switch(view) {
-        case views.mainMenu:
-            if (viewStorage.mainMenu.ready) {
-                viewStorage.mainMenu.setPage();
-            }
-            break;
-        default: 
-            console.log("This view is not available!");
-            break;
+    /**
+    * Initializes different views
+    */
+    initViews() {
+        console.log("Initializing views");
+        this.viewStorage.mainMenu = new mainMenuView(false);
+        this.viewStorage.zlowScreen = new zlowScreen(true);
     }
+
+    setView(view) {
+        switch(view) {
+            case this.views.mainMenu:
+                if (this.viewStorage.mainMenu.ready) {
+                    this.viewStorage.mainMenu.setPage();
+                }
+                break;
+            default: 
+                console.log("This view is not available!");
+                break;
+        }
+    }
+
+    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
 }
-
-export let views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
-
 // For browser usage
 if (typeof window !== "undefined") {
-    window.initViews=initViews;
-    window.setView=setView;
-    window.views=views;
+    window.viewManager=new ViewManager();
 }
