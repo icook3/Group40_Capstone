@@ -19,6 +19,7 @@ import { MilestoneTracker } from "../milestones.js";
 import { NotificationManager } from "../notifications.js";
 import {initCrashReporter} from "../crashReporter.js";
 import { PhysicsEngine } from "../PhysicsEngine.js";
+import { exportToStrava, saveTCX } from "../main.js";
 
 export class zlowScreen {
     content;
@@ -38,11 +39,15 @@ export class zlowScreen {
     scene;
     hud;
     rampController;
+    selectedWorkout;
+    workoutName;
     //0: not in peer-peer mode
     //1: host
     //2: peer
     peerState=0;
     connected = false;
+    peer;
+    conn;
 
     loopRunning=false;
 
@@ -135,8 +140,8 @@ export class zlowScreen {
     //used for frequent updates in update method
     sendPeerDataOver(speed) {
       //console.log("sending data: "+this.connected);
-      if (this.connected&&conn.open) {
-        conn.send({name:"speed",data:speed})
+      if (this.connected&&this.conn.open) {
+        this.conn.send({name:"speed",data:speed})
       }
     }
     
@@ -152,7 +157,7 @@ export class zlowScreen {
           });
           this.pacer.creator.loadOtherData(data.data);
           if (this.peerState==1) {
-            conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+            this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
           break;
         case "speed":
@@ -182,7 +187,404 @@ export class zlowScreen {
       }
     }
 
+    createCrashReporter() {
+        // Initialize crash reporter to collect game related data
+        initCrashReporter(async () => {
+            const rideSamples = rideHistory.samples || [];
+            const lastSample = rideSamples.at(-1);
+            const elapsedMs = lastSample ? lastSample.elapsedMs : 0;
+            const workoutSeconds = Math.floor(elapsedMs / 1000);
+    
+            let riderPos = null;
+            let pacerPos = null;
+    
+            try {
+                const riderEl = document.getElementById("rider");
+                const pacerEl = document.getElementById("pacer");
+    
+                riderPos = riderEl?.getAttribute("position") || null;
+                pacerPos = pacerEl?.getAttribute("position") || null;
+            } catch {}
+    
+            let aframeStats = null;
+    
+            try {
+                const rideScene = AFRAME?.scenes?.[0];
+                const info = rideScene?.renderer?.info;
+    
+                if (rideScene && info) {
+                    aframeStats = {
+                        geometries: info.memory?.geometries,
+                        textures: info.memory?.textures,
+                        programs: info.programs?.length,
+                        drawCalls: info.render?.calls,
+                        triangles: info.render?.triangles,
+                        entities: rideScene.querySelectorAll('a-entity')?.length,
+                    };
+                }
+            } catch (e) {
+                aframeStats = { error: "failed to read aframe stats" };
+            }
+            tempPeerState=this.peerState;
+            return {
+                workout: sessionStorage.getItem("SelectedWorkout") || "free",
+                samples: rideHistory.samples?.length,
+                workoutSeconds: workoutSeconds,
+    
+                speed: lastSample?.speed ?? 0,
+                power: lastSample?.power ?? 0,
+                riderPosition: riderPos,
+                pacerPosition: pacerPos,
+    
+                aframe: aframeStats,
+    
+                testMode: localStorage.getItem("testMode"),
+                trainerConnected: !!this.standardMode?.trainer?.isConnected,
+    
+                tempPeerState,
+                peerConnected: this.connected,
+                peerOpen: this.conn?.open,
+                peerId: this.peer?.id,
+            };
+        });
+    }
 
+    initPeerToPeer() {
+      // if you are the peer
+      if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
+        this.peerState = 2;
+        console.log("connecting to peer");
+        this.peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
+        this.peer.on('open', id => {
+            this.conn = this.peer.connect(sessionStorage.getItem("peer"));
+            console.log("ID="+id);
+    
+            setTimeout(() => {
+                if (!this.connected) {
+                    alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
+                    try { this.conn.close(); } catch {}
+                    this.peerState = 0;
+                    viewManager.setView(viewManager.views.mainMenu)
+                }
+            }, 1500);
+    
+            //console.log("Peer: "+peer);
+            this.conn.on('open', () => {
+              console.log("connected!");
+              console.log(this.conn);
+              this.connected = true;
+              // initially send over JSON of character design
+              // when you recieve data
+              this.conn.on("data", data => {
+                  if (data.name === "error") {
+                      this.connected = false;
+                      alert(data.data);
+                      this.conn.close();
+                      this.peerState = 0;
+                      return;
+                  }
+    
+                  recieveData(data);
+              });
+              this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
+            });
+            this.conn.on('error', function(err) {
+                if (err.type === "peer-unavailable") {
+                    alert("Could not connect — the host does not exist.");
+                    this.peerState = 0;
+                    return;
+                } else {
+                    console.error("Connection Error:", err);
+                }
+    
+                console.error("Connection Error:", err);
+            });
+        });
+        this.peer.on('error', function(err) {
+            // Server/connection issue
+            if (err.type === "network" || err.type === "server-error") {
+                console.log("Network/server error");
+                this.peerState = 0;
+                return;
+            }
+    
+            console.error("PeerJS error:", err);
+        });
+      }
+      // You are hosting a session 
+      else if (sessionStorage.getItem("peerToPeer")=='true') {
+        this.peerState = 1;
+        console.log("hosting peer");
+        this.peer = new Peer(localStorage.getItem("Name"), {host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
+        this.peer.on('open', function(id) {
+            console.log("ID="+id);        
+        });
+        this.peer.on("connection", connection => {
+            if (this.connected) {
+                // reject second player
+                connection.send({
+                    name: "error",
+                    data: "This lobby is full."
+                });
+                connection.close()
+                return
+            }
+    
+            this.conn = connection;
+            this.connected = true;
+    
+            console.log("Peer JOINED lobby:", connection.peer);
+    
+            // Immediately listen for messages
+            this.conn.on("data", data => recieveData(data));
+    
+            // Send host's player data back
+            this.conn.send({
+                name: "playerData",
+                data: localStorage.getItem("playerData")
+            });
+    
+            this.conn.on("error", err => {
+                console.error("Connection error:", err);
+            });
+        });
+        this.peer.on('error', function(err) {
+    
+            if (err.type === "unavailable-id") {
+                alert("This name is already being used. Please choose a different one.");
+                this.peerState = 0;
+                viewManager.setView(viewManager.views.mainMenu);
+                return;
+            }
+    
+            if (err.type === "peer-unavailable") {
+                console.log("Peer unavailable.");
+                return;
+            }
+    
+            if (err.type === "network" || err.type === "server-error") {
+                console.log("Network/server error");
+                this.peerState = 0;
+                return;
+            }
+    
+            switch (err.type) {
+                case "browser-incompatible":
+                    console.log("PeerJS not supported by this browser.");
+                    break;
+                case "invalid-id":
+                    viewManager.setView(viewManager.views.mainMenu);
+                    break;
+            }
+    
+            console.error("PeerJS error:", err);
+        });
+      }
+    }
+
+    initializePacerSpeedInput() {
+      if (localStorage.getItem("testMode") == "true") {
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+        this.scene = new ZlowScene(Number(pacerSpeedInput.value));
+        pacerSpeedInput.addEventListener("input", () => {
+          const val = Number(pacerSpeedInput.value);
+          this.setPacerSpeed(val);
+          // this.scene.setPacerSpeed(val);
+        });
+    
+        this.setPacerSpeed(Number(pacerSpeedInput.value));
+        pacerSpeedInput.addEventListener("input", () => {
+          const val = Number(pacerSpeedInput.value);
+          this.setPacerSpeed(val);
+        });
+      } else {
+        if (sessionStorage.getItem("PacerSpeed") !== null) {
+          const val = Number(sessionStorage.getItem("PacerSpeed"));
+          this.scene = new ZlowScene(val, { getElement });
+          // this.scene.setPacerSpeed(val);
+          this.setPacerSpeed(val);
+        } else {
+          const val = 20;
+          this.scene = new ZlowScene(val, { getElement });
+          //this.scene.setPacerSpeed(val);
+          this.setPacerSpeed(val);
+        }
+      }
+    }
+
+    initializeRampTestController() {
+      // Set up ramp test controller if applicable
+      if (this.selectedWorkout === "ramp") {
+        const now = Date.now();
+        let tempHud=this.hud;
+        this.rampController = new RampTestController({
+          tempHud,
+          nowMs: now,
+          warmupSeconds: 5 * 60, // 5-minute warmup
+          startWatts: 100,
+          stepWatts: 20,
+          stepSeconds: 60,
+          ftpFactor: 0.75,
+        });
+      } else {
+        this.rampController = null;
+      }
+    }
+    initializeHudCountdown() {
+      this.hud.showStartCountdown({
+        workoutName: this.workoutName,
+        seconds: 5,
+        onDone: () => {
+          // After 5s, unpause the sim
+          simulationState.isPaused = false;
+    
+          // If ramp, begin warmup countdown (no pause)
+          if (this.selectedWorkout === "ramp") {
+            // tell HUD to show 5-minute warmup timer
+            this.hud.showWarmupCountdown({
+              seconds: 5 * 60,
+              onDone: () => {
+                // Warmup over → tell RampTestController to start ramps
+                this.rampController?.startRamp?.();
+              },
+            });
+          }
+        },
+      });
+    }
+
+    initPauseBtn() {
+      let savedPacerSpeed;
+      const pauseBtn = getElement("pause-btn");
+      pauseBtn.addEventListener("click", () => {
+        simulationState.isPaused = !simulationState.isPaused;
+        pauseBtn.textContent = simulationState.isPaused ? "Resume" : "Pause";
+    
+        if (simulationState.isPaused) {
+          this.hud.pause();
+          savedPacerSpeed = this.pacerPhysics.getSpeed();
+          this.setPacerSpeed(0); // Stop pacer when paused
+          // start countdown
+          countdown.start(() => {
+            // auto-resume when hits 0
+            simulationState.isPaused = false;
+            this.hud.resume();
+            this.setPacerSpeed(savedPacerSpeed);
+            pauseBtn.textContent = "Pause";
+          });
+        } else {
+          // manual resume
+          countdown.cancel();
+          this.hud.resume();
+          simulationState.isPaused = false;
+          this.setPacerSpeed(savedPacerSpeed);
+          pauseBtn.textContent = "Pause";
+        }
+      });
+    }
+    setupStopButton() {
+            const stopBtn = getElement("stop-btn");
+      stopBtn.addEventListener("click", () => {
+        // Show confirmation dialog
+        showStopConfirmation(
+          // On Confirm - end workout and show summary
+          () => {
+            // End the session and get final stats
+            const finalStats = this.workoutSession.end();
+    
+            // After you compute finalStats from workoutSession / history, etc.
+            if (this.selectedWorkout === "ramp" && this.rampController) {
+              const result = this.rampController.computeFtpFromHistory(
+                rideHistory.samples
+              );
+              if (result) {
+                // Flatten FTP numbers into stats for summary + records
+                finalStats.ftp = Math.round(result.ftp);
+                finalStats.peakMinutePower = Math.round(result.peakMinute);
+    
+                this.hud.showWorkoutMessage({
+                  text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
+                  seconds: 8,
+                });
+              }
+            }
+    
+            // Save workout and check for records
+            const { newRecords, streak } = this.workoutStorage.saveWorkout(finalStats);
+    
+            // Show the summary!
+            workoutSummary.show(finalStats, newRecords, streak);
+    
+            // Reset everything
+            simulationState.isPaused = false;
+            countdown.cancel();
+            constants.riderState.power = 0;
+            this.physics.setSpeed(0);
+            this.hud.resetWorkOut();
+            pauseBtn.textContent = "Pause";
+    
+            // Reset pacer
+            this.setPacerSpeed(0);
+            const startPos = { x: 0.5, y: 1, z: -2 };
+            this.pacer.avatarEntity.setAttribute("position", startPos);
+            constants.pacerStarted = false;
+    
+            // Start a new session for next workout
+            this.workoutSession.start();
+            this.milestoneTracker.reset();
+          },
+          // On Cancel
+          () => {
+            console.log("❌ Stop cancelled - continuing workout");
+          }
+        );
+      });
+    }
+
+    setupTrainerButtons() {
+      const connectBtn = getElement("connect-btn");
+      connectBtn.addEventListener("click", async () => {
+        await this.standardMode.connectTrainer();
+        const ok = await this.standardMode.trainer.connect();
+        if (ok) connectBtn.disabled = true;
+      });
+      // Calibration modal button
+      const calibrateModalBtn = getElement("calibrate-trainer-modal-btn");
+      if (calibrateModalBtn) {
+        calibrateModalBtn.addEventListener("click", () => {
+          const modal = document.getElementById("calibration-modal");
+          if (modal) {
+            modal.classList.add("show");
+            modal.setAttribute("aria-hidden", "false");
+            // Initialize calibration if not already done, passing the shared trainer
+            if (window.initCalibration) {
+              window.initCalibration({ trainer: this.standardMode.trainer });
+            }
+          }
+        });
+      }
+    }
+    setupPacerSyncButton() {
+      const pacerSyncBtn = getElement("pacer-sync-btn");
+      pacerSyncBtn.addEventListener("click", () => {
+        //Set pacer's z to rider's z
+        if (this.scene && this.rider && this.pacer) {
+          const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
+          const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
+          pacerSyncPos.z = riderSyncPos.z;
+    
+          // Set pacer constants to rider constants and adjust animation
+          constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+          document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
+          this.pacer.avatarEntity.removeAttribute("animation__1");
+          this.pacer.avatarEntity.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
+          this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+        }
+        if (this.connected) {
+          this.conn.send({name: "syncPlayers", data: {}});
+        }
+      });
+    }
     /**
      * MAIN ZLOW FLOW
      * 
@@ -329,222 +731,35 @@ export class zlowScreen {
       getElement = (id) => document.getElementById(id),
       requestAnimationFrameFn = window.requestAnimationFrame,
     } = {}) {
-        this.peerState=0;
-        this.loopRunning=false;
-        this.connected=false;
-        this.initializeTiles();
-        /*AFRAME.registerComponent("no-cull", {
-          init() {
-            this.el.addEventListener("model-loaded", () => {
-              this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
-            });
-          },
-        });*/
-        this.updateFavicon();
-        this.darkMode.addEventListener("change", this.updateFavicon);
-
-        window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
-        console.log("initZlowApp count:", window.__zlowInitCount);
+      this.peerState=0;
+      this.loopRunning=false;
+      this.connected=false;
+      this.initializeTiles();
+      /*AFRAME.registerComponent("no-cull", {
+        init() {
+          this.el.addEventListener("model-loaded", () => {
+            this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
+          });
+        },
+      });*/
+      this.updateFavicon();
+      this.darkMode.addEventListener("change", this.updateFavicon);
       
-        // Initialize crash reporter to collect game related data
-        initCrashReporter(async () => {
-            const rideSamples = rideHistory.samples || [];
-            const lastSample = rideSamples.at(-1);
-            const elapsedMs = lastSample ? lastSample.elapsedMs : 0;
-            const workoutSeconds = Math.floor(elapsedMs / 1000);
-    
-            let riderPos = null;
-            let pacerPos = null;
-    
-            try {
-                const riderEl = document.getElementById("rider");
-                const pacerEl = document.getElementById("pacer");
-    
-                riderPos = riderEl?.getAttribute("position") || null;
-                pacerPos = pacerEl?.getAttribute("position") || null;
-            } catch {}
-    
-            let aframeStats = null;
-    
-            try {
-                const rideScene = AFRAME?.scenes?.[0];
-                const info = rideScene?.renderer?.info;
-    
-                if (rideScene && info) {
-                    aframeStats = {
-                        geometries: info.memory?.geometries,
-                        textures: info.memory?.textures,
-                        programs: info.programs?.length,
-                        drawCalls: info.render?.calls,
-                        triangles: info.render?.triangles,
-                        entities: rideScene.querySelectorAll('a-entity')?.length,
-                    };
-                }
-            } catch (e) {
-                aframeStats = { error: "failed to read aframe stats" };
-            }
-            tempPeerState=this.peerState;
-            return {
-                workout: sessionStorage.getItem("SelectedWorkout") || "free",
-                samples: rideHistory.samples?.length,
-                workoutSeconds: workoutSeconds,
-    
-                speed: lastSample?.speed ?? 0,
-                power: lastSample?.power ?? 0,
-                riderPosition: riderPos,
-                pacerPosition: pacerPos,
-    
-                aframe: aframeStats,
-    
-                testMode: localStorage.getItem("testMode"),
-                trainerConnected: !!this.standardMode?.trainer?.isConnected,
-    
-                tempPeerState,
-                peerConnected: this.connected,
-                peerOpen: conn?.open,
-                peerId: peer?.id,
-            };
-        });
+      window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
+      console.log("initZlowApp count:", window.__zlowInitCount);
+      
+      this.createCrashReporter();
     
       // initialize peer-to-peer connection
-      // if you are the peer
-      if (sessionStorage.getItem('SelectedWorkout')=="peerServer") {
-        this.peerState = 2;
-        console.log("connecting to peer");
-        peer = new Peer({host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
-        peer.on('open', id => {
-            conn = peer.connect(sessionStorage.getItem("peer"));
-            console.log("ID="+id);
-    
-            setTimeout(() => {
-                if (!this.connected) {
-                    alert("Connection timed out. Host offline, \nhost lobby is full \nor lobby does not exist");
-                    try { conn.close(); } catch {}
-                    this.peerState = 0;
-                    viewManager.setView(viewManager.views.mainMenu)
-                }
-            }, 1500);
-    
-            //console.log("Peer: "+peer);
-            conn.on('open', () => {
-              console.log("connected!");
-              console.log(conn);
-              this.connected = true;
-              // initially send over JSON of character design
-              // when you recieve data
-              conn.on("data", data => {
-                  if (data.name === "error") {
-                      this.connected = false;
-                      alert(data.data);
-                      conn.close();
-                      this.peerState = 0;
-                      return;
-                  }
-    
-                  recieveData(data);
-              });
-              conn.send({name:"playerData", data:localStorage.getItem('playerData')});
-            });
-            conn.on('error', function(err) {
-                if (err.type === "peer-unavailable") {
-                    alert("Could not connect — the host does not exist.");
-                    this.peerState = 0;
-                    return;
-                } else {
-                    console.error("Connection Error:", err);
-                }
-    
-                console.error("Connection Error:", err);
-            });
-        });
-        peer.on('error', function(err) {
-            // Server/connection issue
-            if (err.type === "network" || err.type === "server-error") {
-                console.log("Network/server error");
-                this.peerState = 0;
-                return;
-            }
-    
-            console.error("PeerJS error:", err);
-        });
-      }
-      // You are hosting a session 
-      else if (sessionStorage.getItem("peerToPeer")=='true') {
-        this.peerState = 1;
-        console.log("hosting peer");
-        peer = new Peer(localStorage.getItem("Name"), {host: constants.peerHost, port: constants.peerPort, path: constants.peerPath});
-        peer.on('open', function(id) {
-            console.log("ID="+id);        
-        });
-        peer.on("connection", connection => {
-            if (this.connected) {
-                // reject second player
-                connection.send({
-                    name: "error",
-                    data: "This lobby is full."
-                });
-                connection.close()
-                return
-            }
-    
-            conn = connection;
-            this.connected = true;
-    
-            console.log("Peer JOINED lobby:", connection.peer);
-    
-            // Immediately listen for messages
-            conn.on("data", data => recieveData(data));
-    
-            // Send host's player data back
-            conn.send({
-                name: "playerData",
-                data: localStorage.getItem("playerData")
-            });
-    
-            conn.on("error", err => {
-                console.error("Connection error:", err);
-            });
-        });
-        peer.on('error', function(err) {
-    
-            if (err.type === "unavailable-id") {
-                alert("This name is already being used. Please choose a different one.");
-                this.peerState = 0;
-                viewManager.setView(viewManager.views.mainMenu);
-                return;
-            }
-    
-            if (err.type === "peer-unavailable") {
-                console.log("Peer unavailable.");
-                return;
-            }
-    
-            if (err.type === "network" || err.type === "server-error") {
-                console.log("Network/server error");
-                this.peerState = 0;
-                return;
-            }
-    
-            switch (err.type) {
-                case "browser-incompatible":
-                    console.log("PeerJS not supported by this browser.");
-                    break;
-                case "invalid-id":
-                    viewManager.setView(viewManager.views.mainMenu);
-                    break;
-            }
-    
-            console.error("PeerJS error:", err);
-        });
-      }
-      const selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
-      console.log("Selected workout:", selectedWorkout);
+      this.initPeerToPeer();
+      this.selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
+      console.log("Selected workout:", this.selectedWorkout);
     
       // set up units properly
       units.setUnits();
       this.setUnits(units.speedUnit.name, "speed-unit");
       this.setUnits(units.weightUnit.name, "weight-unit");
-      //setUnits(units.powerUnit.name,"power-unit");
+      //this.setUnits(units.powerUnit.name,"power-unit");
       this.setUnits(units.distanceUnit.name, "distance-unit");
     
       // start tracking current workout stats
@@ -566,7 +781,6 @@ export class zlowScreen {
       this.workoutSession.start();
       this.milestoneTracker.reset();
     
-      // get the needed objects
       if (localStorage.getItem("testMode") !== "true") {
         const trainer = new TrainerBluetooth();
       } else {
@@ -587,8 +801,6 @@ export class zlowScreen {
         isPacer: false,
       });
       this.physics = new PhysicsEngine();
-      console.log("setting physics to");
-      console.log(this.physics);
     
       if (this.peerState == 0) {
         this.pacer = new AvatarMovement("pacer-entity", {
@@ -617,36 +829,7 @@ export class zlowScreen {
       } else {
         console.log("ERROR: dev-controls-panel element not found!");
       }
-    
-      if (localStorage.getItem("testMode") == "true") {
-        const pacerSpeedInput = getElement("pacer-speed");
-        this.scene = new ZlowScene(Number(pacerSpeedInput.value), { getElement });
-        pacerSpeedInput.addEventListener("input", () => {
-          const val = Number(pacerSpeedInput.value);
-          this.setPacerSpeed(val);
-          // this.scene.setPacerSpeed(val);
-        });
-    
-        this.setPacerSpeed(Number(pacerSpeedInput.value));
-        pacerSpeedInput.addEventListener("input", () => {
-          const val = Number(pacerSpeedInput.value);
-          this.setPacerSpeed(val);
-        });
-      } else {
-        if (sessionStorage.getItem("PacerSpeed") !== null) {
-          const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val, { getElement });
-          // this.scene.setPacerSpeed(val);
-          this.setPacerSpeed(val);
-        } else {
-          const val = 20;
-          this.scene = new ZlowScene(val, { getElement });
-          //this.scene.setPacerSpeed(val);
-          this.setPacerSpeed(val);
-        }
-      }
-      //map the pacer speed input to the pacer speed variable
-    
+      this.initializePacerSpeedInput();    
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
     
@@ -658,45 +841,9 @@ export class zlowScreen {
         sprint: "Sprint Intervals",
       };
     
-      const workoutName = workoutLabels[selectedWorkout] || "Free Ride";
-    
-      // Set up ramp test controller if applicable
-      if (selectedWorkout === "ramp") {
-        const now = Date.now();
-        let tempHud=this.hud;
-        this.rampController = new RampTestController({
-          tempHud,
-          nowMs: now,
-          warmupSeconds: 5 * 60, // 5-minute warmup
-          startWatts: 100,
-          stepWatts: 20,
-          stepSeconds: 60,
-          ftpFactor: 0.75,
-        });
-      } else {
-        this.rampController = null;
-      }
-    
-      this.hud.showStartCountdown({
-        workoutName,
-        seconds: 5,
-        onDone: () => {
-          // After 5s, unpause the sim
-          simulationState.isPaused = false;
-    
-          // If ramp, begin warmup countdown (no pause)
-          if (selectedWorkout === "ramp") {
-            // tell HUD to show 5-minute warmup timer
-            this.hud.showWarmupCountdown({
-              seconds: 5 * 60,
-              onDone: () => {
-                // Warmup over → tell RampTestController to start ramps
-                this.rampController?.startRamp?.();
-              },
-            });
-          }
-        },
-      });
+      this.workoutName = workoutLabels[this.selectedWorkout] || "Free Ride";
+      this.initializeRampTestController();
+      this.initializeHudCountdown();
     
       const strava = new Strava();
     
@@ -705,33 +852,7 @@ export class zlowScreen {
       window.testStorage = this.workoutStorage;
       window.testMilestones = this.milestoneTracker;
     
-      let savedPacerSpeed;
-      const pauseBtn = getElement("pause-btn");
-      pauseBtn.addEventListener("click", () => {
-        simulationState.isPaused = !simulationState.isPaused;
-        pauseBtn.textContent = simulationState.isPaused ? "Resume" : "Pause";
-    
-        if (simulationState.isPaused) {
-          this.hud.pause();
-          savedPacerSpeed = this.pacerPhysics.getSpeed();
-          this.setPacerSpeed(0); // Stop pacer when paused
-          // start countdown
-          countdown.start(() => {
-            // auto-resume when hits 0
-            simulationState.isPaused = false;
-            this.hud.resume();
-            this.setPacerSpeed(savedPacerSpeed);
-            pauseBtn.textContent = "Pause";
-          });
-        } else {
-          // manual resume
-          countdown.cancel();
-          this.hud.resume();
-          simulationState.isPaused = false;
-          this.setPacerSpeed(savedPacerSpeed);
-          pauseBtn.textContent = "Pause";
-        }
-      });
+      this.initPauseBtn();
     
       document.addEventListener("click", async (e) => {
         if (e.target && e.target.id === "summary-export-tcx") {
@@ -742,64 +863,8 @@ export class zlowScreen {
           await exportToStrava();
         }
       });
-    
-      const stopBtn = getElement("stop-btn");
-      stopBtn.addEventListener("click", () => {
-        // Show confirmation dialog
-        showStopConfirmation(
-          // On Confirm - end workout and show summary
-          () => {
-            // End the session and get final stats
-            const finalStats = this.workoutSession.end();
-    
-            // After you compute finalStats from workoutSession / history, etc.
-            if (selectedWorkout === "ramp" && this.rampController) {
-              const result = this.rampController.computeFtpFromHistory(
-                rideHistory.samples
-              );
-              if (result) {
-                // Flatten FTP numbers into stats for summary + records
-                finalStats.ftp = Math.round(result.ftp);
-                finalStats.peakMinutePower = Math.round(result.peakMinute);
-    
-                this.hud.showWorkoutMessage({
-                  text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
-                  seconds: 8,
-                });
-              }
-            }
-    
-            // Save workout and check for records
-            const { newRecords, streak } = this.workoutStorage.saveWorkout(finalStats);
-    
-            // Show the summary!
-            workoutSummary.show(finalStats, newRecords, streak);
-    
-            // Reset everything
-            simulationState.isPaused = false;
-            countdown.cancel();
-            constants.riderState.power = 0;
-            this.physics.setSpeed(0);
-            this.hud.resetWorkOut();
-            pauseBtn.textContent = "Pause";
-    
-            // Reset pacer
-            this.setPacerSpeed(0);
-            const startPos = { x: 0.5, y: 1, z: -2 };
-            this.pacer.avatarEntity.setAttribute("position", startPos);
-            constants.pacerStarted = false;
-    
-            // Start a new session for next workout
-            this.workoutSession.start();
-            this.milestoneTracker.reset();
-          },
-          // On Cancel
-          () => {
-            console.log("❌ Stop cancelled - continuing workout");
-          }
-        );
-      });
-    
+      this.setupStopButton();
+      
       document.addEventListener("keydown", (e) => {
         if (!this.keyboardMode.keyboardMode) return;
         this.keyboardMode.keyboardInputActive(e.key);
@@ -808,51 +873,12 @@ export class zlowScreen {
         if (!this.keyboardMode.keyboardMode) return;
         this.keyboardMode.stopKeyboardMode(e.key.toLowerCase());
       });
-      const connectBtn = getElement("connect-btn");
-      connectBtn.addEventListener("click", async () => {
-        await this.standardMode.connectTrainer();
-        const ok = await this.standardMode.trainer.connect();
-        if (ok) connectBtn.disabled = true;
-      });
-      // Calibration modal button
-      const calibrateModalBtn = getElement("calibrate-trainer-modal-btn");
-      if (calibrateModalBtn) {
-        calibrateModalBtn.addEventListener("click", () => {
-          const modal = document.getElementById("calibration-modal");
-          if (modal) {
-            modal.classList.add("show");
-            modal.setAttribute("aria-hidden", "false");
-            // Initialize calibration if not already done, passing the shared trainer
-            if (window.initCalibration) {
-              window.initCalibration({ trainer: this.standardMode.trainer });
-            }
-          }
-        });
-      }
+      this.setupTrainerButtons();
       this.standardMode.init();
       this.loopRunning=true;
       this.loop();
-    
-      const pacerSyncBtn = getElement("pacer-sync-btn");
-      pacerSyncBtn.addEventListener("click", () => {
-        //Set pacer's z to rider's z
-        if (this.scene && this.rider && this.pacer) {
-          const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
-          const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
-          pacerSyncPos.z = riderSyncPos.z;
-    
-          // Set pacer constants to rider constants and adjust animation
-          constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-          this.pacer.avatarEntity.removeAttribute("animation__1");
-          this.pacer.avatarEntity.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
-          this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
-        }
-        if (this.connected) {
-          conn.send({name: "syncPlayers", data: {}});
-        }
-      });
-    
+      this.setupPacerSyncButton();
+
       if (this.peerState!=0) {
         pacerSyncBtn.innerHTML = "Sync Players";
       }
