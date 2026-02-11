@@ -16,7 +16,7 @@ export class ZlowScene {
     if (this.DEBUG_BANDS) {
       this.scenery.scenePolicy.logBands();
     }
-
+    constants.worldZ=0;
     // Generate a new object field, track, and clouds
     this.track = new Track({ sceneEl: this.scene });        
     this.clouds = new Cloud({ sceneEl: this.scene });

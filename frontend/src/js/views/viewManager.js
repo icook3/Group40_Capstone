@@ -26,7 +26,7 @@ export class ViewManager {
             case this.views.mainMenu:
                 if (this.viewStorage.mainMenu.ready) {
                     this.viewStorage.mainMenu.setPage();
-                    this.viewStorage.zlowScreen.loopRunning=false;
+                    this.viewStorage.zlowScreen.reset();
                 }
                 break;
             case this.views.mainZlow: 
@@ -41,6 +41,7 @@ export class ViewManager {
     }
 
     views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
+    
 }
 // For browser usage
 if (typeof window !== "undefined") {
