@@ -455,7 +455,7 @@ export class zlowScreen {
 
     initPauseBtn() {
       let savedPacerSpeed;
-      const pauseBtn = getElement("pause-btn");
+      const pauseBtn = document.getElementById("pause-btn");
       pauseBtn.addEventListener("click", () => {
         simulationState.isPaused = !simulationState.isPaused;
         pauseBtn.textContent = simulationState.isPaused ? "Resume" : "Pause";
@@ -483,7 +483,7 @@ export class zlowScreen {
       });
     }
     setupStopButton() {
-            const stopBtn = getElement("stop-btn");
+      const stopBtn = document.getElementById("stop-btn");
       stopBtn.addEventListener("click", () => {
         // Show confirmation dialog
         showStopConfirmation(
@@ -542,14 +542,14 @@ export class zlowScreen {
     }
 
     setupTrainerButtons() {
-      const connectBtn = getElement("connect-btn");
+      const connectBtn = document.getElementById("connect-btn");
       connectBtn.addEventListener("click", async () => {
         await this.standardMode.connectTrainer();
         const ok = await this.standardMode.trainer.connect();
         if (ok) connectBtn.disabled = true;
       });
       // Calibration modal button
-      const calibrateModalBtn = getElement("calibrate-trainer-modal-btn");
+      const calibrateModalBtn = document.getElementById("calibrate-trainer-modal-btn");
       if (calibrateModalBtn) {
         calibrateModalBtn.addEventListener("click", () => {
           const modal = document.getElementById("calibration-modal");
@@ -565,7 +565,7 @@ export class zlowScreen {
       }
     }
     setupPacerSyncButton() {
-      const pacerSyncBtn = getElement("pacer-sync-btn");
+      const pacerSyncBtn = document.getElementById("pacer-sync-btn");
       pacerSyncBtn.addEventListener("click", () => {
         //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
