@@ -194,11 +194,12 @@ export class zlowScreen {
     loop({
       getElement = (id) => document.getElementById(id),
       requestAnimationFrameFn = window.requestAnimationFrame,
+      owner = this
     } = {}) {
       const now = Date.now();
       if (simulationState.isPaused) {
         requestAnimationFrameFn(() =>
-          this.loop({ getElement, requestAnimationFrameFn })
+          owner.loop({ getElement, requestAnimationFrameFn, owner })
         );
         return;
       }
@@ -206,9 +207,7 @@ export class zlowScreen {
       constants.lastTime = now;
     
       const currentPower = constants.riderState.power || 0;
-      console.log("using physics=");
-      console.log(this.physics);
-      constants.riderState.speed = this.physics.update(currentPower, dt);
+      constants.riderState.speed = owner.physics.update(currentPower, dt);
     
       // Calculate calories burned using the following formula:
       // calories = (power in watts * delta time (seconds) / 1000)
@@ -218,83 +217,83 @@ export class zlowScreen {
           (constants.riderState.calories || 0) + caloriesBurned;
       }
     
-      this.scene.update(constants.riderState.speed || 0, dt);
+      owner.scene.update(constants.riderState.speed || 0, dt);
     
       //update workout session with current values
-      if (this.workoutSession.isWorkoutActive()) {
-        if (this.rampController) {
+      if (owner.workoutSession.isWorkoutActive()) {
+        if (owner.rampController) {
           // Update FTP result if available
-          this.workoutSession.addFTPResult(this.rampController.ftpResult);
+          owner.workoutSession.addFTPResult(owner.rampController.ftpResult);
         }
-        this.workoutSession.update({
+        owner.workoutSession.update({
           speed: constants.riderState.speed || 0,
           power: constants.riderState.power || 0,
-          distance: this.hud.totalDistance,
+          distance: owner.hud.totalDistance,
           calories: constants.riderState.calories || 0,
         });
     
         //if there is a milestone show it
-        const milestone = this.milestoneTracker.check();
+        const milestone = owner.milestoneTracker.check();
         if (milestone) {
           //console.log("Milestone found, showing notification:", milestone.message);
     
-          this.notificationManager.show(milestone.message, milestone.isSpecial);
+          owner.notificationManager.show(milestone.message, milestone.isSpecial);
         }
       }
     
       //Update Avatar and Pacer
-      this.rider.setSpeed(constants.riderState.speed);
-      this.rider.setPower(constants.riderState.power);
+      owner.rider.setSpeed(constants.riderState.speed);
+      owner.rider.setPower(constants.riderState.power);
     
-      this.rider.update(dt);
+      owner.rider.update(dt);
     
-      if (constants.pacerStarted&&this.peerState==0) {
+      if (constants.pacerStarted&&owner.peerState==0) {
         //console.log("Inside if statement");
         // Start from whatever speed the pacer currently has
-        let pacerSpeed = this.pacerPhysics.getSpeed();
+        let pacerSpeed = owner.pacerPhysics.getSpeed();
     
-        if (this.rampController) {
+        if (owner.rampController) {
           // RampTestController is active (Ramp Test workout)
-          const targetWatts = this.rampController.getCurrentTargetWatts();
+          const targetWatts = owner.rampController.getCurrentTargetWatts();
     
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
             pacerSpeed = constants.riderState.speed;
-            this.pacerPhysics.setSpeed(pacerSpeed);
+            owner.pacerPhysics.setSpeed(pacerSpeed);
           } else {
             // Active ramp step:
             // Pacer behaves like an ideal rider holding target watts,
             // using the same physics as the real rider for smooth changes.
-            pacerSpeed = this.pacerPhysics.update(targetWatts, dt);
+            pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
           }
         }
         // If rampController is null (free ride, other workouts),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
     
         // Apply the computed speed to the pacer avatar
-        this.pacer.setSpeed(pacerSpeed);
-        this.pacerPhysics.setSpeed(pacerSpeed);
-        this.pacer.update(dt);
+        owner.pacer.setSpeed(pacerSpeed);
+        owner.pacerPhysics.setSpeed(pacerSpeed);
+        owner.pacer.update(dt);
       }
     
       // Let the ramp controller advance its state
-      if (this.rampController) {
+      if (owner.rampController) {
         const power = constants.riderState.power || 0;
-        this.rampController.update(now, power);
+        owner.rampController.update(now, power);
     
-        const target = this.rampController.getCurrentTargetWatts();
+        const target = owner.rampController.getCurrentTargetWatts();
         constants.riderState.targetWatts = target || 0;
       }
     
-      this.hud.update(constants.riderState, dt);
+      owner.hud.update(constants.riderState, dt);
       if (localStorage.getItem("testMode") == null) {
         localStorage.setItem("testMode", false);
       }
       if (localStorage.getItem("testMode") == "false") {
-        this.keyboardMode.keyboardMode = false;
+        owner.keyboardMode.keyboardMode = false;
       } else {
-        this.keyboardMode.keyboardMode = true;
+        owner.keyboardMode.keyboardMode = true;
       }
     
       //set up values to push
@@ -308,8 +307,10 @@ export class zlowScreen {
     
       rideHistory.pushSample(pushTime, pushPower, pushSpeed, pushDistance);
     
-      this.sendPeerDataOver(constants.riderState.speed);
-      requestAnimationFrameFn(this.loop);
+      owner.sendPeerDataOver(constants.riderState.speed);
+      requestAnimationFrameFn(() =>
+          owner.loop({ getElement, requestAnimationFrameFn, owner })
+      );
     }
     
     // Exported function to initialize app (for browser and test)
