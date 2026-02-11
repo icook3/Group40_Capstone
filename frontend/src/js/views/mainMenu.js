@@ -5,6 +5,7 @@ import { Strava } from "../strava.js";
 
 export class mainMenuView {
     content;
+    ready=false;
     constructor(setWhenDone) {
         fetch("../html/mainMenu.html").then((content)=> {
             return content.text();
@@ -13,6 +14,7 @@ export class mainMenuView {
             if (setWhenDone) {
                 this.setPage();
             }
+            this.ready=true;
         });
     }
 

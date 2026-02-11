@@ -1,5 +1,6 @@
 import { mainMenuView } from "./mainMenu.js";
-
+import { zlowScreen } from "./zlow.js";
+//TODO: refactor into a class - export an instance of the class to the window
 
 // a list of different views
 class ViewStorage {
@@ -18,12 +19,15 @@ let viewStorage = new ViewStorage;
 export function initViews() {
     console.log("Initializing views");
     viewStorage.mainMenu = new mainMenuView(true);
+    viewStorage.zlowScreen = new zlowScreen(false);
 }
 
 export function setView(view) {
     switch(view) {
         case views.mainMenu:
-            viewStorage.mainMenu.setPage();
+            if (viewStorage.mainMenu.ready) {
+                viewStorage.mainMenu.setPage();
+            }
             break;
         default: 
             console.log("This view is not available!");
