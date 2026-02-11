@@ -1,5 +1,6 @@
 import { mainMenuView } from "./mainMenu.js";
 import { zlowScreen } from "./zlow.js";
+import { changelogView } from "./changelog.js";
 
 // a list of different views
 class ViewStorage {
@@ -19,6 +20,7 @@ export class ViewManager {
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
         this.viewStorage.zlowScreen = new zlowScreen(false);
+        this.viewStorage.changelog = new changelogView(false);
     }
 
     setView(view) {
@@ -32,6 +34,11 @@ export class ViewManager {
             case this.views.mainZlow: 
                 if (this.viewStorage.zlowScreen.ready) {
                     this.viewStorage.zlowScreen.setPage();
+                }
+                break;
+            case this.views.changelog:
+                if (this.viewStorage.changelog.ready) {
+                    this.viewStorage.changelog.setPage();
                 }
                 break;
             default: 
