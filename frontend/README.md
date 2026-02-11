@@ -118,6 +118,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `mainMenu.js` — Stores the main menu, and handles setting it up. 
 			- `viewManager.js` — Handles switching between different views. 
 			- `views.md` — Documentation of how to switch between views, and how views are laid out. 
+			- `zlow.js` — Stores the main application, and handles setting it up when workouts are started. 
 		- `workouts` — Stores different workouts
 			- `RampTestController.js` — Handles a workout involving going up ramps
 	    - `avatarCreator.js` — Sets up A-Frame 3D avatar.

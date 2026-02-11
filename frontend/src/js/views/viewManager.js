@@ -1,6 +1,5 @@
 import { mainMenuView } from "./mainMenu.js";
 import { zlowScreen } from "./zlow.js";
-//TODO: refactor into a class - export an instance of the class to the window
 
 // a list of different views
 class ViewStorage {
