@@ -177,7 +177,7 @@ export function workoutChoice() {
       if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
       // Navigate into your app (same as your current file)
       if (sessionStorage.getItem("SelectedWorkout")==='peerServer') {
-          window.location.href = "../html/connectToPeers.html";
+          viewManager.setView(viewManager.views.peerConnect);
       } else {
           viewManager.setView(viewManager.views.mainZlow);
       }

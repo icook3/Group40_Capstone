@@ -1,7 +1,7 @@
 import { constants } from "./constants.js";
 function openZlow(peer) {
     sessionStorage.setItem("peer",peer);
-    window.location.href="./zlow.html"
+    viewManager.setView(viewManager.views.mainZlow);
 }
 
 export function peerInit() {
