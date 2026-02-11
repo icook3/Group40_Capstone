@@ -30,14 +30,6 @@ class Constants {
   }
   slope = 0; // road grade (decimal)
   lastTime = Date.now();
-  // keyboard mode values - should go in own class for keyboard mode
-  keyboardMode = false;
-  keyboardSpeed = this.kmhToMs(100);
-  keyboardHalfSpeed = this.kmhToMs(50);
-  wKeyDown = false;
-  sKeyDown = false;
-  qKeyDown = false;
-  aKeyDown = false;
 
   riderState = { power: 0, speed: 0, calories: 0 };
   pacerStarted = false;

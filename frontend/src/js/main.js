@@ -19,89 +19,7 @@ import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
 import {initCrashReporter} from "./crashReporter.js";
-
-// Physics-based power-to-speed conversion
-// Returns speed in m/s for given power (watts)
-export function powerToSpeed({ power } = {}) {
-  // Use a root-finding approach for cubic equation: P = a*v^3 + b*v
-  // a = 0.5 * airDensity * cda = air resistance
-  // b = crr * mass * g + mass * g * Math.sin(Math.atan(slope)) = rolling resistance + gravity
-  const a = 0.5 * constants.airDensity * constants.cda;
-  const b =
-    constants.crr * constants.mass * constants.g +
-    constants.mass * constants.g * Math.sin(Math.atan(constants.slope));
-  // Use Newton-Raphson to solve for v
-  let v = 8; // initial guess (m/s)
-  for (let i = 0; i < 20; i++) {
-    const f = a * v * v * v + b * v - power;
-    const df = 3 * a * v * v + b;
-    v = v - f / df;
-    if (v < 0) v = 0.1; // prevent negative speeds
-  }
-  return constants.msToKmh(v);
-}
-
-// Applies realistic coasting when power becomes zero
-// Returns new calculated speed after dt seconds of coasting
-export function calculateCoastingSpeed(currentSpeed, dt) {
-  // Use meters for calculations
-  const v_ms = constants.kmhToMs(currentSpeed);
-
-  // If bycicle has stopped, speed stays at zero
-  if (v_ms <= 0) return 0;
-
-  // Calculate air drag from windResistance function
-  const airDragForce = constants.windResistance(v_ms);
-
-  // Calculate rolling resistance force
-  const rollingResistanceForce = constants.crr * constants.mass * constants.g;
-
-  // Calculate total resistance force
-  const totalForce =
-    (airDragForce + rollingResistanceForce) * constants.coastingFactor;
-
-  // Calculate deceleration using acceleration = force / mass
-  const deceleration = totalForce / constants.mass;
-
-  // Apply decceleration as a function of time: new speed = current speed - (deceleration * delta time)
-  const v_new_ms = v_ms - deceleration * dt;
-
-  // Prevent the new speed from going negative (reverse)
-  const finalSpeed_ms = Math.max(0, v_new_ms);
-
-  // Convert speed to km/s
-  return constants.msToKmh(finalSpeed_ms);
-}
-
-// Calculates acceleration to make speed increases gradual and more realistic
-export function calculateAccelerationSpeed(currentSpeed, currentPower, dt) {
-  // convert km to m (for standard physics equations)
-  const v_ms = constants.kmhToMs(currentSpeed);
-
-  // this prevents division by zero
-  const v_for_calc = Math.max(v_ms, 0.1);
-
-  // Calculates driving force from power: F = P / v
-  const drivingForce = currentPower / v_for_calc;
-
-  // calculates forces against cyclist
-  const airDragForce = constants.windResistance(v_ms);
-  const rollingResistanceForce = constants.crr * constants.mass * constants.g;
-
-  // total force = forward force - resistance forces
-  const netForce = drivingForce - airDragForce - rollingResistanceForce;
-
-  // calculates acceleration using F = ma aka a = F/m
-  const acceleration = netForce / constants.mass;
-
-  // apply acceleration/delta time
-  const v_new_ms = v_ms + acceleration * dt;
-
-  // avoid going backwards (negative speed)
-  const finalSpeed_ms = Math.max(0, v_new_ms);
-
-  return constants.msToKmh(finalSpeed_ms);
-}
+import { PhysicsEngine } from "./PhysicsEngine.js";
 
 // Prevent meshes from disappearing due to frustum culling
 AFRAME.registerComponent("no-cull", {
@@ -133,6 +51,11 @@ let milestoneTracker;
 let rampController = null;
 let peer;
 let conn;
+
+// physics
+let physics;
+let pacerPhysics;
+
 // Handles the main loop and adding to the ride history
 function loop({
   getElement = (id) => document.getElementById(id),
@@ -148,9 +71,8 @@ function loop({
   const dt = (now - constants.lastTime) / 1000;
   constants.lastTime = now;
 
-  // Coasting happens here, only in Q/S keyboard mode
   const currentPower = constants.riderState.power || 0;
-  const currentSpeed = constants.riderState.speed || 0;
+  constants.riderState.speed = physics.update(currentPower, dt);
 
   // Calculate calories burned using the following formula:
   // calories = (power in watts * delta time (seconds) / 1000)
@@ -158,24 +80,6 @@ function loop({
     const caloriesBurned = (currentPower * dt) / 1000;
     constants.riderState.calories =
       (constants.riderState.calories || 0) + caloriesBurned;
-  }
-
-  // If using W/S keyboard mode, don't coast (since power is always zero)
-  const isUsingDirectSpeedControl =
-    keyboardMode.wKeyDown || keyboardMode.sKeyDown;
-
-  // calculates speed based on acceleration and power
-  if (currentPower > 0 && !(keyboardMode.wKeyDown || keyboardMode.sKeyDown)) {
-    constants.riderState.speed = calculateAccelerationSpeed(
-      currentSpeed,
-      currentPower,
-      dt
-    );
-  }
-
-  // If rider is not peddaling and their speed is not zero, calculate new speed
-  if (currentPower === 0 && currentSpeed > 0 && !isUsingDirectSpeedControl) {
-    constants.riderState.speed = calculateCoastingSpeed(currentSpeed, dt);
   }
 
   scene.update(constants.riderState.speed || 0, dt);
@@ -206,15 +110,12 @@ function loop({
   rider.setSpeed(constants.riderState.speed);
   rider.setPower(constants.riderState.power);
 
-  // Cache rider speed (in km/h, same units as calculateAccelerationSpeed)
-  const riderSpeed = constants.riderState.speed || 0;
-
   rider.update(dt);
 
   if (constants.pacerStarted&&peerState==0) {
     //console.log("Inside if statement");
     // Start from whatever speed the pacer currently has
-    let pacerSpeed = pacer.speed || 0;
+    let pacerSpeed = pacerPhysics.getSpeed();
 
     if (rampController) {
       // RampTestController is active (Ramp Test workout)
@@ -223,12 +124,13 @@ function loop({
       if (targetWatts == null) {
         // Warmup or finished:
         // Pacer exactly matches the rider so it stays beside you.
-        pacerSpeed = riderSpeed;
+        pacerSpeed = constants.riderState.speed;
+        pacerPhysics.setSpeed(pacerSpeed);
       } else {
         // Active ramp step:
         // Pacer behaves like an ideal rider holding target watts,
         // using the same physics as the real rider for smooth changes.
-        pacerSpeed = calculateAccelerationSpeed(pacerSpeed, targetWatts, dt);
+        pacerSpeed = pacerPhysics.update(targetWatts, dt);
       }
     }
     // If rampController is null (free ride, other workouts),
@@ -236,32 +138,8 @@ function loop({
 
     // Apply the computed speed to the pacer avatar
     pacer.setSpeed(pacerSpeed);
+    pacerPhysics.setSpeed(pacerSpeed);
     pacer.update(dt);
-
-    // Update pacer position relative to the rider based on speed difference
-    //const relativeSpeed = pacerSpeed - riderSpeed;
-
-      //console.log("Relative speed: "+relativeSpeed);
-      //console.log("Pacer speed: "+pacerSpeed);
-      //console.log("Rider speed: "+riderSpeed);
-    
-
-    
-    //const pacerPos = pacer.avatarEntity.getAttribute("position");
-    //const prevPacerPos = pacer.avatarEntity.getAttribute("position");
-    //pacerPos.z -= relativeSpeed * dt;
-
-    
-    //pacer.setPosition(pacerPos);
-  //} else if (peerState!=0&&connected&&pacer!=undefined) {
-    //pacer.update(dt);
-
-    //const riderSpeed = constants.riderState.speed;    
-    //const pacerSpeed = pacer.speed;
-    //const relativeSpeed = pacerSpeed - riderSpeed;
-    //const pacerPos = pacer.avatarEntity.getAttribute("position");
-    //pacerPos.z -= relativeSpeed * dt;
-    //pacer.setPosition(pacerPos);
   }
 
   // Let the ramp controller advance its state
@@ -318,6 +196,7 @@ function setUnits(storageVal, className) {
 function setPacerSpeed(speed) {
   if (peerState==0) {
     pacer.setSpeed(speed);
+    pacerPhysics.setSpeed(speed);
   }
 }
 
@@ -356,6 +235,7 @@ function recieveData(data) {
       }
       activatePacer();
       pacer.setSpeed(Number(data.data));
+      pacerPhysics.setSpeed(Number(data.data));
       //console.log(pacer.speed);
       break;
     case "syncPlayers":
@@ -366,7 +246,7 @@ function recieveData(data) {
         
         // Set pacer constants to rider constants and adjust animation
         constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-        document.getElementById('pacer-speed').value = constants.riderState.speed;
+        document.getElementById('pacer-speed').value = pacerPhysics.getSpeed();
         pacer.avatarEntity.removeAttribute("animation__2");
         pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
         pacer.avatarEntity.setAttribute("position", pacerSyncPos);
@@ -381,6 +261,9 @@ export function initZlowApp({
   getElement = (id) => document.getElementById(id),
   requestAnimationFrameFn = window.requestAnimationFrame,
 } = {}) {
+    window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
+    console.log("initZlowApp count:", window.__zlowInitCount);
+
     // Initialize crash reporter to collect game related data
     initCrashReporter(async () => {
         const rideSamples = rideHistory.samples || [];
@@ -620,11 +503,14 @@ export function initZlowApp({
     position: { x: -0.5, y: 1, z: 0 },
     isPacer: false,
   });
+  physics = new PhysicsEngine();
+
   if (peerState == 0) {
     pacer = new AvatarMovement("pacer-entity", {
       position: { x: 0.5, y: 1, z: -2 },
       isPacer: true,
     });
+    pacerPhysics = new PhysicsEngine();
     pacer.creator.setPacerColors();
   }
   keyboardMode = new KeyboardMode();
@@ -733,71 +619,6 @@ export function initZlowApp({
   window.testStorage = workoutStorage;
   window.testMilestones = milestoneTracker;
 
-  //Pacer speed control input
-  //Rider state and history
-  if (localStorage.getItem("testMode") == "true") {
-    /*const keyboardBtn = getElement("keyboard-btn");
-        keyboardBtn.removeAttribute("hidden");
-        keyboardBtn.addEventListener("click", () => {
-            keyboardMode.keyboardMode = !keyboardMode.keyboardMode;
-            sessionStorage.setItem("isInKeyboardMode", keyboardMode.keyboardMode);
-            keyboardBtn.textContent = keyboardMode.keyboardMode
-                ? keyboardMode.keyboardOnText
-                : "Keyboard Mode";*/
-    if (!keyboardMode.keyboardMode) {
-      constants.riderState.speed = 0;
-    }
-    //});
-  }
-
-  if (localStorage.getItem("testMode") == "true") {
-    // Hook up live mass updates → optional immediate speed recompute
-    const riderWeightEl = getElement("rider-weight");
-    if (riderWeightEl) {
-      const updateMassAndMaybeSpeed = () => {
-        const newMass = Number(riderWeightEl.value);
-        if (!Number.isFinite(newMass)) return;
-        constants.riderMass = units.weightUnit.convertFrom(newMass);
-
-        const p = constants.riderState.power || 0;
-        const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
-
-        // Only recompute from power if we're not in direct speed mode and power > 0
-        if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-          constants.riderState.speed = powerToSpeed({ power: p });
-        }
-        // If power === 0, coasting uses the new mass automatically on the next frame.
-      };
-
-      // Initialize once and then listen for changes
-      updateMassAndMaybeSpeed();
-      riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
-      riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
-    }
-  } else {
-    const updateMassAndMaybeSpeed = () => {
-      let newMass;
-      if (sessionStorage.getItem("weight") == null) {
-        newMass = 70;
-      } else {
-        newMass = Number(sessionStorage.getItem("weight").value);
-      }
-      if (!Number.isFinite(newMass)) return;
-      constants.riderMass = newMass;
-
-      const p = constants.riderState.power || 0;
-      const isDirectSpeed = keyboardMode?.wKeyDown || keyboardMode?.sKeyDown;
-
-      // Only recompute from power if we're not in direct speed mode and power > 0
-      if (p > 0 && !isDirectSpeed && !keyboardMode?.keyboardMode) {
-        constants.riderState.speed = powerToSpeed({ power: p });
-      }
-      // If power === 0, coasting uses the new mass automatically on the next frame.
-    };
-
-    // Initialize once
-    updateMassAndMaybeSpeed();
-  }
   let savedPacerSpeed;
   const pauseBtn = getElement("pause-btn");
   pauseBtn.addEventListener("click", () => {
@@ -806,7 +627,7 @@ export function initZlowApp({
 
     if (simulationState.isPaused) {
       hud.pause();
-      savedPacerSpeed = pacer.speed;
+      savedPacerSpeed = pacerPhysics.getSpeed();
       setPacerSpeed(0); // Stop pacer when paused
       // start countdown
       countdown.start(() => {
@@ -871,7 +692,8 @@ export function initZlowApp({
         // Reset everything
         simulationState.isPaused = false;
         countdown.cancel();
-        constants.riderState = { power: 0, speed: 0 };
+        constants.riderState.power = 0;
+        physics.setSpeed(0);
         hud.resetWorkOut();
         pauseBtn.textContent = "Pause";
 
@@ -892,10 +714,6 @@ export function initZlowApp({
     );
   });
 
-  keyboardMode.wKeyDown = false;
-  keyboardMode.sKeyDown = false;
-  keyboardMode.qKeyDown = false;
-  keyboardMode.aKeyDown = false;
   document.addEventListener("keydown", (e) => {
     if (!keyboardMode.keyboardMode) return;
     keyboardMode.keyboardInputActive(e.key);
@@ -926,25 +744,6 @@ export function initZlowApp({
     });
   }
   standardMode.init();
-  // setup the speed when using an actual trainer
-  /*trainer.onData = (data) => {
-      if (!keyboardMode.keyboardMode) {
-      let speed = 0;
-      if (typeof data.power === "number" && data.power > 0) {
-        speed = powerToSpeed({ power: data.power });
-      }
-      constants.riderState = {
-        ...constants.riderState,
-        power: data.power,
-        speed,
-      };
-      if (speed > 0) {
-        activatePacer();
-      }
-    } else {
-      constants.riderState = { ...constants.riderState, power: data.power };
-    }
-  };*/
 
   loop();
 
@@ -958,7 +757,7 @@ export function initZlowApp({
 
       // Set pacer constants to rider constants and adjust animation
       constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-      document.getElementById('pacer-speed').value = constants.riderState.speed;
+      document.getElementById('pacer-speed').value = pacerPhysics.getSpeed();
       pacer.avatarEntity.removeAttribute("animation__2");
       pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
