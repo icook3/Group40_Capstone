@@ -33,7 +33,13 @@ export class Track {
 
     // As each animation completes, start the next one
     this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-    this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
+
+    // If peer isn't connected and pacer is started, attach event listener
+    if (constants.pacerStarted&&peerState==0) {
+      this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
+    }
+    
+
     setTimeout(() => this.initialize_animation(), 5000);
   }
 
