@@ -13,32 +13,68 @@ button {
   left: 50%;
   transform: translateX(-50%);
 }
-/*
-    Welcome message
-*/
-#welcome-msg {
-  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+#main-menu-center {
   position: fixed;
-  top: 10%;
-  z-index: 1000;
-
-  /* Changed this to center the title of main menu screen */
+  top: 40%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
 }
 
-#menu-bottom {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1000;
-  /* Background color */
-  background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
-  width: 330px;
+#welcome-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
+
+#start-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.welcome-top {
+  font-family: "Quicksand", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  color: rgba(30, 60, 50, 0.45);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.welcome-main {
+  font-family: "Fugaz One", sans-serif;
+  font-size: 5rem;
+  color: #1a3a2a;
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: baseline;
+}
+
+.welcome-logo {
+  height: 0.90em;
+  width: auto;
+  margin-right: 2px;
+  transform: translateY(12px);
+}
+
+.welcome-accent {
+  display: inline-block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #2d7a4a, #7cd1f3);
+  border-radius: 2px;
+  margin-top: 16px;
+}
+
+
 /*
     other settings
 */
@@ -62,21 +98,6 @@ button {
     display:none;
 }
 
-/*
-    Customize Button
- */
-#customize {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  /* Background color */
-  background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
-  width: 250px;
-}
-
 a-scene {
   position: fixed;
   width: 100%;
@@ -93,161 +114,74 @@ a-scene {
   filter: blur(3px);
 }
 
-/* PILL WRAPPER */
-.split-btn {
-  position: fixed;
-  top: 40%;
-  left: 50%;
-  transform: translateX(-50%) scale(1.4);
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  overflow: visible; /* dropdown not clipped */
-  background: linear-gradient(90deg, #ffb5b5, #b7f1df);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
-  z-index: 1000;
-  white-space: nowrap;
-  max-width: 90vw;
-  isolation: isolate;
-
-  /* NEW: make it the positioning anchor for the dropdown */
-  position: fixed; /* already fixed, but ensure it's a positioned ancestor */
+#start-btn {
+  background: #1a3a2a;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 44px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #d4f0c0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.04em;
 }
 
-/* MAIN HALF */
-.split-btn .main {
+#start-btn:hover {
+  background: #244d38;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(26, 58, 42, 0.25);
+}
+
+#workouts-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex: 1 1 auto;
+}
+
+#workouts-btn {
   background: transparent;
-  color: #223138;
-  border: none;
-  font-size: 1rem;
-  line-height: 1.2;
-  padding: 12px 20px;
+  border: 1.5px solid rgba(26, 58, 42, 0.25);
+  border-radius: 16px;
+  padding: 13px 40px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a3a2a;
   cursor: pointer;
-  text-align: center; /* extra safety for centering text */
+  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
 }
 
-/* TOGGLE HALF — keep the arrow visible and centered */
-.split-btn .toggle {
-  display: flex; /* center the ▾ glyph */
+#workouts-btn:hover {
+  background: rgba(26, 58, 42, 0.08);
+  border-color: rgba(26, 58, 42, 0.4);
+  transform: translateY(-1px);
+}
+
+#menu-links {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: transparent;
-  color: #223138;
+  gap: 6px;
+}
+
+.menu-link {
+  background: none;
   border: none;
-  font-size: 1rem;
-  width: 40px;
-  min-width: 40px; /* don’t collapse */
-  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(26, 58, 42, 0.5);
   cursor: pointer;
-}
-/* Keep your existing blocks; add these if missing */
-.dropdown-content {
-  /* JS sets position/left/top; we only ensure visibility */
-  display: none;
-  background: rgb(53, 72, 79);
-  color: #fff;
-  border-radius: 12px;
-  padding: 6px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-  pointer-events: auto;
-  z-index: 9999;
-
-  /* Debug visibility */
-  visibility: visible;
-  opacity: 1;
-}
-.dropdown-content.show {
-  display: block;
-}
-
-.dropdown-item {
-  display: block; /* ensure they occupy height */
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  color: #fff;
-  border: none;
-  padding: 10px 12px;
-  font-size: 1.1rem;
+  padding: 6px 12px;
   border-radius: 8px;
-  cursor: pointer;
+  transition: color 0.2s ease;
+  letter-spacing: 0.02em;
 }
 
-/* Main menu dropdown: clear hover feedback */
-.dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-/* When an item is selected, keep it highlighted (JS should add .selected) */
-.dropdown-item.selected {
-  background: rgba(255, 255, 255, 0.22);
-}
-
-
-/* When hovering either half, darken the whole pill */
-.split-btn:hover {
-  filter: brightness(85%);
-  transition: filter 0.15s ease;
-}
-
-/* ========================================
-   Main menu side buttons: hover feedback
-   Targets buttons, links, and common "row" items inside the panels
-   ======================================== */
-
-#menu-bottom button,
-#menu-bottom a,
-#menu-bottom [role="button"],
-#menu-bottom .hud-btn,
-#menu-bottom .menu-item,
-#menu-bottom .menu-btn,
-#menu-bottom .btn,
-#customize button,
-#customize a,
-#customize [role="button"],
-#customize .menu-item,
-#customize .menu-btn,
-#customize .btn,
-#menu-settings button,
-#menu-settings a,
-#menu-settings [role="button"],
-#menu-settings .menu-item,
-#menu-settings .menu-btn,
-#menu-settings .btn {
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 10px 12px;   /* harmless for buttons; helps if they are div rows */
-  display: block;       /* harmless for buttons; ensures full-width hitbox for rows */
-  width: 100%;
-  box-sizing: border-box;
-  transition: filter 0.15s ease, background 0.15s ease;
-}
-
-#menu-bottom button:hover,
-#menu-bottom a:hover,
-#menu-bottom [role="button"]:hover,
-#menu-bottom .hud-btn:hover,
-#menu-bottom .menu-item:hover,
-#menu-bottom .menu-btn:hover,
-#menu-bottom .btn:hover,
-#customize button:hover,
-#customize a:hover,
-#customize [role="button"]:hover,
-#customize .menu-item:hover,
-#customize .menu-btn:hover,
-#customize .btn:hover,
-#menu-settings button:hover,
-#menu-settings a:hover,
-#menu-settings [role="button"]:hover,
-#menu-settings .menu-item:hover,
-#menu-settings .menu-btn:hover,
-#menu-settings .btn:hover {
-  background: rgba(255, 255, 255, 0.10); /* visible on your dark panels */
-  filter: brightness(90%);
+.menu-link:hover {
+  color: rgba(26, 58, 42, 0.85);
 }
 
 /* ========================================
