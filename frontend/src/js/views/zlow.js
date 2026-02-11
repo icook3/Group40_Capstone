@@ -3,7 +3,6 @@ import { ZlowScene } from "../scene/index.js";
 import { HUD } from "../hud.js";
 import { Strava } from "../strava.js";
 import { constants } from "../constants.js";
-import { AvatarCreator } from "../avatarCreator.js";
 import { AvatarMovement } from "../avatarMovement.js";
 import { KeyboardMode } from "../keyboardMode.js";
 import { StandardMode } from "../standardMode.js";
@@ -50,6 +49,7 @@ export class zlowScreen {
     conn;
 
     loopRunning=false;
+    darkMode = window.matchMedia("(prefers-color-scheme: dark)");
 
     constructor(setWhenDone) {
         fetch("../html/zlow.html").then((content)=> {
@@ -97,7 +97,6 @@ export class zlowScreen {
         }
     }
 
-    darkMode = window.matchMedia("(prefers-color-scheme: dark)");
     updateFavicon() {
       const favicon = document.querySelector('link[rel="icon"]');
       if (!favicon) {
