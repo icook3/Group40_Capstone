@@ -555,9 +555,9 @@ export class zlowScreen {
       this.notificationManager = new NotificationManager();
       this.milestoneTracker = new MilestoneTracker(this.workoutSession, this.workoutStorage);
       
-      let tempWorkoutStorage=this.workoutStorage;
+      //let tempWorkoutStorage=this.workoutStorage;
       const workoutSummary = new WorkoutSummary({
-        tempWorkoutStorage,
+        workoutStorage: this.workoutStorage,
         onClose: () => {
           viewManager.setView(viewManager.views.mainMenu);
         },
