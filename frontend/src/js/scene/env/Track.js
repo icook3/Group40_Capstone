@@ -35,13 +35,25 @@ export class Track {
     this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
 
     // If peer isn't connected and pacer is started, attach event listener
-    if (constants.pacerStarted&&peerState==0) {
-      this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
-    }
+
+
+    // CRASHES EVERYTHING
+    // MOVE TO INITIALIZE ANIMATION AND SEE IF YOU CAN GET EVERYTHING TO LINE UP THERE MAYBE? WAIT FOR BOTH RIDER AND PACER TO BE SAFE
+    //waitForPacer("#pacer-entity",function(){pacerExists = true;},1000,9000);
+
+
+
+
+    this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
+    
+
+
     
 
     setTimeout(() => this.initialize_animation(), 5000);
   }
+
+  // END OF CONSTRUCTOR
 
   // Update animation speed and target based on current track piece
   update_rider_animation() {
@@ -91,11 +103,20 @@ export class Track {
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
   initialize_animation() {
+    //SHOULD SIT AROUND UNTIL BOTH RIDER AND PACER SPAWN IN
+
+
+
+
     activatePacer();
     this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
     this.pacer.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; startEvents: pacerStart;`);  
   }
 }
+
+// END OF CLASS PROPER ADD ANYTHING HAVING TO DO WITH EXPORTS AFTER HERE
+
+
 
 // Create and append track straight track piece
   function straightPiece() {
