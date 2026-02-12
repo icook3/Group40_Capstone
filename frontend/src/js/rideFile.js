@@ -32,7 +32,7 @@ function buildActivity(samples, kmhToMs) {
         ((samples.at(-1).elapsedMs ?? (endEpochMs - startEpochMs)) || 0) / 1000
     );
 
-    const distanceInMeters = ((samples.at(-1).distance || 0) * 1000).toFixed(1);
+    const distanceInMeters = ((samples.at(-1).distance || 0)).toFixed(1);
 
     let activity = `    <Activity Sport="Biking">\n`;
     activity += `      <Id>${startTime.toISOString()}</Id>\n`;
@@ -64,9 +64,9 @@ function buildTrackPoints(samples, kmhToMs) {
 
 function buildTrackPoint(sample, kmhToMs) {
     const timeISO = new Date(sample.epochMs).toISOString();
-    const distanceMeters = ((sample.distance || 0) * 1000).toFixed(1);
+    const distanceMeters = (sample.distance || 0).toFixed(1);
     const watts = Math.round(sample.power || 0);
-    const speedMetersPerSecond = kmhToMs(sample.speed || 0).toFixed(3);
+    const speedMetersPerSecond = kmhToMs(sample.speed).toFixed(3);
 
     let trackPoint = `          <Trackpoint>\n`;
     trackPoint += `            <Time>${timeISO}</Time>\n`;

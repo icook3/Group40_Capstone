@@ -46,11 +46,15 @@ let pacer;
 // workout session
 let workoutStorage;
 let workoutSession;
+let isRecording = false;
+let rideElapsedMs = 0;
 
 // milestones
 let notificationManager;
 let milestoneTracker;
 let rampController = null;
+
+// peer
 let peer;
 let conn;
 
@@ -70,11 +74,18 @@ function loop({
     );
     return;
   }
+
   const dt = (now - constants.lastTime) / 1000;
   constants.lastTime = now;
+  if (isRecording) {
+    rideElapsedMs += dt * 1000;
+  }
 
   const currentPower = constants.riderState.power || 0;
   constants.riderState.speed = physics.update(currentPower, dt);
+
+  const speedMs = constants.kmhToMs(constants.riderState.speed);
+  constants.riderState.distanceMeters += speedMs * dt;
 
   // Calculate calories burned using the following formula:
   // calories = (power in watts * delta time (seconds) / 1000)
@@ -163,16 +174,15 @@ function loop({
     keyboardMode.keyboardMode = true;
   }
 
-  //set up values to push
-  let pushTime = performance.now();
-  let pushPower = constants.riderState.power || 0;
-  let pushSpeed = units.speedUnit.convertFrom(constants.riderState.speed) || 0;
-  let pushDistance =
-    units.distanceUnit.convertFrom(
-      parseFloat(getElement("distance").textContent)
-    ) || 0;
-
-  rideHistory.pushSample(pushTime, pushPower, pushSpeed, pushDistance);
+  // Add new sample to rideHistory if time is recording and simulation isn't paused
+  if (isRecording && !simulationState.isPaused) {
+    rideHistory.pushSample(
+      rideElapsedMs,
+      constants.riderState.power || 0,           // watts
+      constants.riderState.speed || 0,           // m/s
+      constants.riderState.distanceMeters || 0 // meters
+    );
+  }
 
   sendPeerDataOver(constants.riderState.speed);
   requestAnimationFrameFn(loop);
@@ -600,6 +610,9 @@ export function initZlowApp({
       // After 5s, unpause the sim
       simulationState.isPaused = false;
 
+      isRecording = true;
+      rideElapsedMs = 0;
+
       // If ramp, begin warmup countdown (no pause)
       if (selectedWorkout === "ramp") {
         // tell HUD to show 5-minute warmup timer
@@ -635,6 +648,7 @@ export function initZlowApp({
       countdown.start(() => {
         // auto-resume when hits 0
         simulationState.isPaused = false;
+        constants.lastTime = Date.now();
         hud.resume();
         setPacerSpeed(savedPacerSpeed);
         pauseBtn.textContent = "Pause";
@@ -644,6 +658,7 @@ export function initZlowApp({
       countdown.cancel();
       hud.resume();
       simulationState.isPaused = false;
+      constants.lastTime = Date.now();
       setPacerSpeed(savedPacerSpeed);
       pauseBtn.textContent = "Pause";
     }
@@ -667,6 +682,7 @@ export function initZlowApp({
       () => {
         // End the session and get final stats
         const finalStats = workoutSession.end();
+        isRecording = false;
 
         // After you compute finalStats from workoutSession / history, etc.
         if (selectedWorkout === "ramp" && rampController) {
@@ -695,6 +711,8 @@ export function initZlowApp({
         simulationState.isPaused = false;
         countdown.cancel();
         constants.riderState.power = 0;
+        constants.riderState.distanceMeters = 0;
+        rideElapsedMs = 0;
         physics.setSpeed(0);
         hud.resetWorkOut();
         pauseBtn.textContent = "Pause";
@@ -712,6 +730,7 @@ export function initZlowApp({
       // On Cancel
       () => {
         console.log("❌ Stop cancelled - continuing workout");
+        isRecording = true;
       }
     );
   });
