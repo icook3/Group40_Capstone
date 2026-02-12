@@ -32,7 +32,7 @@ export class Track {
     spawn_track();
 
     // As each animation completes, start the next one
-    this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
+    //this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
 
     // If peer isn't connected and pacer is started, attach event listener
 
@@ -44,7 +44,7 @@ export class Track {
 
 
 
-    this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
+    //this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
     
 
 
@@ -103,14 +103,34 @@ export class Track {
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
   initialize_animation() {
-    //SHOULD SIT AROUND UNTIL BOTH RIDER AND PACER SPAWN IN
+    // Ensure that pacer exists before attempting to add animation. Rider is assumed to spawn before pacer
+    this.waitForElement('#pacer-entity', (element) => {
+      //console.log('Element exists:', element);
 
+      this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
+      document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
+      
 
+      this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:tr;`);
+      console.log('Element exists:', element);
+      activatePacer();
+    });
+  }
 
+  waitForElement(selector, callback) {
+    const observer = new MutationObserver((mutations, observer) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            observer.disconnect();
+            callback(element);
+        }
+    });
 
-    activatePacer();
-    this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    this.pacer.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; startEvents: pacerStart;`);  
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
   }
 }
 

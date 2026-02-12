@@ -193,6 +193,7 @@ function setUnits(storageVal, className) {
   }
 }
 
+// PROBLEM IS MORE OR LESS HERE
 function setPacerSpeed(speed) {
   if (peerState==0) {
     pacer.setSpeed(speed);
@@ -505,14 +506,16 @@ export function initZlowApp({
   });
   physics = new PhysicsEngine();
 
+
   if (peerState == 0) {
     pacer = new AvatarMovement("pacer-entity", {
       position: { x: 0.5, y: 1, z: -2 },
       isPacer: true,
     });
-    pacerPhysics = new PhysicsEngine();
     pacer.creator.setPacerColors();
   }
+
+  pacerPhysics = new PhysicsEngine();
   keyboardMode = new KeyboardMode();
   standardMode = new StandardMode();
 
