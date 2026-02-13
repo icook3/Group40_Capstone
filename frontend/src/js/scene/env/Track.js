@@ -9,6 +9,11 @@ import  {activatePacer } from '../../main.js'
 export class Track {
 
   constructor({ sceneEl }) {
+    // ---- SINGLETON GUARD / CLEANUP PREVIOUS INSTANCE ----
+    if (window.__zlowTrackInstance) {
+      window.__zlowTrackInstance.destroy?.();
+    }
+    window.__zlowTrackInstance = this;
     this.sceneEl = sceneEl;
 
     // Create a-entity for the path and set ID
@@ -29,7 +34,33 @@ export class Track {
     this.path_element.appendChild(track);
     constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
     spawn_track();
-    setTimeout(() => this.initialize_animation(), 5000);
+    this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+  }
+
+  destroy() {
+    // 1) Remove event listener we added
+    if (this.rider && this.update_rider_animation) {
+      this.rider.removeEventListener("animationcomplete__1", this.update_rider_animation);
+    }
+
+    // 2) Clear the delayed init timer
+    if (this._initTimer) {
+      clearTimeout(this._initTimer);
+      this._initTimer = null;
+    }
+
+    // 3) If you want to fully remove the track entity from DOM, do it here.
+    //    Only do this if THIS instance owns it; otherwise you might break others.
+    //    (See “ownsPath” note below.)
+    if (this._ownsPath && this.path_element) {
+      disposeAFrameEl(this.path_element);
+      this.path_element.parentNode?.removeChild(this.path_element);
+    }
+
+    // 4) Clear singleton pointer if it's us
+    if (window.__zlowTrackInstance === this) {
+      window.__zlowTrackInstance = null;
+    }
   }
 
   // Update animation speed and target based on current track piece
@@ -303,6 +334,32 @@ export class Track {
     __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
     window.__tilePool = __tilePool;
   }
+
+  function disposeAFrameEl(el) {
+  if (!el) return;
+
+  // A-Frame keeps the THREE object tree at el.object3D
+  const root = el.object3D;
+  if (!root) return;
+
+  root.traverse((obj) => {
+    if (obj.geometry) obj.geometry.dispose?.();
+
+    if (obj.material) {
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const m of mats) {
+        // dispose common texture slots
+        m.map?.dispose?.();
+        m.normalMap?.dispose?.();
+        m.roughnessMap?.dispose?.();
+        m.metalnessMap?.dispose?.();
+        m.aoMap?.dispose?.();
+        m.emissiveMap?.dispose?.();
+        m.dispose?.();
+      }
+    }
+  });
+}
 
   // Spawn track pieces in
   export function spawn_track() {
