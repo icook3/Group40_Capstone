@@ -121,6 +121,26 @@ export function initSettings() {
       });
   }
   */
+
+  // clear workout storage
+  const workoutStorageBtn = document.getElementById("workoutStorageSetting");
+  if (workoutStorageBtn) {
+    workoutStorageBtn.addEventListener("click", () => {
+      let clearStorage = localStorage.getItem("autoClearWorkoutStorage");
+      if (clearStorage==null) {
+        clearStorage = false;
+      } else if (clearStorage == "false") {
+        clearStorage = false;
+      } else {
+        clearStorage = true;
+      }
+      clearStorage = !clearStorage;
+      localStorage.setItem("autoClearWorkoutStorage",clearStorage);
+      workoutStorageBtn.textContent = clearStorage
+        ? "Automatically clear workout storage: ON"
+        : "Automatically clear workout storage";
+      });
+  }
 }
 
 async function initStravaButton() {
