@@ -16,4 +16,5 @@ export class changelogView {
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
     }
+    reset() {}
 }

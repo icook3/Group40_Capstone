@@ -12,7 +12,7 @@ class ViewStorage {
 }
 export class ViewManager {
     viewStorage = new ViewStorage();
-
+    currentView = this.views.mainMenu;
     /**
     * Initializes different views
     */
@@ -24,11 +24,20 @@ export class ViewManager {
     }
 
     setView(view) {
+        //reset the page you are currently on
+        switch(currentView) {
+            case this.views.mainMenu:
+                this.viewStorage.mainMenu.reset();
+            case this.views.mainZlow:
+                this.viewStorage.zlowScreen.reset();
+            case this.views.changelog:
+                this.viewStorage.changelog.reset();
+        }
+        //set the current page
         switch(view) {
             case this.views.mainMenu:
                 if (this.viewStorage.mainMenu.ready) {
                     this.viewStorage.mainMenu.setPage();
-                    this.viewStorage.zlowScreen.reset();
                 }
                 break;
             case this.views.mainZlow: 
@@ -43,8 +52,11 @@ export class ViewManager {
                 break;
             default: 
                 console.log("This view is not available!");
+                return;
                 break;
         }
+
+        this.currentView=view;
     }
 
     views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};

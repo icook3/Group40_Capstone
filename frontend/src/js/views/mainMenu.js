@@ -27,6 +27,8 @@ export class mainMenuView {
         });
     }
 
+    reset() {}
+    
     initSettings() {
         if (sessionStorage.getItem("peerToPeer")==='true') {
             jQuery("#peer-name").fadeToggle(500);

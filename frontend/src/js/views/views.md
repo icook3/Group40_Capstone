@@ -13,6 +13,8 @@ A class using the **Views** interface represents a possible HTML view.
     - Sets the innerHTML of the element with the id `mainDiv` to the content in `content`, and runs any initializing JavaScript code.
 - **ready** → `boolean`
     - Returns a boolean that is false if content is empty, but gets set to true once content gets filled. 
+- **reset()** → `void`
+    - Resets any variables that need to be reset before unloading the page to prevent errors. For most views, this will not be filled in.
 
 ## Notes
 - To add new views, first create view.html in the html folder. 
@@ -22,5 +24,6 @@ A class using the **Views** interface represents a possible HTML view.
     - In initViews, create a new instance of your specified view.
     - In the object views, add a value for your view.
     - In setView(view), add a condition for if view is equal to your new view, then call the setPage method.
+    - Also add a condition for if currentView is equal to your new view, then call the reset method.  
     - In the class ViewStorage, add the view to it. 
 - To switch between views, call setView(view), passing in the view you want to switch to. 
