@@ -6,20 +6,22 @@ import { constants } from '../constants.js';
 
 export class ZlowScene {
   constructor(_, { getElement = (id) => document.getElementById(id) } = {}) {
+    // If a previous scene exists, tear it down first
+    if (window.__zlowSceneInstance) {
+      window.__zlowSceneInstance.destroy?.();
+    }
+    window.__zlowSceneInstance = this;
+
     this.scene = getElement("scene");
     this.objectsLoaded = false;
-    this.DEBUG_BANDS = true; // set to true to log default policy once
 
-    this.scenery = new SceneryManager({ sceneEl: this.scene }); // actual edge
+    this.scenery = new SceneryManager({ sceneEl: this.scene });
+    // If you only want this once globally, keep it outside instances or flip the flag after logging.
+    // this.scenery.scenePolicy.logBands();
 
-    // --- Optional one-time debug log ---
-    if (this.DEBUG_BANDS) {
-      this.scenery.scenePolicy.logBands();
-    }
-
-    // Generate a new object field, track, and clouds
-    this.track = new Track({ sceneEl: this.scene });        
+    this.track = new Track({ sceneEl: this.scene });
     this.clouds = new Cloud({ sceneEl: this.scene });
+
     this.objectField = new ObjectField({
       sceneEl: this.scene,
       track: this.track,
@@ -28,16 +30,27 @@ export class ZlowScene {
     });
     this.objectField.attachExternalBands(this.scenery.bands);
   }
-  
-  // Pass speed and time instead of dz and calculate in ObjectField
+
+  destroy() {
+    // break cross-references first
+    this.objectField?.attachExternalBands?.([]); // or objectField.detachExternalBands?.()
+
+    this.objectField?.destroy?.();
+    this.clouds?.destroy?.();
+    this.track?.destroy?.();
+    this.scenery?.destroy?.();
+
+    if (window.__zlowSceneInstance === this) window.__zlowSceneInstance = null;
+  }
+
   update(riderSpeed = 0, dt = 0) {
     const dz = riderSpeed * dt;
     constants.worldZ += dz;
 
     if (!this.objectsLoaded) {
-      this.objectField.init(); // keep the original delayed spawn for field
+      this.objectField.init();
       this.objectsLoaded = true;
     }
-    this.objectField.advance(riderSpeed, dt);  // ← the ONLY advancer  
+    this.objectField.advance(riderSpeed, dt);
   }
 }

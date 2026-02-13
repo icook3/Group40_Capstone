@@ -20,17 +20,21 @@ export class AvatarMovement {
     addCamera() {
         // Spawn from class rather than creating new
         this.rider = document.getElementById('rider');
+        if (!this.rider) return;
+
         const rig = document.createElement('a-entity');
         rig.setAttribute('id','rig');
+
         const camera = document.createElement('a-camera');
         camera.setAttribute('wasd-controls-enabled', 'false');
         camera.setAttribute('id','camera');
         camera.setAttribute('look-controls','');
         camera.setAttribute('position','4 5 7');
-        camera.setAttribute('look-at', rider);
+        camera.setAttribute('look-at','#rider');
+
         rig.appendChild(camera);
         this.rider.appendChild(rig);
-    }
+        }
 
     //Helper to interpolate smoothly between A and B
     cycleInterpolate (a, b, phase) {
@@ -154,18 +158,18 @@ export class AvatarMovement {
     }
 
     setPosition(pos) {
-        console.log("SETTING position of "+(isPacer)?"pacer":"rider");
+        console.log("SETTING position of "+(this.isPacer)?"pacer":"rider");
         this.avatarEntity.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
-        if (!isPacer) {
+        if (!this.isPacer) {
             document.getElementById("sky").setAttribute('position', `0 0 ${pos.z}`);
         }
     }
     setHorizontalPosition(pos) {
-        console.log("SETTING position of "+(isPacer)?"pacer":"rider");
+        console.log("SETTING position of "+(this.isPacer)?"pacer":"rider");
         let val = this.avatarEntity.getAttribute('position');
         if (typeof val === 'string') val = AFRAME.utils.coordinates.parse(val);
         this.avatarEntity.setAttribute('position', `${pos.x} ${val.y} ${pos.z}`);
-        if (!isPacer) {
+        if (!this.isPacer) {
             document.getElementById("sky").setAttribute('position', `0 0 ${pos.z}`);
         }
     }
