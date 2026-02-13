@@ -6,7 +6,6 @@ import { constants } from "../../constants.js";
 import { getPos, setPos, getSign } from '../core/util.js';
 import  {activatePacer } from '../../main.js'
 
-
 export class Track {
 
   constructor({ sceneEl }) {
@@ -30,30 +29,8 @@ export class Track {
     this.path_element.appendChild(track);
     constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
     spawn_track();
-
-    // As each animation completes, start the next one
-    //this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-
-    // If peer isn't connected and pacer is started, attach event listener
-
-
-    // CRASHES EVERYTHING
-    // MOVE TO INITIALIZE ANIMATION AND SEE IF YOU CAN GET EVERYTHING TO LINE UP THERE MAYBE? WAIT FOR BOTH RIDER AND PACER TO BE SAFE
-    //waitForPacer("#pacer-entity",function(){pacerExists = true;},1000,9000);
-
-
-
-
-    //this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
-    
-
-
-    
-
     setTimeout(() => this.initialize_animation(), 5000);
   }
-
-  // END OF CONSTRUCTOR
 
   // Update animation speed and target based on current track piece
   update_rider_animation() {
@@ -91,7 +68,6 @@ export class Track {
   update_pacer_animation() {
     let pacerSpeed = document.getElementById('pacer-speed').value;
     constants.pacerCurrentTrackPiece += 1;
-
     let pacer = document.getElementById('pacer-entity');
 
     // Calculate pacer's duration and set attributes
@@ -101,16 +77,11 @@ export class Track {
   }
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
-  // Pacer starts when rider starts. Delay ensures pacer finishes loading
+  // Ensure that pacer exists before attempting to add animation. Rider is assumed to spawn before pacer
   initialize_animation() {
-    // Ensure that pacer exists before attempting to add animation. Rider is assumed to spawn before pacer
     this.waitForElement('#pacer-entity', (element) => {
-      //console.log('Element exists:', element);
-
       this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
       document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
-      
-
       this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
       document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:tr;`);
       console.log('Element exists:', element);
@@ -133,10 +104,6 @@ export class Track {
     });
   }
 }
-
-// END OF CLASS PROPER ADD ANYTHING HAVING TO DO WITH EXPORTS AFTER HERE
-
-
 
 // Create and append track straight track piece
   function straightPiece() {

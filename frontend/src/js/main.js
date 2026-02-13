@@ -193,7 +193,6 @@ function setUnits(storageVal, className) {
   }
 }
 
-// PROBLEM IS MORE OR LESS HERE
 function setPacerSpeed(speed) {
   if (peerState==0) {
     pacer.setSpeed(speed);
@@ -237,6 +236,7 @@ function recieveData(data) {
       activatePacer();
       pacer.setSpeed(Number(data.data));
       pacerPhysics.setSpeed(Number(data.data));
+      document.getElementById('pacer-speed').value = Number(data.data);
       //console.log(pacer.speed);
       break;
     case "syncPlayers":
@@ -760,7 +760,9 @@ export function initZlowApp({
 
       // Set pacer constants to rider constants and adjust animation
       constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-      document.getElementById('pacer-speed').value = pacerPhysics.getSpeed();
+      document.getElementById('pacer-speed').value = constants.riderState.speed;
+      pacer.setSpeed(constants.riderState.speed);
+      pacerPhysics.setSpeed(constants.riderState.speed);
       pacer.avatarEntity.removeAttribute("animation__2");
       pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
       pacer.avatarEntity.setAttribute("position", pacerSyncPos);
