@@ -19,6 +19,11 @@ import { WorkoutSummary, showStopConfirmation } from "./workoutSummary.js";
 import { MilestoneTracker } from "./milestones.js";
 import { NotificationManager } from "./notifications.js";
 import {initCrashReporter} from "./crashReporter.js";
+
+if (typeof window !== "undefined") {
+  window.__zlow = window.__zlow || {};
+  window.__zlow.constants = constants;
+}
 import { PhysicsEngine } from "./PhysicsEngine.js";
 
 // Prevent meshes from disappearing due to frustum culling
@@ -264,6 +269,10 @@ export function initZlowApp({
 } = {}) {
     window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
     console.log("initZlowApp count:", window.__zlowInitCount);
+  
+    // Make constants available to non-module A-Frame components (e.g., ground-instanced)
+    window.__zlow = window.__zlow || {};
+    window.__zlow.constants = constants;
 
     // Initialize crash reporter to collect game related data
     initCrashReporter(async () => {

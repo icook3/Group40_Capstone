@@ -6,6 +6,7 @@
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script type="module" src="../js/scene/env/GroundInstanced.js"></script>
     <link
       rel="stylesheet"
       type="text/css"
@@ -478,55 +479,19 @@
           src="../../resources/models/bgmodels/bush1.glb"
         ></a-asset-item>
       </a-assets>
-      <a-sky id="sky" color="#87ceeb" radius="5000" position="0 0 0"></a-sky>
-
-      <!-- Checkerboard ground: green and brown tiles, covers the whole visible area -->
-      <a-entity id="checkerboard-ground">
-        <a-entity id="tiles"></a-entity>
-      </a-entity>
-
-      <!-- Get values for scene and tilesEntity before using a module to import constants -->
-      <script>
-        const scene = document.currentScript.parentElement;
-        // Add as a new thing rather than getting the entity??
-        const tilesEntity = scene.querySelector("#tiles");
-      </script>
-
-      <!-- Buildings, trees, clouds, and path are generated dynamically in scene.js and will not overlap the center column -->
-      <!-- Use constants to generate checkerboard tiles for ground dynamically -->
-      <script type="module">
-        import { constants } from "../js/constants.js";
-        for (let z = 0; z < constants.gridDepth; z++) {
-          for (let x = 0; x < constants.gridWidth; x++) {
-            const color =
-              (x + z) % 2 === 0
-                ? constants.groundColor1
-                : constants.groundColor2;
-            const tile = document.createElement("a-entity");
-            tile.setAttribute(
-              "geometry",
-              `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
-            );
-            //tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
-            tile.setAttribute("material", "src: #grass-texture");
-            tile.setAttribute(
-              "position",
-              `${constants.startX + x * constants.tileSize} 0 ${
-                constants.startZ - z * constants.tileSize
-              }`
-            );
-            tilesEntity.appendChild(tile);
-          }
-        }
-      </script>
+      <a-sky color="#87ceeb" radius="5000"></a-sky>
+      <a-entity id="tiles" ground-instanced></a-entity>
+    </a-scene>
 
     <script type="module" src="../js/main.js"></script>
     <script type="module" src="../js/trainerCalibration.js"></script>
+
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         if (window.initZlowApp) window.initZlowApp();
       });
     </script>
+
     <script type="module">
       import { NotificationManager } from "../js/notifications.js";
       window.testNotifications = new NotificationManager();

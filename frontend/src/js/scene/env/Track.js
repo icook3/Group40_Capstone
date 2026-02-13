@@ -17,10 +17,16 @@ export class Track {
     this.sceneEl = sceneEl;
 
     // Create a-entity for the path and set ID
-    const path_element = document.createElement('a-entity');
-    path_element.setAttribute('id','track');
+    let path_element = document.getElementById('track');
+    this._ownsPath = !path_element;
+
+    if (!path_element) {
+      path_element = document.createElement('a-entity');
+      path_element.setAttribute('id','track');
+      sceneEl.appendChild(path_element);
+    }
     this.path_element = path_element;
-    sceneEl.appendChild(path_element);
+
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
@@ -62,6 +68,33 @@ export class Track {
       window.__zlowTrackInstance = null;
     }
   }
+
+  destroy() {
+  // 1) Remove event listener we added
+  if (this.rider && this.update_rider_animation) {
+    this.rider.removeEventListener("animationcomplete__1", this.update_rider_animation);
+  }
+
+  // 2) Clear the delayed init timer
+  if (this._initTimer) {
+    clearTimeout(this._initTimer);
+    this._initTimer = null;
+  }
+
+  // 3) If you want to fully remove the track entity from DOM, do it here.
+  //    Only do this if THIS instance owns it; otherwise you might break others.
+  //    (See “ownsPath” note below.)
+  if (this._ownsPath && this.path_element) {
+    disposeAFrameEl(this.path_element);
+    this.path_element.parentNode?.removeChild(this.path_element);
+  }
+
+  // 4) Clear singleton pointer if it's us
+  if (window.__zlowTrackInstance === this) {
+    window.__zlowTrackInstance = null;
+  }
+}
+
 
   // Update animation speed and target based on current track piece
   update_rider_animation() {
