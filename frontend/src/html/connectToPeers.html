@@ -1,26 +1,4 @@
-<html>
-    <head>
-        <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-        <link
-            rel="icon"
-            type="image/svg+xml"
-            href="/resources/favicons/ZlowFavicon.svg"
-        />
-        <link rel="stylesheet" href="../css/hud.css" />
-        <link rel="stylesheet" href="../css/peerToPeer.css" />
-        <link rel="stylesheet" href="../css/changelog.css" />
-        <link rel="stylesheet" href="../css/menu.css" />
-        <link rel="stylesheet" href="../css/generalCSS.css" />
-        <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-        <link rel="stylesheet" href="../css/playerCustomization.css" />
-        <link
-            rel="stylesheet"
-            type="text/css"
-            href="../css/style.css?version=1.0"
-        />
-        <link rel="stylesheet" href="../css/workoutSummary.css" />
-    </head>
-    <body class="bodyStyle bodyImg">
+    <div class="bodyStyle bodyImg">
         <div id="cancel">
             <div class="control-buttons">
                 <button id="cancelButton" onclick="viewManager.setView(viewManager.views.mainMenu);" class="hud-btn peerBtn">Cancel</button>
@@ -34,13 +12,4 @@
             <button class="hud-btn peerBtn" id="connect-btn">Connect!</button>
             
         </div>
-        <script type="module" src="../js/peerConnector.js"></script>
-
-        <script>
-            window.addEventListener("DOMContentLoaded", () => {
-                console.log("LOADING");
-                if (window.peerInit) window.peerInit();
-            });
-        </script>
-    </body>
-</html>
+    </div>

@@ -600,6 +600,9 @@ export class zlowScreen {
           this.conn.send({name: "syncPlayers", data: {}});
         }
       });
+      if (this.peerState!=0) {
+        pacerSyncBtn.innerHTML = "Sync Players";
+      }
     }
 
     
@@ -890,9 +893,7 @@ export class zlowScreen {
       this.loop();
       this.setupPacerSyncButton();
 
-      if (this.peerState!=0) {
-        pacerSyncBtn.innerHTML = "Sync Players";
-      }
+
     
       // Calorie reset button
       const caloriesResetBtn = getElement("calories-reset-btn");

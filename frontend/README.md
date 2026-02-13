@@ -116,6 +116,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `W.js` — Handles unit conversions for Watts - the default power unit.
 		- `views` — Stores different views, and switching between them.
 			- `changelog.js` — Stores the changelog, and handles setting it up. 
+			- `connectToPeers.js` — Stores the peer to peer connection menu, and handles setting it up. 
 			- `mainMenu.js` — Stores the main menu, and handles setting it up. 
 			- `playerCustomization.js` — Stores the player customization screen, and handles setting it up. 
 			- `viewManager.js` — Handles switching between different views. 
@@ -135,7 +136,6 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `milestones.js` — Handles tracking for various milestones.
 		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
-		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling.
 		- `rideHistory.js` — Handles storing past ride data.
 		- `rideHistoryStore.js` — Creates a singleton rideHistory object for other objects to access. 
 		- `simulationstate.js` — Handles tracking the state of the simulation.

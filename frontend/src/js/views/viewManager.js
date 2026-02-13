@@ -3,6 +3,7 @@ import { zlowScreen } from "./zlow.js";
 import { changelogView } from "./changelog.js";
 import { constants } from "../constants.js";
 import { playerCustomizationView } from "./playerCustomization.js";
+import { connectToPeersView } from "./connectToPeers.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -24,6 +25,7 @@ export class ViewManager {
         this.viewStorage.mainMenu = new mainMenuView(true);
         this.viewStorage.zlowScreen = new zlowScreen(false);
         this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+        this.viewStorage.peerConnectScreen = new connectToPeersView(false);
         this.viewStorage.changelog = new changelogView(false);
     }
 
@@ -32,12 +34,19 @@ export class ViewManager {
         switch(this.currentView) {
             case this.views.mainMenu:
                 this.viewStorage.mainMenu.reset();
+                break;
             case this.views.mainZlow:
                 this.viewStorage.zlowScreen.reset();
+                break;
             case this.views.changelog:
                 this.viewStorage.changelog.reset();
+                break;
             case this.views.playerCustomization:
                 this.viewStorage.playerCustomizationScreen.reset();
+                break;
+            case this.views.connectToPeersView:
+                this.viewStorage.peerConnectScreen.reset();
+                break;
         }
         //set the current page
         switch(view) {
@@ -59,6 +68,11 @@ export class ViewManager {
             case this.views.playerCustomization:
                 if (this.viewStorage.playerCustomizationScreen.ready) {
                     this.viewStorage.playerCustomizationScreen.setPage();
+                }
+                break;
+            case this.views.peerConnect:
+                if (this.viewStorage.peerConnectScreen.ready) {
+                    this.viewStorage.peerConnectScreen.setPage();
                 }
                 break;
             default: 
