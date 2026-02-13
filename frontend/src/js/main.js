@@ -754,6 +754,8 @@ export function initZlowApp({
   }
   standardMode.init();
 
+  loop();
+
   const pacerSyncBtn = getElement("pacer-sync-btn");
   pacerSyncBtn.addEventListener("click", () => {
     //Set pacer's z to rider's z
