@@ -6,9 +6,9 @@
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script defer src="../js/workoutMenu.js"></script>
     <link rel="stylesheet" href="../css/hud.css" />
     <link rel="stylesheet" href="../css/menu.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       body {
         #sky-gradient {
@@ -56,6 +56,19 @@
       <div id="workouts-wrapper">
         <button id="workouts-btn" type="button">Workouts</button>
       </div>
+
+      <div id="workout-options" class="hidden">
+        <button id="workout-back" class="menu-link">← Back</button>
+        <button class="workout-option" data-workout="ramp">
+          <span class="workout-name">Ramp Test</span>
+          <span class="workout-desc">Find your FTP</span>
+        </button>
+        <button class="workout-option" data-workout="sprint">
+          <span class="workout-name">Sprint Intervals</span>
+          <span class="workout-desc">30s on / 30s off</span>
+        </button>
+      </div>
+
       <div id="menu-links">
         <button id="connect-btn" class="menu-link">Connect Trainer</button>
         <button id="customize-btn" class="menu-link" onclick="window.location.href='playerCustomization.html'">Customize Character</button>

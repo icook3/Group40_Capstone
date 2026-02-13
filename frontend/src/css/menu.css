@@ -23,6 +23,8 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 32px;
+  /* This is an easy way to scale up or down the whole main menu*/
+  transform: translate(-50%, -50%) scale(1.2);
 }
 
 #welcome-msg {
@@ -35,15 +37,16 @@ button {
 #start-wrapper {
   display: flex;
   justify-content: center;
+  margin-top: -16px;
+
 }
 
 .welcome-top {
-  font-family: "Quicksand", sans-serif;
+  font-family: "Fugaz One", sans-serif;
   font-weight: 500;
-  font-size: 1rem;
-  color: rgba(30, 60, 50, 0.45);
+  font-size: 1.5rem;
+  color: rgba(241, 239, 228, 0.727);
   letter-spacing: 0.35em;
-  text-transform: uppercase;
   margin-bottom: 12px;
 }
 
@@ -115,48 +118,43 @@ a-scene {
 }
 
 #start-btn {
-  background: #1a3a2a;
+  background: #1f6784;
   border: none;
-  border-radius: 16px;
-  padding: 16px 44px;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px 52px;
   font-family: "Nunito", sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 1.1rem;
-  color: #d4f0c0;
+  color: #e0f7ef;
   cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.04em;
+  box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
 }
 
 #start-btn:hover {
-  background: #244d38;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(26, 58, 42, 0.25);
+  background: #1a3a2a;
+}
+
+#workouts-btn {
+  background: none;
+  border: 1.8px solid;
+  border-color:#1a3a2a67;
+  border-radius: 25px 25px 25px 25px;
+  padding: 14px 40px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1a3a2a;;
+  cursor: pointer;
+}
+
+#workouts-btn:hover {
+  background: rgba(46, 139, 110, 0.1);
 }
 
 #workouts-wrapper {
   display: flex;
   justify-content: center;
-}
-
-#workouts-btn {
-  background: transparent;
-  border: 1.5px solid rgba(26, 58, 42, 0.25);
-  border-radius: 16px;
-  padding: 13px 40px;
-  font-family: "Nunito", sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #1a3a2a;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  letter-spacing: 0.03em;
-}
-
-#workouts-btn:hover {
-  background: rgba(26, 58, 42, 0.08);
-  border-color: rgba(26, 58, 42, 0.4);
-  transform: translateY(-1px);
+  margin-top: -18px;
 }
 
 #menu-links {
@@ -164,6 +162,7 @@ a-scene {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  margin-top: -18px;
 }
 
 .menu-link {
@@ -171,8 +170,8 @@ a-scene {
   border: none;
   font-family: "Nunito", sans-serif;
   font-weight: 600;
-  font-size: 0.85rem;
-  color: rgba(26, 58, 42, 0.5);
+  font-size: 1.05rem;
+  color: #1a3a2a;
   cursor: pointer;
   padding: 6px 12px;
   border-radius: 8px;
@@ -182,6 +181,7 @@ a-scene {
 
 .menu-link:hover {
   color: rgba(26, 58, 42, 0.85);
+  background: rgba(46, 139, 110, 0.08);
 }
 
 /* ========================================
@@ -218,5 +218,80 @@ a-scene {
   cursor: text;
 }
 
+#workout-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: fadeSlideIn 0.3s ease both;
+}
+
+#workout-options.hidden {
+  display: none;
+}
+
+.workout-option {
+  background: rgba(46, 139, 110, 0.08);
+  border: 1.5px solid rgba(46, 139, 110, 0.15);
+  border-radius: 16px;
+  padding: 14px 44px;
+  font-family: "Nunito", sans-serif;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 220px;
+}
+
+.workout-option:hover {
+  background: rgba(46, 139, 110, 0.16);
+  border-color: rgba(46, 139, 110, 0.35);
+  transform: translateY(-1px);
+}
+
+.workout-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #267a5e;
+}
+
+.workout-desc {
+  font-weight: 500;
+  font-size: 0.7rem;
+  color: rgba(46, 139, 110, 0.5);
+  letter-spacing: 0.02em;
+}
+
+#workout-back {
+  margin-bottom: 4px;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }m
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-out {
+  animation: fadeSlideOut 0.2s ease both;
+}
+
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
 
 
