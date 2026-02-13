@@ -1,6 +1,7 @@
 import { mainMenuView } from "./mainMenu.js";
 import { zlowScreen } from "./zlow.js";
 import { changelogView } from "./changelog.js";
+import { constants } from "../constants.js";
 
 // a list of different views
 class ViewStorage {
@@ -11,6 +12,8 @@ class ViewStorage {
     zlowScreen;
 }
 export class ViewManager {
+    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
+
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
     /**
@@ -25,7 +28,7 @@ export class ViewManager {
 
     setView(view) {
         //reset the page you are currently on
-        switch(currentView) {
+        switch(this.currentView) {
             case this.views.mainMenu:
                 this.viewStorage.mainMenu.reset();
             case this.views.mainZlow:
@@ -59,10 +62,11 @@ export class ViewManager {
         this.currentView=view;
     }
 
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
     
 }
 // For browser usage
 if (typeof window !== "undefined") {
     window.viewManager=new ViewManager();
+    window.__zlow = window.__zlow || {};
+    window.__zlow.constants = constants;
 }
