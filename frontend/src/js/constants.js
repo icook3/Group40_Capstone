@@ -31,7 +31,7 @@ class Constants {
   slope = 0; // road grade (decimal)
   lastTime = Date.now();
 
-  riderState = { power: 0, speed: 0, calories: 0 };
+  riderState = { power: 0, speed: 0, calories: 0, distanceMeters: 0 };
   pacerStarted = false;
   dragCoefficient = 1.0;
   bikeWheelRadius = 0.22;

@@ -1,5 +1,3 @@
-import { generateTCXFile } from "./main.js";
-
 // strava.js: Handles Strava OAuth and activity upload
 export class Strava {
     constructor() {
@@ -116,7 +114,7 @@ export class Strava {
     }
 
     // Upload workout to Strava through backend (https://developers.strava.com/docs/reference/#api-Uploads-createUpload)
-    async uploadActivity({name, description}) {
+    async uploadActivity({ tcxBlob, name, description }) {
         this.loadToken();
 
         // Expired token
@@ -143,18 +141,13 @@ export class Strava {
 
         // No access token still
         if (!this.accessToken) {
-            alert("Error — please reconnect Strava.");
-            return;
-        }
-
-        const file = generateTCXFile();
-        if (!file) {
-            alert("Not enough workout data yet — ride first!");
-            return;
+            const err = new Error("Strava not connected");
+            err.status = 401;
+            throw err;
         }
 
         const formData = new FormData();
-        formData.append("file", file, "zlow-ride.tcx");
+        formData.append("file", tcxBlob, "zlow-ride.tcx");
         formData.append("name", name);
         formData.append("description", description);
         formData.append("trainer", "1");
@@ -172,8 +165,10 @@ export class Strava {
         console.log("UPLOAD RESPONSE:", json);
 
         if (!res.ok || json.error || json.errors) {
-            alert("Upload failed:\n" + JSON.stringify(json, null, 2));
-            return;
+            const err = new Error("Strava upload failed");
+            err.status = res.status;
+            err.details = json;
+            throw err;
         }
 
         alert("Upload sent! It may take 10–30 seconds to appear in Strava.");
