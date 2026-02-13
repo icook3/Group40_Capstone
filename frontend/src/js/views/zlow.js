@@ -86,34 +86,6 @@ export class zlowScreen {
         
     }
 
-    initializeTiles() {
-        const scene = document.getElementById("scene");
-        // Add as a new thing rather than getting the entity??
-        const tilesEntity = scene.querySelector("#tiles");
-        for (let z = 0; z < constants.gridDepth; z++) {
-          for (let x = 0; x < constants.gridWidth; x++) {
-            const color =
-              (x + z) % 2 === 0
-                ? constants.groundColor1
-                : constants.groundColor2;
-            const tile = document.createElement("a-entity");
-            tile.setAttribute(
-              "geometry",
-              `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
-            );
-            //tile.setAttribute('material', `color: ${color}; roughness: ${constants.roughness}; metalness: ${constants.metalness}`);
-            tile.setAttribute("material", "src: #grass-texture");
-            tile.setAttribute(
-              "position",
-              `${constants.startX + x * constants.tileSize} 0 ${
-                constants.startZ - z * constants.tileSize
-              }`
-            );
-            tilesEntity.appendChild(tile);
-          }
-        }
-    }
-
     updateFavicon() {
       const favicon = document.querySelector('link[rel="icon"]');
       if (!favicon) {
@@ -745,10 +717,11 @@ export class zlowScreen {
       getElement = (id) => document.getElementById(id),
       requestAnimationFrameFn = window.requestAnimationFrame,
     } = {}) {
+      window.__zlow = window.__zlow || {};
+      window.__zlow.constants = constants;
       this.peerState=0;
       this.loopRunning=false;
       this.connected=false;
-      this.initializeTiles();
       /*AFRAME.registerComponent("no-cull", {
         init() {
           this.el.addEventListener("model-loaded", () => {
