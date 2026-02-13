@@ -123,63 +123,6 @@
       </div>
     </div>
 
-    <!-- Main Menu Avatar
-    <a-scene
-      id="mainMenuScene"
-      embedded
-      style="width: 300px; height: 600px; background: transparent"
-    >
-      <a-entity
-        camera
-        position="0 1.5 3"
-        look-controls="enabled: false"
-      ></a-entity>
-      <a-assets>
-        <a-asset-item
-          id="bikeGLB"
-          src="../../resources/models/playermodels/bikeV4.glb"
-        ></a-asset-item>
-        <a-asset-item
-          id="maleGLB"
-          src="../../resources/models/playermodels/maleV5.glb"
-        ></a-asset-item>
-        <a-asset-item
-          id="femaleGLB"
-          src="../../resources/models/playermodels/femaleV6.glb"
-        ></a-asset-item>
-      </a-assets>
-    </a-scene>
-
-    <script>
-      jQuery( document ).ready(function() {
-        console.log("Ready!");
-      });
-    </script>
-
-    <script type="module">
-      import { AvatarCreator } from "../js/avatarCreator.js";
-
-      window.addEventListener("DOMContentLoaded", () => {
-        const scene = document.querySelector("#mainMenuScene");
-        if (!scene) {
-          console.error("Scene not found!");
-          return;
-        }
-
-        //Create the avatar immediately
-        const avatar = new AvatarCreator(
-          "menuAvatar",
-          { x: 0, y: 0, z: -1 },
-          { x: 0, y: 90, z: 0 },
-          (avatarInstance) => {
-            avatarInstance.setMenuPosition();
-            avatarInstance.enableMenuRotation();
-            avatarInstance.startRotationLoop();
-          }
-        );
-      });
-    </script> -->
-
     <div id="sky-gradient"></div>
 
     <!-- Main Menu 3D Background -->
