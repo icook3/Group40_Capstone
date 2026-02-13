@@ -68,9 +68,31 @@ export class Track {
     constants.currentTrackPiece += 1;
     let avatar = document.getElementById('rider');
 
+    // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
+    if (!avatar) return; 
+
+    // ---- NEW: ensure we have enough track points before reading the next one ----
+    // If we're close to the end of the array, spawn more now (before indexing).
+    const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
+    if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+      spawn_track();
+    }
+
+    // ---- NEW: guard against out-of-range / undefined ----
+    const tp = constants.trackPoints[constants.currentTrackPiece];
+    if (!tp) {
+      console.warn(
+        "[Track] Missing track point:",
+        constants.currentTrackPiece,
+        "trackPoints length:",
+        constants.trackPoints.length
+      );
+      return;
+    }
+
     // Calculate rider's duration and set attributes
     // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-    let riderDuration = constants.trackPoints[constants.currentTrackPiece].length / (constants.riderState.speed) * 1000;
+    const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
     avatar.removeAttribute("animation__1");
     avatar.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
 
@@ -81,25 +103,33 @@ export class Track {
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
-
-    // If rider is close to the "front" of the pooled tiles, recycle more rows forward
-    const TILE_BUFFER = 300; // tune if needed (bigger = recycles earlier)
-
-    // Ensure pool exists (otherwise this condition never fires)
-    if (!window.__tilePool) {
-      __initTilePool(); // creates pool + sets window.__tilePool + frontZ
-    }
-
-    // Advance when rider approaches front edge
-    if (window.__tilePool && getPos(avatar).z < (window.__tilePool.frontZ + TILE_BUFFER)) {
-      add_tile();
-    }
   }
 
   update_pacer_animation() {
-    let pacerSpeed = document.getElementById('pacer-speed').value;
+    const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
     constants.pacerCurrentTrackPiece += 1;
     let pacer = document.getElementById('pacer-entity');
+
+    if (!pacer) return; 
+
+    // ---- NEW: ensure we have enough track points before reading the next one ----
+    // If we're close to the end of the array, spawn more now (before indexing).
+    const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
+    if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+      spawn_track();
+    }
+
+    // ---- NEW: guard against out-of-range / undefined ----
+    const tp = constants.trackPoints[constants.currentTrackPiece];
+    if (!tp) {
+      console.warn(
+        "[Track] Missing track point:",
+        constants.currentTrackPiece,
+        "trackPoints length:",
+        constants.trackPoints.length
+      );
+      return;
+    }
 
     // Calculate pacer's duration and set attributes
     let pacerDuration = constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed * 1000;
@@ -221,118 +251,6 @@ export class Track {
     track.setAttribute('position', `3.5 ${constants.pathHeight} ${pointZ-30}`);
     track.setAttribute('rotation', '-90 0 0');
     path_element.appendChild(track);
-  }
-
-  // Add more ground tiles as the rider moves forward
-  function add_tile() {
-    // This is replaced by a helper that uses a tile pool to minimize churn
-    __advanceTilePool(80);
-  }
-
-  // Creating Tile Pool to keep bounded and minimize churn
-
-  let __tilePool = null;
-
-  function __tileWorldZ(zIndex) {
-    return (-zIndex + (constants.startZ / constants.tileSize)) * constants.tileSize;
-  } 
-  
-  function __initTilePool() {
-    const tilesEntity = document.getElementById('tiles');
-    if (!tilesEntity) return;
-
-    const width = constants.gridWidth;
-
-    // Choose a fixed pool size roughly matching your cap.
-    // Must be a multiple of gridWidth to keep clean rows.
-    const MAX_TILES = 1500;
-    const rows = Math.max(1, Math.floor(MAX_TILES / width));
-    const poolTiles = rows * width;
-
-    const startZ = constants.gridDepth;
-
-    const rowTiles = new Array(rows);
-    const frag = document.createDocumentFragment();
-
-    for (let r = 0; r < rows; r++) {
-      rowTiles[r] = new Array(width);
-
-      const zIndex = startZ + r;
-      const wz = __tileWorldZ(zIndex);
-
-      for (let x = 0; x < width; x++) {
-        const tile = document.createElement('a-entity');
-        tile.setAttribute(
-          'geometry',
-          `primitive: box; width: ${constants.tileSize}; height: ${constants.height}; depth: ${constants.tileSize}`
-        );
-        tile.setAttribute('material', 'src: #grass-texture');
-
-        // Helpful for debugging:
-        tile.setAttribute('zlow-kind', 'tile');
-
-        tile.setAttribute(
-          'position',
-          `${constants.startX + x * constants.tileSize} 0 ${wz}`
-        );
-
-        rowTiles[r][x] = tile;
-        frag.appendChild(tile);
-      }
-    }
-
-    tilesEntity.appendChild(frag);
-
-    // Advance gridDepth to reflect that these rows now exist.
-    constants.gridDepth = startZ + rows;
-
-    __tilePool = {
-      tilesEntity,
-      width,
-      rows,
-      rowTiles,
-      nextRecycleRow: 0,          // ring pointer: which row to reuse next
-      nextZIndex: constants.gridDepth // next new zIndex to assign when “extending”
-    };
-
-    //Store "front edge" Z for trigger + expose pool for update_rider_animation()
-    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
-    window.__tilePool = __tilePool;
-
-    console.log(`[tilePool] initialized rows=${rows}, tiles=${poolTiles}`);
-  }
-
-  function __advanceTilePool(rowsToAdvance) {
-    if (!__tilePool || !__tilePool.rowTiles) __initTilePool(); 
-    if (!__tilePool) return;
-
-    const { width, rows, rowTiles } = __tilePool;
-
-    // Reuse N rows by moving them to the “front” (new zIndex values).
-    const n = Math.min(rowsToAdvance, rows);
-
-    for (let i = 0; i < n; i++) {
-      const r = __tilePool.nextRecycleRow;
-      const zIndex = __tilePool.nextZIndex++;
-      const wz = __tileWorldZ(zIndex);
-
-      for (let x = 0; x < width; x++) {
-        // Only update Z (X stays consistent per column)
-        rowTiles[r][x].setAttribute(
-          'position',
-          `${constants.startX + x * constants.tileSize} 0 ${wz}`
-        );
-      }
-
-      __tilePool.nextRecycleRow = (r + 1) % rows;
-    }
-
-    // Keep gridDepth consistent with the old logic (it’s used in the trigger)
-    constants.gridDepth += n;
-
-    // Update front edge after recycling rows
-    __tilePool.frontZ = __tileWorldZ(__tilePool.nextZIndex - 1);
-    window.__tilePool = __tilePool;
   }
 
   function disposeAFrameEl(el) {
