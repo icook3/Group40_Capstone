@@ -67,6 +67,6 @@ export class ViewManager {
 // For browser usage
 if (typeof window !== "undefined") {
     window.viewManager=new ViewManager();
-    window.__zlow = window.__zlow || {};
-    window.__zlow.constants = constants;
+    //window.__zlow = window.__zlow || {};
+    //window.__zlow.constants = constants;
 }

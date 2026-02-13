@@ -77,6 +77,13 @@ export class zlowScreen {
         constants.currentTrackPiece=0;
         constants.pacerCurrentTrackPiece=0;
         constants.trackPoints=[];
+        constants.lastTime=Date.now();
+        constants.worldZ=0;
+
+        constants.lastCloud = Date.now();
+        constants.cloudSpeed = 0;
+        constants.updateEvery=0;
+        
     }
 
     initializeTiles() {
