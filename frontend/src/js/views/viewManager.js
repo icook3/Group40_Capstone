@@ -2,7 +2,7 @@ import { mainMenuView } from "./mainMenu.js";
 import { zlowScreen } from "./zlow.js";
 import { changelogView } from "./changelog.js";
 import { constants } from "../constants.js";
-
+import { playerCustomizationView } from "./playerCustomization.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -23,6 +23,7 @@ export class ViewManager {
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
         this.viewStorage.zlowScreen = new zlowScreen(false);
+        this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
         this.viewStorage.changelog = new changelogView(false);
     }
 
@@ -35,6 +36,8 @@ export class ViewManager {
                 this.viewStorage.zlowScreen.reset();
             case this.views.changelog:
                 this.viewStorage.changelog.reset();
+            case this.views.playerCustomization:
+                this.viewStorage.playerCustomizationScreen.reset();
         }
         //set the current page
         switch(view) {
@@ -51,6 +54,11 @@ export class ViewManager {
             case this.views.changelog:
                 if (this.viewStorage.changelog.ready) {
                     this.viewStorage.changelog.setPage();
+                }
+                break;
+            case this.views.playerCustomization:
+                if (this.viewStorage.playerCustomizationScreen.ready) {
+                    this.viewStorage.playerCustomizationScreen.setPage();
                 }
                 break;
             default: 
