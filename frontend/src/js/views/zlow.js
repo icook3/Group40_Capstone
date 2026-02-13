@@ -69,6 +69,16 @@ export class zlowScreen {
         window.testNotifications = new NotificationManager();
     }
 
+    reset() {
+        this.loopRunning=false;
+        constants.riderState={power: 0,speed: 0,calories: 0};
+        constants.pacerStarted = false;
+        constants.farthestSpawn=1;
+        constants.currentTrackPiece=0;
+        constants.pacerCurrentTrackPiece=0;
+        constants.trackPoints=[];
+    }
+
     initializeTiles() {
         const scene = document.getElementById("scene");
         // Add as a new thing rather than getting the entity??
@@ -591,13 +601,6 @@ export class zlowScreen {
      * 
      * 
      */
-
-
-    reset() {
-        this.loopRunning=false;
-        constants.riderState={power: 0,speed: 0,calories: 0};
-        constants.pacerStarted = false;
-    }
 
     // Handles the main loop and adding to the ride history
     loop({
