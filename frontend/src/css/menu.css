@@ -13,19 +13,19 @@ button {
   left: 50%;
   transform: translateX(-50%);
 }
+
 #main-menu-center {
   position: fixed;
-  top: 40%;
+  top: 23%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%) scale(1.2);
   z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
-  /* This is an easy way to scale up or down the whole main menu*/
-  transform: translate(-50%, -50%) scale(1.2);
 }
+
 
 #welcome-msg {
   display: flex;
@@ -82,19 +82,28 @@ button {
     other settings
 */
 #menu-settings {
-  position: fixed;
-  bottom: 290px;
-  left: 20px;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
   background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
-  width: 300px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  width: 320px;
   display: none;
-  /* Stack controls vertically */
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
+  gap: 10px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+}
+
+#menu-settings.zoom-in {
+  animation: zoomIn 0.35s ease both;
 }
 
 #peer-name {
@@ -198,6 +207,19 @@ a-scene {
    They should NOT show a hand unless you're on a real control */
 #menu-settings .hud-btn {
   cursor: default;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+#menu-settings span.hud-btn label:not(.toggle-switch) {
+  min-width: 70px;
+}
+
+#menu-settings input[type="number"] {
+  width: 40px;
+  text-align: left;
 }
 
 /* Dropdowns (select) should be a hand */
@@ -206,9 +228,26 @@ a-scene {
   cursor: pointer;
 }
 
+.units-group {
+  display: flex;
+  gap: 8px;
+}
+
 /* Buttons inside settings remain a hand (Connect Strava, Host, Clear, Dev Mode) */
 #menu-settings button.hud-btn {
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+#menu-settings button.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 /* Editable fields show text cursor */
@@ -218,12 +257,23 @@ a-scene {
   cursor: text;
 }
 
-#workout-options {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  animation: fadeSlideIn 0.3s ease both;
+#menu-settings.hidden {
+  display: none;
+}
+
+#menu-settings.zoom-out {
+  animation: zoomOut 0.25s ease both;
+}
+
+#menu-settings input:not([type="checkbox"]),
+#menu-settings select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
 }
 
 #workout-options.hidden {
@@ -231,13 +281,14 @@ a-scene {
 }
 
 .workout-option {
-  background: rgba(46, 139, 110, 0.08);
-  border: 1.5px solid rgba(46, 139, 110, 0.15);
-  border-radius: 16px;
+  background: rgba(113, 188, 200, 0.509);
+  border: none;
+  backdrop-filter: blur(14px);
+  border-radius: 15px;
   padding: 14px 44px;
   font-family: "Nunito", sans-serif;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -245,53 +296,204 @@ a-scene {
   min-width: 220px;
 }
 
-.workout-option:hover {
-  background: rgba(46, 139, 110, 0.16);
-  border-color: rgba(46, 139, 110, 0.35);
-  transform: translateY(-1px);
-}
-
 .workout-name {
   font-weight: 700;
   font-size: 0.95rem;
-  color: #267a5e;
+  color:#1a3a2a;
 }
 
 .workout-desc {
   font-weight: 500;
   font-size: 0.7rem;
-  color: rgba(46, 139, 110, 0.5);
+  color: rgba(26, 58, 42, 0.45);
   letter-spacing: 0.02em;
+  font-style: italic;
 }
 
 #workout-back {
   margin-bottom: 4px;
 }
 
-@keyframes fadeSlideIn {
+
+@keyframes zoomIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
-  }m
+    transform: translateX(-50%) scale(2);
+  }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) scale(1);
   }
 }
 
-.fade-out {
-  animation: fadeSlideOut 0.2s ease both;
-}
-
-@keyframes fadeSlideOut {
+@keyframes zoomOut {
   from {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) scale(1);
   }
   to {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(-50%) scale(2);
   }
 }
 
+#workout-options {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: zoomIn 0.35s ease both;
+}
 
+#workout-options.zoom-out {
+  animation: zoomOut 0.25s ease both;
+}
+
+#main-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+#main-buttons.pushed-back {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.5);
+}
+
+.workout-row {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+}
+
+
+.workout-option[data-workout="ramp"]:hover {
+  background: #efd688;
+}
+.workout-option[data-workout="ramp"]:hover .workout-name { color: #1a1a1a; }
+.workout-option[data-workout="ramp"]:hover .workout-desc { color: rgba(0,0,0,0.45); }
+
+
+.workout-option[data-workout="sprint"]:hover {
+  background: #bbea8d;
+}
+.workout-option[data-workout="sprint"]:hover .workout-name { color: #1a1a1a; }
+.workout-option[data-workout="sprint"]:hover .workout-desc { color: rgba(0,0,0,0.45); }
+
+#settings-back {
+  color: #e0e0e0;
+}
+
+#settings-back:hover {
+  color: #fff;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  transition: background 0.25s;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: #2da2d8;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.seg-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.seg-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: rgba(224, 224, 224, 0.5);
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.seg-btn.active {
+  background: #2da2d8;
+  color: #fff;
+}
+
+.seg-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e0e0e0;
+}
+
+#menu-settings .hud-btn::before {
+  display: none;
+}
+
+#menu-settings #clear-btn:hover {
+  background: rgb(200, 81, 81);
+}
+
+#menu-footer {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 1000;
+}
+
+#menu-footer a {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+#menu-footer a:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
