@@ -717,6 +717,8 @@ export class zlowScreen {
       getElement = (id) => document.getElementById(id),
       requestAnimationFrameFn = window.requestAnimationFrame,
     } = {}) {
+      this.reset();
+
       window.__zlow = window.__zlow || {};
       window.__zlow.constants = constants;
       this.peerState=0;
