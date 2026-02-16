@@ -710,7 +710,7 @@ export class zlowScreen {
       // Add new sample to rideHistory if time is recording and simulation isn't paused
       if (owner.isRecording && !simulationState.isPaused) {
         rideHistory.pushSample(
-          rideElapsedMs,
+          owner.rideElapsedMs,
           constants.riderState.power || 0,           // watts
           constants.riderState.speed || 0,           // m/s
           constants.riderState.distanceMeters || 0 // meters
