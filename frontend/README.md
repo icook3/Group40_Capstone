@@ -129,13 +129,15 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `bluetooth.js` — Handles Bluetooth device connection and data polling.
 		- `connectionProtocol.md` — Documentation on the protocol for peer-to-peer connection
 		- `constants.js` — Stores important constants for the program execution.
-		- `crashReporter.js` — Handles checking for crashes, and reporting them to the backend. 
+		- `crashReporter.js` — Handles checking for crashes, and reporting them to the backend.
+		- `download.js` — Handles downloading TCX files
 		- `hud.js` — Renders the heads-up display overlay.
 		- `keyboardMode.js` — Handles keyboard mode functionalities and variables.
-		- `main.js` — Main app entry point.
+		- `main.js` — Handles various important functions for the application
 		- `milestones.js` — Handles tracking for various milestones.
 		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
+		- `rideFile.js` — Handles creating TCX files. 
 		- `rideHistory.js` — Handles storing past ride data.
 		- `rideHistoryStore.js` — Creates a singleton rideHistory object for other objects to access. 
 		- `simulationstate.js` — Handles tracking the state of the simulation.
