@@ -42,6 +42,8 @@ export class zlowScreen {
     workoutName;
     isRecording = false;
     rideElapsedMs=0;
+    workoutSummary;
+    countdown;
     //0: not in peer-peer mode
     //1: host
     //2: peer
@@ -456,7 +458,7 @@ export class zlowScreen {
           savedPacerSpeed = this.pacerPhysics.getSpeed();
           this.setPacerSpeed(0); // Stop pacer when paused
           // start countdown
-          countdown.start(() => {
+          this.countdown.start(() => {
             // auto-resume when hits 0
             simulationState.isPaused = false;
             constants.lastTime = Date.now();
@@ -466,7 +468,7 @@ export class zlowScreen {
           });
         } else {
           // manual resume
-          countdown.cancel();
+          this.countdown.cancel();
           this.hud.resume();
           simulationState.isPaused = false;
           constants.lastTime = Date.now();
@@ -506,16 +508,17 @@ export class zlowScreen {
             const { newRecords, streak } = this.workoutStorage.saveWorkout(finalStats);
     
             // Show the summary!
-            workoutSummary.show(finalStats, newRecords, streak);
+            this.workoutSummary.show(finalStats, newRecords, streak);
     
             // Reset everything
             simulationState.isPaused = false;
-            countdown.cancel();
+            this.countdown.cancel();
             constants.riderState.power = 0;
             constants.riderState.distanceMeters = 0;
-            rideElapsedMs = 0;
+            this.rideElapsedMs = 0;
             this.physics.setSpeed(0);
             this.hud.resetWorkOut();
+            const pauseBtn = document.getElementById("pause-btn");
             pauseBtn.textContent = "Pause";
     
             // Reset pacer
@@ -770,7 +773,7 @@ export class zlowScreen {
       this.milestoneTracker = new MilestoneTracker(this.workoutSession, this.workoutStorage);
       
       //let tempWorkoutStorage=this.workoutStorage;
-      const workoutSummary = new WorkoutSummary({
+      this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
         onClose: () => {
           viewManager.setView(viewManager.views.mainMenu);
@@ -793,7 +796,7 @@ export class zlowScreen {
         }
       }
     
-      const countdown = new PauseCountdown({ getElement, limit: 10 });
+      this.countdown = new PauseCountdown({ getElement, limit: 10 });
     
       this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },

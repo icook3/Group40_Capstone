@@ -195,7 +195,7 @@ workoutCountdownId: number
 + getCurrentStreak(): nmber
 + getCumulativeRideCount(): number
 + clearAll(): void
-+ deleteWorkout(workoutId: number): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1218</x><y>931</y><w>994</w><h>2009</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1400;2850;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1281</x><y>2884</y><w>189</w><h>154</h></coordinates><panel_attributes>WorkoutSession
++ deleteWorkout(workoutId: number): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1218</x><y>1043</y><w>994</w><h>1897</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1400;2690;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1281</x><y>2884</y><w>189</w><h>154</h></coordinates><panel_attributes>WorkoutSession
 --
 
 --
@@ -209,7 +209,7 @@ workoutCountdownId: number
 + getTotalTime(): number
 + getCurrentStats(): object
 + isWorkoutActive(): boolean
-+ cancel(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1190</x><y>931</y><w>168</w><h>1967</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>220;2790;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2149</x><y>1316</y><w>406</w><h>126</h></coordinates><panel_attributes>MilestoneTracker
++ cancel(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1190</x><y>1043</y><w>168</w><h>1855</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>220;2630;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2149</x><y>1316</y><w>406</w><h>126</h></coordinates><panel_attributes>MilestoneTracker
 --
 
 --
@@ -252,19 +252,19 @@ workoutCountdownId: number
 + update(dt: number): void
 + setPosition(pos: object): void
 + setHorizontalPosition(pos: object): void
-+ setRotation(rot: object): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1113</x><y>931</y><w>245</w><h>1316</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>330;1860;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2443</x><y>1540</y><w>112</w><h>70</h></coordinates><panel_attributes>StandardMode
++ setRotation(rot: object): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1113</x><y>1043</y><w>245</w><h>1204</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>330;1700;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2443</x><y>1540</y><w>112</w><h>70</h></coordinates><panel_attributes>StandardMode
 --
 + trainer: TrainerBluetooth
 --
 + connectTrainer(): void
 + init(): void
-+ setTrainer(t: string): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1365</x><y>917</y><w>1148</w><h>707</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1620;990;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>602</x><y>931</y><w>406</w><h>483</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;670;560;10</additional_attributes></element><element><id>Relation</id><coordinates><x>959</x><y>931</y><w>84</w><h>980</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1380;100;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>763</x><y>1876</y><w>203</w><h>70</h></coordinates><panel_attributes>ZlowScene
++ setTrainer(t: string): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1365</x><y>917</y><w>1148</w><h>707</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1620;990;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>602</x><y>1043</y><w>406</w><h>371</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;510;560;10</additional_attributes></element><element><id>Relation</id><coordinates><x>959</x><y>1043</y><w>84</w><h>868</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1220;100;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>763</x><y>1876</y><w>203</w><h>70</h></coordinates><panel_attributes>ZlowScene
 --
 
 --
 + constructor(_, {getElement: object}): ZlowScene
 + destroy(): void
-+ update(riderSpeed: number, dt: number): void)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1134</x><y>931</y><w>812</w><h>1008</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1140;1420;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1932</x><y>1897</y><w>112</w><h>42</h></coordinates><panel_attributes>HUD
++ update(riderSpeed: number, dt: number): void)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1134</x><y>1043</y><w>812</w><h>896</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1140;1260;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1932</x><y>1897</y><w>112</w><h>42</h></coordinates><panel_attributes>HUD
 --
 
 --
@@ -278,7 +278,7 @@ workoutCountdownId: number
 + markFinished(): void
 + computeFtpFromHistory(history: array): {peakMinute: number, ftp: number}
 + _startRamp(nowMs: number): void
-+ _announceStep(stepNumber: number, targetWatts: number): v</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1239</x><y>931</y><w>1176</w><h>1428</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1660;2020;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2205</x><y>2331</y><w>707</w><h>133</h></coordinates><panel_attributes>workouts</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1708</x><y>2667</y><w>287</w><h>140</h></coordinates><panel_attributes>Strava
++ _announceStep(stepNumber: number, targetWatts: number): v</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1239</x><y>1043</y><w>1176</w><h>1316</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1660;1860;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2205</x><y>2331</y><w>707</w><h>133</h></coordinates><panel_attributes>workouts</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1708</x><y>2667</y><w>287</w><h>140</h></coordinates><panel_attributes>Strava
 --
 
 --
@@ -482,7 +482,7 @@ ViewsInterface
 + initPlayerColors({owner: playerCustomizationView}): void
 + initBikeColors({owner: playerCustomizationView}): void
 + initHelmetColors({owner: playerCustomizationView}): void
-+ setInitialPickerValues({owner: playerCustomizationView}): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>882</x><y>343</y><w>147</w><h>56</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;60;190;10</additional_attributes></element><element><id>Relation</id><coordinates><x>742</x><y>476</y><w>1428</w><h>2093</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>2020;2970;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>994</x><y>490</y><w>378</w><h>448</h></coordinates><panel_attributes>zlowScreen
++ setInitialPickerValues({owner: playerCustomizationView}): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>882</x><y>343</y><w>147</w><h>56</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;60;190;10</additional_attributes></element><element><id>Relation</id><coordinates><x>742</x><y>476</y><w>1428</w><h>2093</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>2020;2970;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>994</x><y>490</y><w>378</w><h>560</h></coordinates><panel_attributes>zlowScreen
 --
 + workoutStorage: WorkoutStorage
 + workoutSession: WorkoutSession
@@ -501,6 +501,8 @@ ViewsInterface
 + workoutName: string
 + isRecording: boolean
 + rideElapsedMs: number
++ workoutSummary: WorkoutSummary
++ countdown: PauseCountdown
 + peerState: number
 + connected: boolean
 + peer: Peer
@@ -524,7 +526,7 @@ ViewsInterface
 + setupTrainerButtons(): void
 + setupPacerSyncButton(): void
 + loop({getElement: function, requestAnimationFrameFn: function, owner: zlowScreen}: void
-+ initZlowApp(getElement: function, requestAnimationFrameFn: function): object</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1036</x><y>931</y><w>1680</w><h>1757</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>2380;2490;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1099</x><y>399</y><w>35</w><h>105</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>30;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>903</y><w>448</w><h>658</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;920;620;10</additional_attributes></element><element><id>Relation</id><coordinates><x>917</x><y>931</y><w>112</w><h>217</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;290;140;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1085</x><y>931</y><w>28</w><h>420</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;580;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1365</x><y>791</y><w>833</w><h>252</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1170;340;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>252</x><y>854</y><w>756</w><h>1218</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1720;1060;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1309</x><y>931</y><w>203</w><h>987</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>270;1390;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1344</x><y>931</y><w>756</w><h>770</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1060;1080;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1330</x><y>931</y><w>1085</w><h>2331</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1530;3310;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1281</x><y>931</y><w>280</w><h>854</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>380;1200;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1127</x><y>931</y><w>280</w><h>889</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>380;1250;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1001</x><y>189</y><w>259</w><h>84</h></coordinates><panel_attributes>ViewStorage
++ initZlowApp(getElement: function, requestAnimationFrameFn: function): object</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1036</x><y>1043</y><w>1680</w><h>1645</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>2380;2330;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1099</x><y>399</y><w>35</w><h>105</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>30;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>903</y><w>448</w><h>658</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;920;620;10</additional_attributes></element><element><id>Relation</id><coordinates><x>917</x><y>1043</y><w>112</w><h>105</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;130;140;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1085</x><y>1043</y><w>28</w><h>308</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>20;420;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1365</x><y>791</y><w>833</w><h>252</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1170;340;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>252</x><y>854</y><w>756</w><h>1218</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1720;1060;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1309</x><y>1043</y><w>203</w><h>875</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>270;1230;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1344</x><y>1043</y><w>756</w><h>658</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1060;920;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1330</x><y>1043</y><w>1085</w><h>2219</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>1530;3150;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1281</x><y>1043</y><w>280</w><h>742</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>380;1040;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1127</x><y>1043</y><w>280</w><h>777</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>380;1090;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1001</x><y>189</y><w>259</w><h>84</h></coordinates><panel_attributes>ViewStorage
 --
 + mainMenu: ViewsInterface
 + changelog: ViewsInterface
