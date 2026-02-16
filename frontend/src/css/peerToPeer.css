@@ -1,61 +1,168 @@
 body {
-    margin: 0;
-    font-family: sans-serif;
-    color: #fff;
-    font-family: "Fugaz One", sans-serif;
-    font-size: 1.5em;
+  margin: 0;
+  font-family: "Fugaz One", sans-serif;
+  font-size: 1.5em;
+  color: #fff;
 }
+
 button {
-    font-size: 1em;
-    cursor: pointer;
-}
-.center-item {
-    left: 40%;
+  font-size: 1em;
+  cursor: pointer;
 }
 
+/* Keep your existing cancel container behavior */
 #cancel {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-    /* Background color */
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 250px;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 250px;
 }
 
-#peerConnectMenu {
-    position: fixed;
-    top:43%;
-    left:25%;
-    /* Background color */
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 50%;
-    height: 15%;
-}
-
-/* Hover feedback for buttons on Connect to Peer screen */
 #cancel:hover,
-#peerConnectMenu button:hover,
 button:hover {
   filter: brightness(85%);
   transition: filter 0.15s ease;
 }
 
-
-/* Hover feedback for clickable option rows (if options are divs/spans/lis) */
-#peerConnectMenu [role="button"]:hover,
-#peerConnectMenu .option:hover,
-#peerConnectMenu .peer-option:hover,
-#peerConnectMenu li:hover {
-  background: rgba(255, 255, 255, 0.10);
+/* ===== mainMenu-style center layout ===== */
+#main-menu-center {
+  position: fixed;
+  top: 23%;
+  left: 50%;
+  transform: translateX(-50%) scale(1.2);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
 }
-#peerConnectMenu [role="button"],
-#peerConnectMenu .option,
-#peerConnectMenu .peer-option,
-#peerConnectMenu li {
+
+#welcome-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.welcome-top {
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: rgba(241, 239, 228, 0.727);
+  letter-spacing: 0.35em;
+  margin-bottom: 12px;
+}
+
+.welcome-main {
+  font-size: 5rem;
+  color: #1a3a2a;
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: baseline;
+}
+
+.welcome-logo {
+  height: 0.9em;
+  width: auto;
+  margin-right: 2px;
+  transform: translateY(12px);
+}
+
+.welcome-accent {
+  display: inline-block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #2d7a4a, #7cd1f3);
+  border-radius: 2px;
+  margin-top: 16px;
+}
+
+#main-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ===== input styled to fit the menu ===== */
+#peer-input-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+#name-input {
+  width: 320px;
+  padding: 14px 18px;
+  border-radius: 25px;
+  border: 1.8px solid #1a3a2a67;
+  background: rgba(255, 255, 255, 0.18);
+  color: #1a3a2a;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  outline: none;
+  text-align: center;
+}
+
+#name-input::placeholder {
+  color: rgba(26, 58, 42, 0.55);
+}
+
+/* ===== Connect button styled like Quick Ride ===== */
+#start-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -6px;
+}
+
+/* IMPORTANT: connect button uses your page's ID */
+#connect-btn {
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px 52px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #e0f7ef;
   cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
+}
+
+#connect-btn:hover {
+  background: #1a3a2a;
+}
+
+/* Back link matches menu-link style */
+#menu-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: -10px;
+}
+
+.menu-link {
+  background: none;
+  border: none;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1a3a2a;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.menu-link:hover {
+  color: rgba(26, 58, 42, 0.85);
+  background: rgba(46, 139, 110, 0.08);
 }
