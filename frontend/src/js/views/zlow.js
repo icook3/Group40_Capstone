@@ -40,6 +40,8 @@ export class zlowScreen {
     rampController;
     selectedWorkout;
     workoutName;
+    isRecording = false;
+    rideElapsedMs=0;
     //0: not in peer-peer mode
     //1: host
     //2: peer
@@ -71,7 +73,7 @@ export class zlowScreen {
 
     reset() {
         this.loopRunning=false;
-        constants.riderState={power: 0,speed: 0,calories: 0};
+        constants.riderState={power: 0,speed: 0,calories: 0, distanceMeters: 0};
         constants.pacerStarted = false;
         constants.farthestSpawn=1;
         constants.currentTrackPiece=0;
@@ -425,7 +427,8 @@ export class zlowScreen {
         onDone: () => {
           // After 5s, unpause the sim
           simulationState.isPaused = false;
-    
+          this.isRecording = true;
+          this.rideElapsedMs = 0;
           // If ramp, begin warmup countdown (no pause)
           if (this.selectedWorkout === "ramp") {
             // tell HUD to show 5-minute warmup timer
@@ -456,6 +459,7 @@ export class zlowScreen {
           countdown.start(() => {
             // auto-resume when hits 0
             simulationState.isPaused = false;
+            constants.lastTime = Date.now();
             this.hud.resume();
             this.setPacerSpeed(savedPacerSpeed);
             pauseBtn.textContent = "Pause";
@@ -465,6 +469,7 @@ export class zlowScreen {
           countdown.cancel();
           this.hud.resume();
           simulationState.isPaused = false;
+          constants.lastTime = Date.now();
           this.setPacerSpeed(savedPacerSpeed);
           pauseBtn.textContent = "Pause";
         }
@@ -479,7 +484,7 @@ export class zlowScreen {
           () => {
             // End the session and get final stats
             const finalStats = this.workoutSession.end();
-    
+            this.isRecording = false;
             // After you compute finalStats from workoutSession / history, etc.
             if (this.selectedWorkout === "ramp" && this.rampController) {
               const result = this.rampController.computeFtpFromHistory(
@@ -507,6 +512,8 @@ export class zlowScreen {
             simulationState.isPaused = false;
             countdown.cancel();
             constants.riderState.power = 0;
+            constants.riderState.distanceMeters = 0;
+            rideElapsedMs = 0;
             this.physics.setSpeed(0);
             this.hud.resetWorkOut();
             pauseBtn.textContent = "Pause";
@@ -524,6 +531,7 @@ export class zlowScreen {
           // On Cancel
           () => {
             console.log("❌ Stop cancelled - continuing workout");
+            this.isRecording = true;
           }
         );
       });
@@ -604,10 +612,14 @@ export class zlowScreen {
       }
       const dt = (now - constants.lastTime) / 1000;
       constants.lastTime = now;
-    
+      if (owner.isRecording) {
+          owner.rideElapsedMs+=dt*1000;
+      }
       const currentPower = constants.riderState.power || 0;
       constants.riderState.speed = owner.physics.update(currentPower, dt);
-    
+
+      const speedMs = constants.kmhToMs(constants.riderState.speed);
+      constants.riderState.distanceMeters += speedMs * dt;
       // Calculate calories burned using the following formula:
       // calories = (power in watts * delta time (seconds) / 1000)
       if (currentPower > 0) {
@@ -695,17 +707,15 @@ export class zlowScreen {
         owner.keyboardMode.keyboardMode = true;
       }
     
-      //set up values to push
-      let pushTime = performance.now();
-      let pushPower = constants.riderState.power || 0;
-      let pushSpeed = units.speedUnit.convertFrom(constants.riderState.speed) || 0;
-      let pushDistance =
-        units.distanceUnit.convertFrom(
-          parseFloat(getElement("distance").textContent)
-        ) || 0;
-    
-      rideHistory.pushSample(pushTime, pushPower, pushSpeed, pushDistance);
-    
+      // Add new sample to rideHistory if time is recording and simulation isn't paused
+      if (owner.isRecording && !simulationState.isPaused) {
+        rideHistory.pushSample(
+          rideElapsedMs,
+          constants.riderState.power || 0,           // watts
+          constants.riderState.speed || 0,           // m/s
+          constants.riderState.distanceMeters || 0 // meters
+        );
+      }
       owner.sendPeerDataOver(constants.riderState.speed);
       requestAnimationFrameFn(() =>
           owner.loop({ getElement, requestAnimationFrameFn, owner })
