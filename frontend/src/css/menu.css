@@ -476,6 +476,9 @@ a-scene {
 }
 
 #menu-footer {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 6px 16px;
+  border-radius: 14px;
   position: fixed;
   bottom: 16px;
   left: 50%;
@@ -486,14 +489,14 @@ a-scene {
   font-family: "Nunito", sans-serif;
   font-size: 1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.75);
   z-index: 1000;
 }
 
 #menu-footer a {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 #menu-footer a:hover {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 1);
 }
