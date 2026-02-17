@@ -27,7 +27,6 @@ export class Track {
     }
     this.path_element = path_element;
 
-
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer-entity');
@@ -132,7 +131,7 @@ export class Track {
     // move the sky properly
     setPos(document.getElementById("sky"),{x:0, y:0, z:constants.trackPoints[constants.currentTrackPiece].z});
 
-    // If rider is within 40 units of the end, spawn some more track pieces
+    // If rider is within 200 units of the end, spawn some more track pieces
     if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track();
     }
@@ -165,7 +164,7 @@ export class Track {
     }
 
     // Calculate pacer's duration and set attributes
-    let pacerDuration = constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed * 1000;
+    let pacerDuration = Math.round((constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed) * 1500);
     pacer.removeAttribute("animation__2");
     pacer.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay:true;`);
   }
@@ -177,8 +176,7 @@ export class Track {
       this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
       document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
       this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:tr;`);
-      console.log('Element exists:', element);
+      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay: true;`);
       activatePacer();
     });
   }
