@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+export function workoutMenu () {
   const workoutsBtn = document.getElementById('workouts-btn');
   const workoutOptions = document.getElementById('workout-options');
   const workoutBack = document.getElementById('workout-back');
@@ -63,8 +63,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll(".speedUnit").forEach(el => el.textContent = "km/h");
     document.querySelectorAll(".weightUnit").forEach(el => el.textContent = "kg");
   });
+  // Quick Ride
+  document.getElementById("start-btn").addEventListener("click", () => {
+    launchWorkout("free");
+  });
 
-});
+  // Workout options (Ramp, Sprint, and upcoming workouts)
+  document.querySelectorAll(".workout-option").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      launchWorkout(btn.dataset.workout);
+    });
+  });
+
+  // Connect to Peer menu link
+  document.getElementById("peer-connect-btn").addEventListener("click", () => {
+    launchWorkout("peerServer");
+  });
+}
 
 // --- Launch ride ---
 function launchWorkout(workout) {
@@ -73,25 +88,9 @@ function launchWorkout(workout) {
   if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
 
   if (workout === "peerServer") {
-    window.location.href = "../html/connectToPeers.html";
+    window.viewManager.setView(window.viewManager.views.peerConnect);
   } else {
-    window.location.href = "../html/zlow.html";
+    window.viewManager.setView(window.viewManager.views.mainZlow);
   }
 }
 
-// Quick Ride
-document.getElementById("start-btn").addEventListener("click", () => {
-  launchWorkout("free");
-});
-
-// Workout options (Ramp, Sprint, and upcoming workouts)
-document.querySelectorAll(".workout-option").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    launchWorkout(btn.dataset.workout);
-  });
-});
-
-// Connect to Peer menu link
-document.getElementById("peer-connect-btn").addEventListener("click", () => {
-  launchWorkout("peerServer");
-});
