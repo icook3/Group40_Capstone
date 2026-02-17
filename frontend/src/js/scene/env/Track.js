@@ -72,6 +72,10 @@ export class Track {
   if (window.__zlowTrackInstance === this) {
     window.__zlowTrackInstance = null;
   }
+
+  straightPool = [];
+  straightPoolIndex = 0;
+  poolReady = false;
 }
 
 

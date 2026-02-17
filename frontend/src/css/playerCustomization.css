@@ -1,19 +1,7 @@
-@font-face {
-  font-family: "Fugaz One";
-  src: url("../../resources/fonts/FugazOne-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+body.customizeBody {
+  background-color: grey;
 }
-
-@font-face {
-  font-family: "Nunito";
-  src: url("../../resources/fonts/Nunito-VariableFont_wght.ttf")
-    format("truetype");
-  font-weight: 100 900;
-  font-style: normal;
-}
-
-a-scene {
+a-scene.customizationScene {
   position: fixed;
   right: 33%;
   width: 100%;
@@ -133,7 +121,7 @@ a-scene {
   gap: 12px;
 }
 
-body {
+body.customizeBody {
   margin: 0;
   overflow: hidden;
 }

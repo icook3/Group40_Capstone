@@ -2,7 +2,7 @@
 // Drives menu with pointerdown (single fire), swallows the follow-up click,
 // robust outside-click closer, default "free" workout label.
 
-(function () {
+export function workoutChoice() {
   const ready = (fn) =>
     document.readyState === "loading"
       ? document.addEventListener("DOMContentLoaded", fn, { once: true })
@@ -177,9 +177,9 @@
       if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
       // Navigate into your app (same as your current file)
       if (sessionStorage.getItem("SelectedWorkout")==='peerServer') {
-          window.location.href = "../html/connectToPeers.html";
+          viewManager.setView(viewManager.views.peerConnect);
       } else {
-          window.location.href = "../html/zlow.html";
+          viewManager.setView(viewManager.views.mainZlow);
       }
     });
 
@@ -201,8 +201,4 @@
 
     console.log("[mainMenu] ready");
   });
-})();
-
-
-
-
+};
