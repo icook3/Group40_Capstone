@@ -225,17 +225,14 @@ export class Track {
     let pointZ = -1 * (constants.farthestSpawn);
 
     // Add necessary points based on current farthest spawn
-    constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 8});
-    constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 8});
-    constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 8});
-    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 8});
-    constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 8});
-    constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 8});
-    constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8});
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 8});
-
-    // Add five units to get to the top edge of the curved track graphic
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-66, length: 5});
+    constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 16.55});
+    constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 11.31});
+    constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 9.22});
+    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 9.22});
+    constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 16.16});
+    constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 9.22});
+    constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8.54});
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.61});
 
     // Update farthestSpan
     constants.farthestSpawn += 62;
@@ -259,17 +256,14 @@ export class Track {
     let pointZ = -1 * (constants.farthestSpawn);
 
     // Add necessary points based on current farthest spawn
-    constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 8});
-    constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 8});
-    constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 8});
-    constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 8});
-    constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 8});
-    constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 8});
-    constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8});
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 8});
-
-    // Add five units to get to the top edge of the curved track graphic
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-66, length: 5});
+    constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 16.55});
+    constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 11.31});
+    constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 9.22});
+    constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 9.22});
+    constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 16.16});
+    constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 9.22});
+    constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8.54});
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.62});
 
     // Update farthestSpan
     constants.farthestSpawn += 62;
