@@ -6,6 +6,7 @@
     <title>Zlow: Browser Cycling Simulator</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script defer src="../js/workoutMenu.js"></script>
     <link rel="stylesheet" href="../css/hud.css" />
     <link rel="stylesheet" href="../css/menu.css" />
     <style>
@@ -35,188 +36,113 @@
     ></script>
     <script type="module" src="../js/menu.js"></script>
 
-    <h1 id="welcome-msg" class="center-item">
-      Welcome to
-      <img
-        src="../../resources/favicons/ZlowFavicon.svg"
-        alt="Z"
-        width="30"
-        height="30"
-      />low!
-    </h1>
-
-    <!-- Split Start button -->
-    <div id="start-split" class="split-btn stats-row center-item">
-      <button id="start-btn" class="main" type="button">Start</button>
-      <button
-        id="start-toggle"
-        class="toggle"
-        type="button"
-        aria-haspopup="true"
-        aria-expanded="false"
-        aria-controls="start-menu"
-      >
-        ▾
-      </button>
-
-      <div id="start-menu" class="dropdown-content" role="menu">
-        <button class="dropdown-item" data-workout="free">Free Ride</button>
-        <button class="dropdown-item" data-workout="ramp">Ramp Test</button>
-        <button class="dropdown-item" data-workout="sprint">
-          Sprint Intervals
-        </button>
-        <button class="dropdown-item" data-workout="peerServer">Connect to peer</button>
-      </div>
-    </div>
-
-    <script defer src="../js/workoutChoice.js"></script>
-
-    <div id="menu-settings">
-      <span id="pacer" class="hud-btn">
-        <label for="pacer-speed">Pacer:</label>
-        <input
-          id="pacer-speed"
-          type="number"
-          min="5"
-          max="60"
-          value="20"
-          step="1"
-        />
-        <span class="speedUnit">km/h</span>
-      </span>
-
-      <span id="weight" class="hud-btn">
-        <label for="rider-weight">Weight:</label>
-        <input
-          id="rider-weight"
-          type="number"
-          min="40"
-          max="150"
-          value="70"
-          step="1"
-        />
-        <span class="weightUnit"> kg</span>
-      </span>
-      <button id="connect-strava-btn" class="hud-btn">
-        Connect Strava
-      </button>
-      <span id="unitsSpeed" class="hud-btn">
-        <label for="unitsSpeed">Units for speed: </label>
-        <select name="unitsSpeed" id="unitInputSpeed">
-          <option value="km/h">km/h</option>
-          <option value="mph">mph</option>
-        </select>
-      </span>
-      <span id="unitsWeight" class="hud-btn">
-        <label for="unitsWeight">Units for weight: </label>
-        <select name="unitsWeight" id="unitInputWeight">
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-        </select>
-      </span>
-      <!-- Delete this comment if you want to add alternate options for power input 
-        <span id="unitsPower" class="hud-btn">
-            <label for="unitsPower">Units for power: </label>
-            <select name="unitsPower" id="unitInputPower">
-                <option value="W">W</option>
-            </select>
+    <div id="main-menu-center">
+      <div id="welcome-msg">
+        <span class="welcome-top">Welcome to</span>
+        <span class="welcome-main">
+          <img
+            src="../../resources/favicons/ZlowFavicon.svg"
+            alt="Z"
+            class="welcome-logo"
+          />low
         </span>
-        -->
-      <button id="peer-btn" class="hud-btn">Host peer-to-peer</button>
-      <span id="peer-name" class="hud-btn">
-        <label for="name-input">Name: </label>
-        <input id="name-input" />
+        <span class="welcome-accent"></span>
+      </div>
+
+      <div id="main-buttons">
+        <div id="start-wrapper">
+          <button id="start-btn" type="button" data-workout="free">Quick Ride</button>
+        </div>
+
+        <div id="workouts-wrapper">
+          <button id="workouts-btn" type="button">Workouts</button>
+        </div>
+
+        <div id="menu-links">
+          <button id="peer-connect-btn" class="menu-link" data-workout="peerServer">Connect to Peer</button>
+          <button id="connect-btn" class="menu-link">Connect Trainer</button>
+          <button id="customize-btn" class="menu-link" onclick="window.location.href='playerCustomization.html'">Customize Character</button>
+          <button id="settings-btn" class="menu-link">Settings</button>
+        </div>
+      </div>
+
+      <div id="workout-options" class="hidden">
+        <button id="workout-back" class="menu-link">← Back</button>
+        <div class="workout-row">
+          <button class="workout-option" data-workout="ramp">
+            <span class="workout-name">Ramp Test</span>
+            <span class="workout-desc">Find your FTP</span>
+          </button>
+          <button class="workout-option" data-workout="sprint">
+            <span class="workout-name">Sprint Intervals</span>
+            <!-- Update with actual seconds when sprint intervals is implemented -->
+            <span class="workout-desc">[x]s on / [x]s off</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="menu-settings">
+        <button id="settings-back" class="menu-link">← Back</button>
+        
+        <span id="devMode" class="hud-btn">
+          <label for="dev-toggle">Dev mode</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="dev-toggle" />
+            <span class="toggle-slider"></span>
+          </label>
+        </span>
+
+        <span id="peer-host" class="hud-btn">
+          <label for="peer-toggle">Host P2P</label>
+          <label class="toggle-switch">
+          <input type="checkbox" id="peer-toggle" />
+          <span class="toggle-slider"></span>
+        </label>
       </span>
-      <button id="clear-btn" class="hud-btn" onclick="sessionStorage.clear(); localStorage.clear();">
-        Clear settings
-      </button>
-      <button id="testMode" class="hud-btn">Developer Testing Mode</button>
-    </div>
+        <span id="peer-name" class="hud-btn">
+          <label for="name-input">Host name: </label>
+          <input id="name-input" />
+        </span>
+        
+        <span id="pacer" class="hud-btn">
+          <label for="pacer-speed">Pacer:</label>
+          <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1" />
+          <span class="speedUnit">km/h</span>
+        </span>
 
-    <div id="menu-bottom">
-      <div class="control-buttons">
-        <button id="connect-btn" class="hud-btn">Connect Trainer</button>
-        <button
-          id="settings-btn"
-          class="hud-btn"
-          onclick="jQuery('#menu-settings').fadeToggle(500);"
-        >
-          Settings
+        <span id="weight" class="hud-btn">
+          <label for="rider-weight">Weight:</label>
+          <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" />
+          <span class="weightUnit">kg</span>
+        </span>
+
+        <span id="units-row" class="hud-btn">
+          <label>Units:</label>
+          <div class="units-group">
+            <div class="seg-toggle">
+              <button class="seg-btn active" data-unit="km/h" data-group="speed">km/h</button>
+              <button class="seg-btn" data-unit="mph" data-group="speed">mph</button>
+            </div>
+            <div class="seg-toggle">
+              <button class="seg-btn active" data-unit="kg" data-group="weight">kg</button>
+              <button class="seg-btn" data-unit="lb" data-group="weight">lb</button>
+            </div>
+          </div>
+        </span>
+        
+        <button id="connect-strava-btn" class="hud-btn">
+          Connect Strava
         </button>
-        <button id="github-btn" class="hud-btn" onclick="window.open('https://github.com/gioandjake/zlow/issues/new/choose', '_blank');">Report bugs!</button>
-        <button id="changelog" class="hud-btn" onclick="window.location.href = 'changelog.html'">Zlow version 1.0.0-alpha 3</button>
-
+        
+        <button id="clear-btn" class="hud-btn">Clear settings</button>
       </div>
     </div>
 
-    <div id="customize">
-      <div class="control-buttons">
-        <button
-          id="customize-btn"
-          class="hud-btn"
-          onclick="window.location.href='playerCustomization.html'"
-        >
-          Customize Character
-        </button>
-      </div>
+    <div id="menu-footer">
+      <a href="changelog.html">v1.0.0-alpha.3</a>
+      <span>·</span>
+      <a href="https://github.com/gioandjake/zlow/issues/new/choose" target="_blank">Report a bug</a>
     </div>
-
-    <!-- Main Menu Avatar
-    <a-scene
-      id="mainMenuScene"
-      embedded
-      style="width: 300px; height: 600px; background: transparent"
-    >
-      <a-entity
-        camera
-        position="0 1.5 3"
-        look-controls="enabled: false"
-      ></a-entity>
-      <a-assets>
-        <a-asset-item
-          id="bikeGLB"
-          src="../../resources/models/playermodels/bikeV4.glb"
-        ></a-asset-item>
-        <a-asset-item
-          id="maleGLB"
-          src="../../resources/models/playermodels/maleV5.glb"
-        ></a-asset-item>
-        <a-asset-item
-          id="femaleGLB"
-          src="../../resources/models/playermodels/femaleV6.glb"
-        ></a-asset-item>
-      </a-assets>
-    </a-scene>
-
-    <script>
-      jQuery( document ).ready(function() {
-        console.log("Ready!");
-      });
-    </script>
-
-    <script type="module">
-      import { AvatarCreator } from "../js/avatarCreator.js";
-
-      window.addEventListener("DOMContentLoaded", () => {
-        const scene = document.querySelector("#mainMenuScene");
-        if (!scene) {
-          console.error("Scene not found!");
-          return;
-        }
-
-        //Create the avatar immediately
-        const avatar = new AvatarCreator(
-          "menuAvatar",
-          { x: 0, y: 0, z: -1 },
-          { x: 0, y: 90, z: 0 },
-          (avatarInstance) => {
-            avatarInstance.setMenuPosition();
-            avatarInstance.enableMenuRotation();
-            avatarInstance.startRotationLoop();
-          }
-        );
-      });
-    </script> -->
 
     <div id="sky-gradient"></div>
 
@@ -301,7 +227,6 @@
           id="wide-building-obj"
           src="../../resources/models/bgmodels/WideBuilding.glb"
         ></a-asset-item>
-        s
       </a-assets>
 
       <!--  Main tree -->
