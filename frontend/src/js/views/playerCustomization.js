@@ -83,20 +83,20 @@ export class playerCustomizationView {
         this.genderLabel.textContent = this.models[currentModelIndex];
 
         function updateGenderDisplay() {
-            this.genderLabel.textContent = this.models[currentModelIndex];
+            owner.genderLabel.textContent = owner.models[currentModelIndex];
             window.avatarInstance.setPlayerModel(
-                this.models[currentModelIndex].toLowerCase()
+                owner.models[currentModelIndex].toLowerCase()
             );
         }
 
-        this.leftArrow.addEventListener("click", () => {
+        owner.leftArrow.addEventListener("click", () => {
             currentModelIndex =
-                (currentModelIndex - 1 + this.models.length) % this.models.length;
+                (currentModelIndex - 1 + owner.models.length) % owner.models.length;
             updateGenderDisplay();
         });
 
         this.rightArrow.addEventListener("click", () => {
-            currentModelIndex = (currentModelIndex + 1) % this.models.length;
+            currentModelIndex = (currentModelIndex + 1) % owner.models.length;
             updateGenderDisplay();
         });
     }
