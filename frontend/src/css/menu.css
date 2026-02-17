@@ -13,68 +13,101 @@ button {
   left: 50%;
   transform: translateX(-50%);
 }
-/*
-    Welcome message
-*/
-#welcome-msg {
-  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
-  position: fixed;
-  top: 10%;
-  z-index: 1000;
 
-  /* Changed this to center the title of main menu screen */
+#main-menu-center {
+  position: fixed;
+  top: 23%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(1.2);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
 }
 
-#menu-bottom {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1000;
-  /* Background color */
-  background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
-  width: 330px;
+
+#welcome-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
+
+#start-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -16px;
+
+}
+
+.welcome-top {
+  font-family: "Fugaz One", sans-serif;
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: rgba(241, 239, 228, 0.727);
+  letter-spacing: 0.35em;
+  margin-bottom: 12px;
+}
+
+.welcome-main {
+  font-family: "Fugaz One", sans-serif;
+  font-size: 5rem;
+  color: #1a3a2a;
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: baseline;
+}
+
+.welcome-logo {
+  height: 0.90em;
+  width: auto;
+  margin-right: 2px;
+  transform: translateY(12px);
+}
+
+.welcome-accent {
+  display: inline-block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #2d7a4a, #7cd1f3);
+  border-radius: 2px;
+  margin-top: 16px;
+}
+
+
 /*
     other settings
 */
 #menu-settings {
-  position: fixed;
-  bottom: 290px;
-  left: 20px;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
   background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
-  width: 300px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  width: 320px;
   display: none;
-  /* Stack controls vertically */
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
+  gap: 10px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+}
+
+#menu-settings.zoom-in {
+  animation: zoomIn 0.35s ease both;
 }
 
 #peer-name {
     display:none;
-}
-
-/*
-    Customize Button
- */
-#customize {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  /* Background color */
-  background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
-  width: 250px;
 }
 
 a-scene {
@@ -93,161 +126,71 @@ a-scene {
   filter: blur(3px);
 }
 
-/* PILL WRAPPER */
-.split-btn {
-  position: fixed;
-  top: 40%;
-  left: 50%;
-  transform: translateX(-50%) scale(1.4);
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  overflow: visible; /* dropdown not clipped */
-  background: linear-gradient(90deg, #ffb5b5, #b7f1df);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
-  z-index: 1000;
-  white-space: nowrap;
-  max-width: 90vw;
-  isolation: isolate;
-
-  /* NEW: make it the positioning anchor for the dropdown */
-  position: fixed; /* already fixed, but ensure it's a positioned ancestor */
+#start-btn {
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px 52px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #e0f7ef;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
 }
 
-/* MAIN HALF */
-.split-btn .main {
+#start-btn:hover {
+  background: #1a3a2a;
+}
+
+#workouts-btn {
+  background: none;
+  border: 1.8px solid;
+  border-color:#1a3a2a67;
+  border-radius: 25px 25px 25px 25px;
+  padding: 14px 40px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1a3a2a;;
+  cursor: pointer;
+}
+
+#workouts-btn:hover {
+  background: rgba(46, 139, 110, 0.1);
+}
+
+#workouts-wrapper {
   display: flex;
   justify-content: center;
+  margin-top: -18px;
+}
+
+#menu-links {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  flex: 1 1 auto;
-  background: transparent;
-  color: #223138;
+  gap: 6px;
+  margin-top: -18px;
+}
+
+.menu-link {
+  background: none;
   border: none;
-  font-size: 1rem;
-  line-height: 1.2;
-  padding: 12px 20px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1a3a2a;
   cursor: pointer;
-  text-align: center; /* extra safety for centering text */
-}
-
-/* TOGGLE HALF — keep the arrow visible and centered */
-.split-btn .toggle {
-  display: flex; /* center the ▾ glyph */
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  color: #223138;
-  border: none;
-  font-size: 1rem;
-  width: 40px;
-  min-width: 40px; /* don’t collapse */
-  border-left: 1px solid rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-}
-/* Keep your existing blocks; add these if missing */
-.dropdown-content {
-  /* JS sets position/left/top; we only ensure visibility */
-  display: none;
-  background: rgb(53, 72, 79);
-  color: #fff;
-  border-radius: 12px;
-  padding: 6px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-  pointer-events: auto;
-  z-index: 9999;
-
-  /* Debug visibility */
-  visibility: visible;
-  opacity: 1;
-}
-.dropdown-content.show {
-  display: block;
-}
-
-.dropdown-item {
-  display: block; /* ensure they occupy height */
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  color: #fff;
-  border: none;
-  padding: 10px 12px;
-  font-size: 1.1rem;
+  padding: 6px 12px;
   border-radius: 8px;
-  cursor: pointer;
+  transition: color 0.2s ease;
+  letter-spacing: 0.02em;
 }
 
-/* Main menu dropdown: clear hover feedback */
-.dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-/* When an item is selected, keep it highlighted (JS should add .selected) */
-.dropdown-item.selected {
-  background: rgba(255, 255, 255, 0.22);
-}
-
-
-/* When hovering either half, darken the whole pill */
-.split-btn:hover {
-  filter: brightness(85%);
-  transition: filter 0.15s ease;
-}
-
-/* ========================================
-   Main menu side buttons: hover feedback
-   Targets buttons, links, and common "row" items inside the panels
-   ======================================== */
-
-#menu-bottom button,
-#menu-bottom a,
-#menu-bottom [role="button"],
-#menu-bottom .hud-btn,
-#menu-bottom .menu-item,
-#menu-bottom .menu-btn,
-#menu-bottom .btn,
-#customize button,
-#customize a,
-#customize [role="button"],
-#customize .menu-item,
-#customize .menu-btn,
-#customize .btn,
-#menu-settings button,
-#menu-settings a,
-#menu-settings [role="button"],
-#menu-settings .menu-item,
-#menu-settings .menu-btn,
-#menu-settings .btn {
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 10px 12px;   /* harmless for buttons; helps if they are div rows */
-  display: block;       /* harmless for buttons; ensures full-width hitbox for rows */
-  width: 100%;
-  box-sizing: border-box;
-  transition: filter 0.15s ease, background 0.15s ease;
-}
-
-#menu-bottom button:hover,
-#menu-bottom a:hover,
-#menu-bottom [role="button"]:hover,
-#menu-bottom .hud-btn:hover,
-#menu-bottom .menu-item:hover,
-#menu-bottom .menu-btn:hover,
-#menu-bottom .btn:hover,
-#customize button:hover,
-#customize a:hover,
-#customize [role="button"]:hover,
-#customize .menu-item:hover,
-#customize .menu-btn:hover,
-#customize .btn:hover,
-#menu-settings button:hover,
-#menu-settings a:hover,
-#menu-settings [role="button"]:hover,
-#menu-settings .menu-item:hover,
-#menu-settings .menu-btn:hover,
-#menu-settings .btn:hover {
-  background: rgba(255, 255, 255, 0.10); /* visible on your dark panels */
-  filter: brightness(90%);
+.menu-link:hover {
+  color: rgba(26, 58, 42, 0.85);
+  background: rgba(46, 139, 110, 0.08);
 }
 
 /* ========================================
@@ -264,6 +207,19 @@ a-scene {
    They should NOT show a hand unless you're on a real control */
 #menu-settings .hud-btn {
   cursor: default;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+#menu-settings span.hud-btn label:not(.toggle-switch) {
+  min-width: 70px;
+}
+
+#menu-settings input[type="number"] {
+  width: 40px;
+  text-align: left;
 }
 
 /* Dropdowns (select) should be a hand */
@@ -272,9 +228,26 @@ a-scene {
   cursor: pointer;
 }
 
+.units-group {
+  display: flex;
+  gap: 8px;
+}
+
 /* Buttons inside settings remain a hand (Connect Strava, Host, Clear, Dev Mode) */
 #menu-settings button.hud-btn {
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+#menu-settings button.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 
 /* Editable fields show text cursor */
@@ -284,5 +257,246 @@ a-scene {
   cursor: text;
 }
 
+#menu-settings.hidden {
+  display: none;
+}
+
+#menu-settings.zoom-out {
+  animation: zoomOut 0.25s ease both;
+}
+
+#menu-settings input:not([type="checkbox"]),
+#menu-settings select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+}
+
+#workout-options.hidden {
+  display: none;
+}
+
+.workout-option {
+  background: rgba(113, 188, 200, 0.509);
+  border: none;
+  backdrop-filter: blur(14px);
+  border-radius: 15px;
+  padding: 14px 44px;
+  font-family: "Nunito", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 220px;
+}
+
+.workout-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color:#1a3a2a;
+}
+
+.workout-desc {
+  font-weight: 500;
+  font-size: 0.7rem;
+  color: rgba(26, 58, 42, 0.45);
+  letter-spacing: 0.02em;
+  font-style: italic;
+}
+
+#workout-back {
+  margin-bottom: 4px;
+}
 
 
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(2);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) scale(2);
+  }
+}
+
+#workout-options {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: zoomIn 0.35s ease both;
+}
+
+#workout-options.zoom-out {
+  animation: zoomOut 0.25s ease both;
+}
+
+#main-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+#main-buttons.pushed-back {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.5);
+}
+
+.workout-row {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+}
+
+
+.workout-option[data-workout="ramp"]:hover {
+  background: #efd688;
+}
+.workout-option[data-workout="ramp"]:hover .workout-name { color: #1a1a1a; }
+.workout-option[data-workout="ramp"]:hover .workout-desc { color: rgba(0,0,0,0.45); }
+
+
+.workout-option[data-workout="sprint"]:hover {
+  background: #bbea8d;
+}
+.workout-option[data-workout="sprint"]:hover .workout-name { color: #1a1a1a; }
+.workout-option[data-workout="sprint"]:hover .workout-desc { color: rgba(0,0,0,0.45); }
+
+#settings-back {
+  color: #e0e0e0;
+}
+
+#settings-back:hover {
+  color: #fff;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  transition: background 0.25s;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: #2da2d8;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.seg-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.seg-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: rgba(224, 224, 224, 0.5);
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.seg-btn.active {
+  background: #2da2d8;
+  color: #fff;
+}
+
+.seg-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e0e0e0;
+}
+
+#menu-settings .hud-btn::before {
+  display: none;
+}
+
+#menu-settings #clear-btn:hover {
+  background: rgb(200, 81, 81);
+}
+
+#menu-footer {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 6px 16px;
+  border-radius: 14px;
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  z-index: 1000;
+}
+
+#menu-footer a {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+#menu-footer a:hover {
+  color: rgba(255, 255, 255, 1);
+}

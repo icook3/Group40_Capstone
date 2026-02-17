@@ -16,24 +16,16 @@ export function initSettings() {
     //const ok = await standardMode.trainer.connect();
     //if (ok) connectBtn.disabled = true;
   });
+  
+// Host P2P toggle
+const peerToggle = document.getElementById("peer-toggle");
+// Sync with stored state on load
+peerToggle.checked = sessionStorage.getItem("peerToPeer") === "true";
 
-  const peerBtn = document.getElementById("peer-btn");
-  peerBtn.addEventListener("click", () => {
-      let peerHosting = sessionStorage.getItem("peerToPeer");
-      if (peerHosting==null) {
-        peerHosting = false;
-      } else if (peerHosting == "false") {
-        peerHosting = false;
-      } else {
-        peerHosting = true;
-      }
-      peerHosting = !peerHosting;
-      sessionStorage.setItem("peerToPeer",peerHosting);
-      peerBtn.textContent = peerHosting
-        ? "Host peer-to-peer: ON"
-        : "Host peer-to-peer";
-        jQuery("#peer-name").fadeToggle(500);
-  });
+peerToggle.addEventListener("change", () => {
+  sessionStorage.setItem("peerToPeer", peerToggle.checked);
+  jQuery("#peer-name").fadeToggle(500);
+});
 
   const peerNameInput = document.getElementById("name-input");
   peerNameInput.addEventListener("input", () => {
@@ -48,24 +40,15 @@ export function initSettings() {
   });
 
   //Test Mode
-  const testModeBtn = document.getElementById("testMode");
-  testModeBtn.addEventListener("click", () => {
-    let inTestMode = localStorage.getItem("testMode");
-    if (inTestMode == null) {
-      inTestMode = false;
-    } else if (inTestMode == "false") {
-      inTestMode = false;
-    } else {
-      inTestMode = true;
-    }
-    inTestMode = !inTestMode;
-    localStorage.setItem("testMode", inTestMode);
-    testModeBtn.textContent = inTestMode
-      ? "Test Mode: ON"
-      : "Developer Testing Mode";
-    if (!inTestMode) {
-      constants.riderState.speed = 0;
-    }
+  const devToggle = document.getElementById("dev-toggle");
+  // Sync toggle with stored state on load
+  devToggle.checked = localStorage.getItem("testMode") === "true";
+
+  devToggle.addEventListener("change", () => {
+  localStorage.setItem("testMode", devToggle.checked);
+  if (!devToggle.checked) {
+    constants.riderState.speed = 0;
+  }
   });
   //Pacer speed input
   const pacerSpeedInput = document.getElementById("pacer-speed");
@@ -88,29 +71,45 @@ export function initSettings() {
     riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
   }
 
-  // units input
-  // speed
-  const speedUnitInput = document.getElementById("unitInputSpeed");
-  if (speedUnitInput) {
-    speedUnitInput.addEventListener("input", () => {
-      sessionStorage.setItem("SpeedUnit", speedUnitInput.value);
+  // Units input
+  // Speed unit toggle
+  const speedBtns = document.querySelectorAll('.seg-btn[data-group="speed"]');
+  const savedSpeed = sessionStorage.getItem("SpeedUnit");
+  if (savedSpeed) {
+    speedBtns.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.unit === savedSpeed);
+    });
+  }
+  speedBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      speedBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      sessionStorage.setItem("SpeedUnit", btn.dataset.unit);
       let elements = document.getElementsByClassName("speedUnit");
       for (let i = 0; i < elements.length; i++) {
-        elements.item(i).innerHTML = speedUnitInput.value;
+        elements.item(i).innerHTML = btn.dataset.unit;
       }
+   });
+  });
+  // Weight unit toggle
+  const weightBtns = document.querySelectorAll('.seg-btn[data-group="weight"]');
+  const savedWeight = sessionStorage.getItem("WeightUnit");
+  if (savedWeight) {
+    weightBtns.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.unit === savedWeight);
     });
   }
-  // weight
-  const weightUnitInput = document.getElementById("unitInputWeight");
-  if (weightUnitInput) {
-    weightUnitInput.addEventListener("input", () => {
-      sessionStorage.setItem("WeightUnit", weightUnitInput.value);
+  weightBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      weightBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      sessionStorage.setItem("WeightUnit", btn.dataset.unit);
       let elements = document.getElementsByClassName("weightUnit");
       for (let i = 0; i < elements.length; i++) {
-        elements.item(i).innerHTML = weightUnitInput.value;
+        elements.item(i).innerHTML = btn.dataset.unit;
       }
     });
-  }
+  });
   // power
   //uncomment the following code if alternate units for power are implemented
   /*
