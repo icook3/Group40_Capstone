@@ -1,42 +1,5 @@
-<!DOCTYPE html>
-<html lang="en" class="settings">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zlow: Browser Cycling Simulator</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-    <script defer src="../js/workoutMenu.js"></script>
-    <link rel="stylesheet" href="../css/hud.css" />
-    <link rel="stylesheet" href="../css/menu.css" />
-    <style>
-      body {
-        #sky-gradient {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          z-index: -2;
-          background: linear-gradient(to bottom, #7cd1f3 0%, #c4eeff 100%);
-        }
-      }
-    </style>
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/resources/favicons/ZlowFavicon.svg"
-    />
-  </head>
-  <body>
-    <script
-      src="https://code.jquery.com/jquery-3.7.1.min.js"
-      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-      crossorigin="anonymous"
-    ></script>
-    <script type="module" src="../js/menu.js"></script>
 
-    <div id="main-menu-center">
+     <div id="main-menu-center">
       <div id="welcome-msg">
         <span class="welcome-top">Welcome to</span>
         <span class="welcome-main">
@@ -61,7 +24,7 @@
         <div id="menu-links">
           <button id="peer-connect-btn" class="menu-link" data-workout="peerServer">Connect to Peer</button>
           <button id="connect-btn" class="menu-link">Connect Trainer</button>
-          <button id="customize-btn" class="menu-link" onclick="window.location.href='playerCustomization.html'">Customize Character</button>
+          <button id="customize-btn" class="menu-link" onclick="viewManager.setView(viewManager.views.playerCustomization);">Customize Character</button>
           <button id="settings-btn" class="menu-link">Settings</button>
         </div>
       </div>
@@ -139,7 +102,7 @@
     </div>
 
     <div id="menu-footer">
-      <a href="changelog.html">v1.0.0-alpha.3</a>
+      <a href="javascript:null" onclick="viewManager.setView(viewManager.views.changelog);">v1.0.0-alpha.4</a>
       <span>·</span>
       <a href="https://github.com/gioandjake/zlow/issues/new/choose" target="_blank">Report a bug</a>
     </div>
@@ -147,7 +110,7 @@
     <div id="sky-gradient"></div>
 
     <!-- Main Menu 3D Background -->
-    <a-scene id="mainMenuScene" embedded>
+    <a-scene id="mainMenuScene" class="menuScene" embedded>
       <!-- Camera -->
       <!-- Can change controls to true if other assets are added to the scene to aid in placement -->
       <a-entity
@@ -306,11 +269,4 @@
         scale="1.2 1.2 1.2"
       ></a-entity>
     </a-scene>
-
-    <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        if (window.initSettings) window.initSettings();
-      });
-    </script>
-  </body>
-</html>
+</div>

@@ -27,7 +27,7 @@ To run Zlow, you will need to set up a local server for it.
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
 2. Go to the folder where Zlow is located, open the folder called frontend, and open the command line in it. 
 3. Enter the command ```python3 -m http.server 8000```
-4. In your web browser, open a tab to to ```localhost:8000/src/html/mainMenu.html```
+4. In your web browser, open a tab to to ```localhost:8000/src/html/index.html```
 
 ## Option 2 - using a batch file
 
@@ -35,7 +35,7 @@ To run Zlow, you will need to set up a local server for it.
     - You can check that you have it installed by entering ```python3 --version``` in the command line. 
 2. Go to the folder you downloaded Zlow to. 
 3. Double-click on ```frontend.bat```
-4. In your web browser, navigate to ```localhost:8000/src/html/mainMenu.html```
+4. In your web browser, navigate to ```localhost:8000/src/html/index.html```
 
 ## Important note about running the frontend
 Some installations of python use a different name. If this is the case, you might have to replace python3 in the command prompt above with python or py. If this is the case, the .bat script won't work either, and will also require modification. 
@@ -84,7 +84,7 @@ Ngrok is used to safely give your local server a temporary secure public address
 # Reopening Zlow
 When you close the command terminal, you will have to rerun the commands related to the fronend and backend to run Zlow again. You will not have to redownload Git, Python, Docker, or the Zlow source code itself. 
 
-If you simply close the browser window, you will just have to enter ```localhost:8000/src/html/mainMenu.html``` in the web browser's address bar to reopen Zlow. 
+If you simply close the browser window, you will just have to enter ```localhost:8000/src/html/index.html``` in the web browser's address bar to reopen Zlow. 
 
 To update Zlow, follow these steps: 
 

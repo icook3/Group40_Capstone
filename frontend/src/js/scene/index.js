@@ -15,11 +15,15 @@ export class ZlowScene {
     this.scene = getElement("scene");
     this.objectsLoaded = false;
 
-    this.scenery = new SceneryManager({ sceneEl: this.scene });
-    // If you only want this once globally, keep it outside instances or flip the flag after logging.
-    // this.scenery.scenePolicy.logBands();
+    this.scenery = new SceneryManager({ sceneEl: this.scene }); // actual edge
 
-    this.track = new Track({ sceneEl: this.scene });
+    // --- Optional one-time debug log ---
+    if (this.DEBUG_BANDS) {
+      this.scenery.scenePolicy.logBands();
+    }
+    constants.worldZ=0;
+    // Generate a new object field, track, and clouds
+    this.track = new Track({ sceneEl: this.scene });        
     this.clouds = new Cloud({ sceneEl: this.scene });
 
     this.objectField = new ObjectField({
