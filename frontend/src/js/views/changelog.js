@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {constants} from '../constants.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 export class changelogView {
     content;
     ready=false;
@@ -29,7 +30,7 @@ export class changelogView {
     grassX = 35;
     grassY = 25;
     OldBuildingCount = 20;
-    newBuildingCount = 5;
+    newBuildingCount = 20;
     oldTreeCount = 5;
     newTreeCount = 5;
 
@@ -56,7 +57,50 @@ export class changelogView {
         }
     }
     placeNewBuildings() {
-
+        const loader = new GLTFLoader();
+        for (let i=0;i<this.newBuildingCount;i++) {
+            //pick one out of 3 types
+            let type = Math.random();
+            if (type<0.33) {
+                loader.load('../../resources/models/bgmodels/House.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0.25;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });
+            } else if (type<0.66) {
+                loader.load('../../resources/models/bgmodels/TallBuilding.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0.25;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });
+            } else {
+                loader.load('../../resources/models/bgmodels/WideBuilding.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0.25;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });
+            }
+            
+        }
+        
     }
     placeOldTrees() {
 
@@ -74,7 +118,7 @@ export class changelogView {
             for (let i=-this.grassX; i<this.grassX;i++) {
                 let trackPiece = new THREE.Mesh(geometry, texMat);
                 trackPiece.position.x=i;
-                trackPiece.position.z=1;
+                trackPiece.position.z=0.1;
                 trackPiece.position.y=12;
                 this.scene.add(trackPiece);
             }
@@ -171,6 +215,9 @@ export class changelogView {
         this.placeGrass();
         this.placeTrack();
         this.placeOldBuildings();
+        this.placeNewBuildings();
+        const light = new THREE.AmbientLight(0xFFFFFF, 1);
+        this.scene.add(light);
         this.camera.position.z=10;
         this.camera.position.y=-10;
         this.camera.rotation.x = -100;
