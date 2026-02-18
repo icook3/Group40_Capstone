@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {constants} from '../constants.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 export class changelogView {
     content;
     ready=false;
@@ -27,10 +28,32 @@ export class changelogView {
 
     grassX = 35;
     grassY = 25;
+    OldBuildingCount = 20;
+    newBuildingCount = 5;
+    oldTreeCount = 5;
+    newTreeCount = 5;
 
-    cube;
+    useOrbitDebugMode=false;
+
     placeOldBuildings() {
+        //old buildings were a grey rectangle
+        
+        for (let i=0;i<this.OldBuildingCount;i++) {
+            const g = Math.floor(128+Math.random()*80);
 
+            let color = new THREE.Color().setRGB(g/255,g/255,g/255);
+            const material = new THREE.MeshBasicMaterial({color:color});
+            material.color=color;
+            const w = 2+Math.random()*4;
+            const h = 4+Math.random()*6;
+            const d = 2 + Math.random()*4;
+            const geometry = new THREE.BoxGeometry(w/10, h/10, d/10);
+            let building = new THREE.Mesh(geometry, material);
+            building.position.x=-(5+Math.random()*10);
+            //building.position.z=h/2;
+            building.position.y=-20+Math.random()*30;
+            this.scene.add(building);
+        }
     }
     placeNewBuildings() {
 
@@ -41,9 +64,23 @@ export class changelogView {
     placeNewTrees() {
 
     }
+    //place the track running along the back
     placeTrack() {
-
+        const geometry = new THREE.BoxGeometry(1, 1, 0.1);
+        const loader = new THREE.TextureLoader();
+        let texture = loader.load('../../../resources/textures/Track.jpeg', (texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            const texMat = new THREE.MeshBasicMaterial({map: texture});
+            for (let i=-this.grassX; i<this.grassX;i++) {
+                let trackPiece = new THREE.Mesh(geometry, texMat);
+                trackPiece.position.x=i;
+                trackPiece.position.z=1;
+                trackPiece.position.y=12;
+                this.scene.add(trackPiece);
+            }
+        });
     }
+    //place grass on the screen
     placeGrass() {
         const geometry = new THREE.BoxGeometry(1, 1, 0.1);
         const material1 = new THREE.MeshBasicMaterial({color:constants.groundColor1});
@@ -128,13 +165,20 @@ export class changelogView {
         document.getElementById("changelogBody").appendChild(this.renderer.domElement);
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({color:0x00ff00});
-        this.cube = new THREE.Mesh(geometry, material);
-        this.cube.position.x = -9;
-        this.scene.add(this.cube);
+        //this.cube = new THREE.Mesh(geometry, material);
+        //this.cube.position.x = -9;
+        //this.scene.add(this.cube);
         this.placeGrass();
+        this.placeTrack();
+        this.placeOldBuildings();
         this.camera.position.z=10;
         this.camera.position.y=-10;
         this.camera.rotation.x = -100;
+        if (this.useOrbitDebugMode) {
+            const controls = new OrbitControls(this.camera, document.getElementById("changelogBody"));
+            controls.target.set( 0, 5, 0 );
+	        controls.update();
+        }
         this.renderer.setAnimationLoop((time)=>this.animate(time, this));
     }
     animate(time, owner=this) {
