@@ -1,3 +1,5 @@
+
+
 export class AvatarCreator {
     constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
@@ -84,6 +86,25 @@ export class AvatarCreator {
 
     //Creates avatar entity
     createEntity() {
+        const scene = document.getElementById("scene").object3D
+
+        const avatar1 = new THREE.Group();
+        avatar1.name = this.id;
+        avatar1.position.x = this.position.x;
+        avatar1.position.y = this.position.y;
+        avatar1.position.z = this.position.z;
+        avatar1.rotation.x = this.rotation.x;
+        avatar1.rotation.y = this.rotation.y;
+        avatar1.rotation.z = this.rotation.z;
+        scene.add(avatar1)
+        console.log(avatar1)
+
+       this.createBikeModel(avatar1);
+
+
+
+        //OLD CODE STARTS UNDER HERE
+
         const avatar = document.createElement('a-entity');
         avatar.setAttribute('id', this.id);
         avatar.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
@@ -91,10 +112,18 @@ export class AvatarCreator {
 
         //Create Person
         this.createPlayerModel(avatar);
-        this.createBikeModel(avatar);
+        
+
+        //this.createBikeModel(avatar);
 
         document.querySelector('a-scene').appendChild(avatar);
+        //console.log(document.getElementById('rider'))
         return avatar;
+
+
+
+
+
     }
 
     createPlayerModel (avatarEntity) {
@@ -116,6 +145,8 @@ export class AvatarCreator {
         this.personModel = personModel;
         personModel.addEventListener('model-loaded', (e) => {
             const model = e.detail.model;
+
+            // personRig initializes to null
             this.personRig = model.getObjectByName("metalrig")
 
             //Assign Bones
@@ -203,23 +234,39 @@ export class AvatarCreator {
         });
     }
 
-    createBikeModel(avatarEntity) {
+    // CHECK FOR IMPLICATIONS OF THIS BEING ASYNC -- WAITING FOR PACER AND CHECKREADY SHOULD HANDLE??
+    // REM: https://discoverthreejs.com/book/first-steps/load-models/
+    // put THREE before everything to access the inbuilt three.js
+
+    async createBikeModel(avatarEntity) {
         const checkReady = () => {
             if (this.personLoaded && this.bikeLoaded) {
                 if (this.onReady) this.onReady(this);
             }
         };
 
-        const bikeModel = document.createElement('a-entity');
-        bikeModel.setAttribute('gltf-model', '#bikeGLB');
-        bikeModel.setAttribute('position', '0 0 0');
-        bikeModel.setAttribute('rotation', '0 -90 0');
-        bikeModel.setAttribute('scale', '0.35 0.35 0.35');
-        avatarEntity.appendChild(bikeModel);
-
+        const loader = new THREE.GLTFLoader();
+        const bikeModel = await loader.loadAsync( '../../resources/models/playermodels/bikeV4.glb' );
+        bikeModel.scene.name = "Bike";
+        bikeModel.scene.position.x = 0;
+        bikeModel.scene.position.y = 0;
+        bikeModel.scene.position.z = 0;
+        bikeModel.scene.rotation.x = 0;
+        bikeModel.scene.rotation.y = -90;
+        bikeModel.scene.rotation.z = 0;
+        bikeModel.scene.scale.x = 0.35;
+        bikeModel.scene.scale.y = 0.35;
+        bikeModel.scene.scale.z = 0.35;
+        avatarEntity.add(bikeModel.scene)
+        //avatarEntity.appendChild(bikeModel);
+        
+        // THIS DOESN'T SEEM TO BE ADDED TO THE THING ITSELF, ONLY AS CLASS VARIABLES?
         //Assign bike and assign bike parts
         this.bikeModel = bikeModel;
-        bikeModel.addEventListener('model-loaded', (e) => {
+
+        //DOCUMENT ADDS TOO MANY EVENT LISTENERS
+
+        document.addEventListener('model-loaded', (e) => {
             const model = e.detail.model;
             this.rearWheel = model.getObjectByName("RearTire");
             this.frontWheel = model.getObjectByName("FrontTire");
@@ -241,9 +288,13 @@ export class AvatarCreator {
                     this.bikeLoaded = true;
                     checkReady();
                 }
-            });
-        });
-    }
+            }
+        );
+
+        document.removeEventListener('model-loaded', e);
+    });
+    
+}
 
     //helmetModel.setAttribute('scale', '0.35 0.35 0.35');
     //helmetModel.setAttribute('position', '.38 -.18 0');
