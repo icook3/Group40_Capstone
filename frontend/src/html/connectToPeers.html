@@ -1,74 +1,15 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
-
-    <link rel="icon" type="image/svg+xml" href="/resources/favicons/ZlowFavicon.svg" />
-    <link rel="stylesheet" href="../css/hud.css" />
-    <link rel="stylesheet" href="../css/peerToPeer.css" />
-
-    <!-- keep SAME background file -->
-    <style>
-      body {
-        background: url("../../resources/images/backgroundA.png") no-repeat center center fixed;
-        background-size: cover;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- Cancel (top-left like your screenshots) -->
-    <div id="cancel">
-      <div class="control-buttons">
-        <button id="cancelButton" onclick="window.location.href='mainMenu.html'" class="hud-btn">
-          Cancel
-        </button>
-      </div>
+    <div class="bodyStyle bodyImg">
+        <div id="cancel">
+            <div class="control-buttons">
+                <button id="cancelButton" onclick="viewManager.setView(viewManager.views.mainMenu);" class="hud-btn peerBtn">Cancel</button>
+            </div>
+        </div>
+        <div id="peerConnectMenu" class="control-buttons">
+            <span>
+                <label for="name-input">Peer Name: </label>
+                <input id="name-input" />
+            </span>
+            <button class="hud-btn peerBtn" id="connect-btn">Connect!</button>
+            
+        </div>
     </div>
-
-    <!-- MAIN MENU STYLE CENTER BLOCK -->
-    <div id="main-menu-center">
-      <div id="welcome-msg">
-        <span class="welcome-top">Connect to</span>
-        <span class="welcome-main">
-          <img
-            src="../../resources/favicons/ZlowFavicon.svg"
-            alt="Z"
-            class="welcome-logo"
-          />low
-        </span>
-        <span class="welcome-accent"></span>
-      </div>
-
-      <div id="main-buttons">
-        <!-- peer name input styled like the "Workouts" button area -->
-        <div id="peer-input-wrapper">
-          <input id="name-input" type="text" placeholder="Peer Name" />
-        </div>
-
-        <!-- primary action styled like Quick Ride -->
-        <div id="start-wrapper">
-          <!-- IMPORTANT: keep id="connect-btn" for your JS -->
-          <button id="connect-btn" type="button">Connect</button>
-        </div>
-
-        <!-- optional back link styled like menu links -->
-        <div id="menu-links">
-          <button class="menu-link" type="button" onclick="window.location.href='mainMenu.html'">
-            ← Back
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <script type="module" src="../js/peerConnector.js"></script>
-    <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        if (window.peerInit) window.peerInit();
-      });
-    </script>
-  </body>
-</html>

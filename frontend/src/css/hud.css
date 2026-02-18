@@ -413,7 +413,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 /* Style for input fields */
 #dev-controls-hud #pacer-speed,
 #dev-controls-hud #rider-weight {
-  width: 45px;
+  width: 50px;
   padding: 6px 8px;
   border: 1px solid rgba(220, 229, 222, 0.3);
   background: rgba(0, 0, 0, 0.2);

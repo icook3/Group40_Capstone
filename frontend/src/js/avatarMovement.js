@@ -152,9 +152,10 @@ export class AvatarMovement {
         else {
             document.getElementById('rider').emit('riderResumed');
         }
-
-        this.animatePedalingBike(dt);
-        this.animatePedalingPerson(dt)
+        if (this.creator.leftPedalBone!=null) {
+            this.animatePedalingBike(dt);
+            this.animatePedalingPerson(dt);
+        }
     }
 
     setPosition(pos) {

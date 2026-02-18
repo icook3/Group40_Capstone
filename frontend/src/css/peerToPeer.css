@@ -1,13 +1,9 @@
-body {
-  margin: 0;
-  font-family: "Fugaz One", sans-serif;
-  font-size: 1.5em;
-  color: #fff;
+button.peerBtn {
+    font-size: 1em;
+    cursor: pointer;
 }
-
-button {
-  font-size: 1em;
-  cursor: pointer;
+.center-itemPeer {
+    left: 40%;
 }
 
 /* Keep your existing cancel container behavior */
