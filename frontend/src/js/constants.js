@@ -107,4 +107,21 @@ class Constants {
   peerPort = config.PEER_PORT;
 }
 
+export const features = {
+    peerEnabled: Boolean(
+        config.PEER_HOST &&
+        config.PEER_PORT &&
+        config.PEER_PATH
+    ),
+
+    stravaEnabled: Boolean(
+        config.STRAVA_BACKEND_URL &&
+        config.STRAVA_CLIENT_ID
+    ),
+
+    crashReporterEnabled: Boolean(
+        config.CRASH_REPORTER_BACKEND_URL
+    )
+};
+
 export const constants = new Constants();
