@@ -1,12 +1,14 @@
 // strava.js: Handles Strava OAuth and activity upload
+import config from "./config/configLoader.js";
+
 export class Strava {
     constructor() {
         this.accessToken = null;
         this.refreshToken = null;
         this.expiresAt = null;
 
-        this.CLIENT_ID = "INPUT CLIENT ID"; // TODO
-        this.BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+        this.CLIENT_ID = config.STRAVA_CLIENT_ID;
+        this.BACKEND_URL = config.STRAVA_BACKEND_URL;
         this.STRAVA_BACKEND_HEALTH = "/stravaHealth"
         this.OAUTH_CALLBACK = "/oauth/callback"
         this.REFRESH = "/oauth/refresh"

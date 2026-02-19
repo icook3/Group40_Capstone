@@ -1,3 +1,5 @@
+import config from "./config/configLoader.js";
+
 /**
  * Constants class is a singleton that stores various important constants
  * It also currently stores other variables - this is something to change later
@@ -100,9 +102,9 @@ class Constants {
   // Constants to locate the peerServer
   // If you change the backend environment variables, change this
   // Also change this before hosting it publicly
-  peerHost = "127.0.0.1";
-  peerPath = "/peerServer";
-  peerPort = "9000";
+  peerHost = config.PEER_HOST;
+  peerPath = config.PEER_PATH;
+  peerPort = config.PEER_PORT;
 }
 
 export const constants = new Constants();

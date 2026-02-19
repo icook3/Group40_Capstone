@@ -1,5 +1,4 @@
 
-
 if (!window.APP_CONFIG) {
     throw new Error("APP_CONFIG missing. Ensure config.js is loaded.");
 }
@@ -18,6 +17,7 @@ function validateConfig(cfg) {
             throw new Error("PEER_PATH required when PEER_HOST is set.");
         }
     }
+
     // Strava validation
     if (cfg.STRAVA_BACKEND_URL && !cfg.STRAVA_CLIENT_ID) {
         throw new Error("STRAVA_CLIENT_ID required when STRAVA_BACKEND_URL is set.");
