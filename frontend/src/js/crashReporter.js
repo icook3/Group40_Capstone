@@ -8,6 +8,10 @@ let cachedWebGLInfo = null;
 let staticEnv = null;
 
 async function isCrashReporterBackendUp() {
+    if (!BACKEND_URL) {
+        return false;
+    }
+
     try {
         const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
             method: "GET",

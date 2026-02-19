@@ -16,6 +16,10 @@ export class Strava {
     }
 
     async isStravaBackendUp() {
+        if (!this.BACKEND_URL) {
+            return false;
+        }
+
         try {
             const res = await fetch(`${this.BACKEND_URL}${this.STRAVA_BACKEND_HEALTH}`, {
                 method: "GET",
