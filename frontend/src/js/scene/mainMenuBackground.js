@@ -7,15 +7,15 @@ export function initMenuBackground() {
 
   // Camera
   const camera = new THREE.PerspectiveCamera(
-    45,
+    80,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
   );
-  camera.position.set(-8, 3, 10);
+  camera.position.set(-3.33, .18, 2.6);
   camera.rotation.order = 'YXZ';
   camera.rotation.y = THREE.MathUtils.degToRad(-20);
-  camera.rotation.x = THREE.MathUtils.degToRad(10);
+  camera.rotation.x = THREE.MathUtils.degToRad(11);
 
   // What renders the scene
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -24,7 +24,7 @@ export function initMenuBackground() {
   // Grass plane
   const groundGeometry = new THREE.PlaneGeometry(50, 50);
   const groundMaterial = new THREE.MeshStandardMaterial({
-    color: 0x2d5016,
+    color: 0x58995f,
     roughness: 1
   });
   const ground = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -33,14 +33,14 @@ export function initMenuBackground() {
   scene.add(ground);
 
   // Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
   directionalLight.position.set(-2, 5, 3);
   scene.add(directionalLight);
 
-  const pointLight = new THREE.PointLight(0xffffff, 5.5, 3);
+  const pointLight = new THREE.PointLight(0xffffff, 5.0, 3);
   pointLight.position.set(-2, 0, 2);
   scene.add(pointLight);
 
@@ -48,7 +48,7 @@ export function initMenuBackground() {
   const loader = new GLTFLoader();
   const modelBasePath = '../../resources/models';
 
-  // This function helps load models and places them in scene
+  // This function helps load models and places them in the scene
 function loadModel(path, position, rotation, scale) {
     loader.load(
       path,
@@ -91,7 +91,7 @@ function loadModel(path, position, rotation, scale) {
   // Bush
   loadModel(
     `${modelBasePath}/bgmodels/bush1.glb`,
-    { x: -3.8, y: 0, z: 2 },
+    { x: -3.58, y: 0, z: 2.1 },
     { x: 0, y: 45, z: 0 },
     0.3
   );
@@ -101,7 +101,7 @@ function loadModel(path, position, rotation, scale) {
     { x: -8, y: 4, z: -5 }, { x: 0, y: 0, z: 0 }, 0.1);
 
   loadModel(`${modelBasePath}/bgmodels/cloud2.glb`,
-    { x: -3, y: 8, z: -9 }, { x: 0, y: 0, z: 0 }, 0.2);
+    { x: -3, y: 8.2, z: -9 }, { x: 0, y: 0, z: 0 }, 0.2);
 
   loadModel(`${modelBasePath}/bgmodels/cloud3.glb`,
     { x: -16, y: 6, z: -10 }, { x: 0, y: 0, z: 0 }, 0.3);
@@ -114,13 +114,13 @@ function loadModel(path, position, rotation, scale) {
 
   // Buildings
   loadModel(`${modelBasePath}/bgmodels/TallBuilding.glb`,
-    { x: -10, y: 0, z: -20 }, { x: 0, y: -50, z: 10 }, 1.0);
+    { x: -4, y: -0.25, z: -20 }, { x: 0, y: -50, z: 10 }, 1.0);
 
   loadModel(`${modelBasePath}/bgmodels/House.glb`,
     { x: 50, y: 0, z: -18 }, { x: 0, y: 180, z: 0 }, 2.0);
 
   loadModel(`${modelBasePath}/bgmodels/WideBuilding.glb`,
-    { x: -16, y: -0.1, z: -28 }, { x: 0, y: -50, z: 10 }, 1.2);
+    { x: -7, y: -0.25, z: -28 }, { x: 0, y: -50, z: 10 }, 1.2);
 
   // Handle window resize
   window.addEventListener('resize', () => {
