@@ -15,6 +15,7 @@ export class changelogView {
                 this.setPage();
             }
             this.ready=true;
+            window.objPositions = this.objPositions;
         });
     }
 
@@ -43,9 +44,11 @@ export class changelogView {
 
     useOrbitDebugMode=false;
 
+    objPositions = [];
+    maxDistance = 10;
+
     placeOldBuildings() {
         //old buildings were a grey rectangle
-        
         for (let i=0;i<this.OldBuildingCount;i++) {
             const g = Math.floor(128+Math.random()*80);
 
@@ -57,9 +60,9 @@ export class changelogView {
             const d = 2 + Math.random()*4;
             const geometry = new THREE.BoxGeometry(w/10, h/10, d/10);
             let building = new THREE.Mesh(geometry, material);
-            building.position.x=-(5+Math.random()*10);
-            //building.position.z=h/2;
-            building.position.y=-20+Math.random()*30;
+            let position = new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0);
+            this.objPositions.push(position);
+            building.position.set(position.x, position.y, position.z);
             this.scene.add(building);
         }
     }
@@ -70,9 +73,9 @@ export class changelogView {
             let type = Math.random();
             if (type<0.33) {
                 loader.load('../../resources/models/bgmodels/House.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0.25;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0.25);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -82,9 +85,9 @@ export class changelogView {
                 });
             } else if (type<0.66) {
                 loader.load('../../resources/models/bgmodels/TallBuilding.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -94,9 +97,9 @@ export class changelogView {
                 });
             } else {
                 loader.load('../../resources/models/bgmodels/WideBuilding.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -118,19 +121,15 @@ export class changelogView {
             let material2 = new THREE.MeshBasicMaterial({color:0x2e7d32});
             const trunkGeo = new THREE.CylinderGeometry(0.2,0.2,0.625);
             const trunk = new THREE.Mesh(trunkGeo, material1);
-            let x = -(5+Math.random()*10);
-            let y = -20+Math.random()*30;
-            trunk.position.x=x
-            trunk.position.z=0.3125;
-            trunk.position.y=y
+            let position = new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0.3125);
+            this.objPositions.push(position);
+            trunk.position.set(position.x, position.y, position.z);
             trunk.rotation.x=Math.PI/2;
             this.scene.add(trunk);
 
             const foliageGeo = new THREE.SphereGeometry(0.6+Math.random()*0.4);
             const foliage = new THREE.Mesh(foliageGeo,material2);
-            foliage.position.x=x
-            foliage.position.z=1.35;
-            foliage.position.y=y;
+            foliage.position.set(position.x, position.y, 1.35);
             this.scene.add(foliage);
         }
     }
@@ -141,9 +140,9 @@ export class changelogView {
             let type = Math.random();
             if (type<0.25) {
                 loader.load('../../resources/models/bgmodels/bush1.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -153,9 +152,9 @@ export class changelogView {
                 });
             } else if (type<0.5) {
                 loader.load('../../resources/models/bgmodels/tree1.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -165,9 +164,9 @@ export class changelogView {
                 });
             } else if (type<0.75) {
                 loader.load('../../resources/models/bgmodels/tree2.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -177,9 +176,9 @@ export class changelogView {
                 });
             } else {
                 loader.load('../../resources/models/bgmodels/tree3.glb', (gltf) => {
-                    gltf.scene.position.x=(5+Math.random()*10);
-                    gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0;
+                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    this.objPositions.push(position);
+                    gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
