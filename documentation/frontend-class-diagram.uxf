@@ -455,7 +455,7 @@ ViewsInterface
 --
 + constructor(setWhenDone: boolean): ViewsInterface
 + setPage(): void
-+ reset(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>623</x><y>672</y><w>224</w><h>231</h></coordinates><panel_attributes>changelogView
++ reset(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>623</x><y>672</y><w>224</w><h>252</h></coordinates><panel_attributes>changelogView
 --
 + scene: THREE.Scene
 + camera: THREE.PerspectiveCamera
@@ -467,8 +467,10 @@ ViewsInterface
 + newTreeCount: number
 + useOrbitDebugMode: boolean
 + objPositions: array
-+ maxDistance: number
++ minDistance: number
++ maxTries: number
 --
++ setPosition(setPosFunc: function): THREE.Vector3
 + placeOldBuildings(): void
 + placeNewBuildings(): void
 + placeOldTrees(): void
@@ -564,4 +566,4 @@ ViewsInterface
 </panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1792</x><y>3115</y><w>21</w><h>49</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1624</x><y>3206</y><w>259</w><h>21</h></coordinates><panel_attributes>+ buildTrackPoints(samples: array, khmToMs: function): string
 </panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1743</x><y>3164</y><w>35</w><h>56</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;60;30;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1617</x><y>3248</y><w>259</w><h>21</h></coordinates><panel_attributes>+ buildTrackPoint(sample: object, khmToMs: function): string
 </panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1750</x><y>3220</y><w>21</w><h>42</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;40;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1995</x><y>3115</y><w>126</w><h>21</h></coordinates><panel_attributes>+ xmlTCXFooter(): string
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1932</x><y>3101</y><w>77</w><h>35</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>90;30;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1295</x><y>3094</y><w>147</w><h>21</h></coordinates><panel_attributes>+ tcxToBlob(tcxString: string): Blob</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1414</x><y>1785</y><w>126</w><h>1323</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1870;160;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2016</x><y>448</y><w>105</w><h>21</h></coordinates><panel_attributes>+ workoutChoice(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>742</x><y>896</y><w>42</w><h>252</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>40;340;10;10</additional_attributes></element></diagram>
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1932</x><y>3101</y><w>77</w><h>35</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>90;30;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1295</x><y>3094</y><w>147</w><h>21</h></coordinates><panel_attributes>+ tcxToBlob(tcxString: string): Blob</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1414</x><y>1785</y><w>126</w><h>1323</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;1870;160;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2016</x><y>448</y><w>105</w><h>21</h></coordinates><panel_attributes>+ workoutChoice(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>742</x><y>917</y><w>42</w><h>231</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>40;310;10;10</additional_attributes></element></diagram>

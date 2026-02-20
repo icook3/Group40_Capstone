@@ -15,6 +15,7 @@ export class changelogView {
                 this.setPage();
             }
             this.ready=true;
+            //for debugging
             window.objPositions = this.objPositions;
         });
     }
@@ -35,17 +36,43 @@ export class changelogView {
     camera;
     renderer;
 
+
+    //easily configurable values
+    //how far the grass goes on the x and y
     grassX = 35;
     grassY = 25;
+    //how many scenery objects are there
     OldBuildingCount = 30;
     newBuildingCount = 20;
     oldTreeCount = 20;
     newTreeCount = 20;
 
+    //set to true for debugging positions of objects
     useOrbitDebugMode=false;
 
     objPositions = [];
-    maxDistance = 10;
+    //how far away objects are allowed to be from each other, how many tries are allowed
+    minDistance = 40;
+    maxTries = 20;
+
+    //take in a function parameter that returns a THREE.Vector3
+    //return a unique position with no collisions
+    setPosition(setPosFunc) {
+        let pos = setPosFunc();
+        for (let i=0;i<this.objPositions.length;i++) {
+            //run up to a set number of times to prevent crashing
+            let flag=false;
+            for (let j=0;j<this.maxTries&&flag==false;j++) {
+                if (this.objPositions[i].distanceTo(pos)>this.minDistance) {
+                    flag=true;
+                } else {
+                    pos = setPosFunc();
+                }
+            }
+
+        }
+        return pos;
+    }
 
     placeOldBuildings() {
         //old buildings were a grey rectangle
@@ -60,7 +87,10 @@ export class changelogView {
             const d = 2 + Math.random()*4;
             const geometry = new THREE.BoxGeometry(w/10, h/10, d/10);
             let building = new THREE.Mesh(geometry, material);
-            let position = new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0);
+            //let position = new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0);
+            let position = this.setPosition(()=>{
+                return new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0);
+            });
             this.objPositions.push(position);
             building.position.set(position.x, position.y, position.z);
             this.scene.add(building);
@@ -73,7 +103,10 @@ export class changelogView {
             let type = Math.random();
             if (type<0.33) {
                 loader.load('../../resources/models/bgmodels/House.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0.25);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0.25);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0.25);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
@@ -85,7 +118,10 @@ export class changelogView {
                 });
             } else if (type<0.66) {
                 loader.load('../../resources/models/bgmodels/TallBuilding.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
@@ -97,7 +133,10 @@ export class changelogView {
                 });
             } else {
                 loader.load('../../resources/models/bgmodels/WideBuilding.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
@@ -121,7 +160,10 @@ export class changelogView {
             let material2 = new THREE.MeshBasicMaterial({color:0x2e7d32});
             const trunkGeo = new THREE.CylinderGeometry(0.2,0.2,0.625);
             const trunk = new THREE.Mesh(trunkGeo, material1);
-            let position = new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0.3125);
+            //let position = new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0.3125);
+            let position = this.setPosition(()=>{
+                return new THREE.Vector3(-(5+Math.random()*10), -20+Math.random()*30, 0.3125);
+            });
             this.objPositions.push(position);
             trunk.position.set(position.x, position.y, position.z);
             trunk.rotation.x=Math.PI/2;
@@ -140,7 +182,10 @@ export class changelogView {
             let type = Math.random();
             if (type<0.25) {
                 loader.load('../../resources/models/bgmodels/bush1.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
@@ -152,7 +197,10 @@ export class changelogView {
                 });
             } else if (type<0.5) {
                 loader.load('../../resources/models/bgmodels/tree1.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
@@ -164,7 +212,10 @@ export class changelogView {
                 });
             } else if (type<0.75) {
                 loader.load('../../resources/models/bgmodels/tree2.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
@@ -176,7 +227,10 @@ export class changelogView {
                 });
             } else {
                 loader.load('../../resources/models/bgmodels/tree3.glb', (gltf) => {
-                    let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    let position = this.setPosition(()=>{
+                        return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
+                    });
                     this.objPositions.push(position);
                     gltf.scene.position.set(position.x, position.y, position.z);
                     gltf.scene.rotation.x=Math.PI/2;
