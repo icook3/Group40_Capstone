@@ -76,10 +76,6 @@ export class Track {
   if (window.__zlowTrackInstance === this) {
     window.__zlowTrackInstance = null;
   }
-
-  straightPool = [];
-  straightPoolIndex = 0;
-  poolReady = false;
 }
 
 
@@ -157,15 +153,9 @@ update_pacer_animation() {
   // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
   const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-  
 
   pacer.removeAttribute("animation__2");
-  pacer.setAttribute(
-    "animation__2",
-    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`
-  );
-
-
+  pacer.setAttribute("animation__2", `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`);
 
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)
@@ -292,99 +282,55 @@ function disposeAFrameEl(el) {
     path_element.appendChild(track);
   }
 
-
-const STRAIGHT_POOL_SIZE = 220;   // keep > 200 since you cap children at 200
-let straightPool = [];
-let straightPoolIndex = 0;
-let poolReady = false;
-
-function initStraightPool() {
-  if (poolReady) return;
-  const pathEl = document.getElementById("track");
-  if (!pathEl) return;
-
-  for (let i = 0; i < STRAIGHT_POOL_SIZE; i++) {
-    const track = document.createElement("a-entity");
-    track.setAttribute(
-      "geometry",
-      `primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`
-    );
-    track.setAttribute("material", `src: #track-texture; repeat: 1 0.25`);
-    track.setAttribute("configuration", `straight_vertical`);
-
-    // put them somewhere harmless initially
-    track.setAttribute("position", `0 -9999 0`);
-
-    pathEl.appendChild(track);
-    straightPool.push(track);
-  }
-
-  poolReady = true;
-}
-
-
 function straightPiece() {
-  initStraightPool();
+  let path_element = document.getElementById('track');
+    // Spawn track pieces in 5 unit increments
+    let pointZ = -1 * (constants.farthestSpawn + 5);
 
-  // Spawn track pieces in 5 unit increments
-  const pointZ = -1 * (constants.farthestSpawn + 5);
+    // Adjust Z spawn position to correct for centering of the box geometry
+    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+    constants.farthestSpawn += 5;
+    constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
 
-  // Adjust Z spawn position to correct for centering of the box geometry
-  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-
-  // ---- CAP TRACK POINTS (PREVENT HEAP LEAK) ----
-  const MAX_TRACK_POINTS = 2000;
-  if (constants.trackPoints.length > MAX_TRACK_POINTS) {
-    const drop = constants.trackPoints.length - MAX_TRACK_POINTS;
-    constants.trackPoints.splice(0, drop);
-    constants.currentTrackPiece = Math.max(0, constants.currentTrackPiece - drop);
-    constants.pacerCurrentTrackPiece = Math.max(0, constants.pacerCurrentTrackPiece - drop);
-  }
-
-  // ---- REUSE ENTITY FROM POOL ----
-  const el = straightPool[straightPoolIndex];
-  straightPoolIndex = (straightPoolIndex + 1) % straightPool.length;
-  // move it to new Z
-  el.setAttribute("position", `${constants.pathPositionX} ${constants.pathPositionY} ${pointZ}`);
-  constants.farthestSpawn += 5;
-  constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5})
+    const track = document.createElement('a-entity');
+    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
+    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
+    track.setAttribute('configuration', `straight_vertical`);
+    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
+    path_element.appendChild(track);
 }
 
   // Spawn track pieces in
   export function spawn_track() {
-  // make sure pool exists
-  initStraightPool();
+    for (let i = 0; i < 80; i++) {
+      // Spawn straight pieces in sets of three and more often than curved pieces
+      let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
 
-  // spawn a smaller batch; you're just repositioning now, so this is cheap
-  for (let i = 0; i < 80; i++) {
-
-    let random = Math.floor(Math.random() * (30 - 1 + 1)) + 1;
-
-    if (random % 15 == 0) {
-      straightPiece();
-
-      if (getSign()) {
+      if (random % 15 == 0 && getSign()) {
+        straightPiece();
+        curve_180_right();
+        straightPiece();
+      }
+      else if (random % 15 == 0 && !getSign()) {
+        straightPiece();
         curve_180_left();
+        straightPiece();
       }
 
       else {
-        curve_180_right();
-      }
-      straightPiece();
-
-    }
-    else {
         straightPiece();
+        straightPiece();
+        straightPiece();
+      }
     }
-  }
 
-  // Shorten track element array every time it exceeds 200 elements
-  let track_elements = document.getElementById('track').children;
-  if (track_elements.length > 200) {
-    for (let i = 0; i < 100; i++) {
-      if (track_elements[0].getAttribute('position').z > getPos(document.getElementById('rider')).z + 20) {
-        track_elements[0].parentNode.removeChild(track_elements[0]);
+    // Shorten track element array every time it exceeds 200 elements
+    let track_elements = document.getElementById('track').children;
+    if (track_elements.length > 200) {
+      for (let i = 0; i < 100; i++) {
+        if (track_elements[0].getAttribute('position').z > getPos(document.getElementById('rider')).z + 20) {
+          track_elements[0].parentNode.removeChild(track_elements[0]);
+        }
       }
     }
   }
-}
