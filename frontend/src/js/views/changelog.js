@@ -7,6 +7,7 @@ export class changelogView {
     ready=false;
     constructor(setWhenDone) {
         fetch("../html/changelog.html").then((content)=> {
+            this.createBG();
             return content.text();
         }).then((content)=> {
             this.content=content;
@@ -19,7 +20,13 @@ export class changelogView {
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
-        this.createBG();
+        if (this.useOrbitDebugMode) {
+            const controls = new OrbitControls(this.camera, document.getElementById("changelogBody"));
+            controls.target.set( 0, 5, 0 );
+	        controls.update();
+        }
+        document.getElementById("changelogBody").appendChild(this.renderer.domElement);
+        this.renderer.setAnimationLoop((time)=>this.animate(time, this));
     }
     reset() {}
 
@@ -29,10 +36,10 @@ export class changelogView {
 
     grassX = 35;
     grassY = 25;
-    OldBuildingCount = 20;
+    OldBuildingCount = 30;
     newBuildingCount = 20;
-    oldTreeCount = 5;
-    newTreeCount = 5;
+    oldTreeCount = 20;
+    newTreeCount = 20;
 
     useOrbitDebugMode=false;
 
@@ -77,7 +84,7 @@ export class changelogView {
                 loader.load('../../resources/models/bgmodels/TallBuilding.glb', (gltf) => {
                     gltf.scene.position.x=(5+Math.random()*10);
                     gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0.25;
+                    gltf.scene.position.z=0;
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -89,7 +96,7 @@ export class changelogView {
                 loader.load('../../resources/models/bgmodels/WideBuilding.glb', (gltf) => {
                     gltf.scene.position.x=(5+Math.random()*10);
                     gltf.scene.position.y=-20+Math.random()*30;
-                    gltf.scene.position.z=0.25;
+                    gltf.scene.position.z=0;
                     gltf.scene.rotation.x=Math.PI/2;
                     gltf.scene.rotation.y=-Math.PI/2;
                     //console.log(gltf);
@@ -103,7 +110,29 @@ export class changelogView {
         
     }
     placeOldTrees() {
+        for (let i=0;i<this.oldTreeCount;i++) {
+            //old trees were made of two components
+            //the trunk and the foliage
 
+            let material1 = new THREE.MeshBasicMaterial({color:0x7c4a02});
+            let material2 = new THREE.MeshBasicMaterial({color:0x2e7d32});
+            const trunkGeo = new THREE.CylinderGeometry(0.2,0.2,0.625);
+            const trunk = new THREE.Mesh(trunkGeo, material1);
+            let x = -(5+Math.random()*10);
+            let y = -20+Math.random()*30;
+            trunk.position.x=x
+            trunk.position.z=0.3125;
+            trunk.position.y=y
+            trunk.rotation.x=Math.PI/2;
+            this.scene.add(trunk);
+
+            const foliageGeo = new THREE.SphereGeometry(0.6+Math.random()*0.4);
+            const foliage = new THREE.Mesh(foliageGeo,material2);
+            foliage.position.x=x
+            foliage.position.z=1.35;
+            foliage.position.y=y;
+            this.scene.add(foliage);
+        }
     }
     placeNewTrees() {
 
@@ -206,7 +235,6 @@ export class changelogView {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         this.renderer = new THREE.WebGLRenderer({alpha: true, premultipliedAlpha: false});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById("changelogBody").appendChild(this.renderer.domElement);
         const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({color:0x00ff00});
         //this.cube = new THREE.Mesh(geometry, material);
@@ -216,17 +244,15 @@ export class changelogView {
         this.placeTrack();
         this.placeOldBuildings();
         this.placeNewBuildings();
+        this.placeOldTrees();
+        this.placeNewTrees();
         const light = new THREE.AmbientLight(0xFFFFFF, 1);
         this.scene.add(light);
         this.camera.position.z=10;
         this.camera.position.y=-10;
         this.camera.rotation.x = -100;
-        if (this.useOrbitDebugMode) {
-            const controls = new OrbitControls(this.camera, document.getElementById("changelogBody"));
-            controls.target.set( 0, 5, 0 );
-	        controls.update();
-        }
-        this.renderer.setAnimationLoop((time)=>this.animate(time, this));
+
+
     }
     animate(time, owner=this) {
         //owner.cube.rotation.x=time/2000;
