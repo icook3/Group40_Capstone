@@ -139,18 +139,17 @@ export class AvatarMovement {
 
         // Emit either a start or a resume event based on worldZ
         if (constants.worldZ === 0) {
-            document.getElementById('rider').emit('riderStarted');
-            document.getElementById('pacer-entity').emit('pacerStart');
+            document.emit('riderStarted');
         }
 
         else if (this.speed === 0 && constants.worldZ > 0) {
             // Emit a stop event if speed is 0
-            document.getElementById('rider').emit('riderStopped');
+            document.emit('riderStopped');
         }
 
         // Emit a resume event if both speed and worldZ are greater than 0
         else {
-            document.getElementById('rider').emit('riderResumed');
+            document.emit('riderResumed');
         }
         if (this.creator.leftPedalBone!=null) {
             this.animatePedalingBike(dt);
