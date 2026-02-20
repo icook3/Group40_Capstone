@@ -70,7 +70,7 @@ class Constants {
   // Colors can be refactored out once grid is fully abandoned
   groundColor1 = "#5a7d3a";
   groundColor2 = "#7c5a3a";
-  gridWidth = 12; // 12 tiles wide (120 units)
+  gridWidth = 27; // 12 tiles wide (120 units)
   gridDepth = 80; // 80 tiles deep (800 units)
   height = 1;
   roughness = 0.97;
@@ -89,6 +89,7 @@ class Constants {
 
   farthestSpawn = 1;
   trackPoints = [];
+  sceneryItems = [];
   currentTrackPiece = 0;
   pacerCurrentTrackPiece = 0;
 
