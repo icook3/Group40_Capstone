@@ -43,8 +43,6 @@ export class Track {
 
     // As each animation completes, start the next one
     this.update_rider_animation = this.update_rider_animation.bind(this);
-    this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-    this.pacer.addEventListener('animationcomplete__2', this.update_pacer_animation);
 
   this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
