@@ -51,7 +51,7 @@ To run multiplayer, Strava, and crash logging, you need a custom server. You wil
 PATH=/peerServer
 PORT=9000
 ```
-4. Go to frontend/src/js/constants.js, and at the bottom, change the values of the variables peerHost, peerPath, and peerPort to match what is in .env. 
+4. Go to `frontend/src/js/config/config.js`, change the values of the variables PEER_HOST, PEER_PATH, and PEER_PORT to match what is in .env. 
 5. Do steps 2 and 3 in the strava_service folder and the crash_logging_service folder.
 6. Download and install Docker at https://www.docker.com/products/docker-desktop/
     - You can check that you have it installed by typing in ```docker -v```
@@ -60,7 +60,7 @@ PORT=9000
         - On Windows 10, hold shift, right-click on a folder area in Windows explorer, and select "open PowerShell window here". 
 7. Go back to the backend folder, and open up the command line in it.
 8. On the command line, type in ```docker-compose up``` (Leave this terminal window running)
-9. Go into the frontend code, go to `src/js/crashReporter.js`, and change the value of BACKEND_URL to the URL that you are running the crash reporter on, without any paths. 
+9. Go to `frontend/src/js/config/config.js`, and change the value of CRASH_REPORTER_BACKEND_URL to the URL that you are running the crash reporter on, without any paths. 
 10. The next steps are only if you want to be able to connect and upload to Strava. Strava requires a **secure public address (HTTPS)**
     1. This will require some technical knowledge, you can still upload through Strava manually downloading a TCX
 11. Download ngrok at https://ngrok.com/download/windows if not downloaded (downloading from the Microsoft Store is OK)
@@ -70,9 +70,9 @@ PORT=9000
 13. Run ngrok in powershell or command line terminal `ngrok http 8080` (Leave this terminal window running)
     1. You will see something like : `Forwarding https://jacoby-vitriolic-unruly.ngrok-free.dev -> http://localhost:8080`
 14. Copy the domain from your ngrok URL into Strava’s Authorization Callback Domain field https://www.strava.com/settings/api
-15. Go into your frontend code, go to `src/js/strava.js`, and replace the 2 following lines with your Strava Client ID and the https ngrok URL:
-    - this.CLIENT_ID = "INPUT CLIENT ID"; - your Strava client id
-    - this.BACKEND_URL = "https://YOUR-BACKEND.com"; - your ngrok URL
+15. Go to `frontend/src/js/config/config.js`, and replace the 2 following lines with your Strava Client ID and the https ngrok URL:
+    - STRAVA_CLIENT_ID = our Strava client id
+    - this.STRAVA_BACKEND_URL = your ngrok URL
 16. Close ngrok/terminal windows when you are done using the service
 
 Instead of doing steps 7 and 8, you can double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js.
