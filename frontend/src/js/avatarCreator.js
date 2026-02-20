@@ -117,7 +117,7 @@ export class AvatarCreator {
         //this.createBikeModel(avatar);
 
         document.querySelector('a-scene').appendChild(avatar);
-        //console.log(document.getElementById('rider'))
+
         return avatar;
 
 
@@ -145,6 +145,7 @@ export class AvatarCreator {
         this.personModel = personModel;
         personModel.addEventListener('model-loaded', (e) => {
             const model = e.detail.model;
+            
 
             // personRig initializes to null
             this.personRig = model.getObjectByName("metalrig")
@@ -268,6 +269,7 @@ export class AvatarCreator {
 
         document.addEventListener('model-loaded', (e) => {
             const model = e.detail.model;
+            console.log(e)
             this.rearWheel = model.getObjectByName("RearTire");
             this.frontWheel = model.getObjectByName("FrontTire");
             this.bikeFrontFrame = model.getObjectByName("FrontFrame");
@@ -290,7 +292,7 @@ export class AvatarCreator {
                 }
             }
         );
-
+        //console.log(model)
         document.removeEventListener('model-loaded', e);
     });
     
