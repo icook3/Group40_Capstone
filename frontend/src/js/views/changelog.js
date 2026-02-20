@@ -41,9 +41,7 @@ export class changelogView {
     oldTreeCount = 20;
     newTreeCount = 20;
 
-    objLocations = [];
-
-    useOrbitDebugMode=true;
+    useOrbitDebugMode=false;
 
     placeOldBuildings() {
         //old buildings were a grey rectangle
@@ -291,11 +289,6 @@ export class changelogView {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         this.renderer = new THREE.WebGLRenderer({alpha: true, premultipliedAlpha: false});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({color:0x00ff00});
-        //this.cube = new THREE.Mesh(geometry, material);
-        //this.cube.position.x = -9;
-        //this.scene.add(this.cube);
         this.placeGrass();
         this.placeTrack();
         this.placeOldBuildings();
@@ -308,11 +301,14 @@ export class changelogView {
         this.camera.position.y=-10;
         this.camera.rotation.x = -100;
 
-
+        //check for resizing window
+        window.addEventListener('resize', ()=> {
+            this.camera.aspect=window.innerWidth/window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }, false);
     }
     animate(time, owner=this) {
-        //owner.cube.rotation.x=time/2000;
-        //owner.cube.rotation.y=time/1000;
         owner.renderer.render(owner.scene, owner.camera);
     }
 }
