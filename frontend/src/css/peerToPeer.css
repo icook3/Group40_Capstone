@@ -149,7 +149,7 @@ button:hover {
   padding: 20px clamp(32px, 6vw, 52px);
   font-family: "Nunito", sans-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
   color: #e0f7ef;
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
