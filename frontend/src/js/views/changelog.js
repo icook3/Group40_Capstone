@@ -41,7 +41,9 @@ export class changelogView {
     oldTreeCount = 20;
     newTreeCount = 20;
 
-    useOrbitDebugMode=false;
+    objLocations = [];
+
+    useOrbitDebugMode=true;
 
     placeOldBuildings() {
         //old buildings were a grey rectangle
@@ -135,7 +137,61 @@ export class changelogView {
         }
     }
     placeNewTrees() {
-
+        const loader = new GLTFLoader();
+        for (let i=0;i<this.newTreeCount;i++) {
+            //pick one out of 3 types
+            let type = Math.random();
+            if (type<0.25) {
+                loader.load('../../resources/models/bgmodels/bush1.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });
+            } else if (type<0.5) {
+                loader.load('../../resources/models/bgmodels/tree1.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });
+            } else if (type<0.75) {
+                loader.load('../../resources/models/bgmodels/tree2.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });
+            } else {
+                loader.load('../../resources/models/bgmodels/tree3.glb', (gltf) => {
+                    gltf.scene.position.x=(5+Math.random()*10);
+                    gltf.scene.position.y=-20+Math.random()*30;
+                    gltf.scene.position.z=0;
+                    gltf.scene.rotation.x=Math.PI/2;
+                    gltf.scene.rotation.y=-Math.PI/2;
+                    //console.log(gltf);
+                    this.scene.add(gltf.scene);
+                }, undefined, function(error) {
+                    console.log(error);
+                });                
+            }
+            
+        }
     }
     //place the track running along the back
     placeTrack() {
