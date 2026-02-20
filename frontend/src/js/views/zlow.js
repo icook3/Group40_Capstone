@@ -157,7 +157,7 @@ export class zlowScreen {
           if (this.pacer==null) {
             return;
           }
-          activatePacer();
+          this.activatePacer();
           this.pacer.setSpeed(Number(data.data));
           this.pacerPhysics.setSpeed(Number(data.data));
           //console.log(this.pacer.speed);
@@ -276,7 +276,7 @@ export class zlowScreen {
                       return;
                   }
     
-                  recieveData(data);
+                  this.recieveData(data);
               });
               this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
             });
@@ -328,7 +328,7 @@ export class zlowScreen {
             console.log("Peer JOINED lobby:", connection.peer);
     
             // Immediately listen for messages
-            this.conn.on("data", data => recieveData(data));
+            this.conn.on("data", data => this.recieveData(data));
     
             // Send host's player data back
             this.conn.send({
