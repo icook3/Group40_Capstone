@@ -215,8 +215,3 @@ button:hover {
   color: rgba(26, 58, 42, 0.85);
   background: rgba(46, 139, 110, 0.08);
 }
-
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
