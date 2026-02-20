@@ -1,16 +1,25 @@
-/* SPA background wrapper used by injected views */
 .bodyStyle {
   position: fixed;
   inset: 0;
 }
 
-/* KEEP same background file */
 .bodyImg {
   background: url("../../resources/images/backgroundA.png") no-repeat center center fixed;
   background-size: cover;
+  background-position: center center;
 }
 
-
+.bodyImg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255,255,255,0.0) 0%,
+    rgba(0,0,0,0.25) 100%
+  );
+  pointer-events: none;
+}
 
 button.peerBtn {
     font-size: 1em;
@@ -41,15 +50,16 @@ button:hover {
 /* ===== mainMenu-style center layout ===== */
 #main-menu-center {
   position: fixed;
-  top: 23%;
+  top: clamp(80px, 20vh, 240px);
   left: 50%;
-  transform: translateX(-50%) scale(1.2);
+  transform: translateX(-50%); /* removed scale(1.2) */
   z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;
+  gap: clamp(18px, 3vh, 32px);
 }
+
 
 #welcome-msg {
   display: flex;
@@ -67,7 +77,7 @@ button:hover {
 }
 
 .welcome-main {
-  font-size: 5rem;
+  font-size: clamp(3rem, 8vw, 5rem);
   color: #1a3a2a;
   line-height: 0.9;
   letter-spacing: 0.04em;
@@ -107,7 +117,7 @@ button:hover {
 }
 
 #name-input {
-  width: 320px;
+  width: clamp(240px, 45vw, 360px);
   padding: 14px 18px;
   border-radius: 25px;
   border: 1.8px solid #1a3a2a67;
@@ -136,7 +146,7 @@ button:hover {
   background: #1f6784;
   border: none;
   border-radius: 50px 18px 50px 18px;
-  padding: 20px 52px;
+  padding: 20px clamp(32px, 6vw, 52px);
   font-family: "Nunito", sans-serif;
   font-weight: 700;
   font-size: 1.1rem;
@@ -175,4 +185,9 @@ button:hover {
 .menu-link:hover {
   color: rgba(26, 58, 42, 0.85);
   background: rgba(46, 139, 110, 0.08);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
