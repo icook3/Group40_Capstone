@@ -193,7 +193,7 @@ export class changelogView {
     }
     //place the track running along the back
     placeTrack() {
-        const geometry = new THREE.BoxGeometry(1, 1, 0.1);
+        const geometry = new THREE.BoxGeometry(1, 2, 0.1);
         const loader = new THREE.TextureLoader();
         let texture = loader.load('../../../resources/textures/Track.jpeg', (texture) => {
             texture.colorSpace = THREE.SRGBColorSpace;
@@ -202,7 +202,7 @@ export class changelogView {
                 let trackPiece = new THREE.Mesh(geometry, texMat);
                 trackPiece.position.x=i;
                 trackPiece.position.z=0.1;
-                trackPiece.position.y=12;
+                trackPiece.position.y=13.5;
                 this.scene.add(trackPiece);
             }
         });
