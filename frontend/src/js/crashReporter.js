@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+const BACKEND_URL = "http://localhost:9000/"; // TODO
 const INTAKE_CRASH = "/intake";
 const HEALTH_CHECK = "/crashLoggingHealth";
 
