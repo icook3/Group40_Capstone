@@ -148,6 +148,7 @@ export class zlowScreen {
             isPacer: false,
           });
           this.pacer.creator.loadOtherData(data.data);
+          this.pacerPhysics = new PhysicsEngine();
           if (this.peerState==1) {
             this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
