@@ -1,3 +1,17 @@
+/* SPA background wrapper used by injected views */
+.bodyStyle {
+  position: fixed;
+  inset: 0;
+}
+
+/* KEEP same background file */
+.bodyImg {
+  background: url("../../resources/images/backgroundA.png") no-repeat center center fixed;
+  background-size: cover;
+}
+
+
+
 button.peerBtn {
     font-size: 1em;
     cursor: pointer;
