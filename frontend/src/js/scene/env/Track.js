@@ -36,7 +36,9 @@ export class Track {
     this.path_element.appendChild(track);
     constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
     spawn_track();
-    
+
+    let camera = document.getElementById('camera');
+    camera.setAttribute('position', `-0.5 6 5`);
 
   this._initTimer = setTimeout(() => this.update_rider_animation(), 5000);
   }
@@ -78,6 +80,10 @@ update_rider_animation() {
 
   // Works to  find avatar
   const avatar = document.getElementById("scene").object3D.getObjectByName('rider');
+  let camera = document.getElementById('camera');
+  console.log(avatar.position)
+  console.log(camera.getAttribute('position'))
+
 
   // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
   if (!avatar) return; 
@@ -101,25 +107,31 @@ update_rider_animation() {
     return;
   }
 
-  //ADD TWEEN
+
+  // Animate rider using tween.js
   let coords = {x: 0, y: 0, z: 0};
-  let endpoint = {x: tp.x, y: tp.y, z: -20}
-  console.log(endpoint)
+  let endpoint = {x: tp.x, y: tp.y, z: tp.z}
   
 
   const animateRider = new Tween(coords, false) // Create a new tween that modifies 'coords'.
-		.to(endpoint, 1000) // Move to (300, 200) in 1 second.
+		.to(endpoint, 1000)
 		.onUpdate(() => {
-			// Called after tween.js updates 'coords'.
-			// Move 'box' to the position described by 'coords' with a CSS translation.
       avatar.position.set(coords.x, coords.y, coords.z)
-			console.log("DID SOMETHING")
+      // Add a separate tween to deal with camera??
+      camera.setAttribute('position', `${coords.x} ${coords.y + 5} ${coords.z + 7}`)
 		})
+    .onComplete(() => {
+    // Optionally restart or change the tween
+    console.log("FAR OUT")
+    })
 		.start() // Start the tween immediately.
 
+    // ONCOMPLETE SHOULD RECALCULATE THE DURATION AND SET THE NEW DESTINATION
+
+    // Helper function to move rider
     function animate(time) {
-		animateRider.update(time)
-		requestAnimationFrame(animate)
+      animateRider.update(time)
+      requestAnimationFrame(animate)
 	}
 
 	requestAnimationFrame(animate)
