@@ -25,7 +25,7 @@ export class ObjectField {
 
     // Rotate rig to face forwards relative to the rider
     this.rig = document.getElementById('rig');
-    this.rig.setAttribute('rotation', '0 -105 0'); 
+    //this.rig.setAttribute('rotation', '0 -105 0'); 
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)
@@ -84,7 +84,7 @@ export class ObjectField {
   advance(riderSpeed, dt) {
     if (!this.initialized || riderSpeed === 0 || dt === 0) return;
 
-    const riderEl = document.getElementById('rider');
+    const riderEl = document.getElementById("scene").object3D.getObjectByName('rider');
     const riderZ = getPos(riderEl).z;
     const recycleZ = riderZ + 20;
 

@@ -2,6 +2,7 @@
   Creates the path the rider travels and circular patterns superimposed on the road.
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
+import {Tween, Easing} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 import { constants } from "../../constants.js";
 import { getPos, setPos } from '../core/util.js';
 import  {activatePacer } from '../../main.js'
@@ -27,11 +28,6 @@ export class Track {
     }
     this.path_element = path_element;
 
-
-    // Get entities needed to create the timeline animation
-    this.rider = document.getElementById('rider');
-    this.pacer = document.getElementById('pacer-entity');
-
     // Spawn decorative track behind the rider and pacer and initial track point, then call main spawn function
     const track = document.createElement('a-entity');
     track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: 15`);
@@ -40,12 +36,9 @@ export class Track {
     this.path_element.appendChild(track);
     constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
     spawn_track();
+    
 
-    // As each animation completes, start the next one
-    this.update_rider_animation = this.update_rider_animation.bind(this);
-    this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-
-  this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+  this._initTimer = setTimeout(() => this.update_rider_animation(), 5000);
   }
 
   destroy() {
@@ -83,11 +76,11 @@ export class Track {
 update_rider_animation() {
   constants.currentTrackPiece += 1;
 
-  const avatar = document.getElementById('rider');
-  const pacer = document.getElementById('pacer-entity');
+  // Works to  find avatar
+  const avatar = document.getElementById("scene").object3D.getObjectByName('rider');
 
   // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
-  if (!avatar || !pacer) return; 
+  if (!avatar) return; 
 
   // ---- NEW: ensure we have enough track points before reading the next one ----
   // If we're close to the end of the array, spawn more now (before indexing).
@@ -108,40 +101,46 @@ update_rider_animation() {
     return;
   }
 
-  // Calculate rider's duration and set attributes
-  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
+  //ADD TWEEN
+  let coords = {x: 0, y: 0, z: 0};
+  let endpoint = {x: tp.x, y: tp.y, z: -20}
+  console.log(endpoint)
+  
 
-  avatar.removeAttribute("animation__1");
-  avatar.setAttribute(
-    "animation__1",
-    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
-  );
+  const animateRider = new Tween(coords, false) // Create a new tween that modifies 'coords'.
+		.to(endpoint, 1000) // Move to (300, 200) in 1 second.
+		.onUpdate(() => {
+			// Called after tween.js updates 'coords'.
+			// Move 'box' to the position described by 'coords' with a CSS translation.
+      avatar.position.set(coords.x, coords.y, coords.z)
+			console.log("DID SOMETHING")
+		})
+		.start() // Start the tween immediately.
 
-  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
-  const pacerEndpoint = -(riderDuration / 1500 * pacerSpeed) + getPos(pacer).z;
+    function animate(time) {
+		animateRider.update(time)
+		requestAnimationFrame(animate)
+	}
 
-  pacer.removeAttribute("animation__1");
-  pacer.setAttribute(
-    "animation__1",
-    `property: position; to: ${tp.x + 0.5} ${tp.y} ${pacerEndpoint}; dur: ${riderDuration}; easing: linear; loop: false; autoplay:true;`
-  );
+	requestAnimationFrame(animate)
+
+
+    const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
+    const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
+
+
+
+
 
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)
-  if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track();
-  }
+  //if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    //spawn_track();
+  //}
 }
 
 
-  // Initialize rider animation attribute using a very short section of track to avoid division by zero
-  // Pacer starts when rider starts. Delay ensures pacer finishes loading
-  initialize_animation() {
-    activatePacer();
-    this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-    this.pacer.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; startEvents: pacerStart;`);
-  }
+
 
   // Create an append a track piece curving to the right
   curve_180_right(spawnZ) {
