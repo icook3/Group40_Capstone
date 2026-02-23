@@ -31,7 +31,7 @@ export class ViewManager {
         this.formerPopStateFunction = window.onpopstate;
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
 
-        //window.location.hash=this.views.mainMenu;
+        window.location.hash=this.views.mainMenu;
 
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
@@ -42,6 +42,7 @@ export class ViewManager {
     }
 
     setView(view, usingBrowser=false) {
+        console.group();
         console.log("SETTING VIEW TO "+view);
         //reset the page you are currently on
         switch(this.currentView) {
@@ -90,6 +91,7 @@ export class ViewManager {
                 break;
             default: 
                 console.log("This view is not available! "+view);
+                console.groupEnd();
                 return;
                 break;
         }
@@ -99,22 +101,27 @@ export class ViewManager {
             console.log("Adding "+this.currentView+" to the stack");
             //push the current view onto the stack
             this.pastScreens.push(this.currentView);
+            console.log("stack contains: ",this.pastScreens);
             history.pushState({},"");
         }
+        console.groupEnd();
         window.location.hash=view;
 
         this.currentView=view;
     }
 
     newPopStateFunction(owner, event) {
+        //if you are not actually hitting the back button, but instead are changing the hash
         if (event.state==null) {
             event.preventDefault();
             return;
         }
+        //if you are going to a past screen
         if (owner.pastScreens.length==0) {
             //owner.formerPopStateFunction();
             return;
         }
+        console.group();
         console.log("click back button");
         /*
         owner.futureScreens.push(owner.currentView);
@@ -124,6 +131,7 @@ export class ViewManager {
         owner.setView(owner.pastScreens.pop(), true);
         console.log("AFTER");
         console.log(owner.pastScreens);
+        console.groupEnd();
     }
 }
 // For browser usage
