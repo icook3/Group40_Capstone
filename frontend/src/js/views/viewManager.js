@@ -17,10 +17,17 @@ export class ViewManager {
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
+    formerPopStateFunction;
+    pastScreens=[];
+    futureScreens=[];
     /**
     * Initializes different views
     */
     initViews() {
+        //change the back button
+        this.formerPopStateFunction = window.onpopstate;
+        window.onpopstate = ()=>this.newPopStateFunction(this);
+
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
         this.viewStorage.zlowScreen = new zlowScreen(false);
@@ -80,11 +87,19 @@ export class ViewManager {
                 return;
                 break;
         }
-
+        //push the current view onto the stack
+        this.pastScreens.push(this.currentView);
         this.currentView=view;
     }
 
-    
+    newPopStateFunction(owner) {
+        console.log("click back button");
+        if (owner.pastScreens.length==0) {
+            owner.formerPopStateFunction();
+            return;
+        }
+        owner.setView(owner.pastScreens.pop());
+    }
 }
 // For browser usage
 if (typeof window !== "undefined") {
