@@ -13,12 +13,15 @@ class ViewStorage {
     zlowScreen;
 }
 export class ViewManager {
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
+    views = {changelog: "#changelog", peerConnect: "#peerConnect", mainMenu: "#mainMenu", playerCustomization: "#playerCustomization", mainZlow: "#mainZlow"};
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
     formerPopStateFunction;
+
+    //store a list of past screens - starts with main menu
     pastScreens=[];
+
     futureScreens=[];
     /**
     * Initializes different views
@@ -26,7 +29,9 @@ export class ViewManager {
     initViews() {
         //change the back button
         this.formerPopStateFunction = window.onpopstate;
-        window.onpopstate = ()=>this.newPopStateFunction(this);
+        window.onpopstate = (event)=>this.newPopStateFunction(this, event);
+
+        //window.location.hash=this.views.mainMenu;
 
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
@@ -36,7 +41,8 @@ export class ViewManager {
         this.viewStorage.changelog = new changelogView(false);
     }
 
-    setView(view) {
+    setView(view, usingBrowser=false) {
+        console.log("SETTING VIEW TO "+view);
         //reset the page you are currently on
         switch(this.currentView) {
             case this.views.mainMenu:
@@ -83,22 +89,41 @@ export class ViewManager {
                 }
                 break;
             default: 
-                console.log("This view is not available!");
+                console.log("This view is not available! "+view);
                 return;
                 break;
         }
-        //push the current view onto the stack
-        this.pastScreens.push(this.currentView);
+        
+        // if you are not using browser buttons, add it to the stack
+        if (!usingBrowser) {
+            console.log("Adding "+this.currentView+" to the stack");
+            //push the current view onto the stack
+            this.pastScreens.push(this.currentView);
+            history.pushState({},"");
+        }
+        window.location.hash=view;
+
         this.currentView=view;
     }
 
-    newPopStateFunction(owner) {
-        console.log("click back button");
-        if (owner.pastScreens.length==0) {
-            owner.formerPopStateFunction();
+    newPopStateFunction(owner, event) {
+        if (event.state==null) {
+            event.preventDefault();
             return;
         }
-        owner.setView(owner.pastScreens.pop());
+        if (owner.pastScreens.length==0) {
+            //owner.formerPopStateFunction();
+            return;
+        }
+        console.log("click back button");
+        /*
+        owner.futureScreens.push(owner.currentView);
+        owner.setView(owner.pastScreens.pop());*/
+        console.log("WINDOW.pastScreens=");
+        console.log(owner.pastScreens);
+        owner.setView(owner.pastScreens.pop(), true);
+        console.log("AFTER");
+        console.log(owner.pastScreens);
     }
 }
 // For browser usage
