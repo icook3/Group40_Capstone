@@ -131,7 +131,7 @@ button:hover {
     0 6px 18px rgba(0,0,0,0.18);
 
   /* soft lightening layer */
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.60);
 
   z-index: 0;
 }
@@ -147,7 +147,7 @@ button:hover {
   border: 1.8px solid #1a3a2a67;
 
   /* keep this slightly translucent */
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.70);
 
   color: #1a3a2a;
   font-family: "Nunito", sans-serif;
@@ -170,7 +170,7 @@ button:hover {
 }
 
 /* IMPORTANT: connect button uses your page's ID */
-#connect-btn {
+#connect-btnP {
   background: #1f6784;
   border: none;
   border-radius: 50px 18px 50px 18px;
@@ -183,7 +183,7 @@ button:hover {
   box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
 }
 
-#connect-btn:hover {
+#connect-btnP:hover {
   background: #1a3a2a;
 }
 
