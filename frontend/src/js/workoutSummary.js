@@ -1,6 +1,7 @@
 // Displays after workout stats
 
 import { units } from "./units/index.js";
+import {features} from "./constants.js";
 
 export class WorkoutSummary {
   constructor({ workoutStorage, onClose }) {
@@ -249,7 +250,10 @@ export class WorkoutSummary {
         
         <div class="export-buttons">
           <button id="summary-export-tcx" class="summary-btn">Download TCX</button>
-          <button id="summary-export-strava" class="summary-btn">Export to Strava</button>
+          ${features.stravaEnabled 
+            ? `<button id="summary-export-strava" class="summary-btn">Export to Strava</button>`
+            : ""
+          }
         </div>
         
         <button id="close-summary" class="close-btn">Close</button>
