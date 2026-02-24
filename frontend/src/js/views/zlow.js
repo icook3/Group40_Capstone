@@ -53,7 +53,6 @@ export class zlowScreen {
     conn;
 
     loopRunning=false;
-    darkMode = window.matchMedia("(prefers-color-scheme: dark)");
 
     constructor(setWhenDone) {
         fetch("../html/zlow.html").then((content)=> {
@@ -88,19 +87,6 @@ export class zlowScreen {
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
         
-    }
-
-    updateFavicon() {
-      const favicon = document.querySelector('link[rel="icon"]');
-      if (!favicon) {
-        return;
-      }
-
-      if (this.darkMode.matches) {
-        favicon.href = "../../resources/favicons/ZlowFavicon-dark.svg";
-      } else {
-        favicon.href = "../../resources/favicons/ZlowFavicon.svg";
-      }
     }
 
     activatePacer() {
@@ -747,8 +733,6 @@ export class zlowScreen {
           });
         },
       });*/
-      this.updateFavicon();
-      this.darkMode.addEventListener("change", this.updateFavicon);
       
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
