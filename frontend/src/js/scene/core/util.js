@@ -40,4 +40,10 @@ export function sampleSideX({ isBuilding }) {
   return sign * (min + Math.random() * (max - min));
 }
 
+// Decide whether the number should be positive or negative
+export function getSign() {
+    let randomNo = Math.floor(Math.random() * 10);
+    return randomNo % 2 === 0;
+  }
+
 
