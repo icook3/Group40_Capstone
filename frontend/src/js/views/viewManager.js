@@ -25,6 +25,9 @@ export class ViewManager {
 
     //track if you are doing it through code
     hashChangeThroughCode=false;
+
+    lastState;
+    historyIndex=0;
     /**
     * Initializes different views
     */
@@ -36,8 +39,9 @@ export class ViewManager {
         //initialize views
         //change the back button
         this.formerPopStateFunction = window.onpopstate;
+        history.replaceState({idx:this.historyIndex},'');
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
-
+        this.lastState=window.history.state;
         this.hashChangeThroughCode=true;
         window.location.hash=this.views.mainMenu;
 
@@ -111,6 +115,8 @@ export class ViewManager {
             this.pastScreens.push(this.currentView);
             console.log("stack contains: ",this.pastScreens);
             this.hashChangeThroughCode=true;
+            this.historyIndex++;
+            history.replaceState({idx:this.historyIndex},'');
             //history.pushState({},"");
         }
         console.groupEnd();
@@ -138,6 +144,7 @@ export class ViewManager {
         
         console.log("past screens=",owner.pastScreens,"Future screens=",owner.futureScreens);
         console.log("hashChangeThroughCode=",owner.hashChangeThroughCode);
+        console.log("history state=",window.history.state);
         //if you are not actually hitting the back button, but instead are changing the hash through code
         if (owner.hashChangeThroughCode==true) {
             event.preventDefault();
@@ -146,18 +153,33 @@ export class ViewManager {
             owner.hashChangeThroughCode=false;
             return;
         }
-        //if you are going to a past screen
-        if (owner.pastScreens.length==0) {
-            //owner.formerPopStateFunction();
+     
+        let currentState = window.history.state;
+        console.log("current state=",currentState);
+        //if you are going backwards
+        if (currentState.idx>this.lastState.idx) {
+            //if you are going to a past screen
+            if (owner.pastScreens.length==0) {
+                //owner.formerPopStateFunction();
+                console.groupEnd();
+                return;
+            }
+            console.log("click back button");
+            owner.futureScreens.push(owner.currentView);
+            owner.setView(owner.pastScreens.pop(), true);
+            console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
             console.groupEnd();
-            return;
-        }        
-        
-        console.log("click back button");
-        owner.futureScreens.push(owner.currentView);
-        owner.setView(owner.pastScreens.pop(), true);
-        console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
-        console.groupEnd();
+        } else if (currentState.idx<this.lastState.idx) {
+            if (owner.futureScreens.length==0) {
+                console.groupEnd();
+                return;
+            }
+            console.log("click forwards button");
+            owner.setView(owner.futureScreens.pop(), true);
+            console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
+            console.groupEnd();
+        }
+        this.lastState=currentState;
     }
 }
 // For browser usage
