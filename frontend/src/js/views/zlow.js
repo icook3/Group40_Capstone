@@ -433,32 +433,36 @@ export class zlowScreen {
     initPauseBtn() {
       let savedPacerSpeed;
       const pauseBtn = document.getElementById("pause-btn");
+      const resumeBtn = document.getElementById("pause-resume-btn");
+      const overlay = document.getElementById("pause-overlay");
+
+      const pauseGame = () => {
+        simulationState.isPaused = true;
+        this.hud.pause();
+        savedPacerSpeed = this.pacerPhysics.getSpeed();
+        this.setPacerSpeed(0);
+        overlay.style.display = "flex";
+        overlay.setAttribute("aria-hidden", "false");
+      };
+
+      const resumeGame = () => {
+        simulationState.isPaused = false;
+        pauseBtn.textContent = "Pause";
+        constants.lastTime = Date.now();
+        this.hud.resume();
+        this.setPacerSpeed(savedPacerSpeed);
+        overlay.style.display = "none";
+        overlay.setAttribute("aria-hidden", "true");
+      };
+
       pauseBtn.addEventListener("click", () => {
-        simulationState.isPaused = !simulationState.isPaused;
-        pauseBtn.textContent = simulationState.isPaused ? "Resume" : "Pause";
-    
-        if (simulationState.isPaused) {
-          this.hud.pause();
-          savedPacerSpeed = this.pacerPhysics.getSpeed();
-          this.setPacerSpeed(0); // Stop pacer when paused
-          // start countdown
-          this.countdown.start(() => {
-            // auto-resume when hits 0
-            simulationState.isPaused = false;
-            constants.lastTime = Date.now();
-            this.hud.resume();
-            this.setPacerSpeed(savedPacerSpeed);
-            pauseBtn.textContent = "Pause";
-          });
-        } else {
-          // manual resume
-          this.countdown.cancel();
-          this.hud.resume();
-          simulationState.isPaused = false;
-          constants.lastTime = Date.now();
-          this.setPacerSpeed(savedPacerSpeed);
-          pauseBtn.textContent = "Pause";
+        if (!simulationState.isPaused) {
+          pauseGame();
         }
+      });
+
+      resumeBtn.addEventListener("click", () => {
+        resumeGame();
       });
     }
     setupStopButton() {

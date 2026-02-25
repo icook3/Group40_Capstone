@@ -482,16 +482,6 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 /* ========================================
    Pause overlay style
    ======================================== */
-#pause-overlay {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 9999;
-  pointer-events: auto;
-}
 
 #pause-overlay {
   position: fixed;
@@ -511,6 +501,32 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   flex-direction: column;
   align-items: center;
   gap: 30px;
+}
+
+#pause-overlay .pause-branding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#pause-overlay .pause-subtitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: "Fugaz One", sans-serif;
+  font-weight: 500;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.759);
+  letter-spacing: 0.35em;
+}
+
+#pause-overlay .pause-logo {
+  height: 1.8rem;
+  width: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.759;
+  transform: translateY(6px);
 }
 
 #pause-overlay .pause-title {
@@ -544,6 +560,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 #pause-overlay .pause-resume-btn:hover {
   background: #2d8e8e;
 }
+
 
 #milestone-notifications {
   position: fixed;
