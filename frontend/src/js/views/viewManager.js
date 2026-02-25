@@ -23,9 +23,8 @@ export class ViewManager {
     pastScreens=[];
     futureScreens=[];
 
-    //track if you are doing it through code
+    //track the history state
     hashChangeThroughCode=false;
-
     lastState;
     historyIndex=0;
     /**
@@ -36,7 +35,14 @@ export class ViewManager {
         this.updateFavicon();
         this.darkMode.addEventListener("change", this.updateFavicon);
 
-        
+
+        //fill in past screens and future screens from the sessionStorage
+        if (sessionStorage.getItem("pastScreens")!=null) {
+            this.pastScreens=JSON.parse(sessionStorage.getItem("pastScreens"));
+        }
+        if (sessionStorage.getItem("futureScreens")!=null) {
+            this.futureScreens=JSON.parse(sessionStorage.getItem("futureScreens"));
+        }
         //change the back button
         this.formerPopStateFunction = window.onpopstate;
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
@@ -44,6 +50,7 @@ export class ViewManager {
         window.location.hash=this.views.mainMenu;
         history.replaceState({idx:this.historyIndex},'');
         this.lastState=window.history.state;
+        this.hashChangeThroughCode=false;
 
         //initialize views
         console.log("Initializing views");
@@ -117,7 +124,7 @@ export class ViewManager {
             //console.log("stack contains: ",this.pastScreens);
             this.hashChangeThroughCode=true;
             this.historyIndex++;
-            
+            sessionStorage.setItem("pastScreens",JSON.stringify(this.pastScreens));
             //history.pushState({},"");
         }
         //console.groupEnd();
@@ -148,13 +155,14 @@ export class ViewManager {
         //console.group();
         
         //console.log("past screens=",owner.pastScreens,"Future screens=",owner.futureScreens);
-        //console.log("hashChangeThroughCode=",owner.hashChangeThroughCode);
-        //console.log("history state=",owner.lastState);
+        console.log("hashChangeThroughCode=",owner.hashChangeThroughCode);
+        console.log("history state=",owner.lastState);
         //if you are not actually hitting the back button, but instead are changing the hash through code
         if (owner.hashChangeThroughCode==true) {
             event.preventDefault();
             //console.groupEnd();
             owner.futureScreens=[];
+            sessionStorage.setItem("futureScreens",JSON.stringify(owner.futureScreens));
             owner.hashChangeThroughCode=false;
             return;
         }
@@ -164,7 +172,7 @@ export class ViewManager {
             return;
         }
         let currentState = window.history.state;
-        //console.log("current state=",currentState);
+        console.log("current state=",currentState);
         //if you are going backwards
         if (currentState.idx<=this.lastState.idx) {
             //if you are going to a past screen
@@ -176,6 +184,8 @@ export class ViewManager {
             console.log("click back button");
             owner.futureScreens.push(owner.currentView);
             owner.setView(owner.pastScreens.pop(), true);
+            sessionStorage.setItem("pastScreens",JSON.stringify(owner.pastScreens));
+            sessionStorage.setItem("futureScreens",JSON.stringify(owner.futureScreens));
             //console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
             //console.groupEnd();
         } else if (currentState.idx>owner.lastState.idx) {
@@ -186,6 +196,8 @@ export class ViewManager {
             console.log("click forwards button");
             owner.pastScreens.push(owner.currentView);
             owner.setView(owner.futureScreens.pop(), true);
+            sessionStorage.setItem("pastScreens",JSON.stringify(owner.pastScreens));
+            sessionStorage.setItem("futureScreens",JSON.stringify(owner.futureScreens));
             //console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
             //console.groupEnd();
         }
