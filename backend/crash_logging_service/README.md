@@ -30,6 +30,7 @@ Clients **must not** send secrets, tokens,or personal data.
         - `intakeRoutes` - Crash submission endpoints
         - `reportRoutes` - Crash query / viewing endpoints
     - `services`
+        - `authenticateReportService.js` - Authenticates report API key
         - `storageService.js` - Writes crash reports to the filesystem
         - `validationService.js` - Sanitizes and validates payloads
         - `rateLimitService.js` - In memory abuse protection
@@ -78,6 +79,10 @@ MAX_PAYLOAD_SIZE=200kb
 # Allowed site for CORS (frontend origin only, no path)
 FRONTEND_URI=https://your-frontend.example.com
 
+# API key used to authenticate /report endpoint
+# Generate with: Mac/Linux openssl rand -hex 32 | Windows PowerShell: [System.Convert]::ToHexString((New-Object byte[] 32 | %{Get-Random -Max 256}))
+REPORT_API_KEY=your-strong-random-key-here
+
 # Port service listens on
 PORT=3000
 ```
@@ -109,26 +114,75 @@ Invoke-RestMethod -Uri "http://localhost:3000/intake" `
 ```
 
 ### 6. View Stored Crash Reports
+#### 6a. The following commands are to be used in Windows Powershell
 Fetch recent crashes:
 ```
-http://localhost:3000/report?limit=20
+(Invoke-WebRequest `
+  -Uri "http://localhost:3000/report?limit=20" `
+  -Headers @{ Authorization = "Bearer your-strong-random-key-here" }
+).Content | ConvertFrom-Json | ConvertTo-Json -Depth 5
 ```
 
 Fetch crashes for a specific date:
 ```
-http://localhost:3000/report?date=2026-01-28
+(Invoke-WebRequest `
+  -Uri "http://localhost:3000/report?date=2026-01-28" `
+  -Headers @{ Authorization = "Bearer your-strong-random-key-here" }
+).Content | ConvertFrom-Json | ConvertTo-Json -Depth 5
 ```
 
 Fetch a specific crash by ID:
 ```
-http://localhost:3000/report?id=<crash_id>
+(Invoke-WebRequest `
+  -Uri "http://localhost:3000/report?id=<crash_id>" `
+  -Headers @{ Authorization = "Bearer your-strong-random-key-here" }
+).Content | ConvertFrom-Json | ConvertTo-Json -Depth 5
 ```
+
+#### 6b. Using curl (Mac/Linux)
+Fetch recent crashes:
+```
+curl -H "Authorization: Bearer your-strong-random-key-here" \
+  "http://localhost:3000/report?limit=20"
+```
+
+Fetch crashes for a specific date:
+```
+curl -H "Authorization: Bearer your-strong-random-key-here" \
+  "http://localhost:3000/report?date=2026-01-28"
+```
+
+Fetch a specific crash by ID:
+```
+curl -H "Authorization: Bearer your-strong-random-key-here" \
+  "http://localhost:3000/report?id=<crash_id>"
+```
+
+#### 6c. Using Postman or similar (GUI method)
+Demonstration video: `https://youtu.be/HjnZlCIdQxQ`
+
+Create a GET request and go to the Headers area.
+Add:
+```
+Key: Authorization
+Value: Bearer your-strong-random-key-here
+```
+
+Fetch recent crashes:
+URL: `http://localhost:3000/report?limit=20`
+
+Fetch crashes for a specific date:
+URL: `http://localhost:3000/report?date=2026-01-28`
+
+Fetch a specific crash by ID:
+URL: `http://localhost:3000/report?id=<crash_id>`
 
 ### Deployment Notes
 This service is deployment-agnostic and works anywhere Docker runs.
 The only requirement is that the path defined by DATA_DIR is backed by persistent storage.
 
 ### Security Notes
-- This service accepts crash reports without authentication by design
+- The `/report` endpoint requires a Bearer API key defined in the .env as `REPORT_API_KEY`
+- The API key must never be exposed in frontend or client-side code
 - Protection is provided through strict validation, payload limits, and rate limiting
-- Crash reports must never contain secrets, tokens, or personal data
+- Crash reports should never contain secrets, tokens, or personal data
