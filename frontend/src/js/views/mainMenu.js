@@ -28,6 +28,7 @@ export class mainMenuView {
         canvas.style.top = "0";
         canvas.style.left = "0";
         canvas.style.zIndex = "-1";
+        canvas.style.filter = "blur(3px)";  // blurs the background
         document.getElementById("mainDiv").appendChild(canvas);
         // Everything else
         workoutMenu();

@@ -20,6 +20,9 @@ export function initMenuBackground() {
   // What renders the scene
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
 
   // Grass plane
   const groundGeometry = new THREE.PlaneGeometry(50, 50);
@@ -40,7 +43,7 @@ export function initMenuBackground() {
   directionalLight.position.set(-2, 5, 3);
   scene.add(directionalLight);
 
-  const pointLight = new THREE.PointLight(0xffffff, 5.0, 3);
+  const pointLight = new THREE.PointLight(0xffffff, 5.0, 1.5);
   pointLight.position.set(-2, 0, 2);
   scene.add(pointLight);
 
