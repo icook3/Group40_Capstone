@@ -22,12 +22,31 @@ button.menuBtn {
   position: fixed;
   top: 23%;
   left: 50%;
-  transform: translateX(-50%) scale(1.2);
+  transform: translateX(-50%);
   z-index: 1000;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
+
+  /* KEY CHANGE: constrain height via top+bottom so scroll appears earlier */
+  bottom: 90px;              /* reserve space for footer */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* When height shrinks, reclaim top space first */
+@media (max-height: 800px) {
+  #main-menu-center {
+    top: 14%;
+  }
+}
+
+@media (max-height: 650px) {
+  #main-menu-center {
+    top: 24px;
+  }
 }
 
 
