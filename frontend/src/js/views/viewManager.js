@@ -21,8 +21,10 @@ export class ViewManager {
 
     //store a list of past screens - starts with main menu
     pastScreens=[];
-
     futureScreens=[];
+
+    //track if you are doing it through code
+    hashChangeThroughCode=false;
     /**
     * Initializes different views
     */
@@ -36,6 +38,7 @@ export class ViewManager {
         this.formerPopStateFunction = window.onpopstate;
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
 
+        this.hashChangeThroughCode=true;
         window.location.hash=this.views.mainMenu;
 
         console.log("Initializing views");
@@ -107,14 +110,14 @@ export class ViewManager {
             //push the current view onto the stack
             this.pastScreens.push(this.currentView);
             console.log("stack contains: ",this.pastScreens);
-            history.pushState({},"");
+            this.hashChangeThroughCode=true;
+            //history.pushState({},"");
         }
         console.groupEnd();
+        
         window.location.hash=view;
-
         this.currentView=view;
     }
-
 
     //handle the favicon - MUST be on initializing area
     darkMode = window.matchMedia("(prefers-color-scheme: dark)");
@@ -131,26 +134,29 @@ export class ViewManager {
       }
     }
     newPopStateFunction(owner, event) {
-        //if you are not actually hitting the back button, but instead are changing the hash
-        if (event.state==null) {
+        console.group();
+        
+        console.log("WINDOW.pastScreens=",owner.pastScreens);
+        console.log("hashChangeThroughCode=",owner.hashChangeThroughCode);
+        //if you are not actually hitting the back button, but instead are changing the hash through code
+        if (owner.hashChangeThroughCode==true) {
             event.preventDefault();
+            console.groupEnd();
+            owner.hashChangeThroughCode=false;
             return;
         }
         //if you are going to a past screen
         if (owner.pastScreens.length==0) {
             //owner.formerPopStateFunction();
+            console.groupEnd();
             return;
-        }
-        console.group();
-        console.log("click back button");
+        }        
         /*
         owner.futureScreens.push(owner.currentView);
         owner.setView(owner.pastScreens.pop());*/
-        console.log("WINDOW.pastScreens=");
-        console.log(owner.pastScreens);
+        console.log("click back button");
         owner.setView(owner.pastScreens.pop(), true);
-        console.log("AFTER");
-        console.log(owner.pastScreens);
+        console.log("AFTER:",owner.pastScreens);
         console.groupEnd();
     }
 }
