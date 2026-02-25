@@ -36,15 +36,16 @@ export class ViewManager {
         this.updateFavicon();
         this.darkMode.addEventListener("change", this.updateFavicon);
 
-        //initialize views
+        
         //change the back button
         this.formerPopStateFunction = window.onpopstate;
-        history.replaceState({idx:this.historyIndex},'');
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
-        this.lastState=window.history.state;
         this.hashChangeThroughCode=true;
         window.location.hash=this.views.mainMenu;
+        history.replaceState({idx:this.historyIndex},'');
+        this.lastState=window.history.state;
 
+        //initialize views
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
         this.viewStorage.zlowScreen = new zlowScreen(false);
@@ -116,12 +117,15 @@ export class ViewManager {
             console.log("stack contains: ",this.pastScreens);
             this.hashChangeThroughCode=true;
             this.historyIndex++;
-            history.replaceState({idx:this.historyIndex},'');
+            
             //history.pushState({},"");
         }
         console.groupEnd();
-        
+
         window.location.hash=view;
+        if (!usingBrowser) {
+            history.replaceState({idx:this.historyIndex},'');
+        }
         this.currentView=view;
     }
 
@@ -144,7 +148,7 @@ export class ViewManager {
         
         console.log("past screens=",owner.pastScreens,"Future screens=",owner.futureScreens);
         console.log("hashChangeThroughCode=",owner.hashChangeThroughCode);
-        console.log("history state=",window.history.state);
+        console.log("history state=",owner.lastState);
         //if you are not actually hitting the back button, but instead are changing the hash through code
         if (owner.hashChangeThroughCode==true) {
             event.preventDefault();
@@ -157,7 +161,7 @@ export class ViewManager {
         let currentState = window.history.state;
         console.log("current state=",currentState);
         //if you are going backwards
-        if (currentState.idx>this.lastState.idx) {
+        if (currentState.idx<=this.lastState.idx) {
             //if you are going to a past screen
             if (owner.pastScreens.length==0) {
                 //owner.formerPopStateFunction();
@@ -169,7 +173,7 @@ export class ViewManager {
             owner.setView(owner.pastScreens.pop(), true);
             console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
             console.groupEnd();
-        } else if (currentState.idx<this.lastState.idx) {
+        } else if (currentState.idx>owner.lastState.idx) {
             if (owner.futureScreens.length==0) {
                 console.groupEnd();
                 return;
@@ -179,7 +183,7 @@ export class ViewManager {
             console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
             console.groupEnd();
         }
-        this.lastState=currentState;
+        owner.lastState=currentState;
     }
 }
 // For browser usage
