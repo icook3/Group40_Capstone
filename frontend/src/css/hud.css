@@ -490,15 +490,59 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   justify-content: center;
   background: rgba(0, 0, 0, 0.7);
   z-index: 9999;
-  pointer-events: none;
+  pointer-events: auto;
+}
+
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  pointer-events: auto;
 }
 
 #pause-overlay .pause-dialog {
-  pointer-events: none;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+#pause-overlay .pause-title {
+  font-family: "Fugaz One", sans-serif;
+  font-size: 3.5rem;
+  color: #e0f7ef;
+  letter-spacing: 0.15em;
+  display: block;
+}
+
+#pause-overlay .pause-accent {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #32ee80, #27ae5f39);
+  border-radius: 2px;
+  margin-top: -16px;
+}
+
+#pause-overlay .pause-resume-btn {
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px 52px;
   font-family: "Nunito", sans-serif;
-  font-weight: 600;
-  font-size: 50px;
-  color: rgb(220, 229, 222);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #e0f7ef;
+  cursor: pointer;
+}
+
+#pause-overlay .pause-resume-btn:hover {
+  background: #2d8e8e;
 }
 
 #milestone-notifications {
