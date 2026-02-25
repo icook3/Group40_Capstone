@@ -1,7 +1,7 @@
 ## Crash Logging Service
 This service provides a minimal, stateless backend for collecting, storing, and inspecting client crash reports.
 
-This service is **NOT** an analytics platform, telemetry pipeline, or metics collector. Its **sole responsibility** 
+This service is **NOT** an analytics platform, telemetry pipeline, or metrics collector. Its **sole responsibility** 
 is to be a reliable crash report intake and storage service.
 
 ### Its Responsibilities Include:
@@ -114,7 +114,9 @@ Invoke-RestMethod -Uri "http://localhost:3000/intake" `
 ```
 
 ### 6. View Stored Crash Reports
-#### 6a. The following commands are to be used in Windows Powershell
+The `/report` endpoint is protected and requires authentication.
+Ways to view reports:
+#### 6a. Windows Powershell
 Fetch recent crashes:
 ```
 (Invoke-WebRequest `
@@ -139,7 +141,7 @@ Fetch a specific crash by ID:
 ).Content | ConvertFrom-Json | ConvertTo-Json -Depth 5
 ```
 
-#### 6b. Using curl (Mac/Linux)
+#### 6b. curl (Mac/Linux)
 Fetch recent crashes:
 ```
 curl -H "Authorization: Bearer your-strong-random-key-here" \
@@ -184,5 +186,6 @@ The only requirement is that the path defined by DATA_DIR is backed by persisten
 ### Security Notes
 - The `/report` endpoint requires a Bearer API key defined in the .env as `REPORT_API_KEY`
 - The API key must never be exposed in frontend or client-side code
+- The `/intake` endpoint is intentionally unauthenticated to allow client crash submission.
 - Protection is provided through strict validation, payload limits, and rate limiting
 - Crash reports should never contain secrets, tokens, or personal data
