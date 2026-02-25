@@ -179,6 +179,7 @@ export class ViewManager {
                 return;
             }
             console.log("click forwards button");
+            owner.pastScreens.push(owner.currentView);
             owner.setView(owner.futureScreens.pop(), true);
             console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
             console.groupEnd();
