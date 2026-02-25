@@ -85,7 +85,7 @@ export class ObjectField {
     if (!this.initialized || riderSpeed === 0 || dt === 0) return;
 
     const riderEl = document.getElementById("scene").object3D.getObjectByName('rider');
-    const riderZ = getPos(riderEl).z;
+    const riderZ = riderEl.position.z;
     const recycleZ = riderZ + 20;
 
     // Cache Date.now once
