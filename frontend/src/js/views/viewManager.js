@@ -136,12 +136,13 @@ export class ViewManager {
     newPopStateFunction(owner, event) {
         console.group();
         
-        console.log("WINDOW.pastScreens=",owner.pastScreens);
+        console.log("past screens=",owner.pastScreens,"Future screens=",owner.futureScreens);
         console.log("hashChangeThroughCode=",owner.hashChangeThroughCode);
         //if you are not actually hitting the back button, but instead are changing the hash through code
         if (owner.hashChangeThroughCode==true) {
             event.preventDefault();
             console.groupEnd();
+            owner.futureScreens=[];
             owner.hashChangeThroughCode=false;
             return;
         }
@@ -151,12 +152,11 @@ export class ViewManager {
             console.groupEnd();
             return;
         }        
-        /*
-        owner.futureScreens.push(owner.currentView);
-        owner.setView(owner.pastScreens.pop());*/
+        
         console.log("click back button");
+        owner.futureScreens.push(owner.currentView);
         owner.setView(owner.pastScreens.pop(), true);
-        console.log("AFTER:",owner.pastScreens);
+        console.log("AFTER: past screens=",owner.pastScreens, "Future screens=",owner.futureScreens);
         console.groupEnd();
     }
 }
