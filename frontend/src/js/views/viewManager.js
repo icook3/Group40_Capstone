@@ -16,7 +16,7 @@ export class ViewManager {
     views = {changelog: "#changelog", peerConnect: "#peerConnect", mainMenu: "#mainMenu", playerCustomization: "#playerCustomization", mainZlow: "#mainZlow"};
 
     viewStorage = new ViewStorage();
-    currentView = this.views.mainMenu;
+    currentView;
     formerPopStateFunction;
 
     //store a list of past screens - starts with main menu
@@ -47,18 +47,55 @@ export class ViewManager {
         this.formerPopStateFunction = window.onpopstate;
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
         this.hashChangeThroughCode=true;
-        window.location.hash=this.views.mainMenu;
+        //if there is not already a hash, set one
+        if (window.location.hash=='') {
+            window.location.hash=this.views.mainMenu;
+        }
         history.replaceState({idx:this.historyIndex},'');
         this.lastState=window.history.state;
         this.hashChangeThroughCode=false;
 
         //initialize views
         console.log("Initializing views");
-        this.viewStorage.mainMenu = new mainMenuView(true);
-        this.viewStorage.zlowScreen = new zlowScreen(false);
-        this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
-        this.viewStorage.peerConnectScreen = new connectToPeersView(false);
-        this.viewStorage.changelog = new changelogView(false);
+        this.currentView=window.location.hash;
+        switch (window.location.hash) {
+            case this.views.mainMenu:
+                this.viewStorage.mainMenu = new mainMenuView(true);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.zlowScreen:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(true);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.playerCustomization:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(true);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.connectToPeersView:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(true);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.changelog:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(true);
+                break;
+        }
+
     }
 
     setView(view, usingBrowser=false) {
@@ -175,13 +212,13 @@ export class ViewManager {
         console.log("current state=",currentState);
         //if you are going backwards
         if (currentState.idx<=this.lastState.idx) {
+            console.log("click back button");
             //if you are going to a past screen
             if (owner.pastScreens.length==0) {
                 //owner.formerPopStateFunction();
                 //console.groupEnd();
                 return;
             }
-            console.log("click back button");
             owner.futureScreens.push(owner.currentView);
             owner.setView(owner.pastScreens.pop(), true);
             sessionStorage.setItem("pastScreens",JSON.stringify(owner.pastScreens));
