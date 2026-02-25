@@ -30,7 +30,7 @@ export class connectToPeersView {
 
   peerInit() {
     const peerNameInput = document.getElementById("name-input");
-    const connectBtn = document.getElementById("connect-btn");
+    const connectBtn = document.getElementById("connect-btnP");
     const backBtn = document.getElementById("peer-back-btn");
 
     // ✅ Prevent stacking: replace node with a clone (removes old listeners)
