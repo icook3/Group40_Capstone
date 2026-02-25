@@ -368,9 +368,8 @@ export class zlowScreen {
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
-          // this.scene.setPacerSpeed(val);
         });
-    
+
         this.setPacerSpeed(Number(pacerSpeedInput.value));
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
@@ -379,13 +378,11 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val, { getElement });
-          // this.scene.setPacerSpeed(val);
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val, { getElement });
-          //this.scene.setPacerSpeed(val);
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         }
       }

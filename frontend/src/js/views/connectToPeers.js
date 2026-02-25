@@ -1,3 +1,5 @@
+import {features} from "../constants.js";
+
 export class connectToPeersView {
   content;
   ready = false;
@@ -29,6 +31,12 @@ export class connectToPeersView {
   }
 
   peerInit() {
+        // If peer to peer not configured, return to main menu
+        if (!features.peerEnabled) {
+            alert("Peer to peer multiplayer is not set up.");
+            window.viewManager.setView(window.viewManager.views.mainMenu);
+        }
+
     const peerNameInput = document.getElementById("name-input");
     const connectBtn = document.getElementById("connect-btnP");
     const backBtn = document.getElementById("peer-back-btn");
