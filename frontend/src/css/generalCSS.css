@@ -7,3 +7,8 @@
     font-family: "Fugaz One", sans-serif;
     font-size: 1.5em;
 }
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
