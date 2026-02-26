@@ -435,6 +435,7 @@ export class zlowScreen {
       const pauseBtn = document.getElementById("pause-btn");
       const resumeBtn = document.getElementById("pause-resume-btn");
       const overlay = document.getElementById("pause-overlay");
+      const dialog = overlay.querySelector(".pause-dialog");
 
       const pauseGame = () => {
         simulationState.isPaused = true;
@@ -443,16 +444,27 @@ export class zlowScreen {
         this.setPacerSpeed(0);
         overlay.style.display = "flex";
         overlay.setAttribute("aria-hidden", "false");
+        dialog.classList.remove("zoom-out");
+        dialog.classList.add("zoom-in");
       };
 
       const resumeGame = () => {
+        dialog.classList.remove("zoom-in");
+        dialog.classList.add("zoom-out");
+
+        // This block helps with pause overlay animation finishing before hiding away
+        dialog.addEventListener("animationend", function handler() {
+          dialog.removeEventListener("animationend", handler);
+          overlay.style.display = "none";
+          overlay.setAttribute("aria-hidden", "true");
+          dialog.classList.remove("zoom-out");
+        });
+
         simulationState.isPaused = false;
         pauseBtn.textContent = "Pause";
         constants.lastTime = Date.now();
         this.hud.resume();
         this.setPacerSpeed(savedPacerSpeed);
-        overlay.style.display = "none";
-        overlay.setAttribute("aria-hidden", "true");
       };
 
       pauseBtn.addEventListener("click", () => {
