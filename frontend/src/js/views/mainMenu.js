@@ -1,6 +1,6 @@
 import {workoutMenu} from "../workoutMenu.js";
 import { StandardMode } from "../standardMode.js";
-import { constants } from "../constants.js";
+import {constants, features} from "../constants.js";
 import { Strava } from "../strava.js";
 import { initMenuBackground } from "../scene/mainMenuBackground.js";
 
@@ -36,6 +36,7 @@ export class mainMenuView {
         this.initStravaButton().catch((error)=> {
             console.error("init Strava button failed");
         });
+        this.initPeerButtons();
     }
 
     reset() {}
@@ -53,28 +54,6 @@ export class mainMenuView {
             sessionStorage.setItem("Trainer", JSON.stringify(standardMode.trainer));
             //const ok = await standardMode.trainer.connect();
             //if (ok) connectBtn.disabled = true;
-        });
-
-        // Host P2P toggle
-        const peerToggle = document.getElementById("peer-toggle");
-        // Sync with stored state on load
-        peerToggle.checked = sessionStorage.getItem("peerToPeer") === "true";
-
-        peerToggle.addEventListener("change", () => {
-            sessionStorage.setItem("peerToPeer", peerToggle.checked);
-            jQuery("#peer-name").fadeToggle(500);
-        });
-
-        const peerNameInput = document.getElementById("name-input");
-        peerNameInput.addEventListener("input", () => {
-            localStorage.setItem("Name",peerNameInput.value);
-        });
-
-        peerNameInput.addEventListener("change", () => {
-            const name = peerNameInput.value.trim();
-            if (name.length === 0) {
-                alert("Name cannot be empty");
-            }
         });
 
         //Test Mode
@@ -148,19 +127,14 @@ export class mainMenuView {
                 }
             });
         });
-        // power
-        //uncomment the following code if alternate units for power are implemented
-        /*
-        const powerUnitInput = document.getElementById("unitInputPower");
-        if (powerUnitInput) {
-            powerUnitInput.addEventListener("input", () => {
-                sessionStorage.setItem("PowerUnit", powerUnitInput.value);
-            });
-        }
-        */
     }
 
     async initStravaButton() {
+        if (!features.stravaEnabled) {
+            const stravaBtn = document.getElementById("connect-strava-btn");
+            stravaBtn.style.display = "none";
+        }
+
         const strava = new Strava();
         Strava.loadFromRedirect();
         strava.loadToken();
@@ -187,5 +161,44 @@ export class mainMenuView {
             stravaBtn.disabled = false;
             stravaBtn.addEventListener("click", () => strava.startOAuth());
         }
+    }
+
+    initPeerButtons() {
+        // If peer to peer not configured, hide it
+        if (!features.peerEnabled) {
+            // Connect to Peer
+            const peerConnectBtn = document.getElementById("peer-connect-btn");
+            peerConnectBtn.style.display = "none";
+
+            const peerSection = document.getElementById("peer-section");
+            if (peerSection) {
+                peerSection.style.display = "none";
+            }
+
+            return;
+        }
+
+        // Host P2P toggle
+        const peerToggle = document.getElementById("peer-toggle");
+
+        // Sync with stored state on load
+        peerToggle.checked = sessionStorage.getItem("peerToPeer") === "true";
+
+        peerToggle.addEventListener("change", () => {
+            sessionStorage.setItem("peerToPeer", peerToggle.checked);
+            jQuery("#peer-name").fadeToggle(500);
+        });
+
+        const peerNameInput = document.getElementById("name-input");
+        peerNameInput.addEventListener("input", () => {
+            localStorage.setItem("Name",peerNameInput.value);
+        });
+
+        peerNameInput.addEventListener("change", () => {
+            const name = peerNameInput.value.trim();
+            if (name.length === 0) {
+                alert("Name cannot be empty");
+            }
+        });
     }
 }

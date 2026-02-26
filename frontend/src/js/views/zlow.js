@@ -53,7 +53,6 @@ export class zlowScreen {
     conn;
 
     loopRunning=false;
-    darkMode = window.matchMedia("(prefers-color-scheme: dark)");
 
     constructor(setWhenDone) {
         fetch("../html/zlow.html").then((content)=> {
@@ -88,19 +87,6 @@ export class zlowScreen {
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
         
-    }
-
-    updateFavicon() {
-      const favicon = document.querySelector('link[rel="icon"]');
-      if (!favicon) {
-        return;
-      }
-
-      if (this.darkMode.matches) {
-        favicon.href = "../../resources/favicons/ZlowFavicon-dark.svg";
-      } else {
-        favicon.href = "../../resources/favicons/ZlowFavicon.svg";
-      }
     }
 
     activatePacer() {
@@ -148,6 +134,7 @@ export class zlowScreen {
             isPacer: false,
           });
           this.pacer.creator.loadOtherData(data.data);
+          this.pacerPhysics = new PhysicsEngine();
           if (this.peerState==1) {
             this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
@@ -157,7 +144,7 @@ export class zlowScreen {
           if (this.pacer==null) {
             return;
           }
-          activatePacer();
+          this.activatePacer();
           this.pacer.setSpeed(Number(data.data));
           this.pacerPhysics.setSpeed(Number(data.data));
           //console.log(this.pacer.speed);
@@ -276,7 +263,7 @@ export class zlowScreen {
                       return;
                   }
     
-                  recieveData(data);
+                  this.recieveData(data);
               });
               this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
             });
@@ -328,7 +315,7 @@ export class zlowScreen {
             console.log("Peer JOINED lobby:", connection.peer);
     
             // Immediately listen for messages
-            this.conn.on("data", data => recieveData(data));
+            this.conn.on("data", data => this.recieveData(data));
     
             // Send host's player data back
             this.conn.send({
@@ -381,9 +368,8 @@ export class zlowScreen {
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
-          // this.scene.setPacerSpeed(val);
         });
-    
+
         this.setPacerSpeed(Number(pacerSpeedInput.value));
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
@@ -392,13 +378,11 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val, { getElement });
-          // this.scene.setPacerSpeed(val);
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val, { getElement });
-          //this.scene.setPacerSpeed(val);
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         }
       }
@@ -563,6 +547,7 @@ export class zlowScreen {
         });
       }
     }
+    
     setupPacerSyncButton() {
       const pacerSyncBtn = document.getElementById("pacer-sync-btn");
       pacerSyncBtn.addEventListener("click", () => {
@@ -574,9 +559,10 @@ export class zlowScreen {
     
           // Set pacer constants to rider constants and adjust animation
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-          this.pacer.avatarEntity.removeAttribute("animation__1");
-          this.pacer.avatarEntity.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
+          document.getElementById('pacer-speed').value = constants.riderState.speed;
+          //pacerPhysics.setSpeed(constants.riderState.speed);
+          this.pacer.avatarEntity.removeAttribute("animation__2");
+          this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay: true;`);
           this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
         }
         if (this.connected) {
@@ -744,8 +730,6 @@ export class zlowScreen {
           });
         },
       });*/
-      this.updateFavicon();
-      this.darkMode.addEventListener("change", this.updateFavicon);
       
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
