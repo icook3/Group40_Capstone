@@ -72,6 +72,40 @@ a-scene.customizationScene {
   font-family: "Fugaz One", sans-serif;
 }
 
+
+/*On tiny screens*/
+@media only screen and (max-width: 550px) {
+    #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 20%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:75%;
+
+  }
+
+  #bikeContainer {
+    position: fixed;
+    left: 2%;
+    top: 80%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:75%;
+  }
+  #bikeControls, #playerControls {
+    width: 150px;
+  }
+}
+
 /*Make the controls smaller on smaller screens*/
 @media only screen and (min-width: 550px) {
   #playerContainer {
@@ -186,3 +220,8 @@ input[type="color"] {
   transition: filter 0.15s ease;
 }
 
+div.customizeBody {
+  height: 100%;
+  margin:0;
+  overflow:hidden;
+}
