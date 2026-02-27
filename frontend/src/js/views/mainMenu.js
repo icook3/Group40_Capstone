@@ -70,12 +70,12 @@ export class mainMenuView {
 
         // Pacer speed input
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        autoResizeInput(pacerSpeedInput);
+        resizeInput(pacerSpeedInput);
         restrictNumberInput(pacerSpeedInput, 2, 1, 99.9);
 
         // Weight input
         const riderWeightInput = document.getElementById("rider-weight");
-        autoResizeInput(riderWeightInput)
+        resizeInput(riderWeightInput)
         restrictNumberInput(riderWeightInput, 3, 1, 999.9);
 
         // Units input
@@ -202,14 +202,17 @@ function restrictNumberInput(input, maxDigits, min, max) {
             return;
         }
 
-        autoResizeInput(input)
+        resizeInput(input);
 
         sessionStorage.setItem(input.id, input.value);
     });
 
     input.addEventListener("change", () => {
         let num = parseFloat(input.value);
-        if (isNaN(num)) return;
+        if (isNaN(num)) {
+            input.value = min;
+            return;
+        }
 
         num = Math.max(min, Math.min(max, num));
         input.value = num;
@@ -222,13 +225,7 @@ function restrictNumberInput(input, maxDigits, min, max) {
     });
 }
 
-function autoResizeInput(input) {
-    const resize = () => {
-        const length = String(input.value ?? "").length;
-        input.style.width = 4 + (length + 1) + "ch";
-    };
-
-    input.addEventListener("input", resize);
-    input.addEventListener("change", resize);
-    resize();
+function resizeInput(input) {
+    const length = String(input.value ?? "").length;
+    input.style.width = 4 + (length + 1) + "ch";
 }
