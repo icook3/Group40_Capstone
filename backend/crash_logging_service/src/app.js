@@ -1,10 +1,15 @@
 import cors from "cors";
 import express from "express";
 
+import authenticateReportService from "./services/authenticateReportService.js";
 import intakeRoutes from "./routes/intakeRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 
 const app = express(); // Create express app
+
+// App configuration
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
 
 // Health check
 app.get("/crashLoggingHealth",
@@ -17,7 +22,6 @@ app.get("/crashLoggingHealth",
     }
 );
 
-// CORS only needed for crash intake
 app.use("/intake", cors({
     origin: process.env.FRONTEND_URI,
     methods: ["POST", "OPTIONS"],
@@ -28,8 +32,8 @@ app.use("/intake", express.json({
 }));
 app.use("/intake", intakeRoutes);
 
-// No CORS here. This is for admin tooling
-app.use("/report", reportRoutes);
+
+app.use("/report", authenticateReportService, reportRoutes);
 
 
 export default app;
