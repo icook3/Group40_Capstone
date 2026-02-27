@@ -72,7 +72,8 @@ a-scene.customizationScene {
   font-family: "Fugaz One", sans-serif;
 }
 
-@media only screen and (min-width: 620px) {
+/*Make the controls smaller on smaller screens*/
+@media only screen and (min-width: 550px) {
   #playerContainer {
     position: fixed;
     left: 2%;
@@ -83,6 +84,8 @@ a-scene.customizationScene {
     align-items: center;
     padding: 15px 25px;
     border-radius: 10px;
+    font-size:75%;
+
   }
 
   #bikeContainer {
@@ -95,6 +98,10 @@ a-scene.customizationScene {
     align-items: center;
     padding: 15px 25px;
     border-radius: 10px;
+    font-size:75%;
+  }
+  #bikeControls, #playerControls {
+    width: 150px;
   }
 }
 @media only screen and (min-width: 900px) {
@@ -108,6 +115,8 @@ a-scene.customizationScene {
     align-items: center;
     padding: 15px 25px;
     border-radius: 10px;
+    font-size:130%;
+    width:200px;
   }
 
   #bikeContainer {
@@ -120,6 +129,11 @@ a-scene.customizationScene {
     align-items: center;
     padding: 15px 25px;
     border-radius: 10px;
+    font-size:130%;
+  }
+
+  #bikeControls, #playerControls {
+    width: 200px;
   }
 }
 #bikeControls,
@@ -130,10 +144,7 @@ a-scene.customizationScene {
 
   background: rgb(53, 72, 79);
   padding: 15px;
-  border-radius: 30px;
-  width: 200px;
-
-  font-size: x-large;
+  border-radius: 30px;  
   gap: 8px;
 }
 
@@ -143,7 +154,6 @@ a-scene.customizationScene {
   align-items: center;
   color: rgb(220, 229, 222);
   font-family: "Nunito", sans-serif;
-  font-size: 1em;
   gap: 12px;
 }
 
