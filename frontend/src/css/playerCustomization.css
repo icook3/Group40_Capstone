@@ -72,30 +72,56 @@ a-scene.customizationScene {
   font-family: "Fugaz One", sans-serif;
 }
 
-#playerContainer {
-  position: fixed;
-  left: 2%;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px 25px;
-  border-radius: 10px;
-}
+@media only screen and (min-width: 620px) {
+  #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 20%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+  }
 
-#bikeContainer {
-  position: fixed;
-  right: 2%;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px 25px;
-  border-radius: 10px;
+  #bikeContainer {
+    position: fixed;
+    right: 2%;
+    top: 20%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+  }
 }
+@media only screen and (min-width: 900px) {
+  #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+  }
 
+  #bikeContainer {
+    position: fixed;
+    right: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+  }
+}
 #bikeControls,
 #playerControls {
   display: flex;
