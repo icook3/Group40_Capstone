@@ -43,6 +43,9 @@ export class ViewManager {
         if (sessionStorage.getItem("futureScreens")!=null) {
             this.futureScreens=JSON.parse(sessionStorage.getItem("futureScreens"));
         }
+        if (sessionStorage.getItem("historyIndex")!=null) {
+            this.historyIndex=Number(sessionStorage.getItem("historyIndex"));
+        }
         //change the back button
         this.formerPopStateFunction = window.onpopstate;
         window.onpopstate = (event)=>this.newPopStateFunction(this, event);
@@ -162,6 +165,7 @@ export class ViewManager {
             this.hashChangeThroughCode=true;
             this.historyIndex++;
             sessionStorage.setItem("pastScreens",JSON.stringify(this.pastScreens));
+            sessionStorage.setItem("historyIndex",this.historyIndex);
             //history.pushState({},"");
         }
         //console.groupEnd();
