@@ -214,6 +214,12 @@ function restrictNumberInput(input, maxDigits, min, max) {
         num = Math.max(min, Math.min(max, num));
         input.value = num;
     });
+
+    input.addEventListener("keydown", (e) => {
+        if (["e", "E", "+", "-"].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
 }
 
 function autoResizeInput(input) {
