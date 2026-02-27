@@ -69,9 +69,13 @@ export class mainMenuView {
         });
         //Pacer speed input
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        pacerSpeedInput.addEventListener("input", () => {
-            sessionStorage.setItem("PacerSpeed", pacerSpeedInput.value);
-        });
+        if (pacerSpeedInput) {
+            pacerSpeedInput.addEventListener("input", () => {
+                sessionStorage.setItem("PacerSpeed", pacerSpeedInput.value);
+            });
+
+            autoResizeInput(pacerSpeedInput);
+        };
         //weight input
         // Hook up live mass updates → optional immediate speed recompute
         const riderWeightEl = document.getElementById("rider-weight");
@@ -86,6 +90,7 @@ export class mainMenuView {
             updateMassAndMaybeSpeed();
             riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
             riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
+            autoResizeInput(riderWeightEl);
         }
 
         // Units input
@@ -127,6 +132,17 @@ export class mainMenuView {
                 }
             });
         });
+
+        function autoResizeInput(input) {
+            const resize = () => {
+                const length = String(input.value ?? "").length;
+                input.style.width = 4 + (length + 1) + "ch";
+            };
+
+            input.addEventListener("input", resize);
+            input.addEventListener("change", resize);
+            resize();
+        }
     }
 
     async initStravaButton() {
