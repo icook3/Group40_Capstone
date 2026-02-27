@@ -2,6 +2,7 @@ import {workoutMenu} from "../workoutMenu.js";
 import { StandardMode } from "../standardMode.js";
 import {constants, features} from "../constants.js";
 import { Strava } from "../strava.js";
+import { initMenuBackground } from "../scene/mainMenuBackground.js";
 
 export class mainMenuView {
     content;
@@ -20,6 +21,16 @@ export class mainMenuView {
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
+        
+        // Three.js background
+        const canvas = initMenuBackground();
+        canvas.style.position = "fixed";
+        canvas.style.top = "0";
+        canvas.style.left = "0";
+        canvas.style.zIndex = "-1";
+        canvas.style.filter = "blur(3px)";  // blurs the background
+        document.getElementById("mainDiv").appendChild(canvas);
+        // Everything else
         workoutMenu();
         this.initSettings();
         this.initStravaButton().catch((error)=> {
