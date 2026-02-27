@@ -24,14 +24,63 @@ export class ViewManager {
         //set up the favicon
         this.updateFavicon();
         this.darkMode.addEventListener("change", this.updateFavicon);
-
         //initialize views
         console.log("Initializing views");
-        this.viewStorage.mainMenu = new mainMenuView(true);
-        this.viewStorage.zlowScreen = new zlowScreen(false);
-        this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
-        this.viewStorage.peerConnectScreen = new connectToPeersView(false);
-        this.viewStorage.changelog = new changelogView(false);
+        if (sessionStorage.getItem("currentView")!=null) {
+            this.currentView=sessionStorage.getItem("currentView");
+        } else {
+            this.currentView=this.views.mainMenu;
+            sessionStorage.setItem("currentView",this.views.mainMenu);
+        }
+        switch(this.currentView) {
+            case this.views.mainMenu:
+                this.viewStorage.mainMenu = new mainMenuView(true);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.changelog:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(true);
+                break;
+            case this.views.peerConnect:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(true);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.playerCustomization:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(true);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.mainZlow:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(true);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            default:
+                console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
+                this.viewStorage.mainMenu = new mainMenuView(true);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.currentView=this.views.mainMenu;
+                sessionStorage.setItem("currentView",this.views.mainMenu);
+                break;
+        }
+        
+
     }
 
     setView(view) {
@@ -87,6 +136,7 @@ export class ViewManager {
         }
 
         this.currentView=view;
+        sessionStorage.setItem("currentView",this.currentView);
     }
 
 
