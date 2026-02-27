@@ -109,22 +109,48 @@ update_rider_animation() {
     );
     return;
   }
-  console.log("COORDS")
-  // Animate rider using tween.js
   
+  // Increment current track piece and define starting and ending coordinates
+
+  constants.currentTrackPiece += 1;
   let coords = {x: 0, y: 0, z: 0};
-  console.log(coords)
-  let endpoint = { x: constants.currentTrackPiece.x, y: constants.currentTrackPiece.y, z: constants.currentTrackPiece.z }
-  
-  const animateRider = new Tween(coords, false) // Create a new tween that modifies 'coords'.
-		.to(endpoint, 1000)
+
+  if (constants.currentTrackPiece > 0) {
+    coords = { x: constants.trackPoints[constants.currentTrackPiece - 1].x, y: constants.trackPoints[constants.currentTrackPiece - 1].y, z: constants.trackPoints[constants.currentTrackPiece - 1].z }
+  }
+
+  //console.log("COORDS")
+  //console.log(coords)
+
+  let endpoint = { x: constants.trackPoints[constants.currentTrackPiece].x, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z }
+  //console.log("ENDPOINT")
+  //console.log(endpoint)
+
+  let riderDuration = 0;
+
+  if (constants.riderState.speed > 0) {
+    riderDuration = Math.round((constants.trackPoints[constants.currentTrackPiece].length / constants.riderState.speed) * 1500);
+  }
+
+  else {
+    riderDuration = 700;
+  }
+
+  //console.log("DUR" + riderDuration)
+
+  const animateRider = new Tween(coords, false)
+		.to(endpoint, riderDuration)
 		.onUpdate(() => {
       avatar.position.set(coords.x, coords.y, coords.z)
-      // Add a separate tween to deal with camera??
-      camera.setAttribute('position', `${coords.x} ${coords.y + 5} ${coords.z + 7}`)
+      
+      // Have camera follow the rider's position. Rider starts at 0 0 0; camera at -0.5 6 5
+      camera.setAttribute('position', `${coords.x-0.5} ${coords.y + 6} ${coords.z + 5}`)
+
+      
 		})
     .onComplete(() => {
-      resetAnimation();
+      // Recall this function as long as the program is in use.
+      this.update_rider_animation();
     
     })
 		.start()
@@ -136,25 +162,6 @@ update_rider_animation() {
 	}
 
 	requestAnimationFrame(animate)
-
-    // Helper function to reset tween when rider reaches end of the track
-    function resetAnimation() {
-      console.log("HIT")
-      coords = { x: constants.trackPoints[constants.currentTrackPiece].x, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z };
-      constants.currentTrackPiece += 1;
-      const riderDuration = Math.round((constants.currentTrackPiece.length / constants.riderState.speed) * 1500);
-      const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
-      
-      endpoint = { x: constants.trackPoints[constants.currentTrackPiece].x, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z };
-      console.log(animateRider)
-      animateRider.start();
-
-      //console.log(avatar.position)
-      
-      console.log(constants.trackPoints[constants.currentTrackPiece])
-      //console.log(rider.position)
-      console.log("DUR " + constants.riderState.speed)
-    }
 
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)
