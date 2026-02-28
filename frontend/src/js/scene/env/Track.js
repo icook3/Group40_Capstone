@@ -91,7 +91,6 @@ update_rider_animation() {
   // Update camera call when it transitions to three.js
   const avatar = document.getElementById("scene").object3D.getObjectByName('rider');
   let camera = document.getElementById('camera');
-
   
   // Check for rider to prevent util.js crash and ensure at least 10 track points left
   if (!avatar) return; 

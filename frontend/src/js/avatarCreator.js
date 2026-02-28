@@ -86,7 +86,10 @@ export class AvatarCreator {
 
     //Creates avatar entity
     createEntity() {
+
+        // WAIT FOR SCENE TO SPAWN BEFORE YOU TRY TO CREATE THE THING?? -- LOGIC IS IN playerCustomizationView
         const scene = document.getElementById("scene").object3D
+        console.log(scene);
 
         const avatar = new THREE.Group();
         avatar.name = this.id;
