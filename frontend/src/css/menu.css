@@ -21,21 +21,25 @@ button.menuBtn {
 #main-menu-center {
   position: fixed;
   top: 23%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
 
+  /* NEW centering (no transform) */
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
 
-  /* KEY CHANGE: constrain height via top+bottom so scroll appears earlier */
-  bottom: 90px;              /* reserve space for footer */
+  /* Your “scroll appears” behavior */
+  bottom: 90px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-
 /* When height shrinks, reclaim top space first */
 @media (max-height: 800px) {
   #main-menu-center {
@@ -105,11 +109,12 @@ button.menuBtn {
     other settings
 */
 #menu-settings {
-  position: absolute;
+  position: fixed; /* was: absolute */
   top: 40%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 2000; /* optional but safer than 1000 */
+
   background: rgb(53, 72, 79);
   padding: 20px 24px;
   border-radius: 20px;
@@ -123,6 +128,10 @@ button.menuBtn {
   font-size: 0.85rem;
   font-weight: 600;
   opacity: 0;
+
+  /* optional safety so it never runs off-screen */
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 #menu-settings.zoom-in {
