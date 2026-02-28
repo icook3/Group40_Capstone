@@ -37,9 +37,12 @@ export class Track {
     constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
     spawn_track();
 
+    // Set camera position when class is initialized
+    const avatar = document.getElementById("scene").object3D.getObjectByName('rider');
     let camera = document.getElementById('camera');
-    camera.setAttribute('position', `-0.5 6 5`);
-
+    camera.setAttribute('position', `${avatar.position.x} ${avatar.position.y + 4} ${avatar.position.z + 8}`);
+    console.log(avatar.position.x)
+    console.log()
   this._initTimer = setTimeout(() => this.update_rider_animation(), 5000);
   }
 
@@ -73,23 +76,23 @@ export class Track {
   poolReady = false;
 }
 
-
-
-
-
-
-
-
-
-
-
 // Update animation speed and target based on current track piece
 update_rider_animation() {
 
-  // Works to  find avatar
+  // Busywait if the rider is not moving
+  if (constants.riderState.speed === 0) {
+    setTimeout(() => { 
+    this.update_rider_animation();
+    }, 500);
+    return;
+  }
+
+  // Find avatar and camera
+  // Update camera call when it transitions to three.js
   const avatar = document.getElementById("scene").object3D.getObjectByName('rider');
   let camera = document.getElementById('camera');
 
+  
   // Check for rider to prevent util.js crash and ensure at least 10 track points left
   if (!avatar) return; 
 
@@ -98,7 +101,7 @@ update_rider_animation() {
     spawn_track();
   }
 
-  // ---- NEW: guard against out-of-range / undefined ----
+  // Guard against out-of-range and undefined track points
   const tp = constants.trackPoints[constants.currentTrackPiece];
   if (!tp) {
     console.warn(
@@ -111,48 +114,32 @@ update_rider_animation() {
   }
   
   // Increment current track piece and define starting and ending coordinates
-
   constants.currentTrackPiece += 1;
-  let coords = {x: 0, y: 0, z: 0};
-
+  let coords = {x: -0.5, y: 0, z: 0};
   if (constants.currentTrackPiece > 0) {
-    coords = { x: constants.trackPoints[constants.currentTrackPiece - 1].x, y: constants.trackPoints[constants.currentTrackPiece - 1].y, z: constants.trackPoints[constants.currentTrackPiece - 1].z }
+    coords = { x: constants.trackPoints[constants.currentTrackPiece - 1].x - 0.5, y: constants.trackPoints[constants.currentTrackPiece - 1].y, z: constants.trackPoints[constants.currentTrackPiece - 1].z }
   }
+  
+  let endpoint = { x: constants.trackPoints[constants.currentTrackPiece].x - 0.5, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z };
+  let riderDuration = Math.round((constants.trackPoints[constants.currentTrackPiece].length / constants.riderState.speed) * 1500);
 
-  //console.log("COORDS")
-  //console.log(coords)
-
-  let endpoint = { x: constants.trackPoints[constants.currentTrackPiece].x, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z }
-  //console.log("ENDPOINT")
-  //console.log(endpoint)
-
-  let riderDuration = 0;
-
-  if (constants.riderState.speed > 0) {
-    riderDuration = Math.round((constants.trackPoints[constants.currentTrackPiece].length / constants.riderState.speed) * 1500);
-  }
-
-  else {
-    riderDuration = 700;
-  }
-
-  //console.log("DUR" + riderDuration)
-
+  // Animate rider's position over time
   const animateRider = new Tween(coords, false)
 		.to(endpoint, riderDuration)
 		.onUpdate(() => {
       avatar.position.set(coords.x, coords.y, coords.z)
       
       // Have camera follow the rider's position. Rider starts at 0 0 0; camera at -0.5 6 5
-      camera.setAttribute('position', `${coords.x-0.5} ${coords.y + 6} ${coords.z + 5}`)
-
       
-		})
+      camera.setAttribute('position', `${avatar.position.x} ${avatar.position.y + 4} ${avatar.position.z + 8}`);
+    })
     .onComplete(() => {
       // Recall this function as long as the program is in use.
       this.update_rider_animation();
     
     })
+
+    // It is assumed the rider is moving as this function busywaits if speed is 0
 		.start()
 
     // Helper function to move rider
@@ -169,12 +156,6 @@ update_rider_animation() {
     //spawn_track();
   //}
 }
-
-
-
-
-
-
 
   // Create an append a track piece curving to the right
   curve_180_right(spawnZ) {
