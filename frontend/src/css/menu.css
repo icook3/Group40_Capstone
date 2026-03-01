@@ -46,6 +46,9 @@ button.menuBtn {
   flex-direction: column;
   align-items: center;
   text-align: center;
+
+  max-height: 200px; /* enough to fit content */
+  transition: opacity 0.2s ease, max-height 0.2s ease;
 }
 
 #start-wrapper {
@@ -571,8 +574,17 @@ a-scene.menuScene {
 }
 
 /* Hide footer in ultra-short viewports */
-@media (max-height: 520px) {
+@media (max-height: 420px) {
   #menu-footer {
     display: none !important;
+  }
+}
+
+@media (max-height: 580px) {
+  #welcome-msg {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
   }
 }
