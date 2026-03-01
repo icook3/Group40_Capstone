@@ -204,7 +204,9 @@ export class zlowScreen {
             } catch (e) {
                 aframeStats = { error: "failed to read aframe stats" };
             }
-            tempPeerState=this.peerState;
+
+            let tempPeerState = this.peerState;
+
             return {
                 workout: sessionStorage.getItem("SelectedWorkout") || "free",
                 samples: rideHistory.samples?.length,
