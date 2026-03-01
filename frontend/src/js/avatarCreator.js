@@ -63,7 +63,7 @@ export class AvatarCreator {
 
         //Player and bike colors
         this.playerModel = "male";
-        this.skinColor = "#ff5500";
+        this.skinColor = "#e801a3";
         this.shirtColor = "#ff0000";
         this.shortsColor = "#000000";
         this.shoesColor = "#000000";
@@ -86,11 +86,6 @@ export class AvatarCreator {
 
     //Creates avatar entity
     createEntity() {
-
-        // WAIT FOR SCENE TO SPAWN BEFORE YOU TRY TO CREATE THE THING?? -- LOGIC IS IN playerCustomizationView
-        const scene = document.getElementById("scene").object3D
-        console.log(scene);
-
         const avatar = new THREE.Group();
         avatar.name = this.id;
         avatar.position.x = this.position.x;
@@ -100,12 +95,12 @@ export class AvatarCreator {
         avatar.rotation.y = this.rotation.y;
         avatar.rotation.z = this.rotation.z;
         avatar.frustumCulled = false;
-        scene.add(avatar)
 
         this.createPlayerModel(avatar);
         this.createBikeModel(avatar);
-        //console.log(avatar)
-
+        
+        //Don't try to access scene until the end of this function, or it will crash
+        document.querySelector('a-scene').object3D.add(avatar);
         return avatar;
     }
 
@@ -199,6 +194,9 @@ export class AvatarCreator {
         });
     }
 
+
+    
+
     setPlayerModel(model) {
         this.playerModel = model;
         if (this.avatarEntity) {
@@ -212,23 +210,37 @@ export class AvatarCreator {
         this.savePlayerData();
     }
 
+    // DOESN'T SEEM TO DO ANYTHING
     setPlayerColors(skin, shirt, shorts, shoes) {
         this.skinColor = skin;
         this.shirtColor = shirt;
         this.shortsColor = shorts;
-        this.shoesColor = shoes;
+        this.shoesColor = '#e801a3';
 
         this.applyPlayerColors();
         this.savePlayerData();
     }
 
     applyPlayerColors() {
-        if (!this.personModel || !this.personModel.object3D) {
+        
+
+        if (!this.avatarEntity) {
             return;
         }
 
-        this.personModel.object3D.traverse((child) => {
+
+        console.log("HIT")
+        console.log(this.avatarEntity)
+
+        
+
+
+
+        this.avatarEntity.traverse((child) => {
             if (child.isMesh && child.material) {
+
+                
+
                 if (child.material.name.includes("Skin")) child.material.color.set(this.skinColor);
                 if (child.material.name.includes("Shirt")) child.material.color.set(this.shirtColor);
                 if (child.material.name.includes("Shorts")) child.material.color.set(this.shortsColor);
@@ -431,11 +443,14 @@ applyHelmetColors() {
         this.leftFoot.rotation.x = -pi / 6;
     }
 
-
+    // Initialize the avatar's position in the editing menu
     setMenuPosition() {
-        this.avatarEntity.setAttribute('position', `0 0 0`);
-        this.avatarEntity.setAttribute('rotation', `0 180 0`);
-
+        this.avatarEntity.position.x = 0;
+        this.avatarEntity.position.y = 0;
+        this.avatarEntity.position.z = 0;
+        this.avatarEntity.rotation.x = 0;
+        this.avatarEntity.rotation.y = 180;
+        this.avatarEntity.rotation.z = 0;
         this.setInitialPose();
     }
 
@@ -444,18 +459,18 @@ applyHelmetColors() {
         this.rotationSpeed = speed;
     }
 
+    // Rotate avatar -- DOES NOT WORK
     startRotationLoop() {
         if (this._rotationLoopRunning) return;
         this._rotationLoopRunning = true;
 
         const rotate = () => {
             if (this.avatarEntity && this.autoRotate) {
-                const rot = this.avatarEntity.getAttribute('rotation');
-                this.avatarEntity.setAttribute('rotation', {
-                    x: rot.x,
-                    y: rot.y + this.rotationSpeed,
-                    z: rot.z
-                });
+                let rotY = this.avatarEntity.position.y + this.rotationSpeed;
+
+                //const rot = this.avatarEntity.getAttribute('rotation');
+                this.avatarEntity.rotation.y = rotY;
+
             }
             requestAnimationFrame(rotate);
         };

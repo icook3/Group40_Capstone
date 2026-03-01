@@ -118,9 +118,18 @@
     <!-- Pause overlay -->
     <div id="pause-overlay" aria-hidden="true">
       <div class="pause-dialog">
-        Resuming in <span id="pause-countdown">10</span>…
+        <div class="pause-branding">
+          <div class="pause-subtitle">
+            <img src="../../resources/favicons/ZlowFavicon.svg" alt="Z" class="pause-logo" />
+            <span>low</span>
+          </div>
+          <span class="pause-title">PAUSED</span>
+        </div>
+        <div class="pause-accent"></div>
+        <button id="pause-resume-btn" class="pause-resume-btn">Resume</button>
       </div>
     </div>
+    
   </div>
 
 
@@ -201,7 +210,7 @@
     </div>
 
     <!-- Generate starting scene -->
-    <a-scene id="scene" animation-timeline__1="timeline: #avatarMotion">
+    <a-scene id="scene">
       <a-assets id="scene_assets">
         <!-- Add textures used to create the track and grass -->
         <img id="track-texture" src="../../resources/textures/Track.jpeg" />

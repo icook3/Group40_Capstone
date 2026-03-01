@@ -21,6 +21,11 @@ export class ViewManager {
     * Initializes different views
     */
     initViews() {
+        //set up the favicon
+        this.updateFavicon();
+        this.darkMode.addEventListener("change", this.updateFavicon);
+
+        //initialize views
         console.log("Initializing views");
         this.viewStorage.mainMenu = new mainMenuView(true);
         this.viewStorage.zlowScreen = new zlowScreen(false);
@@ -84,6 +89,21 @@ export class ViewManager {
         this.currentView=view;
     }
 
+
+    //handle the favicon - MUST be on initializing area
+    darkMode = window.matchMedia("(prefers-color-scheme: dark)");
+    updateFavicon() {
+      const favicon = document.querySelector('link[rel="icon"]');
+      if (!favicon) {
+        return;
+      }
+
+      if (this.darkMode.matches) {
+        favicon.href = "../../resources/favicons/ZlowFavicon-dark.svg";
+      } else {
+        favicon.href = "../../resources/favicons/ZlowFavicon.svg";
+      }
+    }
     
 }
 // For browser usage
