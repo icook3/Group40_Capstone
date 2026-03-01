@@ -580,3 +580,19 @@ a-scene.menuScene {
     pointer-events: none;
   }
 }
+
+@media (max-width: 300px), (max-height: 400px) {
+  body::before {
+    content: "Window too small for optimal experience";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 0.75rem;
+    text-align: center;
+    z-index: 9999;
+  }
+}
