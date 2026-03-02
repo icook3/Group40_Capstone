@@ -1,44 +1,39 @@
-// js/workouts/RampTestController.js
-
-export class RampTestController {
+export class SprintIntervalController {
   constructor({
     hud,
     nowMs = Date.now(),
     warmupSeconds = 5 * 60,
-    startWatts = 100,
-    stepWatts = 20,
-    stepSeconds = 60,
+    secondOn = 10,
+    useWatts = 20,
+    secondsOff = 10,
     ftpFactor = 0.75,
-    
+    wattsOff = 0
   } = {}) {
     this.hud = hud;
 
-    this.phase = "warmup";      // "warmup" | "ramp" | "finished"
-    this.startWatts = startWatts;
-    this.stepWatts = stepWatts;
-    this.stepSeconds = stepSeconds;
+    this.phase = "warmup";      // "warmup" | "on" | "off" | "finished"
+    this.secondOn = secondOn;
+    this.useWatts = useWatts;
+    this.secondsOff = secondsOff;
     this.ftpFactor = ftpFactor;
-
-    this.rampStartTimeMs = null;
-    this.lastStepChangeMs = null;
-    this.currentStep = -1;
 
     this.earlyExitWatts = 120;
     this.earlyExitDurationSec = 30;
     this.aboveThresholdAccumSec = 0;
     this.lastUpdateMs = nowMs;
+    this.wattsOff = wattsOff;
 
     // Kick off warmup countdown in the overlay
     if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
       this.hud.showWarmupCountdown({
         seconds: warmupSeconds,
         onDone: () => {
-          this._startRamp();
+          this._startSprintIntervals();
         },
       });
     } else {
       // Fallback: if HUD can’t do the countdown, just start ramp immediately
-      this._startRamp();
+      this._startSprintIntervals();
     }
   }
 
@@ -57,25 +52,33 @@ export class RampTestController {
 
         if (this.aboveThresholdAccumSec >= this.earlyExitDurationSec) {
           console.log("Warmup ended early due to power threshold");
-          this._startRamp();
+          this._startSprintIntervals();
           return;
         }
       } else {
         this.aboveThresholdAccumSec = 0;
       }
 
-      return; // <-- ensures no ramp logic until warmup ends/forced
+      return; // <-- ensures no workout logic until warmup ends/forced
     }
 
-    // --- Ramp phase logic ---
-    if (this.phase === "ramp" && this.lastStepChangeMs != null) {
+    // --- Sprint on phase logic ---
+    if (this.phase === "on" && this.lastStepChangeMs != null) {
       const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
       if (sinceStepSec >= this.stepSeconds) {
         this.currentStep++;
         this.lastStepChangeMs = nowMs;
         const target = this.getCurrentTargetWatts();
-        this._announceStep(this.currentStep + 1, target);
+        this._announceStep(this.useWatts, true);
       }
+    } else if (this.phase==="off" && this.lastStepChangeMs!=null) {
+      const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
+      if (sinceStepSec >= this.stepSeconds) {
+        this.currentStep++;
+        this.lastStepChangeMs = nowMs;
+        const target = this.getCurrentTargetWatts();
+        this._announceStep(this.wattsOff, false);
+      }        
     }
   }
 
@@ -126,17 +129,17 @@ export class RampTestController {
     return this.ftpResult;
   }
 
-  _startRamp(nowMs = Date.now()) {
-    console.log("Ramp starting");
+  _startSprintIntervals(nowMs = Date.now()) {
+    console.log("Sprint starting");
 
     // ensure warmup cannot restart
-    this.phase = "ramp";
+    this.phase = "sprint";
     this.aboveThresholdAccumSec = 0;
 
     // timestamp ramp init
-    this.rampStartTimeMs = nowMs;
-    this.lastStepChangeMs = nowMs;
-    this.currentStep = 0;
+    //this.rampStartTimeMs = nowMs;
+    //this.lastStepChangeMs = nowMs;
+    //this.currentStep = 0;
 
     // make sure warmup countdown can never resume
     if (this.hud?.skipWarmupCountdownEarly) {
@@ -148,13 +151,14 @@ export class RampTestController {
     this._announceStep(1, target);
   }
 
-  _announceStep(stepNumber, targetWatts) {
+  _announceStep(targetWatts, on) {
     if (!this.hud || typeof this.hud.showWorkoutMessage !== "function") return;
-    
-    const label = stepNumber === 1
-      ? `Ramp start – target ${targetWatts} W`
-      : `Ramp step ${stepNumber} – target ${targetWatts} W`;
-
+    let label;
+    if (on) {
+        label = `Sprint target ${targetWatts} W`;
+    } else {
+        label = `Sprint off: target ${targetWatts} W`;
+    }
     this.hud.showWorkoutMessage({
       text: label,
       seconds: 8,

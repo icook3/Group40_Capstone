@@ -10,6 +10,7 @@ import { simulationState } from "../simulationstate.js";
 import { PauseCountdown } from "../pause_countdown.js";
 import { units } from "../units/index.js";
 import { RampTestController } from "../workouts/RampTestController.js";
+import { SprintIntervalController } from "../workouts/SprintIntervalController.js";
 import { rideHistory } from "../rideHistoryStore.js";
 import { WorkoutStorage } from "../workoutStorage.js";
 import { WorkoutSession } from "../workoutSession.js";
@@ -37,9 +38,12 @@ export class zlowScreen {
     standardMode;
     scene;
     hud;
+
     rampController;
+    sprintController;
     selectedWorkout;
     workoutName;
+    
     isRecording = false;
     rideElapsedMs=0;
     workoutSummary;
@@ -390,13 +394,14 @@ export class zlowScreen {
       }
     }
 
-    initializeRampTestController() {
+    initializeWorkouts() {
       // Set up ramp test controller if applicable
       if (this.selectedWorkout === "ramp") {
         const now = Date.now();
         let tempHud=this.hud;
+        console.log("tempHUD = ",tempHud);
         this.rampController = new RampTestController({
-          tempHud,
+          hud: tempHud,
           nowMs: now,
           warmupSeconds: 5 * 60, // 5-minute warmup
           startWatts: 100,
@@ -404,8 +409,21 @@ export class zlowScreen {
           stepSeconds: 60,
           ftpFactor: 0.75,
         });
+      } else if (this.selectedWorkout==="sprint") {
+        const now = Date.now();
+        let tempHud=this.hud;
+        this.sprintController = new SprintIntervalController({
+          hud: tempHud,
+          nowMs: now,
+          warmupSeconds: 5*60,
+          secondOn: 10,
+          useWatts: 20,
+          secondsOff: 10,
+          ftpFactor: 0.75
+        });
       } else {
         this.rampController = null;
+        this.sprintController = null;
       }
     }
     initializeHudCountdown() {
@@ -421,12 +439,19 @@ export class zlowScreen {
           if (this.selectedWorkout === "ramp") {
             // tell HUD to show 5-minute warmup timer
             this.hud.showWarmupCountdown({
-              seconds: 5 * 60,
+              seconds: 5,
               onDone: () => {
                 // Warmup over → tell RampTestController to start ramps
-                this.rampController?.startRamp?.();
+                this.rampController?._startRamp();
               },
             });
+          } else if (this.selectedWorkout==="sprint") {
+            this.hud.showWarmupCountdown({
+              seconds: 5,
+              onDone: () => {
+                this.sprintController?._startSprintIntervals();
+              }
+            })
           }
         },
       });
@@ -501,6 +526,18 @@ export class zlowScreen {
     
                 this.hud.showWorkoutMessage({
                   text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
+                  seconds: 8,
+                });
+              }
+            } else if (this.selectedWorkout==="sprint" && this.sprintController) {
+              const result = this.sprintController.computeFtpFromHistory(rideHistory.samples);
+              if (result) {
+                // Flatten FTP numbers into stats for summary + records
+                finalStats.ftp = Math.round(result.ftp);
+                finalStats.peakMinutePower = Math.round(result.peakMinute);
+    
+                this.hud.showWorkoutMessage({
+                  text: `Sprint Intervals FTP ≈ ${finalStats.ftp} W`,
                   seconds: 8,
                 });
               }
@@ -702,6 +739,11 @@ export class zlowScreen {
     
         const target = owner.rampController.getCurrentTargetWatts();
         constants.riderState.targetWatts = target || 0;
+      } else if (owner.sprintController) {
+        const power = constants.riderState.power || 0;
+        owner.sprintController.update(now, power);
+        const target = owner.sprintController.getCurrentTargetWatts();
+        constants.riderState.targetWatts = target || 0;
       }
     
       owner.hud.update(constants.riderState, dt);
@@ -846,7 +888,7 @@ export class zlowScreen {
       };
     
       this.workoutName = workoutLabels[this.selectedWorkout] || "Free Ride";
-      this.initializeRampTestController();
+      this.initializeWorkouts();
       this.initializeHudCountdown();
     
       const strava = new Strava();
