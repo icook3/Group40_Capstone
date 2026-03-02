@@ -226,15 +226,15 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   border-radius: 30px;
 
   width: fit-content;
-  /* This keeps consistent width heights when switching views, e.g. Trainer vs Main options */
-  min-width: 180px;
-  min-height: 230px; 
+  min-width: auto;
+  min-height: auto;
 }
 
-/* Stack buttons vertically */
+/* Stack buttons horizontally */
 .control-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 0px;
 }
 
@@ -354,9 +354,11 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 
 /* Divider between trainer and game buttons */
 .hud-divider {
-  height: 1px;
+  width: 1px;
+  height: 24px;
   background: rgba(220, 229, 222, 0.3);
-  margin: 8px 0;
+  margin: 0 8px;
+  align-self: center;
 }
 
 /* ========================================
@@ -368,12 +370,12 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   border-radius: 30px;
 
   width: fit-content;
-  min-width: 180px;
+  min-width: auto;
 
-  /* Stack controls vertically */
+  /* Stack controls horizontally */
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
 }
 
@@ -733,13 +735,14 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 #hud-bottom-container {
   position: fixed;
   bottom: 20px;
-  left: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
   
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: row;
   gap: 15px;
-  align-items: flex-start;
+  align-items: center;
 }
 
 /* ========================================
@@ -856,8 +859,8 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 
   /* Tighter container padding */
   #hud-bottom {
-    padding: 10px;
-    border-radius: 20px;
+    min-width: auto;
+    min-height: auto;
   }
 
   #dev-controls-hud {
