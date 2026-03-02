@@ -68,8 +68,6 @@ a-scene.customizationScene {
   font-family: "Fugaz One", sans-serif;
 }
 
-/*Narrow, but wide screens*/
-
 /*On tiny screens*/
 @media only screen and (max-aspect-ratio: 0.6) {
   #playerContainer {
@@ -175,7 +173,7 @@ a-scene.customizationScene {
     align-items: center;
     padding: 15px 25px;
     border-radius: 10px;
-    font-size:130%;
+    font-size:1.3em;
   }
 
   #bikeControls, #playerControls {
