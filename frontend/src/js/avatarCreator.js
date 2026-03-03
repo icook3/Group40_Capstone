@@ -7,7 +7,7 @@ export class AvatarCreator {
         this.rotation = rotation;
         this.onReady = onReady;
         this.autoRotate = false;
-        this.rotationSpeed = 0.2;
+        this.rotationSpeed = 0;
 
         //GLB Flags
         this.personLoaded = false;
@@ -221,26 +221,13 @@ export class AvatarCreator {
         this.savePlayerData();
     }
 
+    // WORKS TO APPLY COLORS PROPERLY
     applyPlayerColors() {
-        
-
         if (!this.avatarEntity) {
             return;
         }
-
-
-        console.log("HIT")
-        console.log(this.avatarEntity)
-
-        
-
-
-
         this.avatarEntity.traverse((child) => {
             if (child.isMesh && child.material) {
-
-                
-
                 if (child.material.name.includes("Skin")) child.material.color.set(this.skinColor);
                 if (child.material.name.includes("Shirt")) child.material.color.set(this.shirtColor);
                 if (child.material.name.includes("Shorts")) child.material.color.set(this.shortsColor);
@@ -355,8 +342,7 @@ applyHelmetColors() {
     if (!this.helmetObject) {
         return;
     }
-
-    this.helmetObject.traverse((child) => {
+    this.avatarEntity.traverse((child) => {
         if (child.isMesh && child.material) {
             if (child.material.name.includes("Helmet")) {
                 child.material.color.set(this.helmetColor);
@@ -381,12 +367,13 @@ applyHelmetColors() {
         this.savePlayerData();
     }
 
+    // Apply colors to bike. References avatarEntity, as the bike is a subcomponent of the avatar.
     applyBikeColors () {
-        if (!this.bikeModel || !this.bikeModel.object3D) {
+        if (!this.bikeModel) {
             return;
         }
 
-        this.bikeModel.object3D.traverse((child) => {
+        this.avatarEntity.traverse((child) => {
             if (child.isMesh && child.material) {
                 if (child.material.name.includes("Frame_Mat")) child.material.color.set(this.bikeFrameColor);
                 if (child.material.name.includes("Tire_Mat")) child.material.color.set(this.bikeTireColor);
@@ -454,28 +441,28 @@ applyHelmetColors() {
         this.setInitialPose();
     }
 
-    enableMenuRotation(speed = 0.5) {
+    enableMenuRotation(speed = 0.01) {
         this.autoRotate = true;
         this.rotationSpeed = speed;
     }
 
-    // Rotate avatar -- DOES NOT WORK
+    // Rotate avatar
     startRotationLoop() {
         if (this._rotationLoopRunning) return;
         this._rotationLoopRunning = true;
 
         const rotate = () => {
             if (this.avatarEntity && this.autoRotate) {
-                let rotY = this.avatarEntity.position.y + this.rotationSpeed;
-
-                //const rot = this.avatarEntity.getAttribute('rotation');
-                this.avatarEntity.rotation.y = rotY;
-
+                const rot = this.avatarEntity.rotation;
+                this.avatarEntity.rotation.x = rot.x;
+                this.avatarEntity.rotation.y = rot.y + this.rotationSpeed;
+                this.avatarEntity.rotation.z = rot.z;
             }
             requestAnimationFrame(rotate);
         };
         rotate();
     }
+
 
     savePlayerData() {
         const data = {
