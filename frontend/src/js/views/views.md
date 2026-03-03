@@ -21,8 +21,8 @@ A class using the **Views** interface represents a possible HTML view.
     - Start by creating a valid HTML file that looks how you want it to look, then remove the head and the body tags. 
     - Ensure that any JS is in external files. 
 - To set up a new view, afterwards, create your view.js file, implementing this interface, then change viewManager.js.
-    - In initViews, create a new instance of your specified view.
     - In the object views, add a value for your view.
+    - In initViews, create a new instance of your specified view in each switch case, and add a new switch case for your new view.
     - In setView(view), add a condition for if view is equal to your new view, then call the setPage method.
     - Also add a condition for if currentView is equal to your new view, then call the reset method.  
     - In the class ViewStorage, add the view to it. 
