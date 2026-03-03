@@ -1,5 +1,3 @@
-
-
 export class AvatarCreator {
     constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
@@ -7,7 +5,7 @@ export class AvatarCreator {
         this.rotation = rotation;
         this.onReady = onReady;
         this.autoRotate = false;
-        this.rotationSpeed = 0;
+        this.rotationSpeed = 0.01;
 
         //GLB Flags
         this.personLoaded = false;
@@ -194,9 +192,6 @@ export class AvatarCreator {
         });
     }
 
-
-    
-
     setPlayerModel(model) {
         this.playerModel = model;
         if (this.avatarEntity) {
@@ -210,18 +205,15 @@ export class AvatarCreator {
         this.savePlayerData();
     }
 
-    // DOESN'T SEEM TO DO ANYTHING
     setPlayerColors(skin, shirt, shorts, shoes) {
         this.skinColor = skin;
         this.shirtColor = shirt;
         this.shortsColor = shorts;
-        this.shoesColor = '#e801a3';
-
+        this.shoesColor = shoes;
         this.applyPlayerColors();
         this.savePlayerData();
     }
 
-    // WORKS TO APPLY COLORS PROPERLY
     applyPlayerColors() {
         if (!this.avatarEntity) {
             return;
@@ -293,7 +285,7 @@ export class AvatarCreator {
     );    
 }
 
-async createHelmetModel(avatarEntity) {
+async createHelmetModel() {
     if (this.helmetObject == null) {
         const loader = new THREE.GLTFLoader();
 
@@ -329,31 +321,31 @@ async createHelmetModel(avatarEntity) {
         }
 
         this.applyHelmetColors();
-}
-
-setHelmetColors(helmet, padding) {
-    this.helmetColor = helmet;
-    this.helmetPaddingColor = padding;
-    this.applyHelmetColors();
-    this.savePlayerData();
-}
-
-applyHelmetColors() {
-    if (!this.helmetObject) {
-        return;
     }
-    this.avatarEntity.traverse((child) => {
-        if (child.isMesh && child.material) {
-            if (child.material.name.includes("Helmet")) {
-                child.material.color.set(this.helmetColor);
-            }
 
-            if (child.material.name.includes("Padding")) {
-                child.material.color.set(this.helmetPaddingColor);
-            }
+    setHelmetColors(helmet, padding) {
+        this.helmetColor = helmet;
+        this.helmetPaddingColor = padding;
+        this.applyHelmetColors();
+        this.savePlayerData();
+    }
+
+    applyHelmetColors() {
+        if (!this.helmetObject) {
+            return;
         }
-    });
-}
+        this.avatarEntity.traverse((child) => {
+            if (child.isMesh && child.material) {
+                if (child.material.name.includes("Helmet")) {
+                    child.material.color.set(this.helmetColor);
+                }
+
+                if (child.material.name.includes("Padding")) {
+                    child.material.color.set(this.helmetPaddingColor);
+                }
+            }
+        });
+    }
 
     setBikeColors(frame, tires, grip, seat, pedals, pedalCrank) {
         this.bikeFrameColor = frame;
@@ -462,7 +454,6 @@ applyHelmetColors() {
         };
         rotate();
     }
-
 
     savePlayerData() {
         const data = {

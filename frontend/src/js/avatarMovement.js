@@ -1,5 +1,4 @@
 import { AvatarCreator } from "./avatarCreator.js";
-import { constants } from "./constants.js";
 import { units } from "./units/index.js";
 
 export class AvatarMovement {
@@ -31,11 +30,6 @@ export class AvatarMovement {
         camera.setAttribute('position','4 5 7');
         camera.setAttribute('active', true)
         camera.setAttribute('look-at','#rider');
-
-        //rig.appendChild(camera);
-        //document.getElementById("scene").appendChild('camera')
-
-        console.log("HIT")
         }
 
     //Helper to interpolate smoothly between A and B
@@ -78,8 +72,6 @@ export class AvatarMovement {
         this.creator.leftFoot.rotation.x  = this.cycleInterpolate(baseLeftFootX,  baseRightFootX,  crankAngle)
             + Math.sin(crankAngle) * footForwardSwing;
     }
-
-
 
     animatePedalingBike(dt) {
         //variables for frequency 1.5 Hz at 30 km/h, scale with speed

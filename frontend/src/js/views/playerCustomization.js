@@ -45,10 +45,6 @@ export class playerCustomizationView {
           return;
         }
 
-        // MAKE IT WAIT FOR THE SCENE BEFORE IT LOADS??
-
-
-
         //Create the avatar immediately
         this.avatar = new AvatarCreator(
           "menuAvatar",
@@ -58,7 +54,6 @@ export class playerCustomizationView {
             avatarInstance.setMenuPosition();
             avatarInstance.enableMenuRotation();
             avatarInstance.startRotationLoop();
-
             window.avatarInstance = avatarInstance;
           }
         );
@@ -151,6 +146,7 @@ export class playerCustomizationView {
             });
         });
     }
+
     initBikeColors({owner=this}={}) {
         if (owner.stopLoop) {
             return;
@@ -168,7 +164,6 @@ export class playerCustomizationView {
             picker.addEventListener("input", (e) => {
                 const mat = picker.dataset.mat; // Frame_Mat, Tire_Mat, Grip_Mat, etc.
                 const color = e.target.value;
-
                 const avatar = window.avatarInstance;
 
                 //Get current bike colors
@@ -273,7 +268,6 @@ export class playerCustomizationView {
         document.querySelector(
             '#playerControls .color-picker[data-mat="Shoes"]'
         ).value = avatar.shoesColor;
-
         document.querySelector(
             '#bikeControls .color-picker[data-mat="Frame_Mat"]'
         ).value = avatar.bikeFrameColor;
@@ -292,7 +286,6 @@ export class playerCustomizationView {
         document.querySelector(
             '#bikeControls .color-picker[data-mat="PedalCrank_Mat"]'
         ).value = avatar.bikeCrankColor;
-
         document.querySelector(
             '#playerControls .color-picker[data-mat="Helmet"]'
         ).value = avatar.helmetColor;

@@ -90,6 +90,7 @@ class Constants {
   farthestSpawn = 1;
   trackPoints = [];
   sceneryItems = [];
+  tweens = null;
   currentTrackPiece = 0;
   pacerCurrentTrackPiece = 0;
 
