@@ -1,3 +1,28 @@
+.bodyStyle {
+  position: fixed;
+  inset: 0;
+}
+
+.bodyImg {
+  background: url("../../resources/images/backgroundA.png") no-repeat center center fixed;
+  background-size: cover;
+  background-position: 50% 45%;
+}
+
+.bodyImg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255,255,255,0.00) 0%,
+      rgba(0,0,0,0.30) 100%
+    );
+  pointer-events: none;
+}
+
+
 button.peerBtn {
     font-size: 1em;
     cursor: pointer;
@@ -6,49 +31,187 @@ button.peerBtn {
     left: 40%;
 }
 
+/* Keep your existing cancel container behavior */
 #cancel {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-    /* Background color */
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 250px;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgb(53, 72, 79);
+  padding: 15px;
+  border-radius: 30px;
+  width: 250px;
 }
 
-#peerConnectMenu {
-    position: fixed;
-    top:43%;
-    left:25%;
-    /* Background color */
-    background: rgb(53, 72, 79);
-    padding: 15px;
-    border-radius: 30px;
-    width: 50%;
-    height: 15%;
-}
-
-/* Hover feedback for buttons on Connect to Peer screen */
 #cancel:hover,
-#peerConnectMenu button:hover,
 button:hover {
   filter: brightness(85%);
   transition: filter 0.15s ease;
 }
 
-
-/* Hover feedback for clickable option rows (if options are divs/spans/lis) */
-#peerConnectMenu [role="button"]:hover,
-#peerConnectMenu .option:hover,
-#peerConnectMenu .peer-option:hover,
-#peerConnectMenu li:hover {
-  background: rgba(255, 255, 255, 0.10);
+/* ===== mainMenu-style center layout ===== */
+#main-menu-center {
+  position: fixed;
+  top: clamp(80px, 20vh, 240px);
+  left: 50%;
+  transform: translateX(-50%); /* removed scale(1.2) */
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 3vh, 32px);
 }
-#peerConnectMenu [role="button"],
-#peerConnectMenu .option,
-#peerConnectMenu .peer-option,
-#peerConnectMenu li {
+
+
+
+#welcome-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.welcome-top {
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: rgba(241, 239, 228, 0.727);
+  letter-spacing: 0.35em;
+  margin-bottom: 12px;
+}
+
+.welcome-main {
+  font-size: clamp(3rem, 8vw, 5rem);
+  color: #1a3a2a;
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,0.45),
+    0 8px 24px rgba(0,0,0,0.25);  display: flex;
+  align-items: baseline;
+}
+
+.welcome-logo {
+  height: 0.9em;
+  width: auto;
+  margin-right: 2px;
+  transform: translateY(12px);
+}
+
+.welcome-accent {
+  display: inline-block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #2d7a4a, #7cd1f3);
+  border-radius: 2px;
+  margin-top: 16px;
+}
+
+#main-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ===== input styled to fit the menu ===== */
+#peer-input-wrapper {
+  position: relative;           /* required for ::before */
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+#peer-input-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -10px -14px;           /* extends beyond the input */
+  border-radius: 30px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    0 6px 18px rgba(0,0,0,0.18);
+
+  /* soft lightening layer */
+  background: rgba(255, 255, 255, 0.60);
+
+  z-index: 0;
+}
+
+
+#name-input {
+  position: relative;
+  z-index: 1;
+
+  width: clamp(240px, 45vw, 360px);
+  padding: 14px 18px;
+  border-radius: 25px;
+  border: 1.8px solid #1a3a2a67;
+
+  /* keep this slightly translucent */
+  background: rgba(255, 255, 255, 0.70);
+
+  color: #1a3a2a;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  outline: none;
+  text-align: center;
+}
+
+
+#name-input::placeholder {
+  color: rgba(26, 58, 42, 0.55);
+}
+
+/* ===== Connect button styled like Quick Ride ===== */
+#start-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -6px;
+}
+
+/* IMPORTANT: connect button uses your page's ID */
+#connect-btnP {
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px clamp(32px, 6vw, 52px);
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  color: #e0f7ef;
   cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
+}
+
+#connect-btnP:hover {
+  background: #1a3a2a;
+}
+
+/* Back link matches menu-link style */
+#menu-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: -10px;
+}
+
+.menu-link {
+  background: none;
+  border: none;
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1a3a2a;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.2s ease;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 10px rgba(255,255,255,0.35);
+}
+
+.menu-link:hover {
+  color: rgba(26, 58, 42, 0.85);
+  background: rgba(46, 139, 110, 0.08);
 }

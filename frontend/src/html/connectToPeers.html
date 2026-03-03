@@ -1,15 +1,29 @@
-    <div class="bodyStyle bodyImg">
-        <div id="cancel">
-            <div class="control-buttons">
-                <button id="cancelButton" onclick="viewManager.setView(viewManager.views.mainMenu);" class="hud-btn peerBtn">Cancel</button>
-            </div>
-        </div>
-        <div id="peerConnectMenu" class="control-buttons">
-            <span>
-                <label for="name-input">Peer Name: </label>
-                <input id="name-input" />
-            </span>
-            <button class="hud-btn peerBtn" id="connect-btn">Connect!</button>
-            
-        </div>
+<div class="bodyStyle bodyImg">
+  <div id="main-menu-center">
+    <div id="welcome-msg">
+      <span class="welcome-top">Connect to</span>
+      <span class="welcome-main">
+        <img
+          src="../../resources/favicons/ZlowFavicon.svg"
+          alt="Z"
+          class="welcome-logo"
+        />low
+      </span>
+      <span class="welcome-accent"></span>
     </div>
+
+    <div id="main-buttons">
+      <div id="peer-input-wrapper">
+        <input id="name-input" placeholder="Peer Name" />
+      </div>
+
+      <div id="start-wrapper">
+        <button id="connect-btnP" type="button">Connect</button>
+      </div>
+
+      <div id="menu-links">
+        <button id="peer-back-btn" class="menu-link" type="button">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
