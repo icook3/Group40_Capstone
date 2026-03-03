@@ -205,7 +205,8 @@ a-scene.menuScene {
   background: rgb(53, 72, 79);
   padding: 20px 24px;
   border-radius: 20px;
-  width: min(320px, calc(100vw - 60px));  display: none;
+  width: min(320px, calc(100vw - 60px));  
+  display: none;
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
@@ -218,19 +219,13 @@ a-scene.menuScene {
   /* optional safety so it never runs off-screen */
   max-height: 85vh;
   overflow-y: auto;
+
+  cursor: default;
+
 }
 
 #menu-settings.zoom-in {
   animation: zoomIn 0.35s ease both;
-}
-/* ========================================
-   FIX: Settings panel cursor behavior
-   (mainMenu.html uses <span class="hud-btn"> rows inside #menu-settings)
-   ======================================== */
-
-/* The settings panel background should be normal arrow */
-#menu-settings {
-  cursor: default;
 }
 
 /* IMPORTANT: rows in settings are spans with class hud-btn
@@ -567,6 +562,10 @@ a-scene.menuScene {
   }
   #menu-footer {
     display: none !important;
+  }
+  #menu-settings {
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 
