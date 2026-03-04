@@ -126,6 +126,9 @@ export class RampTestController {
     return this.ftpResult;
   }
 
+  startWorkout(nowMs = Date.now()) {
+    this._startRamp(nowMs);
+  }
   _startRamp(nowMs = Date.now()) {
     console.log("Ramp starting");
 

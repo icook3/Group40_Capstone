@@ -129,6 +129,9 @@ export class SprintIntervalController {
     return this.ftpResult;
   }
 
+  startWorkout(nowMs = Date.now()) {
+    this._startSprintIntervals(nowMs);
+  }
   _startSprintIntervals(nowMs = Date.now()) {
     console.log("Sprint starting");
 

@@ -39,8 +39,8 @@ export class zlowScreen {
     scene;
     hud;
 
-    rampController;
-    sprintController;
+    workoutController;
+
     selectedWorkout;
     workoutName;
     
@@ -400,7 +400,7 @@ export class zlowScreen {
         const now = Date.now();
         let tempHud=this.hud;
         console.log("tempHUD = ",tempHud);
-        this.rampController = new RampTestController({
+        this.workoutController = new RampTestController({
           hud: tempHud,
           nowMs: now,
           warmupSeconds: 5 * 60, // 5-minute warmup
@@ -412,7 +412,7 @@ export class zlowScreen {
       } else if (this.selectedWorkout==="sprint") {
         const now = Date.now();
         let tempHud=this.hud;
-        this.sprintController = new SprintIntervalController({
+        this.workoutController = new SprintIntervalController({
           hud: tempHud,
           nowMs: now,
           warmupSeconds: 5*60,
@@ -422,8 +422,7 @@ export class zlowScreen {
           ftpFactor: 0.75
         });
       } else {
-        this.rampController = null;
-        this.sprintController = null;
+        this.workoutController = null;
       }
     }
     initializeHudCountdown() {
@@ -435,24 +434,13 @@ export class zlowScreen {
           simulationState.isPaused = false;
           this.isRecording = true;
           this.rideElapsedMs = 0;
+          this.hud.showWarmupCountdown({
+            seconds:5,
+            onDone: () => {
+              this.workoutController?.startWorkout();
+            }
+          });
           // If ramp, begin warmup countdown (no pause)
-          if (this.selectedWorkout === "ramp") {
-            // tell HUD to show 5-minute warmup timer
-            this.hud.showWarmupCountdown({
-              seconds: 5,
-              onDone: () => {
-                // Warmup over → tell RampTestController to start ramps
-                this.rampController?._startRamp();
-              },
-            });
-          } else if (this.selectedWorkout==="sprint") {
-            this.hud.showWarmupCountdown({
-              seconds: 5,
-              onDone: () => {
-                this.sprintController?._startSprintIntervals();
-              }
-            })
-          }
         },
       });
     }
@@ -514,34 +502,19 @@ export class zlowScreen {
             // End the session and get final stats
             const finalStats = this.workoutSession.end();
             this.isRecording = false;
+            const result = this.workoutController.computeFtpFromHistory(rideHistory.samples);
             // After you compute finalStats from workoutSession / history, etc.
-            if (this.selectedWorkout === "ramp" && this.rampController) {
-              const result = this.rampController.computeFtpFromHistory(
-                rideHistory.samples
-              );
-              if (result) {
+            if (result) {
                 // Flatten FTP numbers into stats for summary + records
                 finalStats.ftp = Math.round(result.ftp);
                 finalStats.peakMinutePower = Math.round(result.peakMinute);
     
                 this.hud.showWorkoutMessage({
-                  text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
+                  text: `${this.selectedWorkout} Test FTP ≈ ${finalStats.ftp} W`,
                   seconds: 8,
                 });
-              }
-            } else if (this.selectedWorkout==="sprint" && this.sprintController) {
-              const result = this.sprintController.computeFtpFromHistory(rideHistory.samples);
-              if (result) {
-                // Flatten FTP numbers into stats for summary + records
-                finalStats.ftp = Math.round(result.ftp);
-                finalStats.peakMinutePower = Math.round(result.peakMinute);
-    
-                this.hud.showWorkoutMessage({
-                  text: `Sprint Intervals FTP ≈ ${finalStats.ftp} W`,
-                  seconds: 8,
-                });
-              }
             }
+            
     
             // Save workout and check for records
             const { newRecords, streak } = this.workoutStorage.saveWorkout(finalStats);
@@ -676,9 +649,8 @@ export class zlowScreen {
     
       //update workout session with current values
       if (owner.workoutSession.isWorkoutActive()) {
-        if (owner.rampController) {
-          // Update FTP result if available
-          owner.workoutSession.addFTPResult(owner.rampController.ftpResult);
+        if (owner.workoutController) {
+          owner.workoutSession.addFTPResult(owner.workoutController.ftpResult);
         }
         owner.workoutSession.update({
           speed: constants.riderState.speed || 0,
@@ -706,24 +678,21 @@ export class zlowScreen {
         //console.log("Inside if statement");
         // Start from whatever speed the pacer currently has
         let pacerSpeed = owner.pacerPhysics.getSpeed();
-    
-        if (owner.rampController) {
-          // RampTestController is active (Ramp Test workout)
-          const targetWatts = owner.rampController.getCurrentTargetWatts();
-    
+        if (owner.workoutController) {
+          const targetWatts = owner.workoutController.getCurrentTargetWatts();
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
             pacerSpeed = constants.riderState.speed;
             owner.pacerPhysics.setSpeed(pacerSpeed);
           } else {
-            // Active ramp step:
+            // Active workout:
             // Pacer behaves like an ideal rider holding target watts,
             // using the same physics as the real rider for smooth changes.
             pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
           }
         }
-        // If rampController is null (free ride, other workouts),
+        // If workoutController is null (free ride, peer-to-peer),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
     
         // Apply the computed speed to the pacer avatar
@@ -733,17 +702,12 @@ export class zlowScreen {
       }
     
       // Let the ramp controller advance its state
-      if (owner.rampController) {
+      if (owner.workoutController) {
         const power = constants.riderState.power || 0;
-        owner.rampController.update(now, power);
+        owner.workoutController.update(now, power);
     
-        const target = owner.rampController.getCurrentTargetWatts();
-        constants.riderState.targetWatts = target || 0;
-      } else if (owner.sprintController) {
-        const power = constants.riderState.power || 0;
-        owner.sprintController.update(now, power);
-        const target = owner.sprintController.getCurrentTargetWatts();
-        constants.riderState.targetWatts = target || 0;
+        const target = owner.workoutController.getCurrentTargetWatts();
+        constants.riderState.targetWatts = target || 0;        
       }
     
       owner.hud.update(constants.riderState, dt);
