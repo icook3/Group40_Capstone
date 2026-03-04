@@ -63,34 +63,43 @@ export class SprintIntervalController {
     }
 
     // --- Sprint on phase logic ---
+    console.log("running phase logic for phase ",this.phase);
     if (this.phase === "on" && this.lastStepChangeMs != null) {
       const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
-      if (sinceStepSec >= this.stepSeconds) {
-        this.currentStep++;
+      if (sinceStepSec >= this.secondOn) {
+        
+        this.phase="off";
+        console.log("turning phase to off: ",this.phase);
         this.lastStepChangeMs = nowMs;
         const target = this.getCurrentTargetWatts();
-        this._announceStep(this.useWatts, true);
+        this._announceStep(target, false);
       }
-    } else if (this.phase==="off" && this.lastStepChangeMs!=null) {
+    }
+    // --- Sprint off phase logic 
+    else if (this.phase==="off" && this.lastStepChangeMs!=null) {
       const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
-      if (sinceStepSec >= this.stepSeconds) {
-        this.currentStep++;
+      if (sinceStepSec >= this.secondsOff) {
+        
+        this.phase="on";
+        console.log("turning phase to on: ",this.phase);
         this.lastStepChangeMs = nowMs;
         const target = this.getCurrentTargetWatts();
-        this._announceStep(this.wattsOff, false);
+        this._announceStep(target, true);
       }        
     }
   }
-
-
-
 
   /**
    * Current ramp target watts, or null during warmup / finished.
    */
   getCurrentTargetWatts() {
-    if (this.phase !== "ramp" || this.currentStep < 0) return null;
-    return this.startWatts + this.currentStep * this.stepWatts;
+    if (this.phase !== "on" && this.phase !=="off") return null;
+    if (this.phase==="off") {
+      return this.wattsOff;
+    } else if (this.phase==="on") {
+      return this.useWatts;
+    }
+    //return this.startWatts + this.currentStep * this.stepWatts;
   }
 
   /**
@@ -136,12 +145,12 @@ export class SprintIntervalController {
     console.log("Sprint starting");
 
     // ensure warmup cannot restart
-    this.phase = "sprint";
+    this.phase = "on";
     this.aboveThresholdAccumSec = 0;
 
     // timestamp ramp init
     //this.rampStartTimeMs = nowMs;
-    //this.lastStepChangeMs = nowMs;
+    this.lastStepChangeMs = nowMs;
     //this.currentStep = 0;
 
     // make sure warmup countdown can never resume
@@ -151,7 +160,7 @@ export class SprintIntervalController {
 
     // Show first ramp target
     const target = this.getCurrentTargetWatts();
-    this._announceStep(1, target);
+    this._announceStep(target, this.phase==="on");
   }
 
   _announceStep(targetWatts, on) {

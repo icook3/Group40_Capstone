@@ -419,7 +419,8 @@ export class zlowScreen {
           secondOn: 10,
           useWatts: 20,
           secondsOff: 10,
-          ftpFactor: 0.75
+          ftpFactor: 0.75,
+          wattsOff: 10
         });
       } else {
         this.workoutController = null;
