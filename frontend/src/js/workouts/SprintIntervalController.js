@@ -63,13 +63,11 @@ export class SprintIntervalController {
     }
 
     // --- Sprint on phase logic ---
-    console.log("running phase logic for phase ",this.phase);
     if (this.phase === "on" && this.lastStepChangeMs != null) {
       const sinceStepSec = (nowMs - this.lastStepChangeMs) / 1000;
       if (sinceStepSec >= this.secondOn) {
         
         this.phase="off";
-        console.log("turning phase to off: ",this.phase);
         this.lastStepChangeMs = nowMs;
         const target = this.getCurrentTargetWatts();
         this._announceStep(target, false);
@@ -81,7 +79,6 @@ export class SprintIntervalController {
       if (sinceStepSec >= this.secondsOff) {
         
         this.phase="on";
-        console.log("turning phase to on: ",this.phase);
         this.lastStepChangeMs = nowMs;
         const target = this.getCurrentTargetWatts();
         this._announceStep(target, true);
