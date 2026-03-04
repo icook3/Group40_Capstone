@@ -415,11 +415,10 @@ export class zlowScreen {
         this.workoutController = new SprintIntervalController({
           hud: tempHud,
           nowMs: now,
-          warmupSeconds: 5*60,
+          warmupSeconds: 5 * 60,
           secondOn: 10,
           useWatts: 20,
           secondsOff: 10,
-          ftpFactor: 0.75,
           wattsOff: 10
         });
       } else {
@@ -436,7 +435,9 @@ export class zlowScreen {
           this.isRecording = true;
           this.rideElapsedMs = 0;
           this.hud.showWarmupCountdown({
-            seconds:5,
+            //if you are not doing a workout, 0
+            //otherwise, use the seconds in the workout controller
+            seconds:this.workoutController==null ? 0 : this.workoutController.warmupSeconds,
             onDone: () => {
               this.workoutController?.startWorkout();
             }
@@ -503,17 +504,19 @@ export class zlowScreen {
             // End the session and get final stats
             const finalStats = this.workoutSession.end();
             this.isRecording = false;
-            const result = this.workoutController.computeFtpFromHistory(rideHistory.samples);
-            // After you compute finalStats from workoutSession / history, etc.
-            if (result) {
-                // Flatten FTP numbers into stats for summary + records
-                finalStats.ftp = Math.round(result.ftp);
-                finalStats.peakMinutePower = Math.round(result.peakMinute);
+            if (this.selectedWorkout==="ramp") {
+              const result = this.workoutController.computeFtpFromHistory(rideHistory.samples);
+              // After you compute finalStats from workoutSession / history, etc.
+              if (result) {
+                  // Flatten FTP numbers into stats for summary + records
+                  finalStats.ftp = Math.round(result.ftp);
+                  finalStats.peakMinutePower = Math.round(result.peakMinute);
     
-                this.hud.showWorkoutMessage({
-                  text: `${this.selectedWorkout} Test FTP ≈ ${finalStats.ftp} W`,
-                  seconds: 8,
-                });
+                  this.hud.showWorkoutMessage({
+                    text: `${this.selectedWorkout} Test FTP ≈ ${finalStats.ftp} W`,
+                    seconds: 8,
+                  });
+              }
             }
             
     
@@ -650,7 +653,7 @@ export class zlowScreen {
     
       //update workout session with current values
       if (owner.workoutSession.isWorkoutActive()) {
-        if (owner.workoutController) {
+        if (owner.workoutController&&this.selectedWorkout==="ramp") {
           owner.workoutSession.addFTPResult(owner.workoutController.ftpResult);
         }
         owner.workoutSession.update({

@@ -16,7 +16,8 @@ A class using the **Workouts** interface represents a workout that the player ca
     - Returns the current target watts
 - **update(Number, Number)** → void
     - Updates the phase progression
-
+- **warmupSeconds** → Number
+     - Returns the number of seconds in the warmup
 ## Notes
 - To add new workouts, first edit mainMenu.html
     - This adds the option to the menu
