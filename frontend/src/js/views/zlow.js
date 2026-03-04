@@ -399,7 +399,6 @@ export class zlowScreen {
       if (this.selectedWorkout === "ramp") {
         const now = Date.now();
         let tempHud=this.hud;
-        console.log("tempHUD = ",tempHud);
         this.workoutController = new RampTestController({
           hud: tempHud,
           nowMs: now,
@@ -436,8 +435,7 @@ export class zlowScreen {
           this.rideElapsedMs = 0;
           if (this.workoutController!=null) {
           this.hud.showWarmupCountdown({
-              //if you are not doing a workout, 0
-              //otherwise, use the seconds in the workout controller
+              //use the seconds in the workout controller
               seconds:this.workoutController.warmupSeconds,
               onDone: () => {
                 this.workoutController?.startWorkout();

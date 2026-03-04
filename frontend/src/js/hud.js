@@ -180,7 +180,6 @@ initTrainerToggle() {
    * Reuses the same area as the countdown.
    */
   showWorkoutMessage({ text, seconds = 4 } = {}) {
-    console.log("showing workout message");
     if (!this.workoutOverlay || !this.workoutDialog) return;
     
     // clear any previous hide timer
