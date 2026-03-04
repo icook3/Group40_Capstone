@@ -67,26 +67,16 @@ export class mainMenuView {
                 constants.riderState.speed = 0;
             }
         });
-        //Pacer speed input
-        const pacerSpeedInput = document.getElementById("pacer-speed");
-        pacerSpeedInput.addEventListener("input", () => {
-            sessionStorage.setItem("PacerSpeed", pacerSpeedInput.value);
-        });
-        //weight input
-        // Hook up live mass updates → optional immediate speed recompute
-        const riderWeightEl = document.getElementById("rider-weight");
-        if (riderWeightEl) {
-            const updateMassAndMaybeSpeed = () => {
-                const newMass = Number(riderWeightEl.value);
-                if (!Number.isFinite(newMass)) return;
-                sessionStorage.setItem("weight", newMass);
-            };
 
-            // Initialize once and then listen for changes
-            updateMassAndMaybeSpeed();
-            riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
-            riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
-        }
+        // Pacer speed input
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+        resizeInput(pacerSpeedInput);
+        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9);
+
+        // Weight input
+        const riderWeightInput = document.getElementById("rider-weight");
+        resizeInput(riderWeightInput)
+        restrictNumberInput(riderWeightInput, 3, 1, 999.9);
 
         // Units input
         // Speed unit toggle
@@ -201,4 +191,41 @@ export class mainMenuView {
             }
         });
     }
+}
+
+function restrictNumberInput(input, maxDigits, min, max) {
+    input.addEventListener("input", () => {
+        const pattern = new RegExp(`^\\d{0,${maxDigits}}(\\.\\d{0,1})?$`);
+
+        if (!pattern.test(input.value)) {
+            input.value = input.value.slice(0, -1);
+            return;
+        }
+
+        resizeInput(input);
+
+        sessionStorage.setItem(input.id, input.value);
+    });
+
+    input.addEventListener("change", () => {
+        let num = parseFloat(input.value);
+        if (isNaN(num)) {
+            input.value = min;
+            return;
+        }
+
+        num = Math.max(min, Math.min(max, num));
+        input.value = num;
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (["e", "E", "+", "-"].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+}
+
+function resizeInput(input) {
+    const length = String(input.value ?? "").length;
+    input.style.width = 4 + (length + 1) + "ch";
 }
