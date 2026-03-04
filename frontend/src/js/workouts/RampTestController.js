@@ -31,7 +31,7 @@ export class RampTestController {
     // Kick off warmup countdown in the overlay
     if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
       this.hud.showWarmupCountdown({
-        seconds: warmupSeconds,
+        seconds: this.warmupSeconds,
         onDone: () => {
           this._startRamp();
         },

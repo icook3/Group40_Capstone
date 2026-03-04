@@ -415,11 +415,11 @@ export class zlowScreen {
         this.workoutController = new SprintIntervalController({
           hud: tempHud,
           nowMs: now,
-          warmupSeconds: 5 * 60,
-          secondOn: 10,
-          useWatts: 20,
-          secondsOff: 10,
-          wattsOff: 10
+          warmupSeconds: 10 * 60,
+          secondOn: 2*60,
+          useWatts: 1.05*this.workoutStorage?.data?.personalRecords?.highestFtp?.value||120,
+          secondsOff: 2*60,
+          wattsOff: 0.95*this.workoutStorage?.data?.personalRecords?.highestFtp?.value||10
         });
       } else {
         this.workoutController = null;
@@ -434,15 +434,16 @@ export class zlowScreen {
           simulationState.isPaused = false;
           this.isRecording = true;
           this.rideElapsedMs = 0;
+          if (this.workoutController!=null) {
           this.hud.showWarmupCountdown({
-            //if you are not doing a workout, 0
-            //otherwise, use the seconds in the workout controller
-            seconds:this.workoutController==null ? 0 : this.workoutController.warmupSeconds,
-            onDone: () => {
-              this.workoutController?.startWorkout();
-            }
-          });
-          // If ramp, begin warmup countdown (no pause)
+              //if you are not doing a workout, 0
+              //otherwise, use the seconds in the workout controller
+              seconds:this.workoutController.warmupSeconds,
+              onDone: () => {
+                this.workoutController?.startWorkout();
+              }
+            });
+          }
         },
       });
     }

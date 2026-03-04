@@ -2,10 +2,10 @@ export class SprintIntervalController {
   constructor({
     hud,
     nowMs = Date.now(),
-    warmupSeconds = 5 * 60,
-    secondOn = 10,
-    useWatts = 20,
-    secondsOff = 10,
+    warmupSeconds = 10 * 60,
+    secondOn = 60*2,
+    useWatts = 120,
+    secondsOff = 60*2,
     ftpFactor = 0.75,
     wattsOff = 0
   } = {}) {
@@ -26,7 +26,7 @@ export class SprintIntervalController {
     // Kick off warmup countdown in the overlay
     if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
       this.hud.showWarmupCountdown({
-        seconds: warmupSeconds,
+        seconds: this.warmupSeconds,
         onDone: () => {
           this._startSprintIntervals();
         },
