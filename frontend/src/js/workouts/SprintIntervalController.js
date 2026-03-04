@@ -22,6 +22,7 @@ export class SprintIntervalController {
     this.aboveThresholdAccumSec = 0;
     this.lastUpdateMs = nowMs;
     this.wattsOff = wattsOff;
+    this.warmupSeconds = warmupSeconds;
 
     // Kick off warmup countdown in the overlay
     if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
