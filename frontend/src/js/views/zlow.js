@@ -2,7 +2,7 @@ import { TrainerBluetooth } from "../bluetooth.js";
 import { ZlowScene } from "../scene/index.js";
 import { HUD } from "../hud.js";
 import { Strava } from "../strava.js";
-import { constants } from "../constants.js";
+import {constants, features} from "../constants.js";
 import { AvatarMovement } from "../avatarMovement.js";
 import { KeyboardMode } from "../keyboardMode.js";
 import { StandardMode } from "../standardMode.js";
@@ -205,7 +205,9 @@ export class zlowScreen {
             } catch (e) {
                 aframeStats = { error: "failed to read aframe stats" };
             }
-            tempPeerState=this.peerState;
+
+            let tempPeerState = this.peerState;
+
             return {
                 workout: sessionStorage.getItem("SelectedWorkout") || "free",
                 samples: rideHistory.samples?.length,
@@ -365,7 +367,7 @@ export class zlowScreen {
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        this.scene = new ZlowScene(Number(pacerSpeedInput.value));
+        this.scene = new ZlowScene();
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
@@ -379,11 +381,11 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val);
+          this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val);
+          this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         }
       }
@@ -748,8 +750,9 @@ export class zlowScreen {
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
       
-      this.createCrashReporter();
-    
+      if (features.crashReporterEnabled) {
+          this.createCrashReporter();
+      }
       // initialize peer-to-peer connection
       this.initPeerToPeer();
       this.selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";

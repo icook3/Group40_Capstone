@@ -2,15 +2,8 @@
 import { Strava } from "./strava.js";
 import { constants } from "./constants.js";
 import { rideHistory } from "./rideHistoryStore.js";
-
-// Prevent meshes from disappearing due to frustum culling
-AFRAME.registerComponent("no-cull", {
-  init() {
-    this.el.addEventListener("model-loaded", () => {
-      this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
-    });
-  },
-});
+import {buildTCX, tcxToBlob} from "./rideFile.js";
+import {downloadBlob} from "./download.js";
 
 export function activatePacer() {
   //if (peerState!=0) {return;}

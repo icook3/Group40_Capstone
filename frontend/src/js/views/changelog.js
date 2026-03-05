@@ -248,7 +248,7 @@ export class changelogView {
     placeTrack() {
         const geometry = new THREE.BoxGeometry(1, 2, 0.1);
         const loader = new THREE.TextureLoader();
-        let texture = loader.load('../../../resources/textures/Track.jpeg', (texture) => {
+        let texture = loader.load('../../resources/textures/Track.jpeg', (texture) => {
             texture.colorSpace = THREE.SRGBColorSpace;
             const texMat = new THREE.MeshBasicMaterial({map: texture});
             for (let i=-this.grassX; i<this.grassX;i++) {
@@ -266,7 +266,7 @@ export class changelogView {
         const material1 = new THREE.MeshBasicMaterial({color:constants.groundColor1});
         const material2 = new THREE.MeshBasicMaterial({color:constants.groundColor2});
         const loader = new THREE.TextureLoader();
-        let texture = loader.load('../../../resources/textures/Grass.jpeg', (texture) => {
+        let texture = loader.load('../../resources/textures/Grass.jpeg', (texture) => {
             texture.colorSpace = THREE.SRGBColorSpace;
             const texMat = new THREE.MeshBasicMaterial({map: texture});
             let currentlyMat1=true;
