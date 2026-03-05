@@ -24,13 +24,6 @@ export class ObjectField {
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
-
-    // Rotate rig to face forwards relative to the rider
-      this.rig = this.scene.getObjectByName("rig");
-
-      if (this.rig) {
-          this.rig.rotation.y = THREE.MathUtils.degToRad(-105);
-      }
   }
 
   // allow scene to register bands (each with items[] and recyclePolicy)

@@ -317,11 +317,17 @@ function straightPiece(trackSystem) {
     // Shorten track element array every time it exceeds 200 elements
     let track_elements = trackSystem.path_element.children;
     if (track_elements.length > 200) {
-      for (let i = 0; i < 100; i++) {
-        const obj = track_elements[0];
-        if (obj?.parent) {
-          obj.parent.remove(obj);
-        }
+      const riderZ = document.getElementById('rider')?.object3D?.position.z ?? 0;
+      let removed = 0;
+      while (track_elements.length > 100 && removed < 100) {
+      const obj = track_elements[0];
+      // Only remove pieces that are behind the rider
+      if (obj.position.z > riderZ + 20) {
+        obj.parent.remove(obj);
+        removed++;
+      } else {
+        break; // stop if we've reached pieces the rider hasn't passed
+      }
       }
     }
   }
