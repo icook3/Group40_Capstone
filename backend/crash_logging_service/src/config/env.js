@@ -3,7 +3,8 @@ dotenv.config();
 
 const required = [
     "DATA_DIR",
-    "FRONTEND_URI"
+    "FRONTEND_URI",
+    "REPORT_API_KEY"
 ];
 
 for (const key of required) {
