@@ -9,8 +9,8 @@ import { SceneryBand } from './SceneryBand.js';
  * - dynamic bands: participate in advance/recycle (if you later add that logic)
  */
 export class SceneryManager {
-  constructor({ sceneEl }) {
-    this.sceneEl = sceneEl;
+  constructor({ scene }) {
+    this.scene = scene;
     this.scenePolicy = new ScenePolicy(cfg);
 
     // ADDED: track lifecycle so we don't double-destroy
@@ -22,7 +22,7 @@ export class SceneryManager {
     // Create SceneryBand instances for all of them
     this.bands = all.map(bandPolicy => {
       const band = new SceneryBand({
-        sceneEl,
+        scene: this.scene,
         policy: bandPolicy,
         name: bandPolicy.name,
       });
@@ -72,8 +72,8 @@ export class SceneryManager {
         // (Adjust this block to match your SceneryBand implementation.)
         const items = band.items; // ADDED
         if (Array.isArray(items)) { // ADDED
-          for (const el of items) { // ADDED
-            if (el && el.parentNode) el.parentNode.removeChild(el); // ADDED
+          for (const obj of items) { // ADDED
+            if (obj && obj.parent) obj.parent.remove(obj); // ADDED
           }
           band.items.length = 0; // ADDED
         }
@@ -85,6 +85,6 @@ export class SceneryManager {
     this.dynamicBands = []; // ADDED
     this.bands = []; // ADDED
     this.scenePolicy = null; // ADDED
-    this.sceneEl = null; // ADDED
+    this.scene = null; // ADDED
   }
 }
