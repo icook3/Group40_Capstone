@@ -461,7 +461,6 @@ export class zlowScreen {
         });
 
         simulationState.isPaused = false;
-        pauseBtn.textContent = "Pause";
         constants.lastTime = Date.now();
         this.hud.resume();
         this.setPacerSpeed(savedPacerSpeed);
@@ -519,8 +518,7 @@ export class zlowScreen {
             this.physics.setSpeed(0);
             this.hud.resetWorkOut();
             const pauseBtn = document.getElementById("pause-btn");
-            pauseBtn.textContent = "Pause";
-    
+                
             // Reset pacer
             this.setPacerSpeed(0);
             const startPos = { x: 0.5, y: 1, z: -2 };
@@ -817,23 +815,43 @@ export class zlowScreen {
     
       // Show/hide dev hud based on testMode
       console.log("testMode value:", localStorage.getItem("testMode"));
+      const devWrapper = getElement("dev-controls-wrapper");
       const devHud = getElement("dev-controls-hud");
-      console.log("devHud element found:", devHud);
-    
-      if (devHud) {
+
+      if (devWrapper) {
         if (localStorage.getItem("testMode") === "true") {
-          console.log("Removing hidden attribute");
-          devHud.removeAttribute("hidden");
+          devWrapper.removeAttribute("hidden");
         } else {
-          console.log("Adding hidden attribute");
-          devHud.setAttribute("hidden", "");
+          devWrapper.setAttribute("hidden", "");
         }
-      } else {
-        console.log("ERROR: dev-controls-panel element not found!");
+      }
+
+      const devToggleBtn = getElement("dev-toggle-btn");
+      if (devToggleBtn && devHud) {
+        devToggleBtn.addEventListener("click", () => {
+          devHud.hidden = !devHud.hidden;
+        });
       }
       this.initializePacerSpeedInput();    
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
+
+      // Dismiss trainer and dev menus when clicking outsideof their pop up
+      document.addEventListener("click", (e) => {
+        // Trainer menu
+        const trainerControls = document.querySelector(".trainer-controls");
+        const trainerMenu = document.querySelector(".trainer-menu");
+        if (trainerMenu && !trainerMenu.hidden && !trainerControls.contains(e.target)) {
+          trainerMenu.hidden = true;
+        }
+
+        // Dev menu
+        const devWrapper = document.getElementById("dev-controls-wrapper");
+        const devHud = document.getElementById("dev-controls-hud");
+        if (devHud && !devHud.hidden && devWrapper && !devWrapper.contains(e.target)) {
+          devHud.hidden = true;
+        }
+      });
     
     
       // Map workout keys to user-facing labels
