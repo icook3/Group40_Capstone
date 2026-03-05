@@ -1,4 +1,5 @@
-import { setPos } from "../../core/util.js";
+import * as THREE from "three";
+import { loadModel } from "../../modelCache.js";
 
 function sampleTreeX() {
   // original behavior: uniform [-20,20] but exclude path (-4..4)
@@ -11,53 +12,41 @@ function sampleTreeX() {
 
 export const TreeKind = {
   name: "tree",
-  spawn(sceneEl, z) {
-    const x = sampleTreeX();
-    const obj = document.createElement("a-entity");
-    obj.setAttribute("zlow-kind", "tree"); // mark kind explicitly
 
-    // different tree types
+  spawn(scene, z) {
+    const x = sampleTreeX();
+
+    const group = new THREE.Group();
+
     const treeTypes = ["tree1", "tree2", "tree3"];
-    const bushChance = 0.25; //chance of a bush instead
+    const bushChance = 0.25;
 
     let modelId;
     if (Math.random() < bushChance) {
-      modelId = "tree-bush1";
+      modelId = "bush1";
     } else {
       modelId = treeTypes[Math.floor(Math.random() * treeTypes.length)];
     }
 
     // get glb model
-    obj.setAttribute("gltf-model", `#${modelId}`);
+    loadModel(modelId).then((model) => {
+      group.userData.zlowKind = "tree";
 
-    // testing 
-    const onModelLoaded = () => {
-      const mesh = obj.getObject3D("mesh");
-      if (mesh) {
-        mesh.traverse((node) => {
-          if (node.isMesh && node.material) {
-            if (node.material.color) {
-              //this controls the brightness
-              node.material.color.multiplyScalar(3);
-            }
-
-            // other material properties that can be tweaked
-            node.material.roughness = 0.85;
-
-            node.material.needsUpdate = true;
+      model.traverse((node) => {
+        if (node.isMesh && node.material) {
+          if (node.material.color) {
+            node.material.color.multiplyScalar(3);
           }
-        });
-      }
 
-      // IMPORTANT: avoid retaining a closure/listener forever
-      obj.removeEventListener("model-loaded", onModelLoaded);
-    };
+          node.material.roughness = 0.85;
+        }
+      });
 
-    obj.addEventListener("model-loaded", onModelLoaded);
+      group.add(model);
+    });
 
-    // rotate tree randomly as well
-    const rotation = Math.random() * 360;
-    obj.setAttribute("rotation", `0 ${rotation} 0`);
+    // rotate tree randomly
+    group.rotation.y = Math.random() * Math.PI * 2;
 
     // scale trees randomly from 450-490%
     // bushes from 200-220%
@@ -68,12 +57,14 @@ export const TreeKind = {
       scale = 4 + Math.random() * 4;
     }
 
-    obj.setAttribute("scale", `${scale} ${scale} ${scale}`);
+    group.scale.set(scale, scale, scale);
+    group.position.set(x, 0, z);
 
-    setPos(obj, { x, y: 0, z });
-    sceneEl.appendChild(obj);
-    return obj;
+    scene.add(group);
+
+    return group;
   },
+
   resampleX() {
     return sampleTreeX();
   },

@@ -2,80 +2,70 @@
   Creates the path the rider travels and circular patterns superimposed on the road.
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
+import * as THREE from "three";
 import { constants } from "../../constants.js";
-import { getPos, setPos, getSign } from '../core/util.js';
+import {getPos, getSign} from '../core/util.js';
 import  {activatePacer } from '../../main.js'
 
 export class Track {
-
-  constructor({ sceneEl }) {
+  constructor({ scene }) {
     // ---- SINGLETON GUARD / CLEANUP PREVIOUS INSTANCE ----
     if (window.__zlowTrackInstance) {
       window.__zlowTrackInstance.destroy?.();
     }
     window.__zlowTrackInstance = this;
-    this.sceneEl = sceneEl;
+    this.scene = scene;
 
-    // Create a-entity for the path and set ID
-    let path_element = document.getElementById('track');
+    let path_element = scene.getObjectByName("track");
     this._ownsPath = !path_element;
 
     if (!path_element) {
-      path_element = document.createElement('a-entity');
-      path_element.setAttribute('id','track');
-      sceneEl.appendChild(path_element);
+      path_element = new THREE.Group();
+      path_element.name = "track";
+      scene.add(path_element);
     }
     this.path_element = path_element;
 
+    this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
     this.pacer = document.getElementById('pacer-entity');
-
-    // Spawn decorative track behind the rider and pacer and initial track point, then call main spawn function
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: 15`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 1`);
-    track.setAttribute('position', `0 0 4`);
-    this.path_element.appendChild(track);
-    constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
-    spawn_track();
-
-    // As each animation completes, start the next one
     this.update_rider_animation = this.update_rider_animation.bind(this);
+    this.update_pacer_animation = this.update_pacer_animation.bind(this);
 
-  this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+    const geometry = new THREE.BoxGeometry(
+      constants.pathWidth,
+      constants.pathHeight,
+        15
+    );
+
+    const material = new THREE.MeshStandardMaterial({
+      map: this.trackTexture
+    });
+
+    const track = new THREE.Mesh(geometry, material);
+    track.position.set(0, 0, 4);
+    this.path_element.add(track);
+    constants.trackPoints.push({ x: 0, y: 1, z: -1, length: 1 });
+
+    spawn_track(this);
+
+    this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
   destroy() {
-  // 1) Remove event listener we added
-  if (this.rider && this.update_rider_animation) {
-    this.rider.removeEventListener("animationcomplete__1", this.update_rider_animation);
-  }
-  if (this.pacer && this.update_pacer_animation) {
-    this.pacer.removeEventListener("animationcomplete__2", this.update_pacer_animation);
-  }
+    this.path_element.traverse(obj => {
+      if (obj.geometry) obj.geometry.dispose();
 
-  // 2) Clear the delayed init timer
-  if (this._initTimer) {
-    clearTimeout(this._initTimer);
-    this._initTimer = null;
-  }
+      if (obj.material) {
+        if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+        else obj.material.dispose();
+      }
+    });
 
-  // 3) If you want to fully remove the track entity from DOM, do it here.
-  //    Only do this if THIS instance owns it; otherwise you might break others.
-  //    (See “ownsPath” note below.)
-  if (this._ownsPath && this.path_element) {
-    disposeAFrameEl(this.path_element);
-    this.path_element.parentNode?.removeChild(this.path_element);
+    this.path_element.parent?.remove(this.path_element);
   }
-
-  // 4) Clear singleton pointer if it's us
-  if (window.__zlowTrackInstance === this) {
-    window.__zlowTrackInstance = null;
-  }
-}
-
 
 // Update animation speed and target based on current track piece
 update_rider_animation() {
@@ -89,7 +79,7 @@ update_rider_animation() {
   // If we're close to the end of the array, spawn more now (before indexing).
   const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
   if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track();
+    spawn_track(this);
   }
 
   // ---- NEW: guard against out-of-range / undefined ----
@@ -117,7 +107,7 @@ update_rider_animation() {
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)
   if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track();
+    spawn_track(this);
   }
 }
 
@@ -132,7 +122,7 @@ update_pacer_animation() {
   // If we're close to the end of the array, spawn more now (before indexing).
   const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
   if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track();
+    spawn_track(this);
   }
 
   // ---- NEW: guard against out-of-range / undefined ----
@@ -158,7 +148,7 @@ update_pacer_animation() {
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)
   if (getPos(pacer).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track();
+    spawn_track(this);
   }
 }
 
@@ -192,37 +182,10 @@ update_pacer_animation() {
   }
 }
 
-function disposeAFrameEl(el) {
-  if (!el) return;
-
-  // A-Frame keeps the THREE object tree at el.object3D
-  const root = el.object3D;
-  if (!root) return;
-
-  root.traverse((obj) => {
-    if (obj.geometry) obj.geometry.dispose?.();
-
-    if (obj.material) {
-      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-      for (const m of mats) {
-        // dispose common texture slots
-        m.map?.dispose?.();
-        m.normalMap?.dispose?.();
-        m.roughnessMap?.dispose?.();
-        m.metalnessMap?.dispose?.();
-        m.aoMap?.dispose?.();
-        m.emissiveMap?.dispose?.();
-        m.dispose?.();
-      }
-    }
-  });
-}
-
   // Create and append a track piece curving to the right
-  function curve_180_right() {
-    let path_element = document.getElementById('track');
-    const track = document.createElement('a-entity');
-    let pointZ = -1 * (constants.farthestSpawn);
+  function curve_180_right(trackSystem) {
+    const path_element = trackSystem.path_element;
+    const pointZ = -1 * (constants.farthestSpawn);
 
     // Add necessary points based on current farthest spawn
     constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 16.55});
@@ -238,22 +201,31 @@ function disposeAFrameEl(el) {
     constants.farthestSpawn += 62;
 
     // Add graphical track representation
-    track.setAttribute('id', 'curve')
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
-    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
-    track.setAttribute('configuration', `curve_right_180`);
+    const geometry = new THREE.RingGeometry(
+      25,
+      35,
+      32,
+      1,
+      THREE.MathUtils.degToRad(270),
+      THREE.MathUtils.degToRad(180)
+    );
 
-    // Subract an additional 30 to compensate for centering mismatches
-    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${pointZ-30}`);
-    track.setAttribute('rotation', '-90 0 0');
-    path_element.appendChild(track);
+    const material = new THREE.MeshStandardMaterial({
+      map: trackSystem.trackTexture,
+      side: THREE.DoubleSide
+    });
+
+    const track = new THREE.Mesh(geometry, material);
+    track.position.set(-3.5, constants.pathHeight, pointZ-30);
+    track.rotation.x = -Math.PI/2;
+
+    path_element.add(track);
   }
 
   // Create and append a track piece curving to the left
-  function curve_180_left() {
-    let path_element = document.getElementById('track');
-    const track = document.createElement('a-entity');
-    let pointZ = -1 * (constants.farthestSpawn);
+  function curve_180_left(trackSystem) {
+    const path_element = trackSystem.path_element;
+    const pointZ = -1 * (constants.farthestSpawn);
 
     // Add necessary points based on current farthest spawn
     constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 16.55});
@@ -269,65 +241,86 @@ function disposeAFrameEl(el) {
     constants.farthestSpawn += 62;
 
     // Add graphical track representation
-    track.setAttribute('id', 'curve')
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 90`);
-    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
-    track.setAttribute('configuration', `curve_right_180`);
+    const geometry = new THREE.RingGeometry(
+      25,
+      35,
+      32,
+      1,
+      THREE.MathUtils.degToRad(90),
+      THREE.MathUtils.degToRad(180)
+    );
 
-    // Subract an additional 30 to compensate for centering mismatches
-    track.setAttribute('position', `3.5 ${constants.pathHeight} ${pointZ-30}`);
-    track.setAttribute('rotation', '-90 0 0');
-    path_element.appendChild(track);
+      const material = new THREE.MeshStandardMaterial({
+          map: trackSystem.trackTexture,
+          side: THREE.DoubleSide
+      });
+
+      const track = new THREE.Mesh(geometry, material);
+      track.position.set(3.5, constants.pathHeight, pointZ-30);
+      track.rotation.x = -Math.PI/2;
+
+      path_element.add(track);
   }
 
-function straightPiece() {
-  let path_element = document.getElementById('track');
-    // Spawn track pieces in 5 unit increments
-    let pointZ = -1 * (constants.farthestSpawn + 5);
+function straightPiece(trackSystem) {
+  const path_element = trackSystem.path_element;
+  const pointZ = -1 * (constants.farthestSpawn + 5);
+  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+  constants.farthestSpawn += 5;
+  constants.trackPoints.push({ x: 0, y: 1, z: pointZ, length: 5 });
 
-    // Adjust Z spawn position to correct for centering of the box geometry
-    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-    constants.farthestSpawn += 5;
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
+  const geometry = new THREE.BoxGeometry(
+    constants.pathWidth,
+    constants.pathHeight,
+    constants.pathDepth
+  );
 
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
-    track.setAttribute('configuration', `straight_vertical`);
-    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
-    path_element.appendChild(track);
+  const material = new THREE.MeshStandardMaterial({
+    map: trackSystem.trackTexture
+  });
+
+  const track = new THREE.Mesh(geometry, material);
+
+   track.position.set(
+     constants.pathPositionX,
+     constants.pathPositionY,
+     trackZ
+   );
+
+   path_element.add(track);
 }
 
   // Spawn track pieces in
-  export function spawn_track() {
+  export function spawn_track(trackSystem) {
     for (let i = 0; i < 80; i++) {
       // Spawn straight pieces in sets of three and more often than curved pieces
       let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
 
-      if (random % 15 == 0 && getSign()) {
-        straightPiece();
-        curve_180_right();
-        straightPiece();
+      if (random % 15 === 0 && getSign()) {
+        straightPiece(trackSystem);
+        curve_180_right(trackSystem);
+        straightPiece(trackSystem);
       }
-      else if (random % 15 == 0 && !getSign()) {
-        straightPiece();
-        curve_180_left();
-        straightPiece();
+      else if (random % 15 === 0 && !getSign()) {
+        straightPiece(trackSystem);
+        curve_180_left(trackSystem);
+        straightPiece(trackSystem);
       }
 
       else {
-        straightPiece();
-        straightPiece();
-        straightPiece();
+        straightPiece(trackSystem);
+        straightPiece(trackSystem);
+        straightPiece(trackSystem);
       }
     }
 
     // Shorten track element array every time it exceeds 200 elements
-    let track_elements = document.getElementById('track').children;
+    let track_elements = trackSystem.path_element.children;
     if (track_elements.length > 200) {
       for (let i = 0; i < 100; i++) {
-        if (track_elements[0].getAttribute('position').z > getPos(document.getElementById('rider')).z + 20) {
-          track_elements[0].parentNode.removeChild(track_elements[0]);
+        const obj = track_elements[0];
+        if (obj?.parent) {
+          obj.parent.remove(obj);
         }
       }
     }
