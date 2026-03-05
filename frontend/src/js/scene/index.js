@@ -1,60 +1,91 @@
-import { ObjectField } from './objects/ObjectField.js';
-import { Track } from './env/Track.js';
-import { Cloud } from './env/Cloud.js';
-import { SceneryManager } from './env/SceneryManager.js';
-import { constants } from '../constants.js';
+import * as THREE from "three";
+import { Camera } from "./Camera.js";
+import { ObjectField } from "./objects/ObjectField.js";
+import { Track } from "./env/Track.js";
+import { Cloud } from "./env/Cloud.js";
+import { SceneryManager } from "./env/SceneryManager.js";
+import { constants } from "../constants.js";
 
 export class ZlowScene {
-  constructor(_, { getElement = (id) => document.getElementById(id) } = {}) {
-    // If a previous scene exists, tear it down first
-    if (window.__zlowSceneInstance) {
-      window.__zlowSceneInstance.destroy?.();
+    constructor() {
+        if (window.__zlowSceneInstance) {
+            window.__zlowSceneInstance.destroy?.();
+        }
+        window.__zlowSceneInstance = this;
+
+        // Scene
+        this.scene = new THREE.Scene();
+        this.objectsLoaded = false;
+
+        // Renderer
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(this.renderer.domElement);
+
+        // Camera
+        this.cam = new Camera(this.scene);
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+        this.scene.add(ambient);
+        const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+        sun.position.set(5, 10, 7);
+        this.scene.add(sun);
+
+        // Scenery
+        this.scenery = new SceneryManager({ scene: this.scene });
+        constants.worldZ = 0;
+
+        // World systems
+        this.track = new Track({ scene: this.scene });
+        this.clouds = new Cloud({ scene: this.scene });
+
+        this.objectField = new ObjectField({
+            scene: this.scene,
+            track: this.track,
+            policy: this.scenery.defaultPolicy,
+            clouds: this.clouds,
+        });
+        this.objectField.attachExternalBands(this.scenery.bands);
+
+        // Resize
+        this._onResize = () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            this.renderer.setSize(w, h);
+            this.cam.camera.aspect = w / h;
+            this.cam.camera.updateProjectionMatrix();
+        };
+        window.addEventListener("resize", this._onResize);
     }
-    window.__zlowSceneInstance = this;
 
-    this.scene = getElement("scene");
-    this.objectsLoaded = false;
+    update(riderSpeed = 0, dt = 0) {
+        const dz = riderSpeed * dt;
+        constants.worldZ += dz;
 
-    this.scenery = new SceneryManager({ sceneEl: this.scene }); // actual edge
+        if (!this.objectsLoaded) {
+            this.objectField.init();
+            this.objectsLoaded = true;
+        }
+        this.objectField.advance(riderSpeed, dt);
 
-    // --- Optional one-time debug log ---
-    if (this.DEBUG_BANDS) {
-      this.scenery.scenePolicy.logBands();
+        this.renderer.render(this.scene, this.cam.camera);
     }
-    constants.worldZ=0;
-    // Generate a new object field, track, and clouds
-    this.track = new Track({ sceneEl: this.scene });        
-    this.clouds = new Cloud({ sceneEl: this.scene });
 
-    this.objectField = new ObjectField({
-      sceneEl: this.scene,
-      track: this.track,
-      policy: this.scenery.defaultPolicy,
-      clouds: this.clouds
-    });
-    this.objectField.attachExternalBands(this.scenery.bands);
-  }
+    destroy() {
+        window.removeEventListener("resize", this._onResize);
+        this.renderer?.domElement?.remove();
+        this.renderer?.dispose();
 
-  destroy() {
-    // break cross-references first
-    this.objectField?.attachExternalBands?.([]); // or objectField.detachExternalBands?.()
+        this.objectField?.attachExternalBands?.([]);
+        this.objectField?.destroy?.();
+        this.clouds?.destroy?.();
+        this.track?.destroy?.();
+        this.scenery?.destroy?.();
 
-    this.objectField?.destroy?.();
-    this.clouds?.destroy?.();
-    this.track?.destroy?.();
-    this.scenery?.destroy?.();
-
-    if (window.__zlowSceneInstance === this) window.__zlowSceneInstance = null;
-  }
-
-  update(riderSpeed = 0, dt = 0) {
-    const dz = riderSpeed * dt;
-    constants.worldZ += dz;
-
-    if (!this.objectsLoaded) {
-      this.objectField.init();
-      this.objectsLoaded = true;
+        if (window.__zlowSceneInstance === this) {
+            window.__zlowSceneInstance = null;
+        }
     }
-    this.objectField.advance(riderSpeed, dt);
-  }
 }

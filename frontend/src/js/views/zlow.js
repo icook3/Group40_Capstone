@@ -366,7 +366,7 @@ export class zlowScreen {
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        this.scene = new ZlowScene(Number(pacerSpeedInput.value));
+        this.scene = new ZlowScene();
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
@@ -380,11 +380,11 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val);
+          this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val);
+          this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         }
       }
