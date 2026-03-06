@@ -76,6 +76,10 @@ export class ObjectField {
   advance(riderSpeed, dt) {
     if (!this.initialized || riderSpeed === 0 || dt === 0) return;
 
+    if (!this.rider) {
+      this.rider = this.scene.getObjectByName("rider");
+    }
+
     const riderZ = this.rider?.position.z ?? 0;
     const recycleZ = riderZ + 20;
 
@@ -124,18 +128,32 @@ export class ObjectField {
       for (const obj of band.items) {
         if (obj.position.z > recycleZ) {
           obj.position.z = bandMinZ - 5;
+
           const mix =
             typeof band.policy.mix === "function"
               ? band.policy.mix()
               : { tree: 0.5, building: 0.5 };
 
           const roll = Math.random();
-          const nextIsBuilding = roll < mix.building;
-
-          const kindName = nextIsBuilding ? "building" : "tree";
+          const kindName = roll < mix.building ? "building" : "tree";
           obj.userData.zlowKind = kindName;
 
-          obj.position.x = detectKind(obj).resampleX();
+          // Use band policy for X positioning instead of kind.resampleX()
+          const side = obj.userData.zlowSide === "right" ? 1 : -1;
+          if (typeof band.policy.xAnchor === "function") {
+            const anchor = band.policy.xAnchor(kindName, side);
+            const jitter = typeof band.policy.jitterX === "function"
+              ? band.policy.jitterX()
+              : 0.35;
+            let x = anchor + (Math.random() - 0.5) * jitter;
+
+            if (typeof band.policy.clampX === "function") {
+              x = band.policy.clampX(kindName, side, x);
+            }
+            obj.position.x = x;
+          } else {
+            obj.position.x = detectKind(obj).resampleX();
+          }
 
           bandMinZ = obj.position.z;
         }

@@ -9,8 +9,7 @@ const cache = {};
  */
 export function loadModel(modelName) {
     return new Promise((resolve, reject) => {
-
-        // Already loaded → clone
+        // Already loaded
         if (cache[modelName]) {
             resolve(cache[modelName].clone(true));
             return;

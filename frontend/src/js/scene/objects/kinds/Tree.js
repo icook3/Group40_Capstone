@@ -34,10 +34,6 @@ export const TreeKind = {
 
       model.traverse((node) => {
         if (node.isMesh && node.material) {
-          if (node.material.color) {
-            node.material.color.multiplyScalar(3);
-          }
-
           node.material.roughness = 0.85;
         }
       });

@@ -1,7 +1,8 @@
-
+import * as THREE from "three";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 export class AvatarCreator {
-    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
+    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null, scene = null) {
         this.id = id;
         this.position = position;
         this.rotation = rotation;
@@ -82,6 +83,8 @@ export class AvatarCreator {
 
         this.loadPlayerData();
         this.avatarEntity = this.createEntity();
+
+        this.scene = scene;
     }
 
     //Creates avatar entity
@@ -98,9 +101,15 @@ export class AvatarCreator {
 
         this.createPlayerModel(avatar);
         this.createBikeModel(avatar);
-        
-        //Don't try to access scene until the end of this function, or it will crash
-        document.querySelector('a-scene').object3D.add(avatar);
+
+        const targetScene = this.scene || window.__zlowSceneInstance?.scene;
+
+        if (targetScene) {
+            targetScene.add(avatar);
+        } else {
+            console.warn("[AvatarCreator] No scene found to add avatar to");
+        }
+
         return avatar;
     }
 
@@ -111,7 +120,7 @@ export class AvatarCreator {
             }
         };
 
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
         try {
             if (this.playerModel == "male") {
                 var personModel = await loader.loadAsync( '../../resources/models/playermodels/maleV5.glb' );
@@ -244,7 +253,7 @@ export class AvatarCreator {
         };
 
         // Create loader and attempt to load bike model
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
         try {
             var bikeModel = await loader.loadAsync( '../../resources/models/playermodels/bikeV4.glb' );
             console.log("Bike model loaded.")
@@ -295,7 +304,7 @@ export class AvatarCreator {
 
 async createHelmetModel(avatarEntity) {
     if (this.helmetObject == null) {
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
 
             try {
                 var helmetModel = await loader.loadAsync( '../../resources/models/playermodels/helmet.glb' );

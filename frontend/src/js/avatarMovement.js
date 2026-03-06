@@ -1,42 +1,14 @@
 import { AvatarCreator } from "./avatarCreator.js";
-import { constants } from "./constants.js";
 import { units } from "./units/index.js";
 
 export class AvatarMovement {
     constructor(id, options = {}) {
-        this.creator = new AvatarCreator(id, options.position);
+        this.creator = new AvatarCreator(id, options.position, undefined, null, options.scene || window.__zlowSceneInstance?.scene);
         this.avatarEntity = this.creator.avatarEntity;
         this.speed = 0;
         this.power = 0;
         this.isPacer = options.isPacer || false;
-        // Fix camera to rider entity
-        if (id == "rider") {
-            this.addCamera();
-        }
     }
-
-    // Add point-of-view camera to rider using a rig
-    addCamera() {
-        // Spawn from class rather than creating new
-        this.rider = document.getElementById("scene").object3D.getObjectByName('rider');
-        if (!this.rider) return;
-
-        const rig = document.createElement('a-entity');
-        rig.setAttribute('id','rig');
-
-        const camera = document.createElement('a-camera');
-        camera.setAttribute('wasd-controls-enabled', 'false');
-        camera.setAttribute('id','camera');
-        camera.setAttribute('look-controls','');
-        camera.setAttribute('position','4 5 7');
-        camera.setAttribute('active', true)
-        camera.setAttribute('look-at','#rider');
-
-        //rig.appendChild(camera);
-        //document.getElementById("scene").appendChild('camera')
-
-        console.log("HIT")
-        }
 
     //Helper to interpolate smoothly between A and B
     cycleInterpolate (a, b, phase) {

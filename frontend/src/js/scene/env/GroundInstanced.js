@@ -14,7 +14,7 @@ export class GroundInstanced {
             constants.tileSize
         );
 
-        const texture = new THREE.TextureLoader().load("../../../resources/textures/Grass.png");
+        const texture = new THREE.TextureLoader().load("../../resources/textures/Grass.jpeg");
         const mat = new THREE.MeshBasicMaterial({ map: texture });
 
         this.mesh = new THREE.InstancedMesh(geom, mat, count);

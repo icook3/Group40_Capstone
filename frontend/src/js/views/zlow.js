@@ -132,6 +132,7 @@ export class zlowScreen {
           this.pacer = new AvatarMovement("pacer-entity", {
             position: { x: 0.5, y: 1, z: 0 },
             isPacer: false,
+              scene: this.scene.scene
           });
           this.pacer.creator.loadOtherData(data.data);
           this.pacerPhysics = new PhysicsEngine();
@@ -363,10 +364,13 @@ export class zlowScreen {
       }
     }
 
+    initializeScene() {
+        this.scene = new ZlowScene();
+    }
+
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        this.scene = new ZlowScene();
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
@@ -380,11 +384,9 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         }
       }
@@ -525,8 +527,7 @@ export class zlowScreen {
     
             // Reset pacer
             this.setPacerSpeed(0);
-            const startPos = { x: 0.5, y: 1, z: -2 };
-            this.pacer.avatarEntity.setAttribute("position", startPos);
+            this.pacer.avatarEntity.position.set(0.5, 1, -2);
             constants.pacerStarted = false;
     
             // Start a new session for next workout
@@ -779,6 +780,7 @@ export class zlowScreen {
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
         onClose: () => {
+          this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
@@ -800,10 +802,13 @@ export class zlowScreen {
       }
     
       this.countdown = new PauseCountdown({ getElement, limit: 10 });
-    
+
+      this.initializeScene();
+
       this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },
         isPacer: false,
+        scene: this.scene.scene
       });
       this.physics = new PhysicsEngine();
     
@@ -811,6 +816,7 @@ export class zlowScreen {
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
           isPacer: true,
+          scene: this.scene.scene
         });
         this.pacerPhysics = new PhysicsEngine();
         this.pacer.creator.setPacerColors();
@@ -834,10 +840,9 @@ export class zlowScreen {
       } else {
         console.log("ERROR: dev-controls-panel element not found!");
       }
-      this.initializePacerSpeedInput();    
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
-    
+      this.initializePacerSpeedInput();
     
       // Map workout keys to user-facing labels
       const workoutLabels = {
@@ -884,6 +889,14 @@ export class zlowScreen {
       this.loop();
       this.setupPacerSyncButton();
 
+      const menuBtn = getElement("menu-btn");
+      menuBtn.addEventListener("click", () => {
+        if (confirm("Return to Main Menu? Gameplay data will be lost.")) {
+          this.cleanup();
+          viewManager.setView(viewManager.views.mainMenu);
+          }
+        });
+
 
     
       // Calorie reset button
@@ -919,5 +932,41 @@ export class zlowScreen {
           rideHistory.lastSecond = val; },
         getLastHistorySecond: () => rideHistory.lastSecond,
       };
+    }
+
+    cleanup() {
+        // Stop the loop first
+        this.loopRunning = false;
+
+        // Destroy the scene (renderer, ground, track, clouds, scenery)
+        this.scene?.destroy();
+        this.scene = null;
+
+        // Remove the Three.js canvas from the DOM
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.remove();
+
+        // Clear singleton guards so fresh instances are created
+        window.__zlowSceneInstance = null;
+        window.__zlowTrackInstance = null;
+
+        // Reset all constants
+        this.reset();
+
+        // Null out references so nothing carries over
+        this.rider = null;
+        this.pacer = null;
+        this.physics = null;
+        this.pacerPhysics = null;
+        this.hud = null;
+        this.rampController = null;
+        this.workoutSession = null;
+        this.workoutStorage = null;
+        this.milestoneTracker = null;
+        this.notificationManager = null;
+        this.keyboardMode = null;
+        this.standardMode = null;
+        this.countdown = null;
+        this.workoutSummary = null;
     }
 }

@@ -1,7 +1,7 @@
-//import * as THREE from 'three';
+import * as THREE from 'three';
 import {constants} from '../constants.js'
-//import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 export class changelogView {
     content;
     ready=false;
@@ -23,9 +23,9 @@ export class changelogView {
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
         if (this.useOrbitDebugMode) {
-            const controls = new THREE.OrbitControls(this.camera, document.getElementById("changelogBody"));
+            const controls = new OrbitControls(this.camera, document.getElementById("changelogBody"));
             controls.target.set( 0, 5, 0 );
-	        controls.update();
+            controls.update();
         }
         document.getElementById("changelogBody").appendChild(this.renderer.domElement);
         this.renderer.setAnimationLoop((time)=>this.animate(time, this));
@@ -97,7 +97,7 @@ export class changelogView {
         }
     }
     placeNewBuildings() {
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
         for (let i=0;i<this.newBuildingCount;i++) {
             //pick one out of 3 types
             let type = Math.random();
@@ -147,9 +147,9 @@ export class changelogView {
                     console.log(error);
                 });
             }
-            
+
         }
-        
+
     }
     placeOldTrees() {
         for (let i=0;i<this.oldTreeCount;i++) {
@@ -176,7 +176,7 @@ export class changelogView {
         }
     }
     placeNewTrees() {
-        const loader = new THREE.GLTFLoader();
+        const loader = new GLTFLoader();
         for (let i=0;i<this.newTreeCount;i++) {
             //pick one out of 3 types
             let type = Math.random();
@@ -239,9 +239,9 @@ export class changelogView {
                     this.scene.add(gltf.scene);
                 }, undefined, function(error) {
                     console.log(error);
-                });                
+                });
             }
-            
+
         }
     }
     //place the track running along the back
@@ -324,7 +324,7 @@ export class changelogView {
                     currentlyMat1=!currentlyMat1;
                 }
                 currentlyMat1=!currentlyMat1;
-            }        
+            }
             //only new style grass
             for (let i=Math.round(this.grassX*0.25);i<this.grassX;i++) {
                 for (let j=-this.grassY;j<this.grassY;j++) {
@@ -332,10 +332,10 @@ export class changelogView {
                     grassPiece.position.x=i;
                     grassPiece.position.y=j;
                     this.scene.add(grassPiece);
-                    currentlyMat1=!currentlyMat1;                
+                    currentlyMat1=!currentlyMat1;
                 }
             }
-        });    
+        });
     }
     createBG() {
         this.scene = new THREE.Scene();

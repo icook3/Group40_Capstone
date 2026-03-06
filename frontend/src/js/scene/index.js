@@ -5,6 +5,7 @@ import { Track } from "./env/Track.js";
 import { Cloud } from "./env/Cloud.js";
 import { SceneryManager } from "./env/SceneryManager.js";
 import { constants } from "../constants.js";
+import {GroundInstanced} from "./env/GroundInstanced.js";
 
 export class ZlowScene {
     constructor() {
@@ -17,10 +18,14 @@ export class ZlowScene {
         this.scene = new THREE.Scene();
         this.objectsLoaded = false;
 
+        // Sky
+        this.scene.background = new THREE.Color(0x87CEEB);
+
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.body.appendChild(this.renderer.domElement);
 
         // Camera
@@ -36,6 +41,9 @@ export class ZlowScene {
         // Scenery
         this.scenery = new SceneryManager({ scene: this.scene });
         constants.worldZ = 0;
+
+        // Ground
+        this.ground = new GroundInstanced(this.scene);
 
         // World systems
         this.track = new Track({ scene: this.scene });
@@ -70,14 +78,22 @@ export class ZlowScene {
         }
         this.objectField.advance(riderSpeed, dt);
 
+        const rider = this.scene.getObjectByName("rider");
+        this.ground.update(rider);
+
         this.renderer.render(this.scene, this.cam.camera);
     }
 
     destroy() {
-        window.removeEventListener("resize", this._onResize);
+        // Remove all children from the scene but don't dispose shared materials
+        while (this.scene.children.length > 0) {
+            this.scene.remove(this.scene.children[0]);
+        }
+
         this.renderer?.domElement?.remove();
         this.renderer?.dispose();
 
+        this.ground?.destroy();
         this.objectField?.attachExternalBands?.([]);
         this.objectField?.destroy?.();
         this.clouds?.destroy?.();
