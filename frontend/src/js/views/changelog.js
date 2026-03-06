@@ -1,7 +1,7 @@
-import * as THREE from 'three';
+//import * as THREE from 'three';
 import {constants} from '../constants.js'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+//import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 export class changelogView {
     content;
     ready=false;
@@ -23,7 +23,7 @@ export class changelogView {
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
         if (this.useOrbitDebugMode) {
-            const controls = new OrbitControls(this.camera, document.getElementById("changelogBody"));
+            const controls = new THREE.OrbitControls(this.camera, document.getElementById("changelogBody"));
             controls.target.set( 0, 5, 0 );
 	        controls.update();
         }
@@ -97,7 +97,7 @@ export class changelogView {
         }
     }
     placeNewBuildings() {
-        const loader = new GLTFLoader();
+        const loader = new THREE.GLTFLoader();
         for (let i=0;i<this.newBuildingCount;i++) {
             //pick one out of 3 types
             let type = Math.random();
@@ -176,7 +176,7 @@ export class changelogView {
         }
     }
     placeNewTrees() {
-        const loader = new GLTFLoader();
+        const loader = new THREE.GLTFLoader();
         for (let i=0;i<this.newTreeCount;i++) {
             //pick one out of 3 types
             let type = Math.random();

@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+//import * as THREE from 'three';
+//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export function initMenuBackground() {
   // Scene
@@ -48,7 +48,7 @@ export function initMenuBackground() {
   scene.add(pointLight);
 
   // GLB Models
-  const loader = new GLTFLoader();
+  const loader = new THREE.GLTFLoader();
   const modelBasePath = '../../resources/models';
 
   // This function helps load models and places them in the scene

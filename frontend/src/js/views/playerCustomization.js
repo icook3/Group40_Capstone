@@ -45,6 +45,10 @@ export class playerCustomizationView {
           return;
         }
 
+        // MAKE IT WAIT FOR THE SCENE BEFORE IT LOADS??
+
+
+
         //Create the avatar immediately
         this.avatar = new AvatarCreator(
           "menuAvatar",

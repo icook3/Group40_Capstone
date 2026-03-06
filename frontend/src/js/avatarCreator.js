@@ -1,3 +1,5 @@
+
+
 export class AvatarCreator {
     constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
@@ -5,7 +7,7 @@ export class AvatarCreator {
         this.rotation = rotation;
         this.onReady = onReady;
         this.autoRotate = false;
-        this.rotationSpeed = 0.2;
+        this.rotationSpeed = 0;
 
         //GLB Flags
         this.personLoaded = false;
@@ -61,7 +63,7 @@ export class AvatarCreator {
 
         //Player and bike colors
         this.playerModel = "male";
-        this.skinColor = "#ff5500";
+        this.skinColor = "#e801a3";
         this.shirtColor = "#ff0000";
         this.shortsColor = "#000000";
         this.shoesColor = "#000000";
@@ -84,86 +86,116 @@ export class AvatarCreator {
 
     //Creates avatar entity
     createEntity() {
-        const avatar = document.createElement('a-entity');
-        avatar.setAttribute('id', this.id);
-        avatar.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
-        avatar.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
+        const avatar = new THREE.Group();
+        avatar.name = this.id;
+        avatar.position.x = this.position.x;
+        avatar.position.y = this.position.y;
+        avatar.position.z = this.position.z;
+        avatar.rotation.x = this.rotation.x;
+        avatar.rotation.y = this.rotation.y;
+        avatar.rotation.z = this.rotation.z;
+        avatar.frustumCulled = false;
 
-        //Create Person
         this.createPlayerModel(avatar);
         this.createBikeModel(avatar);
-
-        document.querySelector('a-scene').appendChild(avatar);
+        
+        //Don't try to access scene until the end of this function, or it will crash
+        document.querySelector('a-scene').object3D.add(avatar);
         return avatar;
     }
 
-    createPlayerModel (avatarEntity) {
+    async createPlayerModel (avatarEntity) {
         const checkReady = () => {
             if (this.personLoaded && this.bikeLoaded) {
                 if (this.onReady) this.onReady(this);
             }
         };
 
-        const personModel = document.createElement('a-entity');
-        personModel.setAttribute('gltf-model', `#${this.playerModel}GLB`);
-        personModel.setAttribute('position', '0 0 0');
-        personModel.setAttribute('rotation', '0 -90 0');
-        personModel.setAttribute('scale', '0.35 0.35 0.35');
-        personModel.setAttribute('no-cull', ''); // Fixes avatar partially disappearing
-        avatarEntity.appendChild(personModel);
+        const loader = new THREE.GLTFLoader();
+        try {
+            if (this.playerModel == "male") {
+                var personModel = await loader.loadAsync( '../../resources/models/playermodels/maleV5.glb' );
+                console.log("Person model loaded.")
+            }
+
+            else if (this.playerModel == "female") {
+                var personModel = await loader.loadAsync( '../../resources/models/playermodels/femaleV5.glb' );
+                console.log("Person model loaded.")
+            } 
+        }
+
+        // If the avatar model fails to load, exit to main menu
+        catch (error) {
+            console.error("Person model could not be loaded! Exiting to main menu ...")
+            viewManager.setView(viewManager.views.mainMenu);
+        }
+
+        // Set initial values and map bones to class variables
+        personModel.scene.name = "Avatar";
+        personModel.scene.position.x = 0;
+        personModel.scene.position.y = 0;
+        personModel.scene.position.z = 0;
+        personModel.scene.rotation.x = 0;
+        personModel.scene.rotation.y = -90;
+        personModel.scene.rotation.z = 0;
+        personModel.scene.scale.x = 0.35;
+        personModel.scene.scale.y = 0.35;
+        personModel.scene.scale.z = 0.35;
+        avatarEntity.add(personModel.scene)
 
         //Assign person and person bones
         this.personModel = personModel;
-        personModel.addEventListener('model-loaded', (e) => {
-            const model = e.detail.model;
-            this.personRig = model.getObjectByName("metalrig")
 
-            //Assign Bones
-            model.traverse((child) => {
-                if (child.isSkinnedMesh && child.skeleton) {
-                    const personSkeleton = child.skeleton;
-                    //Spine
-                    this.spine = personSkeleton.getBoneByName("spine");
-                    this.spine1 = personSkeleton.getBoneByName("spine001");
-                    this.spine2 = personSkeleton.getBoneByName("spine002");
-                    this.spine3 = personSkeleton.getBoneByName("spine003");
-                    this.spine4 = personSkeleton.getBoneByName("spine004");
-                    this.spine5 = personSkeleton.getBoneByName("spine005");
-                    this.spine6 = personSkeleton.getBoneByName("spine006");
-                    //Left Side
-                    this.leftBreast = personSkeleton.getBoneByName("breastL");
-                    this.leftShoulder = personSkeleton.getBoneByName("shoulderL");
-                    this.leftUpperArm = personSkeleton.getBoneByName("upper_armL");
-                    this.leftForearm = personSkeleton.getBoneByName("forearmL");
-                    this.leftHand = personSkeleton.getBoneByName("handL");
-                    this.leftPelvis = personSkeleton.getBoneByName("pelvisL");
-                    this.leftThigh = personSkeleton.getBoneByName("thighL");
-                    this.leftShin = personSkeleton.getBoneByName("shinL");
-                    this.leftFoot = personSkeleton.getBoneByName("footL");
-                    this.leftToe = personSkeleton.getBoneByName("toeL");
-                    this.leftHeel = personSkeleton.getBoneByName("heel02L");
-                    //Right Side
-                    this.rightBreast = personSkeleton.getBoneByName("breastR");
-                    this.rightShoulder = personSkeleton.getBoneByName("shoulderR");
-                    this.rightUpperArm = personSkeleton.getBoneByName("upper_armR");
-                    this.rightForearm = personSkeleton.getBoneByName("forearmR");
-                    this.rightHand = personSkeleton.getBoneByName("handR");
-                    this.rightPelvis = personSkeleton.getBoneByName("pelvisR");
-                    this.rightThigh = personSkeleton.getBoneByName("thighR");
-                    this.rightShin = personSkeleton.getBoneByName("shinR");
-                    this.rightFoot = personSkeleton.getBoneByName("footR");
-                    this.rightToe = personSkeleton.getBoneByName("toeR");
-                    this.rightHeel = personSkeleton.getBoneByName("heel02R");
+        // personRig initializes to null
+        this.personRig = avatarEntity.getObjectByName("metarig")
 
-                    this.applyPlayerColors();
-                    this.setInitialPose();
-                    this.personLoaded = true;
-                    checkReady();
-                    this.createHelmetModel(avatarEntity);
-                }
-            });
+        //Assign Bones
+        avatarEntity.traverse((child) => {
+            if (child.isSkinnedMesh && child.skeleton) {
+                //Spine
+                this.spine = avatarEntity.getObjectByName("spine");
+                this.spine1 = avatarEntity.getObjectByName("spine001");
+                this.spine2 = avatarEntity.getObjectByName("spine002");
+                this.spine3 = avatarEntity.getObjectByName("spine003");
+                this.spine4 = avatarEntity.getObjectByName("spine004");
+                this.spine5 = avatarEntity.getObjectByName("spine005");
+                this.spine6 = avatarEntity.getObjectByName("spine006");
+                //Left Side
+                this.leftBreast = avatarEntity.getObjectByName("breastL");
+                this.leftShoulder = avatarEntity.getObjectByName("shoulderL");
+                this.leftUpperArm = avatarEntity.getObjectByName("upper_armL");
+                this.leftForearm = avatarEntity.getObjectByName("forearmL");
+                this.leftHand = avatarEntity.getObjectByName("handL");
+                this.leftPelvis = avatarEntity.getObjectByName("pelvisL");
+                this.leftThigh = avatarEntity.getObjectByName("thighL");
+                this.leftShin = avatarEntity.getObjectByName("shinL");
+                this.leftFoot = avatarEntity.getObjectByName("footL");
+                this.leftToe = avatarEntity.getObjectByName("toeL");
+                this.leftHeel = avatarEntity.getObjectByName("heel02L");
+                //Right Side
+                this.rightBreast = avatarEntity.getObjectByName("breastR");
+                this.rightShoulder = avatarEntity.getObjectByName("shoulderR");
+                this.rightUpperArm = avatarEntity.getObjectByName("upper_armR");
+                this.rightForearm = avatarEntity.getObjectByName("forearmR");
+                this.rightHand = avatarEntity.getObjectByName("handR");
+                this.rightPelvis = avatarEntity.getObjectByName("pelvisR");
+                this.rightThigh = avatarEntity.getObjectByName("thighR");
+                this.rightShin = avatarEntity.getObjectByName("shinR");
+                this.rightFoot = avatarEntity.getObjectByName("footR");
+                this.rightToe = avatarEntity.getObjectByName("toeR");
+                this.rightHeel = avatarEntity.getObjectByName("heel02R");
+
+                this.applyPlayerColors();
+                this.setInitialPose();
+                this.personLoaded = true;
+                checkReady();
+                this.createHelmetModel(avatarEntity);
+            }
         });
     }
+
+
+    
 
     setPlayerModel(model) {
         this.playerModel = model;
@@ -178,22 +210,23 @@ export class AvatarCreator {
         this.savePlayerData();
     }
 
+    // DOESN'T SEEM TO DO ANYTHING
     setPlayerColors(skin, shirt, shorts, shoes) {
         this.skinColor = skin;
         this.shirtColor = shirt;
         this.shortsColor = shorts;
-        this.shoesColor = shoes;
+        this.shoesColor = '#e801a3';
 
         this.applyPlayerColors();
         this.savePlayerData();
     }
 
+    // WORKS TO APPLY COLORS PROPERLY
     applyPlayerColors() {
-        if (!this.personModel || !this.personModel.object3D) {
+        if (!this.avatarEntity) {
             return;
         }
-
-        this.personModel.object3D.traverse((child) => {
+        this.avatarEntity.traverse((child) => {
             if (child.isMesh && child.material) {
                 if (child.material.name.includes("Skin")) child.material.color.set(this.skinColor);
                 if (child.material.name.includes("Shirt")) child.material.color.set(this.shirtColor);
@@ -203,74 +236,99 @@ export class AvatarCreator {
         });
     }
 
-    createBikeModel(avatarEntity) {
+    async createBikeModel(avatarEntity) {
         const checkReady = () => {
             if (this.personLoaded && this.bikeLoaded) {
                 if (this.onReady) this.onReady(this);
             }
         };
 
-        const bikeModel = document.createElement('a-entity');
-        bikeModel.setAttribute('gltf-model', '#bikeGLB');
-        bikeModel.setAttribute('position', '0 0 0');
-        bikeModel.setAttribute('rotation', '0 -90 0');
-        bikeModel.setAttribute('scale', '0.35 0.35 0.35');
-        avatarEntity.appendChild(bikeModel);
+        // Create loader and attempt to load bike model
+        const loader = new THREE.GLTFLoader();
+        try {
+            var bikeModel = await loader.loadAsync( '../../resources/models/playermodels/bikeV4.glb' );
+            console.log("Bike model loaded.")
+        }
 
-        //Assign bike and assign bike parts
+        // If the bike model fails to load, exit to main menu
+        catch (error) {
+            console.error("Bike model could not be loaded! Exiting to main menu ...")
+            viewManager.setView(viewManager.views.mainMenu);
+        }
+
+        // Set initial values and map bike pieces to class variables
+        bikeModel.scene.name = "Bike";
+        bikeModel.scene.position.x = 0;
+        bikeModel.scene.position.y = 0;
+        bikeModel.scene.position.z = 0;
+        bikeModel.scene.rotation.x = 0;
+        bikeModel.scene.rotation.y = -90;
+        bikeModel.scene.rotation.z = 0;
+        bikeModel.scene.scale.x = 0.35;
+        bikeModel.scene.scale.y = 0.35;
+        bikeModel.scene.scale.z = 0.35;
+        avatarEntity.add(bikeModel.scene)
+
         this.bikeModel = bikeModel;
-        bikeModel.addEventListener('model-loaded', (e) => {
-            const model = e.detail.model;
-            this.rearWheel = model.getObjectByName("RearTire");
-            this.frontWheel = model.getObjectByName("FrontTire");
-            this.bikeFrontFrame = model.getObjectByName("FrontFrame");
-            this.bikeFrame = model.getObjectByName("Frame");
-            this.bikeGrips = model.getObjectByName("Grips");
-            this.bikeSeat = model.getObjectByName("Seat")
-            this.bikePedals = model.getObjectByName("Pedals")
-            console.log("loading model");
-            //Assign bike bones
-            model.traverse((child) => {
-                if (child.isSkinnedMesh && child.skeleton) {
-                    const bikeSkeleton = child.skeleton;
-                    this.leftPedalBone = bikeSkeleton.getBoneByName("b_leftPedal");
-                    this.rightPedalBone = bikeSkeleton.getBoneByName("b_rightPedal");
-                    this.pedalCrankBone = bikeSkeleton.getBoneByName("b_pedalcrank");
+        this.rearWheel = avatarEntity.getObjectByName("RearTire");
+        this.frontWheel = avatarEntity.getObjectByName("FrontTire");
+        this.bikeFrontFrame = avatarEntity.getObjectByName("FrontFrame");
+        this.bikeFrame = avatarEntity.getObjectByName("Frame");
+        this.bikeGrips = avatarEntity.getObjectByName("Grips");
+        this.bikeSeat = avatarEntity.getObjectByName("Seat")
+        this.bikePedals = avatarEntity.getObjectByName("Pedals")
 
-                    this.applyBikeColors();
-                    this.bikeLoaded = true;
-                    checkReady();
-                }
-            });
-        });
-    }
+        //Assign bike bones
+        avatarEntity.traverse((child) => {
+            if (child.isSkinnedMesh && child.skeleton) {
+                const bikeSkeleton = child.skeleton;
+                this.leftPedalBone = bikeSkeleton.getBoneByName("b_leftPedal");
+                this.rightPedalBone = bikeSkeleton.getBoneByName("b_rightPedal");
+                this.pedalCrankBone = bikeSkeleton.getBoneByName("b_pedalcrank");
+                this.applyBikeColors();
+                this.bikeLoaded = true;
+                checkReady();
+            }
+        }
+    );    
+}
 
-    //helmetModel.setAttribute('scale', '0.35 0.35 0.35');
-    //helmetModel.setAttribute('position', '.38 -.18 0');
+async createHelmetModel(avatarEntity) {
+    if (this.helmetObject == null) {
+        const loader = new THREE.GLTFLoader();
 
-createHelmetModel(avatarEntity) {
-    const helmetModel = document.createElement('a-entity');
-    helmetModel.setAttribute('gltf-model', '#helmetGLB');
-    helmetModel.setAttribute('no-cull', '');
-    avatarEntity.appendChild(helmetModel);
+            try {
+                var helmetModel = await loader.loadAsync( '../../resources/models/playermodels/helmet.glb' );
+                console.log("Helmet model loaded.")
+            }
 
-    this.helmetModel = helmetModel;
-    helmetModel.addEventListener('model-loaded', (e) => {
-        if (this.spine6) {
-            const loadedModel = e.detail.model;
-            
-            // Helmet should dynamically follow the head
-            loadedModel.position.set(0, .2, -0.03);
-            loadedModel.rotation.set(0, 135, 0);
-            loadedModel.scale.set(.35, .35, .35);
-            this.spine6.add(loadedModel);
-            
-            // Store reference for color changes
-            this.helmetObject = loadedModel;
+            // If the bike model fails to load, exit to main menu
+            catch (error) {
+                console.error("Helmet model could not be loaded! Exiting to main menu ...")
+                viewManager.setView(viewManager.views.mainMenu);
+            }
+        }
+
+        // Set initial values
+        helmetModel.scene.name = "Helmet";
+        helmetModel.scene.position.x = 0;
+        helmetModel.scene.position.y = .2;
+        helmetModel.scene.position.z = -0.03;
+        helmetModel.scene.rotation.x = 0;
+        helmetModel.scene.rotation.y = 135;
+        helmetModel.scene.rotation.z = 0;
+        helmetModel.scene.scale.x = 0.35;
+        helmetModel.scene.scale.y = 0.35;
+        helmetModel.scene.scale.z = 0.35;
+        helmetModel.frustumCulled = false;
+        this.helmetObject = helmetModel.scene;
+
+        // Have helmet follow the rider's head dynamically and be sure to only add one helmet
+        if (this.spine6 && !this.spine6.getObjectByName("Helmet")) {
+            this.spine6.add(helmetModel.scene);
         }
 
         this.applyHelmetColors();
-    });
 }
 
 setHelmetColors(helmet, padding) {
@@ -284,12 +342,12 @@ applyHelmetColors() {
     if (!this.helmetObject) {
         return;
     }
-
-    this.helmetObject.traverse((child) => {
+    this.avatarEntity.traverse((child) => {
         if (child.isMesh && child.material) {
             if (child.material.name.includes("Helmet")) {
                 child.material.color.set(this.helmetColor);
             }
+
             if (child.material.name.includes("Padding")) {
                 child.material.color.set(this.helmetPaddingColor);
             }
@@ -309,12 +367,13 @@ applyHelmetColors() {
         this.savePlayerData();
     }
 
+    // Apply colors to bike. References avatarEntity, as the bike is a subcomponent of the avatar.
     applyBikeColors () {
-        if (!this.bikeModel || !this.bikeModel.object3D) {
+        if (!this.bikeModel) {
             return;
         }
 
-        this.bikeModel.object3D.traverse((child) => {
+        this.avatarEntity.traverse((child) => {
             if (child.isMesh && child.material) {
                 if (child.material.name.includes("Frame_Mat")) child.material.color.set(this.bikeFrameColor);
                 if (child.material.name.includes("Tire_Mat")) child.material.color.set(this.bikeTireColor);
@@ -371,36 +430,39 @@ applyHelmetColors() {
         this.leftFoot.rotation.x = -pi / 6;
     }
 
-
+    // Initialize the avatar's position in the editing menu
     setMenuPosition() {
-        this.avatarEntity.setAttribute('position', `0 0 0`);
-        this.avatarEntity.setAttribute('rotation', `0 180 0`);
-
+        this.avatarEntity.position.x = 0;
+        this.avatarEntity.position.y = 0;
+        this.avatarEntity.position.z = 0;
+        this.avatarEntity.rotation.x = 0;
+        this.avatarEntity.rotation.y = 180;
+        this.avatarEntity.rotation.z = 0;
         this.setInitialPose();
     }
 
-    enableMenuRotation(speed = 0.5) {
+    enableMenuRotation(speed = 0.01) {
         this.autoRotate = true;
         this.rotationSpeed = speed;
     }
 
+    // Rotate avatar
     startRotationLoop() {
         if (this._rotationLoopRunning) return;
         this._rotationLoopRunning = true;
 
         const rotate = () => {
             if (this.avatarEntity && this.autoRotate) {
-                const rot = this.avatarEntity.getAttribute('rotation');
-                this.avatarEntity.setAttribute('rotation', {
-                    x: rot.x,
-                    y: rot.y + this.rotationSpeed,
-                    z: rot.z
-                });
+                const rot = this.avatarEntity.rotation;
+                this.avatarEntity.rotation.x = rot.x;
+                this.avatarEntity.rotation.y = rot.y + this.rotationSpeed;
+                this.avatarEntity.rotation.z = rot.z;
             }
             requestAnimationFrame(rotate);
         };
         rotate();
     }
+
 
     savePlayerData() {
         const data = {

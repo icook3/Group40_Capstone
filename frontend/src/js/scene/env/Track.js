@@ -3,6 +3,7 @@
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
 import * as THREE from "three";
+import {Tween, Easing} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 import { constants } from "../../constants.js";
 import {getPos, getSign} from '../core/util.js';
 import  {activatePacer } from '../../main.js'
@@ -69,20 +70,24 @@ export class Track {
 
 // Update animation speed and target based on current track piece
 update_rider_animation() {
-  constants.currentTrackPiece += 1;
-  const avatar = document.getElementById('rider');
+
+  // Busywait if the rider is not moving
+  if (constants.riderState.speed === 0) {
+    setTimeout(() => {
+    this.update_rider_animation();
+    }, 500);
+    return;
+  }
 
   // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
   if (!avatar) return; 
 
-  // ---- NEW: ensure we have enough track points before reading the next one ----
-  // If we're close to the end of the array, spawn more now (before indexing).
-  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
+  const BUFFER_POINTS = 10;
   if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
     spawn_track(this);
   }
 
-  // ---- NEW: guard against out-of-range / undefined ----
+  // Guard against out-of-range and undefined track points
   const tp = constants.trackPoints[constants.currentTrackPiece];
   if (!tp) {
     console.warn(
@@ -94,15 +99,42 @@ update_rider_animation() {
     return;
   }
 
-  // Calculate rider's duration and set attributes
-  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
+  // Increment current track piece and define starting and ending coordinates
+  constants.currentTrackPiece += 1;
+  let coords = {x: -0.5, y: 0, z: 0};
+  if (constants.currentTrackPiece > 0) {
+    coords = { x: constants.trackPoints[constants.currentTrackPiece - 1].x - 0.5, y: constants.trackPoints[constants.currentTrackPiece - 1].y, z: constants.trackPoints[constants.currentTrackPiece - 1].z }
+  }
 
-  avatar.removeAttribute("animation__1");
-  avatar.setAttribute(
-    "animation__1",
-    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
-  );
+  let endpoint = { x: constants.trackPoints[constants.currentTrackPiece].x - 0.5, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z };
+  let riderDuration = Math.round((constants.trackPoints[constants.currentTrackPiece].length / constants.riderState.speed) * 1500);
+
+  // Animate rider's position over time
+  const animateRider = new Tween(coords, false)
+		.to(endpoint, riderDuration)
+		.onUpdate(() => {
+      avatar.position.set(coords.x, coords.y, coords.z)
+
+      // Have camera follow the rider's position. Rider starts at 0 0 0; camera at -0.5 6 5
+
+      camera.setAttribute('position', `${avatar.position.x} ${avatar.position.y + 4} ${avatar.position.z + 8}`);
+    })
+    .onComplete(() => {
+      // Recall this function as long as the program is in use.
+      this.update_rider_animation();
+
+    })
+
+    // It is assumed the rider is moving as this function busywaits if speed is 0
+		.start()
+
+    // Helper function to move rider
+    function animate(time) {
+      animateRider.update(time)
+      requestAnimationFrame(animate)
+	}
+
+	requestAnimationFrame(animate)
 
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)

@@ -9,7 +9,6 @@ export class AvatarMovement {
         this.speed = 0;
         this.power = 0;
         this.isPacer = options.isPacer || false;
-
         // Fix camera to rider entity
         if (id == "rider") {
             this.addCamera();
@@ -19,7 +18,7 @@ export class AvatarMovement {
     // Add point-of-view camera to rider using a rig
     addCamera() {
         // Spawn from class rather than creating new
-        this.rider = document.getElementById('rider');
+        this.rider = document.getElementById("scene").object3D.getObjectByName('rider');
         if (!this.rider) return;
 
         const rig = document.createElement('a-entity');
@@ -30,10 +29,13 @@ export class AvatarMovement {
         camera.setAttribute('id','camera');
         camera.setAttribute('look-controls','');
         camera.setAttribute('position','4 5 7');
+        camera.setAttribute('active', true)
         camera.setAttribute('look-at','#rider');
 
-        rig.appendChild(camera);
-        this.rider.appendChild(rig);
+        //rig.appendChild(camera);
+        //document.getElementById("scene").appendChild('camera')
+
+        console.log("HIT")
         }
 
     //Helper to interpolate smoothly between A and B
@@ -137,21 +139,6 @@ export class AvatarMovement {
             return;
         }
 
-        // Emit either a start or a resume event based on worldZ
-        if (constants.worldZ === 0) {
-            document.getElementById('rider').emit('riderStarted');
-            document.getElementById('pacer-entity').emit('pacerStart');
-        }
-
-        else if (this.speed === 0 && constants.worldZ > 0) {
-            // Emit a stop event if speed is 0
-            document.getElementById('rider').emit('riderStopped');
-        }
-
-        // Emit a resume event if both speed and worldZ are greater than 0
-        else {
-            document.getElementById('rider').emit('riderResumed');
-        }
         if (this.creator.leftPedalBone!=null) {
             this.animatePedalingBike(dt);
             this.animatePedalingPerson(dt);

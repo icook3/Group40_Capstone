@@ -20,7 +20,7 @@ export class ObjectField {
     this.policy = policy;
 
     this.rider = this.scene.getObjectByName("rider");
-    
+
     // weights parallel KINDS (keep 50/50 for identical behavior)
     this.weights = [1, 1];
     this.totalWeight = this.weights.reduce((a, b) => a + b, 0);
