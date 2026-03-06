@@ -83,7 +83,6 @@ export class zlowScreen {
         constants.trackPoints=[];
         constants.lastTime=Date.now();
         constants.worldZ=0;
-
         constants.lastCloud = Date.now();
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
@@ -111,8 +110,6 @@ export class zlowScreen {
         this.pacerPhysics.setSpeed(speed);
       }
     }
-    
-
 
     //used for frequent updates in update method
     sendPeerDataOver(speed) {
@@ -123,12 +120,9 @@ export class zlowScreen {
     }
     
     recieveData(data) {
-      //console.log("Recieving data");
-      //console.log(data);
       switch(data.name) {
         case "playerData":
           console.log("recieving player data");
-          console.log("MOVEMENT1")
           this.pacer = new AvatarMovement("pacer-entity", {
             position: { x: 0.5, y: 1, z: 0 },
             isPacer: false,
@@ -367,7 +361,6 @@ export class zlowScreen {
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        console.log("FIRST")
         this.scene = new ZlowScene(this.scene);
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
@@ -382,13 +375,11 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          console.log("SECOND")
-          this.scene = new ZlowScene();
+          this.scene = new ZlowScene(this.scene);
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene();
-          console.log("THIRD")
+          this.scene = new ZlowScene(this.scene);
           this.setPacerSpeed(val);
         }
       }
@@ -797,7 +788,6 @@ export class zlowScreen {
       }
     
       this.countdown = new PauseCountdown({ getElement, limit: 10 });
-      console.log("MOVEMENT2")
       this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },
         isPacer: false,
@@ -806,7 +796,6 @@ export class zlowScreen {
       this.physics = new PhysicsEngine();
     
       if (this.peerState == 0) {
-        console.log("MOVEMENT3")
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
           isPacer: true,

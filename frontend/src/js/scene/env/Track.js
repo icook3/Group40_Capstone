@@ -5,6 +5,7 @@
 import { constants } from "../../constants.js";
 import {getPos, getSign} from '../core/util.js';
 import  {activatePacer } from '../../main.js'
+import {Tween, Easing, Group, add, remove} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 
 export class Track {
   constructor({ scene }) {
@@ -28,11 +29,10 @@ export class Track {
     this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
 
     // Get entities needed to create the timeline animation
-    this.rider = document.getElementById('rider');
-    console.log(this.rider)
-    this.pacer = document.getElementById('pacer-entity');
-    this.update_rider_animation = this.update_rider_animation.bind(this);
-    this.update_pacer_animation = this.update_pacer_animation.bind(this);
+    //this.rider = document.getElementById('rider');
+    //this.pacer = document.getElementById('pacer-entity');
+    //this.update_rider_animation = this.update_rider_animation.bind(this);
+    //this.update_pacer_animation = this.update_pacer_animation.bind(this);
 
     const geometry = new THREE.BoxGeometry(
       constants.pathWidth,
@@ -51,7 +51,8 @@ export class Track {
 
     spawn_track(this);
 
-    this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+    this._initTimer = setTimeout(() => this.update_rider_animation(), 5000);
+    update_pacer_animation(this.scene);
   }
 
   destroy() {
@@ -69,101 +70,88 @@ export class Track {
 
 // Update animation speed and target based on current track piece
 update_rider_animation() {
-  constants.currentTrackPiece += 1;
-  const avatar = document.getElementById('rider');
 
-  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
-  if (!avatar) return; 
-
-  // ---- NEW: ensure we have enough track points before reading the next one ----
-  // If we're close to the end of the array, spawn more now (before indexing).
-  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
-  if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track(this);
+  // Busywait if the rider is not moving
+  if (constants.riderState.speed === 0) {
+    setTimeout(() => { 
+    this.update_rider_animation();
+    }, 500);
+    return;
   }
 
-  // ---- NEW: guard against out-of-range / undefined ----
+  // Find avatar and camera
+  // Update camera call when it transitions to three.js
+
+
+  const avatar = this.scene.getObjectByName('rider');
+  let camera = this.scene.getObjectByName('camera');
+  
+  // Check for rider to prevent util.js crash and ensure at least 10 track points left
+  if (!avatar) return; 
+
+  const BUFFER_POINTS = 10;
+  if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+    spawn_track();
+  }
+
+  // Guard against out-of-range and undefined track points
   const tp = constants.trackPoints[constants.currentTrackPiece];
   if (!tp) {
     console.warn(
-      "[Track] Missing track point:",
+      "[Track] Missing track point: ",
       constants.currentTrackPiece,
-      "trackPoints length:",
+      "trackPoints length: ",
       constants.trackPoints.length
     );
     return;
   }
-
-  // Calculate rider's duration and set attributes
-  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
-
-  avatar.removeAttribute("animation__1");
-  avatar.setAttribute(
-    "animation__1",
-    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
-  );
-
-  // If rider is within 200 units of the end, spawn some more track pieces
-  // (this can stay as-is; it’s your "keep ahead" logic)
-  if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track(this);
+  
+  // Increment current track piece and define starting and ending coordinates
+  constants.currentTrackPiece += 1;
+  let coords = {x: -0.5, y: 0, z: 0};
+  if (constants.currentTrackPiece > 0) {
+    coords = { x: constants.trackPoints[constants.currentTrackPiece - 1].x - 0.5, y: constants.trackPoints[constants.currentTrackPiece - 1].y, z: constants.trackPoints[constants.currentTrackPiece - 1].z }
   }
-}
+  
+  let endpoint = { x: constants.trackPoints[constants.currentTrackPiece].x - 0.5, y: constants.trackPoints[constants.currentTrackPiece].y, z: constants.trackPoints[constants.currentTrackPiece].z };
+  let riderDuration = Math.round((constants.trackPoints[constants.currentTrackPiece].length / constants.riderState.speed) * 1500);
 
-update_pacer_animation() {
-  constants.pacerCurrentTrackPiece += 1;
-  const pacer = document.getElementById('pacer-entity');
-
-  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
-  if (!pacer) return; 
-
-  // ---- NEW: ensure we have enough track points before reading the next one ----
-  // If we're close to the end of the array, spawn more now (before indexing).
-  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
-  if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track(this);
-  }
-
-  // ---- NEW: guard against out-of-range / undefined ----
-  const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
-  if (!tp) {
-    console.warn(
-      "[Track] Missing track point:",
-      constants.pacerCurrentTrackPiece,
-      "trackPoints length:",
-      constants.trackPoints.length
-    );
-    return;
-  }
-
-  // Calculate pacer's duration and set attributes
-  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-  pacer.removeAttribute("animation__2");
-  pacer.setAttribute("animation__2", `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`);
-
-  // If rider is within 200 units of the end, spawn some more track pieces
-  // (this can stay as-is; it’s your "keep ahead" logic)
-  if (getPos(pacer).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track(this);
-  }
-}
-
-  // Initialize rider animation attribute using a very short section of track to avoid division by zero
-  // Pacer starts when rider starts. Delay ensures pacer finishes loading
-  initialize_animation() {
-    this.waitForElement('#pacer-entity', (element) => {
-      this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-      document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
-      this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:true;`);
-      activatePacer();
+  // Animate rider's position over time
+  const animateRider = new Tween(coords, false)
+		.to(endpoint, riderDuration)
+		.onUpdate(() => {
+      avatar.position.set(coords.x, coords.y, coords.z)
       
-    });
-  }
+      // Have camera follow the rider's position. Rider starts at 0 0 0; camera at -0.5 6 5
+      
+      //camera.setAttribute('position', `${avatar.position.x} ${avatar.position.y + 4} ${avatar.position.z + 8}`);
+      camera.position.x = avatar.position.x;
+      camera.position.y = avatar.position.y + 1;
+      camera.position.z = avatar.position.z + 8;
+    })
+    .onComplete(() => {
+      // Recall this function as long as the program is in use.
+      this.update_rider_animation();
+    
+    })
+
+    // It is assumed the rider is moving as this function busywaits if speed is 0
+		.start()
+
+    // Helper function to move rider
+    function animate(time) {
+      animateRider.update(time)
+      requestAnimationFrame(animate)
+	}
+
+	requestAnimationFrame(animate)
+
+  // If rider is within 200 units of the end, spawn some more track pieces
+  // (this can stay as-is; it’s your "keep ahead" logic)
+  //if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    //spawn_track();
+  //}
+}
 
   // Helper function to check for an element's existance
   waitForElement(selector, callback) {
@@ -289,6 +277,90 @@ function straightPiece(trackSystem) {
 
    path_element.add(track);
 }
+
+// Update animation speed and target based on current track piece
+  export function update_pacer_animation(scene, newCoords = null, riderSpeed = null, sync = false) {
+
+    // Busywait if the rider is not moving
+    if (constants.riderState.speed === 0) {
+      setTimeout(() => { 
+        update_pacer_animation(scene);
+      }, 500);
+      return;
+    }
+
+    // Find pacer avatar
+    const pacer = scene.getObjectByName('pacer-entity');
+    
+    // Check for rider to prevent util.js crash and ensure at least 10 track points left
+    if (!pacer) return; 
+
+    const BUFFER_POINTS = 10;
+    if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+      spawn_track();
+    }
+
+    // Guard against out-of-range and undefined track points
+    const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+    if (!tp) {
+      console.warn(
+        "[Track] Missing track point: ",
+        constants.pacerCurrentTrackPiece,
+        "trackPoints length: ",
+        constants.trackPoints.length
+      );
+      return;
+    }
+    
+    // Increment current track piece and define starting and ending coordinates
+    let coords;
+    let pacerSpeed;
+
+    if (!sync) {
+      constants.pacerCurrentTrackPiece += 1;
+      pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
+      coords = {x: -0.5, y: 0, z: 0};
+      if (constants.pacerCurrentTrackPiece > 0) {
+        coords = { x: constants.trackPoints[constants.pacerCurrentTrackPiece - 1].x - 0.5, y: constants.trackPoints[constants.pacerCurrentTrackPiece - 1].y, z: constants.trackPoints[constants.pacerCurrentTrackPiece - 1].z }
+      }
+    }
+
+    else {
+      coords = newCoords;
+      pacerSpeed = riderSpeed;
+    }
+
+    let endpoint = { x: constants.trackPoints[constants.pacerCurrentTrackPiece].x - 0.5, y: constants.trackPoints[constants.pacerCurrentTrackPiece].y, z: constants.trackPoints[constants.pacerCurrentTrackPiece].z };
+    
+    // May mess up pacer speed a little
+    let pacerDuration = Math.round((constants.trackPoints[constants.pacerCurrentTrackPiece].length / pacerSpeed) * 1500);
+
+    // Animate pacer's position over time
+    const animatePacer = new Tween(coords, false)
+      .to(endpoint, pacerDuration)
+      .onUpdate(() => {
+        pacer.position.set(coords.x, coords.y, coords.z)
+      })
+      .onComplete(() => {
+        // Recall this function as long as the program is in use.
+        update_pacer_animation(scene);
+      })
+      .start()
+
+      // Helper function to move pacer
+      function animate(time) {
+        animatePacer.update(time)
+        requestAnimationFrame(animate)
+    }
+
+    requestAnimationFrame(animate)
+
+    // If rider is within 200 units of the end, spawn some more track pieces
+    // (this can stay as-is; it’s your "keep ahead" logic)
+    //if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+      //spawn_track();
+    //}
+  }
 
   // Spawn track pieces in
   export function spawn_track(trackSystem) {

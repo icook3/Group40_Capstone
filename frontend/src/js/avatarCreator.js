@@ -1,7 +1,6 @@
 import { ZlowScene } from "../js/scene/index.js";
 import { zlowScreen } from "./views/zlow.js";
 
-// PASSES SCENE SUCCESSFULLY TO HERE
 export class AvatarCreator {
     constructor(scene, id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
@@ -101,11 +100,7 @@ export class AvatarCreator {
 
         this.createPlayerModel(avatar);
         this.createBikeModel(avatar);
-        
-        //console.log("HERE")
-        console.log(this.scene)
         this.scene.add(avatar);
-        //console.log(avatar)
         return avatar;
     }
 

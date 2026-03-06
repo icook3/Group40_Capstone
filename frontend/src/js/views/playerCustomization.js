@@ -40,7 +40,6 @@ export class playerCustomizationView {
     createAvatar() {
         
         this.scene = document.querySelector("#playerCustomizerScene");
-        console.log(this.scene)
         if (!this.scene) {
           console.error("Scene not found!");
           return;
@@ -62,7 +61,6 @@ export class playerCustomizationView {
 
     createGenderLabels() {
         this.models = ["Male", "Female"];
-
         this.genderLabel = document.getElementById("genderLabel");
         this.leftArrow = document.getElementById("leftArrow");
         this.rightArrow = document.getElementById("rightArrow");

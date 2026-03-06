@@ -11,9 +11,6 @@ class Camera {
             1000                                         // far
         );
         this.camera.name = "camera";
-
-        console.log(scene)
-
         this.rig.add(this.camera);
         scene.add(this.rig);
 

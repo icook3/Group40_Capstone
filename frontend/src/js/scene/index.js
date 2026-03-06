@@ -14,7 +14,6 @@ export class ZlowScene {
 
         // Scene
         this.scene = scene;
-        console.log(this.scene)
         this.objectsLoaded = false;
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
