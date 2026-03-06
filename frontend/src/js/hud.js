@@ -27,20 +27,18 @@ export class HUD {
 initTrainerToggle() {
   const trainerToggleBtn = document.getElementById("trainer-toggle-btn");
   const trainerBackBtn = document.getElementById("trainer-back-btn");
-  const mainControls = document.querySelector(".main-controls");
-  const trainerControls = document.querySelector(".trainer-controls");
+
+  const trainerControls = document.querySelector(".trainer-menu");
   
-  if (trainerToggleBtn && trainerBackBtn && mainControls && trainerControls) {
+  if (trainerToggleBtn && trainerBackBtn && trainerControls) {
     // Show trainer view
     trainerToggleBtn.addEventListener("click", () => {
-      mainControls.hidden = true;
-      trainerControls.hidden = false;
+      trainerControls.hidden = !trainerControls.hidden;
     });
     
     // Back to main view
     trainerBackBtn.addEventListener("click", () => {
       trainerControls.hidden = true;
-      mainControls.hidden = false;
     });
   }
 }
@@ -181,7 +179,7 @@ initTrainerToggle() {
    */
   showWorkoutMessage({ text, seconds = 4 } = {}) {
     if (!this.workoutOverlay || !this.workoutDialog) return;
-
+    
     // clear any previous hide timer
     if (this.workoutMessageTimeoutId) {
       clearTimeout(this.workoutMessageTimeoutId);

@@ -44,97 +44,100 @@
   <!-- Three.js renderer attaches its canvas here -->
   <div id="scene-container"></div>
 
-  <div id="hud-bottom-container">
-    <div id="hud-bottom">
-<!-- Main controls view -->
-      <div class="control-buttons main-controls">
-        <button id="trainer-toggle-btn" class="hud-btn zlowBtn" title="Trainer">
+<div id="hud-bottom-container">
+
+    <!-- Left: Trainer + Dev -->
+    <div class="hud-area-left">
+      <div class="trainer-controls">
+        <button id="trainer-toggle-btn" class="hud-btn zlowBtn icon-only" title="Trainer">
+          <span class="tooltip">Trainer</span>
           <span class="btn-text">Trainer</span>
         </button>
-        
-        <div class="hud-divider"></div>
-        
-        <button id="pacer-sync-btn" class="hud-btn zlowBtn" title="Sync Pacer">
-          <span class="btn-text">Sync Pacer</span>
-        </button>
-        <button id="pause-btn" class="hud-btn zlowBtn" title="Pause">
-          <span class="btn-text">Pause</span>
-        </button>
-        <button id="stop-btn" class="hud-btn zlowBtn" title="Stop">
-          <span class="btn-text">Stop</span>
-        </button>
-        <button id="menu-btn" class="hud-btn zlowBtn" title="Exit to Main Menu">
-          <span class="btn-text">Exit to Main Menu</span>
-        </button>
+        <div class="trainer-menu" hidden>
+          <button id="trainer-back-btn" class="hud-btn zlowBtn" title="Back">
+            <span class="tooltip">Back</span>
+            <span class="btn-text">Back</span>
+          </button>
+          <button id="connect-btn" class="hud-btn zlowBtn" title="Connect Trainer">
+            <span class="tooltip">Connect</span>
+            <span class="btn-text">Connect Trainer</span>
+          </button>
+          <button id="calibrate-trainer-modal-btn" class="hud-btn zlowBtn" title="Calibrate Trainer">
+            <span class="tooltip">Calibrate</span>
+            <span class="btn-text">Calibrate Trainer</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Trainer controls view (hidden by default) -->
-      <div class="control-buttons trainer-controls" hidden>
-        <button id="trainer-back-btn" class="hud-btn zlowBtn" title="Back">
-          <span class="btn-text">Back</span>
+      <div class="dev-controls-wrapper" id="dev-controls-wrapper" hidden>
+        <button id="dev-toggle-btn" class="hud-btn zlowBtn icon-only" title="Dev Controls">
+          <span class="tooltip">Dev Controls</span>
+          <span class="btn-text">DEV</span>
         </button>
-        
-        <div class="hud-divider"></div>
-        
-        <button id="connect-btn" class="hud-btn zlowBtn" title="Connect Trainer">
-          <span class="btn-text">Connect Trainer</span>
-        </button>
-        <button id="calibrate-trainer-modal-btn" class="hud-btn zlowBtn" title="Calibrate Trainer">
-          <span class="btn-text">Calibrate Trainer</span>
-        </button>
+        <div id="dev-controls-hud" hidden>
+          <span id="pacer" title="Pacer Speed">
+            <label for="pacer-speed">Pacer:</label>
+            <input id="pacer-speed" type="number" min="5" max="60" value="20" step="1" />
+            <span class="speed-unit">km/h</span>
+          </span>
+          <span id="weight" title="Rider Weight">
+            <label for="rider-weight">Weight:</label>
+            <input id="rider-weight" type="number" min="40" max="150" value="70" step="1" />
+            <span class="weight-unit">kg</span>
+          </span>
+          <button id="calories-reset-btn" class="hud-btn zlowBtn" title="Reset Calories">
+            <span class="btn-text">Reset Calories</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Dev hud - hidden by default -->
-    <div id="dev-controls-hud" hidden>
-      <span id="pacer" title="Pacer Speed">
-        <label for="pacer-speed">Pacer:</label>
-        <input
-          id="pacer-speed"
-          type="number"
-          min="5"
-          max="60"
-          value="20"
-          step="1"
-        />
-        <span class="speed-unit">km/h</span>
-      </span>
-
-      <span id="weight" title="Rider Weight">
-        <label for="rider-weight">Weight:</label>
-        <input
-          id="rider-weight"
-          type="number"
-          min="40"
-          max="150"
-          value="70"
-          step="1"
-        />
-        <span class="weight-unit">kg</span>
-      </span>
-
-      <button id="calories-reset-btn" class="hud-btn zlowBtn" title="Reset Calories">
-        <span class="btn-text">Reset Calories</span>
+    <!-- Center: Core ride controls -->
+    <div class="hud-area-center">
+      <button id="pacer-sync-btn" class="hud-btn zlowBtn icon-only" title="Sync Pacer">
+        <span class="tooltip">Sync Pacer</span>
+        <span class="btn-text">Sync Pacer</span>
       </button>
 
+      <div class="hud-divider"></div>
+
+      <button id="pause-btn" class="hud-btn zlowBtn icon-only" title="Pause">
+        <span class="tooltip">Pause</span>
+        <span class="btn-text">Pause</span>
+      </button>
+
+      <div class="hud-divider"></div>
+
+      <button id="stop-btn" class="hud-btn zlowBtn icon-only" title="Stop">
+        <span class="tooltip">Stop</span>
+        <span class="btn-text">Stop</span>
+      </button>
     </div>
 
-    <!-- Pause overlay -->
-    <div id="pause-overlay" aria-hidden="true">
-      <div class="pause-dialog">
-        <div class="pause-branding">
-          <div class="pause-subtitle">
-            <img src="../../resources/favicons/ZlowFavicon.svg" alt="Z" class="pause-logo" />
-            <span>low</span>
-          </div>
-          <span class="pause-title">PAUSED</span>
-        </div>
-        <div class="pause-accent"></div>
-        <button id="pause-resume-btn" class="pause-resume-btn">Resume</button>
-      </div>
+    <!-- Right: Exit -->
+    <div class="hud-area-right">
+      <button id="menu-btn" class="hud-btn zlowBtn icon-only" title="Exit to Main Menu" onclick="if (confirm('Return to Main Menu? Gameplay data will be lost.')) {viewManager.setView(viewManager.views.mainMenu);}">
+        <span class="tooltip">Exit to Menu</span>
+        <span class="btn-text">Exit to Main Menu</span>
+      </button>
     </div>
-    
+
+</div>
+
+<!-- Pause overlay -->
+<div id="pause-overlay" aria-hidden="true">
+  <div class="pause-dialog">
+    <div class="pause-branding">
+      <div class="pause-subtitle">
+        <img src="../../resources/favicons/ZlowFavicon.svg" alt="Z" class="pause-logo" />
+        <span>low</span>
+      </div>
+      <span class="pause-title">PAUSED</span>
+    </div>
+    <div class="pause-accent"></div>
+    <button id="pause-resume-btn" class="pause-resume-btn">Resume</button>
   </div>
+</div>
 
 
     <!-- Trainer Calibration Modal -->

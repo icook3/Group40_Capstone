@@ -14,17 +14,13 @@ a-scene.customizationScene {
 #menuButton {
   position: fixed;
   display: flex;
-  gap: 20px;
   align-items: center;
   background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
-  padding: 15px 100px;
+
   mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
     100%;
   -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
     100% 100%;
-  bottom: 2%;
-  right: 2%;
-  font-size: xx-large;
 }
 
 #menuButton:hover {
@@ -72,30 +68,166 @@ a-scene.customizationScene {
   font-family: "Fugaz One", sans-serif;
 }
 
-#playerContainer {
-  position: fixed;
-  left: 2%;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px 25px;
-  border-radius: 10px;
+/*On tiny screens*/
+@media only screen and (max-aspect-ratio: 0.6) {
+  #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 20%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:75%;
+
+  }
+
+  #bikeContainer {
+    position: fixed;
+    left: 2%;
+    top: 80%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:75%;
+  }
+  #bikeControls, #playerControls {
+    width: 150px;
+  }
+  #menuButton {
+    bottom: 40%;
+    right: 2%;
+    font-size: small;
+    padding: 15px 100px;
+    gap: 20px;
+  }
 }
 
-#bikeContainer {
-  position: fixed;
-  right: 2%;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px 25px;
-  border-radius: 10px;
-}
+/*Make the controls smaller on smaller screens*/
+@media only screen and (min-aspect-ratio: 0.6) {
+  #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 20%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:75%;
 
+  }
+
+  #bikeContainer {
+    position: fixed;
+    right: 2%;
+    top: 20%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:75%;
+  }
+  #bikeControls, #playerControls {
+    width: 150px;
+  }
+  #menuButton {
+    bottom: 2%;
+    right: 2%;
+    font-size: xx-large;
+    padding: 15px 100px;
+    gap: 20px;
+  }
+}
+/*Normal size controls on normal size screens*/
+@media only screen and (min-aspect-ratio: 1) {
+  #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:130%;
+    width:200px;
+  }
+
+  #bikeContainer {
+    position: fixed;
+    right: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:1.3em;
+  }
+
+  #bikeControls, #playerControls {
+    width: 200px;
+  }
+}
+/*Long, narrow screens*/
+@media only screen and (min-aspect-ratio: 3) {
+  #playerContainer {
+    position: fixed;
+    left: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:130%;
+    width:200px;
+  }
+
+  #bikeContainer {
+    position: fixed;
+    right: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size:130%;
+  }
+
+  #bikeControls, #playerControls {
+    width: 200px;
+  }
+  #menuButton {
+    bottom: 2%;
+    right: 60%;
+    font-size: xx-large;
+    padding: 15px 100px;
+    gap: 20px;
+  }
+  #playerContainer h2,
+  #bikeContainer h2 {
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px black;
+    color: white;
+    font-size: 100%;
+    font-family: "Fugaz One", sans-serif;
+  }
+}
 #bikeControls,
 #playerControls {
   display: flex;
@@ -104,10 +236,7 @@ a-scene.customizationScene {
 
   background: rgb(53, 72, 79);
   padding: 15px;
-  border-radius: 30px;
-  width: 200px;
-
-  font-size: x-large;
+  border-radius: 30px;  
   gap: 8px;
 }
 
@@ -117,7 +246,6 @@ a-scene.customizationScene {
   align-items: center;
   color: rgb(220, 229, 222);
   font-family: "Nunito", sans-serif;
-  font-size: 1em;
   gap: 12px;
 }
 
@@ -150,3 +278,8 @@ input[type="color"] {
   transition: filter 0.15s ease;
 }
 
+div.customizeBody {
+  height: 100%;
+  margin:0;
+  overflow:hidden;
+}
