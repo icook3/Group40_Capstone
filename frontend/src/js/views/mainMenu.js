@@ -204,7 +204,7 @@ function restrictNumberInput(input, maxDigits, min, max) {
 
         resizeInput(input);
 
-        sessionStorage.setItem(input.id, input.value);
+        localStorage.setItem(input.id, input.value);
     });
 
     input.addEventListener("change", () => {
