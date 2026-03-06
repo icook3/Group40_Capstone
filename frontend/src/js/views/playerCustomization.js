@@ -23,10 +23,9 @@ export class playerCustomizationView {
         this.initPlayerColors();
         this.initBikeColors();
         this.initHelmetColors();
-
         this.setInitialPickerValues();
-
     }
+    
     reset() {
         this.stopLoop=true;
     }
@@ -39,7 +38,9 @@ export class playerCustomizationView {
     rightArrow;
     stopLoop = true;
     createAvatar() {
+        
         this.scene = document.querySelector("#playerCustomizerScene");
+        console.log(this.scene)
         if (!this.scene) {
           console.error("Scene not found!");
           return;

@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { getSign } from '../core/util.js';
 import { constants } from "../../constants.js";
 import { loadModel } from "../modelCache.js";

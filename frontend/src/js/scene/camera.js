@@ -1,5 +1,3 @@
-import * as THREE from "three";
-
 class Camera {
     constructor(scene) {
         // The rig is a Group that holds the camera (lets you move/rotate them together)
@@ -13,6 +11,8 @@ class Camera {
             1000                                         // far
         );
         this.camera.name = "camera";
+
+        console.log(scene)
 
         this.rig.add(this.camera);
         scene.add(this.rig);

@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { constants } from "../../constants.js";
 
 export class GroundInstanced {

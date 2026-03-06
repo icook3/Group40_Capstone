@@ -1,5 +1,4 @@
 // Building.js
-import * as THREE from "three";
 import { loadModel } from "../../modelCache.js";
 
 function sampleBuildingX() {

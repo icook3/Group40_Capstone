@@ -19,7 +19,6 @@ import { NotificationManager } from "../notifications.js";
 import {initCrashReporter} from "../crashReporter.js";
 import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
-import { update_pacer_animation } from "../scene/env/Track.js";
 
 export class zlowScreen {
     content;
@@ -63,6 +62,7 @@ export class zlowScreen {
             if (setWhenDone) {
                 this.setPage();
             }
+            this.scene = new THREE.Scene();
             this.ready=true;
         });
     }
@@ -91,9 +91,7 @@ export class zlowScreen {
     }
 
     activatePacer() {
-      //if (this.peerState!=0) {return;}
       if (!constants.pacerStarted) {
-        //this.scene.activatePacer();
         constants.pacerStarted = true;
       }
     }
@@ -130,10 +128,12 @@ export class zlowScreen {
       switch(data.name) {
         case "playerData":
           console.log("recieving player data");
+          console.log("MOVEMENT1")
           this.pacer = new AvatarMovement("pacer-entity", {
             position: { x: 0.5, y: 1, z: 0 },
             isPacer: false,
-          });
+          },
+        this.scene);
           this.pacer.creator.loadOtherData(data.data);
           this.pacerPhysics = new PhysicsEngine();
           if (this.peerState==1) {
@@ -152,16 +152,16 @@ export class zlowScreen {
           break;
         case "syncPlayers":
           if (this.scene && this.rider && this.pacer) {
-            const riderSyncPos = this.rider.avatarEntity.position;
-            const pacerSyncPos = this.pacer.avatarEntity.position;
+            const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
+            const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
             pacerSyncPos.z = riderSyncPos.z;
             
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
             document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-
-            // THIS WON'T WORK AS WRITTEN
-           reset_pacer_animation(pacerSyncPos, this.pacerPhysics.getSpeed())
+            this.pacer.avatarEntity.removeAttribute("animation__2");
+            this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
+            this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
           }
           break;
       }
@@ -367,7 +367,8 @@ export class zlowScreen {
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        this.scene = new ZlowScene();
+        console.log("FIRST")
+        this.scene = new ZlowScene(this.scene);
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
@@ -381,11 +382,13 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
+          console.log("SECOND")
           this.scene = new ZlowScene();
           this.setPacerSpeed(val);
         } else {
           const val = 20;
           this.scene = new ZlowScene();
+          console.log("THIRD")
           this.setPacerSpeed(val);
         }
       }
@@ -572,14 +575,17 @@ export class zlowScreen {
       pacerSyncBtn.addEventListener("click", () => {
         //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
-          const riderSyncPos = this.rider.avatarEntity.position;
-          const pacerSyncPos = this.pacer.avatarEntity.position;
+          const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
+          const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
           pacerSyncPos.z = riderSyncPos.z;
     
           // Set pacer constants to rider constants and adjust animation
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
           document.getElementById('pacer-speed').value = constants.riderState.speed;
-          update_pacer_animation(pacerSyncPos, this.pacerPhysics.getSpeed(), true)
+          //pacerPhysics.setSpeed(constants.riderState.speed);
+          this.pacer.avatarEntity.removeAttribute("animation__2");
+          this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay: true;`);
+          this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
@@ -739,13 +745,6 @@ export class zlowScreen {
       this.peerState=0;
       this.loopRunning=false;
       this.connected=false;
-      /*AFRAME.registerComponent("no-cull", {
-        init() {
-          this.el.addEventListener("model-loaded", () => {
-            this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
-          });
-        },
-      });*/
       
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
@@ -798,18 +797,21 @@ export class zlowScreen {
       }
     
       this.countdown = new PauseCountdown({ getElement, limit: 10 });
-    
+      console.log("MOVEMENT2")
       this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },
         isPacer: false,
-      });
+      },
+      this.scene);
       this.physics = new PhysicsEngine();
     
       if (this.peerState == 0) {
+        console.log("MOVEMENT3")
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
           isPacer: true,
-        });
+        },
+        this.scene);
         this.pacerPhysics = new PhysicsEngine();
         this.pacer.creator.setPacerColors();
       }

@@ -1,5 +1,4 @@
-import * as THREE from "three";
-import { Camera } from "./Camera.js";
+import { Camera } from "./camera.js";
 import { ObjectField } from "./objects/ObjectField.js";
 import { Track } from "./env/Track.js";
 import { Cloud } from "./env/Cloud.js";
@@ -7,16 +6,16 @@ import { SceneryManager } from "./env/SceneryManager.js";
 import { constants } from "../constants.js";
 
 export class ZlowScene {
-    constructor() {
+    constructor(scene) {
         if (window.__zlowSceneInstance) {
             window.__zlowSceneInstance.destroy?.();
         }
         window.__zlowSceneInstance = this;
 
         // Scene
-        this.scene = new THREE.Scene();
+        this.scene = scene;
+        console.log(this.scene)
         this.objectsLoaded = false;
-
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);

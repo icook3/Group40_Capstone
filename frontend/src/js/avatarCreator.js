@@ -1,6 +1,11 @@
+import { ZlowScene } from "../js/scene/index.js";
+import { zlowScreen } from "./views/zlow.js";
+
+// PASSES SCENE SUCCESSFULLY TO HERE
 export class AvatarCreator {
-    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
+    constructor(scene, id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null) {
         this.id = id;
+        this.scene = scene;
         this.position = position;
         this.rotation = rotation;
         this.onReady = onReady;
@@ -97,8 +102,10 @@ export class AvatarCreator {
         this.createPlayerModel(avatar);
         this.createBikeModel(avatar);
         
-        //Don't try to access scene until the end of this function, or it will crash
-        document.querySelector('a-scene').object3D.add(avatar);
+        //console.log("HERE")
+        console.log(this.scene)
+        this.scene.add(avatar);
+        //console.log(avatar)
         return avatar;
     }
 

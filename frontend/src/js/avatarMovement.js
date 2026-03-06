@@ -2,16 +2,18 @@ import { AvatarCreator } from "./avatarCreator.js";
 import { units } from "./units/index.js";
 
 export class AvatarMovement {
-    constructor(id, options = {}) {
-        this.creator = new AvatarCreator(id, options.position);
+    constructor(id, options = {}, scene) {
+        this.scene = scene;
+        this.creator = new AvatarCreator(this.scene, id, options.position);
         this.avatarEntity = this.creator.avatarEntity;
         this.speed = 0;
         this.power = 0;
         this.isPacer = options.isPacer || false;
+        
         // Fix camera to rider entity
-        if (id == "rider") {
-            this.addCamera();
-        }
+        //if (id == "rider") {
+            //this.addCamera();
+        //}
     }
 
     // Add point-of-view camera to rider using a rig

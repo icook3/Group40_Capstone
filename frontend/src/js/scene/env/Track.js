@@ -2,7 +2,6 @@
   Creates the path the rider travels and circular patterns superimposed on the road.
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
-import * as THREE from "three";
 import { constants } from "../../constants.js";
 import {getPos, getSign} from '../core/util.js';
 import  {activatePacer } from '../../main.js'
@@ -30,6 +29,7 @@ export class Track {
 
     // Get entities needed to create the timeline animation
     this.rider = document.getElementById('rider');
+    console.log(this.rider)
     this.pacer = document.getElementById('pacer-entity');
     this.update_rider_animation = this.update_rider_animation.bind(this);
     this.update_pacer_animation = this.update_pacer_animation.bind(this);
@@ -69,35 +69,26 @@ export class Track {
 
 // Update animation speed and target based on current track piece
 update_rider_animation() {
+  constants.currentTrackPiece += 1;
+  const avatar = document.getElementById('rider');
 
-  // Busywait if the rider is not moving
-  if (constants.riderState.speed === 0) {
-    setTimeout(() => { 
-    this.update_rider_animation();
-    }, 500);
-    return;
-  }
-
-  // Find avatar and camera
-  // Update camera call when it transitions to three.js
-  const avatar = document.getElementById("scene").object3D.getObjectByName('rider');
-  let camera = document.getElementById('camera');
-  
-  // Check for rider to prevent util.js crash and ensure at least 10 track points left
+  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
   if (!avatar) return; 
 
-  const BUFFER_POINTS = 10;
+  // ---- NEW: ensure we have enough track points before reading the next one ----
+  // If we're close to the end of the array, spawn more now (before indexing).
+  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
   if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
     spawn_track(this);
   }
 
-  // Guard against out-of-range and undefined track points
+  // ---- NEW: guard against out-of-range / undefined ----
   const tp = constants.trackPoints[constants.currentTrackPiece];
   if (!tp) {
     console.warn(
-      "[Track] Missing track point: ",
+      "[Track] Missing track point:",
       constants.currentTrackPiece,
-      "trackPoints length: ",
+      "trackPoints length:",
       constants.trackPoints.length
     );
     return;
@@ -161,20 +152,33 @@ update_pacer_animation() {
   }
 }
 
-  
+  // Initialize rider animation attribute using a very short section of track to avoid division by zero
+  // Pacer starts when rider starts. Delay ensures pacer finishes loading
+  initialize_animation() {
+    this.waitForElement('#pacer-entity', (element) => {
+      this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
+      document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
+      this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
+      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:true;`);
+      activatePacer();
+      
+    });
+  }
 
-  // Create an append a track piece curving to the right
-  curve_180_right(spawnZ) {
-    const track = document.createElement('a-entity');
-    track.setAttribute('id', 'curve')
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
-    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
-    track.setAttribute('configuration', `curve_right_180`);
-    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${spawnZ}`);
-    track.setAttribute('rotation', '-90 0 0');
-    track.setAttribute('parametric-curve', `xyzFunctions: -18*cos(t), 2, -18*sin(t); tRange: 4.7, 1.5;`);
-    this.path_element.appendChild(track);
-    return track.getAttribute("configuration");
+  // Helper function to check for an element's existance
+  waitForElement(selector, callback) {
+    const observer = new MutationObserver((mutations, observer) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            observer.disconnect();
+            callback(element);
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
   }
 }
 

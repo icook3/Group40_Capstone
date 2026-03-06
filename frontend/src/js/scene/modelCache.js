@@ -1,6 +1,4 @@
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-
-const loader = new GLTFLoader();
+const loader = new THREE.GLTFLoader();
 const cache = {};
 
 /**

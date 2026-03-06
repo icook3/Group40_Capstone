@@ -6,7 +6,6 @@
   import { constants } from "../../constants.js";
   import { spawnCloud } from "../env/Cloud.js";
   import { KINDS, detectKind } from "./kinds/index.js";
-  import * as THREE from "three";
 
 export class ObjectField {
 
