@@ -179,7 +179,7 @@ initTrainerToggle() {
    */
   showWorkoutMessage({ text, seconds = 4 } = {}) {
     if (!this.workoutOverlay || !this.workoutDialog) return;
-
+    
     // clear any previous hide timer
     if (this.workoutMessageTimeoutId) {
       clearTimeout(this.workoutMessageTimeoutId);
