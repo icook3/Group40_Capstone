@@ -179,31 +179,31 @@ export class zlowScreen {
             let pacerPos = null;
     
             try {
-                const riderEl = document.getElementById("rider");
-                const pacerEl = document.getElementById("pacer");
-    
-                riderPos = riderEl?.getAttribute("position") || null;
-                pacerPos = pacerEl?.getAttribute("position") || null;
+                const rider = this.scene?.scene?.getObjectByName("rider");
+                const pacer = this.scene?.scene?.getObjectByName("pacer-entity");
+
+                if (rider) riderPos = { x: rider.position.x, y: rider.position.y, z: rider.position.z };
+                if (pacer) pacerPos = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
             } catch {}
     
-            let aframeStats = null;
+            let rendererStats = null;
     
             try {
-                const rideScene = AFRAME?.scenes?.[0];
-                const info = rideScene?.renderer?.info;
-    
-                if (rideScene && info) {
-                    aframeStats = {
+                const renderer = this.scene?.renderer;
+                const info = renderer?.info;
+
+                if (info) {
+                    rendererStats = {
                         geometries: info.memory?.geometries,
                         textures: info.memory?.textures,
                         programs: info.programs?.length,
                         drawCalls: info.render?.calls,
                         triangles: info.render?.triangles,
-                        entities: rideScene.querySelectorAll('a-entity')?.length,
+                        sceneObjects: this.scene?.scene?.children?.length,
                     };
                 }
             } catch (e) {
-                aframeStats = { error: "failed to read aframe stats" };
+                rendererStats = { error: "failed to read renderer stats" };
             }
 
             let tempPeerState = this.peerState;
@@ -218,7 +218,7 @@ export class zlowScreen {
                 riderPosition: riderPos,
                 pacerPosition: pacerPos,
     
-                aframe: aframeStats,
+                renderer: rendererStats,
     
                 testMode: localStorage.getItem("testMode"),
                 trainerConnected: !!this.standardMode?.trainer?.isConnected,
