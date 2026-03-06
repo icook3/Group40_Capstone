@@ -378,8 +378,8 @@ export class zlowScreen {
           this.setPacerSpeed(val);
         });
       } else {
-        if (sessionStorage.getItem("PacerSpeed") !== null) {
-          const val = Number(sessionStorage.getItem("PacerSpeed"));
+        if (localStorage.getItem("pacer-speed") !== null) {
+          const val = Number(localStorage.getItem("pacer-speed"));
           this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         } else {
