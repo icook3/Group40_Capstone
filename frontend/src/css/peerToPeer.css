@@ -27,9 +27,7 @@ button.peerBtn {
     font-size: 1em;
     cursor: pointer;
 }
-.center-itemPeer {
-    left: 40%;
-}
+
 
 /* Keep your existing cancel container behavior */
 #cancel {
@@ -48,21 +46,6 @@ button:hover {
   filter: brightness(85%);
   transition: filter 0.15s ease;
 }
-
-/* ===== mainMenu-style center layout ===== */
-#main-menu-center {
-  position: fixed;
-  top: clamp(80px, 20vh, 240px);
-  left: 50%;
-  transform: translateX(-50%); /* removed scale(1.2) */
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(18px, 3vh, 32px);
-}
-
-
 
 #welcome-msg {
   display: flex;
@@ -86,7 +69,8 @@ button:hover {
   letter-spacing: 0.04em;
   text-shadow:
     0 2px 0 rgba(255,255,255,0.45),
-    0 8px 24px rgba(0,0,0,0.25);  display: flex;
+    0 8px 24px rgba(0,0,0,0.25);  
+  display: flex;
   align-items: baseline;
 }
 

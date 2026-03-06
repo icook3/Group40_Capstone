@@ -1,13 +1,11 @@
-div.menuBody {
-  #sky-gradient {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -2;
-    background: linear-gradient(to bottom, #7cd1f3 0%, #c4eeff 100%);
-  }
+#sky-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  background: linear-gradient(to bottom, #7cd1f3 0%, #c4eeff 100%);
 }
 button.menuBtn {
   font-size: 1em;
@@ -21,21 +19,30 @@ button.menuBtn {
 #main-menu-center {
   position: fixed;
   top: 23%;
-  left: 50%;
-  transform: translateX(-50%) scale(1.2);
+
+  /* NEW centering (no transform) */
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+
   z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 32px;
-}
 
+}
 
 #welcome-msg {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+
+  max-height: 200px; /* enough to fit content */
+  transition: opacity 0.2s ease, max-height 0.2s ease;
 }
 
 #start-wrapper {
@@ -79,35 +86,6 @@ button.menuBtn {
   background: linear-gradient(90deg, #2d7a4a, #7cd1f3);
   border-radius: 2px;
   margin-top: 16px;
-}
-
-
-/*
-    other settings
-*/
-#menu-settings {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  background: rgb(53, 72, 79);
-  padding: 20px 24px;
-  border-radius: 20px;
-  width: 320px;
-  display: none;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-  color: #e0e0e0;
-  font-family: "Nunito", sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  opacity: 0;
-}
-
-#menu-settings.zoom-in {
-  animation: zoomIn 0.35s ease both;
 }
 
 #peer-name {
@@ -212,14 +190,40 @@ a-scene.menuScene {
   background: rgba(46, 139, 110, 0.08);
 }
 
-/* ========================================
-   FIX: Settings panel cursor behavior
-   (mainMenu.html uses <span class="hud-btn"> rows inside #menu-settings)
-   ======================================== */
-
-/* The settings panel background should be normal arrow */
+/*
+    other settings
+*/
 #menu-settings {
+  position: fixed; /* was: absolute */
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000; /* optional but safer than 1000 */
+
+  background: rgb(53, 72, 79);
+  padding: 20px 24px;
+  border-radius: 20px;
+  width: min(320px, calc(100vw - 60px));  
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+
+  /* optional safety so it never runs off-screen */
+  max-height: 85vh;
+  overflow-y: auto;
+
   cursor: default;
+
+}
+
+#menu-settings.zoom-in {
+  animation: zoomIn 0.35s ease both;
 }
 
 /* IMPORTANT: rows in settings are spans with class hud-btn
@@ -289,6 +293,23 @@ a-scene.menuScene {
   font-family: "Nunito", sans-serif;
   font-weight: 600;
 }
+
+#menu-settings .hud-btn::before {
+  display: none;
+}
+
+#menu-settings #clear-btn:hover {
+  background: rgb(200, 81, 81);
+}
+
+#settings-back {
+  color: #e0e0e0;
+}
+
+#settings-back:hover {
+  color: #fff;
+}
+
 
 #workout-options.hidden {
   display: none;
@@ -401,14 +422,6 @@ a-scene.menuScene {
 .workout-option[data-workout="sprint"]:hover .workout-name { color: #1a1a1a; }
 .workout-option[data-workout="sprint"]:hover .workout-desc { color: rgba(0,0,0,0.45); }
 
-#settings-back {
-  color: #e0e0e0;
-}
-
-#settings-back:hover {
-  color: #fff;
-}
-
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -481,14 +494,6 @@ a-scene.menuScene {
   color: #e0e0e0;
 }
 
-#menu-settings .hud-btn::before {
-  display: none;
-}
-
-#menu-settings #clear-btn:hover {
-  background: rgb(200, 81, 81);
-}
-
 #menu-footer {
   background: rgba(0, 0, 0, 0.35);
   padding: 6px 16px;
@@ -513,4 +518,84 @@ a-scene.menuScene {
 
 #menu-footer a:hover {
   color: rgba(255, 255, 255, 1);
+}
+
+/* Force settings content to stay left-aligned at all widths */
+#menu-settings {
+  text-align: left !important;
+}
+
+#menu-settings .hud-btn {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+#menu-settings .hud-btn label,
+#menu-settings .hud-btn span,
+#menu-settings .hud-btn div {
+  text-align: left !important;
+}
+
+/* Keep grouped controls from centering */
+#menu-settings .units-group,
+#menu-settings .seg-toggle {
+  justify-content: flex-start !important;
+}
+
+/* When height shrinks, reclaim top space first */
+@media (max-height: 800px) {
+  #main-menu-center {
+    top: 14%;
+  }
+}
+
+@media (max-height: 650px) {
+  #main-menu-center {
+    top: 0;
+    bottom: 0;
+    justify-content: center; /* centers children vertically within the column */
+    gap: 24px;
+  }
+  #menu-footer {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    bottom: 6px;
+  }
+}
+
+
+@media (max-height: 580px) {
+  #welcome-msg {
+    display: none !important;
+  }
+  #main-menu-center {
+    top: 24px;  /* your “margin” */
+    gap: 16px;
+  }
+  #menu-footer {
+    display: none !important;
+  }
+  #menu-settings {
+    top: 20%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 300px), (max-height: 400px) {
+  body::before {
+    content: "Window too small for optimal experience";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 0.75rem;
+    text-align: center;
+    z-index: 9999;
+  }
 }
