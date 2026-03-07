@@ -30,7 +30,7 @@ export class Track {
     this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
 
     this.update_rider_animation = this.update_rider_animation.bind(this);
-    this.update_pacer_animation = this.update_pacer_animation.bind(this);
+    this.update_pacer_animation = update_pacer_animation.bind(this);
 
     const geometry = new THREE.BoxGeometry(
       constants.pathWidth,
@@ -137,45 +137,7 @@ export class Track {
     }
 }
 
-update_pacer_animation() {
-  constants.pacerCurrentTrackPiece += 1;
-  const pacer = this._getPacer();
-  if (!pacer) return;
 
-  const BUFFER_POINTS = 10;
-  if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track(this);
-  }
-
-  const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
-  if (!tp) {
-    console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
-    return;
-  }
-
-  const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
-  if (pacerSpeed === 0) return;
-
-  let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
-  const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-  const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
-    pacer.position.set(coords.x, coords.y, coords.z);
-  }).onComplete(() => {
-    this.update_pacer_animation();
-  }).start();
-
-  function animate(time) {
-    animatePacer.update(time);
-    requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
-
-  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track(this);
-  }
-}
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
@@ -190,7 +152,7 @@ update_pacer_animation() {
     }
 
     this.update_rider_animation();
-    this.update_pacer_animation();
+    update_pacer_animation(this.scene);
     activatePacer();
   }
 
@@ -353,5 +315,53 @@ export function spawn_track(trackSystem) {
         break; // stop if we've reached pieces the rider hasn't passed
       }
     }
+  }
+}
+
+export function update_pacer_animation(scene) {
+  if (constants.riderState.speed === 0) {
+      setTimeout(() => update_pacer_animation(scene), 500);
+      return;
+    }
+
+  constants.pacerCurrentTrackPiece += 1;
+  
+
+  const pacer = scene.getObjectByName("pacer-entity");
+
+  if (!pacer) return;
+
+  const BUFFER_POINTS = 10;
+  if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+    spawn_track(this);
+  }
+
+  const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+  if (!tp) {
+    console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
+    return;
+  }
+
+  const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
+  if (pacerSpeed === 0) return;
+
+  let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
+  const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
+  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
+  const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
+    pacer.position.set(coords.x, coords.y, coords.z);
+  }).onComplete(() => {
+    update_pacer_animation(scene);
+  }).start();
+
+  function animate(time) {
+    animatePacer.update(time);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    spawn_track(this);
   }
 }
