@@ -1,7 +1,8 @@
 import {workoutMenu} from "../workoutMenu.js";
 import { StandardMode } from "../standardMode.js";
-import { constants } from "../constants.js";
+import {constants, features} from "../constants.js";
 import { Strava } from "../strava.js";
+import { initMenuBackground } from "../scene/mainMenuBackground.js";
 
 export class mainMenuView {
     content;
@@ -20,11 +21,22 @@ export class mainMenuView {
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
+        
+        // Three.js background
+        const canvas = initMenuBackground();
+        canvas.style.position = "fixed";
+        canvas.style.top = "0";
+        canvas.style.left = "0";
+        canvas.style.zIndex = "-1";
+        canvas.style.filter = "blur(3px)";  // blurs the background
+        document.getElementById("mainDiv").appendChild(canvas);
+        // Everything else
         workoutMenu();
         this.initSettings();
         this.initStravaButton().catch((error)=> {
             console.error("init Strava button failed");
         });
+        this.initPeerButtons();
     }
 
     reset() {}
@@ -44,28 +56,6 @@ export class mainMenuView {
             //if (ok) connectBtn.disabled = true;
         });
 
-        // Host P2P toggle
-        const peerToggle = document.getElementById("peer-toggle");
-        // Sync with stored state on load
-        peerToggle.checked = sessionStorage.getItem("peerToPeer") === "true";
-
-        peerToggle.addEventListener("change", () => {
-            sessionStorage.setItem("peerToPeer", peerToggle.checked);
-            jQuery("#peer-name").fadeToggle(500);
-        });
-
-        const peerNameInput = document.getElementById("name-input");
-        peerNameInput.addEventListener("input", () => {
-            localStorage.setItem("Name",peerNameInput.value);
-        });
-
-        peerNameInput.addEventListener("change", () => {
-            const name = peerNameInput.value.trim();
-            if (name.length === 0) {
-                alert("Name cannot be empty");
-            }
-        });
-
         //Test Mode
         const devToggle = document.getElementById("dev-toggle");
         // Sync toggle with stored state on load
@@ -77,26 +67,16 @@ export class mainMenuView {
                 constants.riderState.speed = 0;
             }
         });
-        //Pacer speed input
-        const pacerSpeedInput = document.getElementById("pacer-speed");
-        pacerSpeedInput.addEventListener("input", () => {
-            sessionStorage.setItem("PacerSpeed", pacerSpeedInput.value);
-        });
-        //weight input
-        // Hook up live mass updates → optional immediate speed recompute
-        const riderWeightEl = document.getElementById("rider-weight");
-        if (riderWeightEl) {
-            const updateMassAndMaybeSpeed = () => {
-                const newMass = Number(riderWeightEl.value);
-                if (!Number.isFinite(newMass)) return;
-                sessionStorage.setItem("weight", newMass);
-            };
 
-            // Initialize once and then listen for changes
-            updateMassAndMaybeSpeed();
-            riderWeightEl.addEventListener("input", updateMassAndMaybeSpeed);
-            riderWeightEl.addEventListener("change", updateMassAndMaybeSpeed);
-        }
+        // Pacer speed input
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+        resizeInput(pacerSpeedInput);
+        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9);
+
+        // Weight input
+        const riderWeightInput = document.getElementById("rider-weight");
+        resizeInput(riderWeightInput)
+        restrictNumberInput(riderWeightInput, 3, 1, 999.9);
 
         // Units input
         // Speed unit toggle
@@ -137,19 +117,14 @@ export class mainMenuView {
                 }
             });
         });
-        // power
-        //uncomment the following code if alternate units for power are implemented
-        /*
-        const powerUnitInput = document.getElementById("unitInputPower");
-        if (powerUnitInput) {
-            powerUnitInput.addEventListener("input", () => {
-                sessionStorage.setItem("PowerUnit", powerUnitInput.value);
-            });
-        }
-        */
     }
 
     async initStravaButton() {
+        if (!features.stravaEnabled) {
+            const stravaBtn = document.getElementById("connect-strava-btn");
+            stravaBtn.style.display = "none";
+        }
+
         const strava = new Strava();
         Strava.loadFromRedirect();
         strava.loadToken();
@@ -177,4 +152,80 @@ export class mainMenuView {
             stravaBtn.addEventListener("click", () => strava.startOAuth());
         }
     }
+
+    initPeerButtons() {
+        // If peer to peer not configured, hide it
+        if (!features.peerEnabled) {
+            // Connect to Peer
+            const peerConnectBtn = document.getElementById("peer-connect-btn");
+            peerConnectBtn.style.display = "none";
+
+            const peerSection = document.getElementById("peer-section");
+            if (peerSection) {
+                peerSection.style.display = "none";
+            }
+
+            return;
+        }
+
+        // Host P2P toggle
+        const peerToggle = document.getElementById("peer-toggle");
+
+        // Sync with stored state on load
+        peerToggle.checked = sessionStorage.getItem("peerToPeer") === "true";
+
+        peerToggle.addEventListener("change", () => {
+            sessionStorage.setItem("peerToPeer", peerToggle.checked);
+            jQuery("#peer-name").fadeToggle(500);
+        });
+
+        const peerNameInput = document.getElementById("name-input");
+        peerNameInput.addEventListener("input", () => {
+            localStorage.setItem("Name",peerNameInput.value);
+        });
+
+        peerNameInput.addEventListener("change", () => {
+            const name = peerNameInput.value.trim();
+            if (name.length === 0) {
+                alert("Name cannot be empty");
+            }
+        });
+    }
+}
+
+function restrictNumberInput(input, maxDigits, min, max) {
+    input.addEventListener("input", () => {
+        const pattern = new RegExp(`^\\d{0,${maxDigits}}(\\.\\d{0,1})?$`);
+
+        if (!pattern.test(input.value)) {
+            input.value = input.value.slice(0, -1);
+            return;
+        }
+
+        resizeInput(input);
+
+        sessionStorage.setItem(input.id, input.value);
+    });
+
+    input.addEventListener("change", () => {
+        let num = parseFloat(input.value);
+        if (isNaN(num)) {
+            input.value = min;
+            return;
+        }
+
+        num = Math.max(min, Math.min(max, num));
+        input.value = num;
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (["e", "E", "+", "-"].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+}
+
+function resizeInput(input) {
+    const length = String(input.value ?? "").length;
+    input.style.width = 4 + (length + 1) + "ch";
 }

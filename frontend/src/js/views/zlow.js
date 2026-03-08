@@ -10,6 +10,7 @@ import { simulationState } from "../simulationstate.js";
 import { PauseCountdown } from "../pause_countdown.js";
 import { units } from "../units/index.js";
 import { RampTestController } from "../workouts/RampTestController.js";
+import { SprintIntervalController } from "../workouts/SprintIntervalController.js";
 import { rideHistory } from "../rideHistoryStore.js";
 import { WorkoutStorage } from "../workoutStorage.js";
 import { WorkoutSession } from "../workoutSession.js";
@@ -37,9 +38,12 @@ export class zlowScreen {
     standardMode;
     scene;
     hud;
-    rampController;
+
+    workoutController;
+
     selectedWorkout;
     workoutName;
+    
     isRecording = false;
     rideElapsedMs=0;
     workoutSummary;
@@ -204,7 +208,9 @@ export class zlowScreen {
             } catch (e) {
                 aframeStats = { error: "failed to read aframe stats" };
             }
-            tempPeerState=this.peerState;
+
+            let tempPeerState = this.peerState;
+
             return {
                 workout: sessionStorage.getItem("SelectedWorkout") || "free",
                 samples: rideHistory.samples?.length,
@@ -368,9 +374,8 @@ export class zlowScreen {
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
-          // this.scene.setPacerSpeed(val);
         });
-    
+
         this.setPacerSpeed(Number(pacerSpeedInput.value));
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
@@ -379,25 +384,23 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val, { getElement });
-          // this.scene.setPacerSpeed(val);
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val, { getElement });
-          //this.scene.setPacerSpeed(val);
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         }
       }
     }
 
-    initializeRampTestController() {
+    initializeWorkouts() {
       // Set up ramp test controller if applicable
       if (this.selectedWorkout === "ramp") {
         const now = Date.now();
         let tempHud=this.hud;
-        this.rampController = new RampTestController({
-          tempHud,
+        this.workoutController = new RampTestController({
+          hud: tempHud,
           nowMs: now,
           warmupSeconds: 5 * 60, // 5-minute warmup
           startWatts: 100,
@@ -405,8 +408,20 @@ export class zlowScreen {
           stepSeconds: 60,
           ftpFactor: 0.75,
         });
+      } else if (this.selectedWorkout==="sprint") {
+        const now = Date.now();
+        let tempHud=this.hud;
+        this.workoutController = new SprintIntervalController({
+          hud: tempHud,
+          nowMs: now,
+          warmupSeconds: 10 * 60,
+          secondOn: 2*60,
+          useWatts: 1.05*this.workoutStorage?.data?.personalRecords?.highestFtp?.value||120,
+          secondsOff: 2*60,
+          wattsOff: 0.95*this.workoutStorage?.data?.personalRecords?.highestFtp?.value||10
+        });
       } else {
-        this.rampController = null;
+        this.workoutController = null;
       }
     }
     initializeHudCountdown() {
@@ -418,15 +433,13 @@ export class zlowScreen {
           simulationState.isPaused = false;
           this.isRecording = true;
           this.rideElapsedMs = 0;
-          // If ramp, begin warmup countdown (no pause)
-          if (this.selectedWorkout === "ramp") {
-            // tell HUD to show 5-minute warmup timer
-            this.hud.showWarmupCountdown({
-              seconds: 5 * 60,
+          if (this.workoutController!=null) {
+          this.hud.showWarmupCountdown({
+              //use the seconds in the workout controller
+              seconds:this.workoutController.warmupSeconds,
               onDone: () => {
-                // Warmup over → tell RampTestController to start ramps
-                this.rampController?.startRamp?.();
-              },
+                this.workoutController?.startWorkout();
+              }
             });
           }
         },
@@ -436,32 +449,47 @@ export class zlowScreen {
     initPauseBtn() {
       let savedPacerSpeed;
       const pauseBtn = document.getElementById("pause-btn");
+      const resumeBtn = document.getElementById("pause-resume-btn");
+      const overlay = document.getElementById("pause-overlay");
+      const dialog = overlay.querySelector(".pause-dialog");
+
+      const pauseGame = () => {
+        simulationState.isPaused = true;
+        this.hud.pause();
+        savedPacerSpeed = this.pacerPhysics.getSpeed();
+        this.setPacerSpeed(0);
+        overlay.style.display = "flex";
+        overlay.setAttribute("aria-hidden", "false");
+        dialog.classList.remove("zoom-out");
+        dialog.classList.add("zoom-in");
+      };
+
+      const resumeGame = () => {
+        dialog.classList.remove("zoom-in");
+        dialog.classList.add("zoom-out");
+
+        // This block helps with pause overlay animation finishing before hiding away
+        dialog.addEventListener("animationend", function handler() {
+          dialog.removeEventListener("animationend", handler);
+          overlay.style.display = "none";
+          overlay.setAttribute("aria-hidden", "true");
+          dialog.classList.remove("zoom-out");
+        });
+
+        simulationState.isPaused = false;
+        constants.lastTime = Date.now();
+        this.hud.resume();
+        this.setPacerSpeed(savedPacerSpeed);
+      };
+
       pauseBtn.addEventListener("click", () => {
-        simulationState.isPaused = !simulationState.isPaused;
-        pauseBtn.textContent = simulationState.isPaused ? "Resume" : "Pause";
-    
-        if (simulationState.isPaused) {
-          this.hud.pause();
-          savedPacerSpeed = this.pacerPhysics.getSpeed();
-          this.setPacerSpeed(0); // Stop pacer when paused
-          // start countdown
-          this.countdown.start(() => {
-            // auto-resume when hits 0
-            simulationState.isPaused = false;
-            constants.lastTime = Date.now();
-            this.hud.resume();
-            this.setPacerSpeed(savedPacerSpeed);
-            pauseBtn.textContent = "Pause";
-          });
-        } else {
-          // manual resume
-          this.countdown.cancel();
-          this.hud.resume();
-          simulationState.isPaused = false;
-          constants.lastTime = Date.now();
-          this.setPacerSpeed(savedPacerSpeed);
-          pauseBtn.textContent = "Pause";
+        if (!simulationState.isPaused) {
+          pauseGame();
         }
+      });
+
+      resumeBtn.addEventListener("click", () => {
+        resumeGame();
       });
     }
     setupStopButton() {
@@ -474,22 +502,21 @@ export class zlowScreen {
             // End the session and get final stats
             const finalStats = this.workoutSession.end();
             this.isRecording = false;
-            // After you compute finalStats from workoutSession / history, etc.
-            if (this.selectedWorkout === "ramp" && this.rampController) {
-              const result = this.rampController.computeFtpFromHistory(
-                rideHistory.samples
-              );
+            if (this.selectedWorkout==="ramp") {
+              const result = this.workoutController.computeFtpFromHistory(rideHistory.samples);
+              // After you compute finalStats from workoutSession / history, etc.
               if (result) {
-                // Flatten FTP numbers into stats for summary + records
-                finalStats.ftp = Math.round(result.ftp);
-                finalStats.peakMinutePower = Math.round(result.peakMinute);
+                  // Flatten FTP numbers into stats for summary + records
+                  finalStats.ftp = Math.round(result.ftp);
+                  finalStats.peakMinutePower = Math.round(result.peakMinute);
     
-                this.hud.showWorkoutMessage({
-                  text: `Ramp Test FTP ≈ ${finalStats.ftp} W`,
-                  seconds: 8,
-                });
+                  this.hud.showWorkoutMessage({
+                    text: `${this.selectedWorkout} Test FTP ≈ ${finalStats.ftp} W`,
+                    seconds: 8,
+                  });
               }
             }
+            
     
             // Save workout and check for records
             const { newRecords, streak } = this.workoutStorage.saveWorkout(finalStats);
@@ -506,8 +533,7 @@ export class zlowScreen {
             this.physics.setSpeed(0);
             this.hud.resetWorkOut();
             const pauseBtn = document.getElementById("pause-btn");
-            pauseBtn.textContent = "Pause";
-    
+                
             // Reset pacer
             this.setPacerSpeed(0);
             const startPos = { x: 0.5, y: 1, z: -2 };
@@ -624,9 +650,8 @@ export class zlowScreen {
     
       //update workout session with current values
       if (owner.workoutSession.isWorkoutActive()) {
-        if (owner.rampController) {
-          // Update FTP result if available
-          owner.workoutSession.addFTPResult(owner.rampController.ftpResult);
+        if (owner.workoutController&&this.selectedWorkout==="ramp") {
+          owner.workoutSession.addFTPResult(owner.workoutController.ftpResult);
         }
         owner.workoutSession.update({
           speed: constants.riderState.speed || 0,
@@ -654,24 +679,21 @@ export class zlowScreen {
         //console.log("Inside if statement");
         // Start from whatever speed the pacer currently has
         let pacerSpeed = owner.pacerPhysics.getSpeed();
-    
-        if (owner.rampController) {
-          // RampTestController is active (Ramp Test workout)
-          const targetWatts = owner.rampController.getCurrentTargetWatts();
-    
+        if (owner.workoutController) {
+          const targetWatts = owner.workoutController.getCurrentTargetWatts();
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
             pacerSpeed = constants.riderState.speed;
             owner.pacerPhysics.setSpeed(pacerSpeed);
           } else {
-            // Active ramp step:
+            // Active workout:
             // Pacer behaves like an ideal rider holding target watts,
             // using the same physics as the real rider for smooth changes.
             pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
           }
         }
-        // If rampController is null (free ride, other workouts),
+        // If workoutController is null (free ride, peer-to-peer),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
     
         // Apply the computed speed to the pacer avatar
@@ -681,12 +703,12 @@ export class zlowScreen {
       }
     
       // Let the ramp controller advance its state
-      if (owner.rampController) {
+      if (owner.workoutController) {
         const power = constants.riderState.power || 0;
-        owner.rampController.update(now, power);
+        owner.workoutController.update(now, power);
     
-        const target = owner.rampController.getCurrentTargetWatts();
-        constants.riderState.targetWatts = target || 0;
+        const target = owner.workoutController.getCurrentTargetWatts();
+        constants.riderState.targetWatts = target || 0;        
       }
     
       owner.hud.update(constants.riderState, dt);
@@ -804,23 +826,43 @@ export class zlowScreen {
     
       // Show/hide dev hud based on testMode
       console.log("testMode value:", localStorage.getItem("testMode"));
+      const devWrapper = getElement("dev-controls-wrapper");
       const devHud = getElement("dev-controls-hud");
-      console.log("devHud element found:", devHud);
-    
-      if (devHud) {
+
+      if (devWrapper) {
         if (localStorage.getItem("testMode") === "true") {
-          console.log("Removing hidden attribute");
-          devHud.removeAttribute("hidden");
+          devWrapper.removeAttribute("hidden");
         } else {
-          console.log("Adding hidden attribute");
-          devHud.setAttribute("hidden", "");
+          devWrapper.setAttribute("hidden", "");
         }
-      } else {
-        console.log("ERROR: dev-controls-panel element not found!");
+      }
+
+      const devToggleBtn = getElement("dev-toggle-btn");
+      if (devToggleBtn && devHud) {
+        devToggleBtn.addEventListener("click", () => {
+          devHud.hidden = !devHud.hidden;
+        });
       }
       this.initializePacerSpeedInput();    
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
+
+      // Dismiss trainer and dev menus when clicking outsideof their pop up
+      document.addEventListener("click", (e) => {
+        // Trainer menu
+        const trainerControls = document.querySelector(".trainer-controls");
+        const trainerMenu = document.querySelector(".trainer-menu");
+        if (trainerMenu && !trainerMenu.hidden && !trainerControls.contains(e.target)) {
+          trainerMenu.hidden = true;
+        }
+
+        // Dev menu
+        const devWrapper = document.getElementById("dev-controls-wrapper");
+        const devHud = document.getElementById("dev-controls-hud");
+        if (devHud && !devHud.hidden && devWrapper && !devWrapper.contains(e.target)) {
+          devHud.hidden = true;
+        }
+      });
     
     
       // Map workout keys to user-facing labels
@@ -831,7 +873,7 @@ export class zlowScreen {
       };
     
       this.workoutName = workoutLabels[this.selectedWorkout] || "Free Ride";
-      this.initializeRampTestController();
+      this.initializeWorkouts();
       this.initializeHudCountdown();
     
       const strava = new Strava();
