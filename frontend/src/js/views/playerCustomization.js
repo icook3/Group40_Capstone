@@ -1,7 +1,9 @@
+import * as THREE from 'three';
 import { AvatarCreator } from "../avatarCreator.js";
 export class playerCustomizationView {
     content;
     ready=false;
+    
     constructor(setWhenDone) {
         fetch("../html/playerCustomization.html").then((content)=> {
             return content.text();
@@ -12,12 +14,26 @@ export class playerCustomizationView {
             }
             this.ready=true;
         });
+
+        // Add reference to scene
+        this.scene = null;
     }
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
+
+        // Add scene and append to DOM
+        const canvas = this.initCustomizationScene();
+        canvas.style.position = "fixed";
+        canvas.style.top = "0";
+        canvas.style.left = "0";
+        canvas.style.zIndex = "-1";
+        //canvas.style.width = 100;
+        //canvas.style.height = 100;
+        document.getElementById("mainDiv").appendChild(canvas);
+
         this.stopLoop=false;
-        this.createAvatar();
+        
         const colorPicker = document.getElementById("colorPicker");
         this.createGenderLabels();
         this.initPlayerColors();
@@ -27,6 +43,84 @@ export class playerCustomizationView {
         this.setInitialPickerValues();
 
     }
+    // Create the scene used to display the avatar during customization
+    initCustomizationScene() {
+        const scene = new THREE.Scene();
+        this.scene = scene;
+        this.objectsLoaded = false;
+        this.scene.name = "playerCustomizerScene";
+        this.createAvatar();
+        // Camera
+          const camera = new THREE.PerspectiveCamera(
+            80,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          );
+
+          camera.position.set(-3.33, .18, 2.6);
+          camera.rotation.order = 'YXZ';
+          camera.rotation.y = THREE.MathUtils.degToRad(-20);
+          camera.rotation.x = THREE.MathUtils.degToRad(11);
+          this.camera = camera;
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        this.renderer = renderer;
+
+        // Brown platform base (sides)
+        const baseGeometry = new THREE.CylinderGeometry(2.5, 2.5, 0.1);
+        const baseMaterial = new THREE.MeshBasicMaterial( { color: "#725335"} );
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = -1.2
+        this.scene.add( base );
+
+        // Green top surface
+        const circleGeometry = new THREE.CylinderGeometry(2.5, 2.5, 0.001);
+        const circleMaterial = new THREE.MeshBasicMaterial( { color: "#477e23"} );
+        const circle = new THREE.Mesh( circleGeometry, circleMaterial );
+        circle.position.y = -1.1;
+        circle.rotation.x = 0;
+        circle.rotation.y = 0;
+        circle.rotation.z = 0;
+        this.scene.add( circle )
+
+        console.log( base );
+        
+        camera.lookAt(new THREE.Vector3(0,0,0));
+        // Lighting (same as main menu)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        this.scene.add(ambientLight);
+    
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(-2, 5, 3);
+        this.scene.add(directionalLight);
+    
+        const pointLight = new THREE.PointLight(0xffffff, 5.0, 1.5);
+        pointLight.position.set(-2, 0, 2);
+        this.scene.add(pointLight);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.render(this.scene, camera);
+        });
+
+        // Animate scene (will also re-render changes)
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        return renderer.domElement;
+    }
+
     reset() {
         this.stopLoop=true;
     }
@@ -39,15 +133,11 @@ export class playerCustomizationView {
     rightArrow;
     stopLoop = true;
     createAvatar() {
-        this.scene = document.querySelector("#playerCustomizerScene");
+        //this.scene = document.querySelector("#playerCustomizerScene");
         if (!this.scene) {
           console.error("Scene not found!");
           return;
         }
-
-        // MAKE IT WAIT FOR THE SCENE BEFORE IT LOADS??
-
-
 
         //Create the avatar immediately
         this.avatar = new AvatarCreator(
@@ -60,13 +150,13 @@ export class playerCustomizationView {
             avatarInstance.startRotationLoop();
 
             window.avatarInstance = avatarInstance;
-          }
+          },
+          this.scene,
         );
     }
 
     createGenderLabels() {
         this.models = ["Male", "Female"];
-
         this.genderLabel = document.getElementById("genderLabel");
         this.leftArrow = document.getElementById("leftArrow");
         this.rightArrow = document.getElementById("rightArrow");

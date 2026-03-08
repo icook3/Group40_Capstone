@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 export class AvatarCreator {
     constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null, scene = null) {
         this.id = id;
+        this.scene = scene;
         this.position = position;
         this.rotation = rotation;
         this.onReady = onReady;
@@ -83,8 +84,6 @@ export class AvatarCreator {
 
         this.loadPlayerData();
         this.avatarEntity = this.createEntity();
-
-        this.scene = scene;
     }
 
     //Creates avatar entity
@@ -442,7 +441,7 @@ applyHelmetColors() {
     // Initialize the avatar's position in the editing menu
     setMenuPosition() {
         this.avatarEntity.position.x = 0;
-        this.avatarEntity.position.y = 0;
+        this.avatarEntity.position.y = -1.1;
         this.avatarEntity.position.z = 0;
         this.avatarEntity.rotation.x = 0;
         this.avatarEntity.rotation.y = 180;

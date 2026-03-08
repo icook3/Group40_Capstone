@@ -318,17 +318,15 @@ export function spawn_track(trackSystem) {
   }
 }
 
-export function update_pacer_animation(scene) {
+export function update_pacer_animation(scene, update=false) {
   if (constants.riderState.speed === 0) {
       setTimeout(() => update_pacer_animation(scene), 500);
       return;
     }
 
   constants.pacerCurrentTrackPiece += 1;
-  
-
   const pacer = scene.getObjectByName("pacer-entity");
-
+  
   if (!pacer) return;
 
   const BUFFER_POINTS = 10;
@@ -349,12 +347,19 @@ export function update_pacer_animation(scene) {
   const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
-  const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
+  if (update) {
+    constants.pacerTween.stop();
+    constants.pacerTween = null;
+  }
+
+   const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
     pacer.position.set(coords.x, coords.y, coords.z);
   }).onComplete(() => {
     update_pacer_animation(scene);
   }).start();
-
+  if (update) {console.log(animatePacer)}
+  constants.pacerTween = animatePacer;
+  
   function animate(time) {
     animatePacer.update(time);
     requestAnimationFrame(animate);

@@ -2,7 +2,7 @@
   <div class="customizeBody">
     <div id="sky-gradient"></div>
 
-    <!-- Avatar -->
+    <!-- Avatar
     <a-scene class="customizationScene"
       id="playerCustomizerScene"
       embedded
@@ -14,15 +14,15 @@
         height: 100vh;
         z-index: -1;
       "
-    >
-      <!-- Camera -->
+    > -->
+      <!-- Camera
       <a-entity
         camera
         position="0 1.5 4"
         look-controls="enabled: false"
-      ></a-entity>
+      ></a-entity> -->
 
-      <!-- 3d Assets -->
+      <!-- 3d Assets
       <a-assets>
         <a-asset-item
           id="bikeGLB"
@@ -40,7 +40,7 @@
           id="helmetGLB"
           src="../../resources/models/playermodels/helmet.glb"
           ></a-asset-item>
-      </a-assets>
+      </a-assets> -->
 
       <!-- Floor - solid color -->
       <!-- I think it looks better without it - -->
@@ -55,7 +55,7 @@
         ></a-plane>
       </a-entity> -->
 
-      <!-- Brown platform base (sides) -->
+      <!-- Brown platform base (sides)
       <a-cylinder
         position="0 -.3 -1"
         radius="2.5"
@@ -63,9 +63,9 @@
         color="#725335"
         metalness="0.3"
         roughness="0.7"
-      ></a-cylinder>
+      ></a-cylinder> -->
 
-      <!-- Green top surface (grass) -->
+      <!-- Green top surface (grass)
       <a-circle
         position="0 -0.24 -1"
         radius="2.5"
@@ -73,9 +73,9 @@
         color="#477e23"
         metalness="0.3"
         roughness="1.0"
-      ></a-circle>
+      ></a-circle> -->
 
-      <!-- Lighting (same as main menu) -->
+      <!-- Lighting (same as main menu)
       <a-light type="ambient" color="#FFF" intensity="0.8"></a-light>
       <a-light
         type="directional"
@@ -90,9 +90,9 @@
         position="0 1 -1"
         distance="2"
       ></a-light>
-    </a-scene>
+    </a-scene> -->
 
-    <!-- Person Color Buttons -->
+    <!-- Person Color Buttons SHOULD ONLY BE USING THIS STUFF AND HAVE THE SCENE RENDERED IN THREE JS SOMEWHERE ELSE-->
     <div id="playerContainer">
       <h2>Player Customization</h2>
       <div id="playerControls">
