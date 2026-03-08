@@ -65,7 +65,7 @@ export class AvatarCreator {
 
         //Player and bike colors
         this.playerModel = "male";
-        this.skinColor = "#e801a3";
+        this.skinColor = "#c1591a";
         this.shirtColor = "#ff0000";
         this.shortsColor = "#000000";
         this.shoesColor = "#000000";
@@ -127,7 +127,7 @@ export class AvatarCreator {
             }
 
             else if (this.playerModel == "female") {
-                var personModel = await loader.loadAsync( '../../resources/models/playermodels/femaleV5.glb' );
+                var personModel = await loader.loadAsync( '../../resources/models/playermodels/femaleV6.glb' );
                 console.log("Person model loaded.")
             } 
         }
@@ -202,14 +202,13 @@ export class AvatarCreator {
         });
     }
 
-
-    
-
     setPlayerModel(model) {
         this.playerModel = model;
         if (this.avatarEntity) {
             //Remove old model
             if (this.personModel) {
+
+                
                 this.avatarEntity.removeChild(this.personModel);
             }
             //Add new model
@@ -218,18 +217,16 @@ export class AvatarCreator {
         this.savePlayerData();
     }
 
-    // DOESN'T SEEM TO DO ANYTHING
     setPlayerColors(skin, shirt, shorts, shoes) {
         this.skinColor = skin;
         this.shirtColor = shirt;
         this.shortsColor = shorts;
-        this.shoesColor = '#e801a3';
+        this.shoesColor = shoes;
 
         this.applyPlayerColors();
         this.savePlayerData();
     }
 
-    // WORKS TO APPLY COLORS PROPERLY
     applyPlayerColors() {
         if (!this.avatarEntity) {
             return;

@@ -28,8 +28,6 @@ export class playerCustomizationView {
         canvas.style.top = "0";
         canvas.style.left = "0";
         canvas.style.zIndex = "-1";
-        //canvas.style.width = 100;
-        //canvas.style.height = 100;
         document.getElementById("mainDiv").appendChild(canvas);
 
         this.stopLoop=false;
@@ -39,17 +37,21 @@ export class playerCustomizationView {
         this.initPlayerColors();
         this.initBikeColors();
         this.initHelmetColors();
-
         this.setInitialPickerValues();
 
     }
     // Create the scene used to display the avatar during customization
     initCustomizationScene() {
+        // Create new scene
         const scene = new THREE.Scene();
         this.scene = scene;
         this.objectsLoaded = false;
         this.scene.name = "playerCustomizerScene";
         this.createAvatar();
+
+        // Add background
+        this.scene.background = new THREE.Color(0x87CEEB);
+
         // Camera
           const camera = new THREE.PerspectiveCamera(
             80,
@@ -83,24 +85,21 @@ export class playerCustomizationView {
         const circleMaterial = new THREE.MeshBasicMaterial( { color: "#477e23"} );
         const circle = new THREE.Mesh( circleGeometry, circleMaterial );
         circle.position.y = -1.1;
-        circle.rotation.x = 0;
-        circle.rotation.y = 0;
-        circle.rotation.z = 0;
         this.scene.add( circle )
 
-        console.log( base );
-        
+        // Point camera at center of scene
         camera.lookAt(new THREE.Vector3(0,0,0));
+
         // Lighting (same as main menu)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         this.scene.add(ambientLight);
     
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        directionalLight.position.set(-2, 5, 3);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(2, 5, 3);
         this.scene.add(directionalLight);
     
-        const pointLight = new THREE.PointLight(0xffffff, 5.0, 1.5);
-        pointLight.position.set(-2, 0, 2);
+        const pointLight = new THREE.PointLight(0xffffff, 1.0, 5);
+        pointLight.position.set(0, 1, -1);
         this.scene.add(pointLight);
 
         // Handle window resize
@@ -133,7 +132,6 @@ export class playerCustomizationView {
     rightArrow;
     stopLoop = true;
     createAvatar() {
-        //this.scene = document.querySelector("#playerCustomizerScene");
         if (!this.scene) {
           console.error("Scene not found!");
           return;
@@ -176,22 +174,23 @@ export class playerCustomizationView {
         let currentModelIndex = savedModel.toLowerCase() === "female" ? 1 : 0;
         this.genderLabel.textContent = this.models[currentModelIndex];
 
-        function updateGenderDisplay() {
+        function updateGenderDisplay(scene) {
             owner.genderLabel.textContent = owner.models[currentModelIndex];
             window.avatarInstance.setPlayerModel(
-                owner.models[currentModelIndex].toLowerCase()
+                owner.models[currentModelIndex].toLowerCase(),
+                scene
             );
         }
 
         owner.leftArrow.addEventListener("click", () => {
             currentModelIndex =
                 (currentModelIndex - 1 + owner.models.length) % owner.models.length;
-            updateGenderDisplay();
+            updateGenderDisplay(this.scene);
         });
 
         this.rightArrow.addEventListener("click", () => {
             currentModelIndex = (currentModelIndex + 1) % owner.models.length;
-            updateGenderDisplay();
+            updateGenderDisplay(this.scene);
         });
     }
 
