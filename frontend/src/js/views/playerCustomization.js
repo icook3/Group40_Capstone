@@ -257,7 +257,6 @@ export class playerCustomizationView {
             picker.addEventListener("input", (e) => {
                 const mat = picker.dataset.mat; // Frame_Mat, Tire_Mat, Grip_Mat, etc.
                 const color = e.target.value;
-
                 const avatar = window.avatarInstance;
 
                 //Get current bike colors

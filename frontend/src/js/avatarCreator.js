@@ -207,9 +207,7 @@ export class AvatarCreator {
         if (this.avatarEntity) {
             //Remove old model
             if (this.personModel) {
-
-                
-                this.avatarEntity.removeChild(this.personModel);
+                this.avatarEntity.remove(this.avatarEntity.getObjectByName('Avatar'));
             }
             //Add new model
             this.createPlayerModel(this.avatarEntity);
@@ -298,7 +296,7 @@ export class AvatarCreator {
     );    
 }
 
-async createHelmetModel(avatarEntity) {
+async createHelmetModel() {
     if (this.helmetObject == null) {
         const loader = new GLTFLoader();
 
@@ -312,53 +310,53 @@ async createHelmetModel(avatarEntity) {
                 console.error("Helmet model could not be loaded! Exiting to main menu ...")
                 viewManager.setView(viewManager.views.mainMenu);
             }
-        }
 
-        // Set initial values
-        helmetModel.scene.name = "Helmet";
-        helmetModel.scene.position.x = 0;
-        helmetModel.scene.position.y = .2;
-        helmetModel.scene.position.z = -0.03;
-        helmetModel.scene.rotation.x = 0;
-        helmetModel.scene.rotation.y = 135;
-        helmetModel.scene.rotation.z = 0;
-        helmetModel.scene.scale.x = 0.35;
-        helmetModel.scene.scale.y = 0.35;
-        helmetModel.scene.scale.z = 0.35;
-        helmetModel.frustumCulled = false;
-        this.helmetObject = helmetModel.scene;
+            // Set initial values if the helmet is being created from scratch
+            helmetModel.scene.name = "Helmet";
+            helmetModel.scene.position.x = 0;
+            helmetModel.scene.position.y = .2;
+            helmetModel.scene.position.z = -0.03;
+            helmetModel.scene.rotation.x = 0;
+            helmetModel.scene.rotation.y = 135;
+            helmetModel.scene.rotation.z = 0;
+            helmetModel.scene.scale.x = 0.35;
+            helmetModel.scene.scale.y = 0.35;
+            helmetModel.scene.scale.z = 0.35;
+            helmetModel.frustumCulled = false;
+            this.helmetObject = helmetModel.scene;
+        }
 
         // Have helmet follow the rider's head dynamically and be sure to only add one helmet
         if (this.spine6 && !this.spine6.getObjectByName("Helmet")) {
-            this.spine6.add(helmetModel.scene);
+            this.spine6.add(this.helmetObject);
         }
 
         this.applyHelmetColors();
-}
-
-setHelmetColors(helmet, padding) {
-    this.helmetColor = helmet;
-    this.helmetPaddingColor = padding;
-    this.applyHelmetColors();
-    this.savePlayerData();
-}
-
-applyHelmetColors() {
-    if (!this.helmetObject) {
-        return;
     }
-    this.avatarEntity.traverse((child) => {
-        if (child.isMesh && child.material) {
-            if (child.material.name.includes("Helmet")) {
-                child.material.color.set(this.helmetColor);
-            }
 
-            if (child.material.name.includes("Padding")) {
-                child.material.color.set(this.helmetPaddingColor);
-            }
+    setHelmetColors(helmet, padding) {
+        this.helmetColor = helmet;
+        this.helmetPaddingColor = padding;
+        this.applyHelmetColors();
+        this.savePlayerData();
+    }
+
+    applyHelmetColors() {
+        if (!this.helmetObject) {
+            return;
         }
-    });
-}
+        this.avatarEntity.traverse((child) => {
+            if (child.isMesh && child.material) {
+                if (child.material.name.includes("Helmet")) {
+                    child.material.color.set(this.helmetColor);
+                }
+
+                if (child.material.name.includes("Padding")) {
+                    child.material.color.set(this.helmetPaddingColor);
+                }
+            }
+        });
+    }
 
     setBikeColors(frame, tires, grip, seat, pedals, pedalCrank) {
         this.bikeFrameColor = frame;
