@@ -20,6 +20,8 @@ import { NotificationManager } from "../notifications.js";
 import {initCrashReporter} from "../crashReporter.js";
 import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
+import { TrainerCalibration } from "../trainerCalibration.js";
+import { initCalibration } from "../trainerCalibration.js";
 
 export class zlowScreen {
     content;
@@ -568,10 +570,7 @@ export class zlowScreen {
           if (modal) {
             modal.classList.add("show");
             modal.setAttribute("aria-hidden", "false");
-            // Initialize calibration if not already done, passing the shared trainer
-            if (window.initCalibration) {
-              window.initCalibration({ trainer: this.standardMode.trainer });
-            }
+            initCalibration({ trainer: this.standardMode.trainer });
           }
         });
       }

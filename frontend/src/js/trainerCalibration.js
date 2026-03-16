@@ -292,7 +292,7 @@ export class TrainerCalibration {
 }
 
 // Initialize on page load - handles both modal and standalone modes
-window.initCalibration = function (options = {}) {
+export function initCalibration(options = {}) {
   // Determine if we're in modal mode by checking if the modal exists
   const isModal = !!document.getElementById("calibration-modal");
   const calibration = new TrainerCalibration({ 
