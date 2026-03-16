@@ -2,18 +2,18 @@ import {Achievement} from './achievement.js'
 class AchievementManager {
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
-        this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","","Welcome"));
+        this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!",""));
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
-            let otherObtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
-            for (let i=0;i<otherObtainedAchievements.length;i++) {
-                this.obtainedAchievements.push(new Date(otherObtainedAchievements[i]));
-            }
-        }
-
-        if (this.obtainedAchievements.length<this.achievements.length) {
-            for (let i=this.obtainedAchievements.length;i<this.achievements.length;i++) {
-                this.obtainedAchievements.push(null);
+            let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
+            for (let i=0;i<obtainedAchievements.length;i++) {
+                //set the unlock status of the achievement
+                /*
+                    achievements in local storage are formatted as a JSON array like this
+                    [{ID: ID, completed: true, completedDate: Date}]
+                */
+                this.achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
+                this.achievements.get(obtainedAchievements[i].ID).unlockDate = obtainedAchievements[i].completedDate;
             }
         }
     }
@@ -24,17 +24,20 @@ class AchievementManager {
         });
     }
     storeAchievementsInLocalStorage() {
-        localStorage.setItem("AchievementsObtained",JSON.stringify(this.obtainedAchievements));
+        let objs = [];
+        this.achievements.forEach((value, key)=>{
+            let obj={ID:key,completed:value.unlocked,completedDate:value.unlockDate}
+            objs.push(obj);
+        });
+        localStorage.setItem("AchievementsObtained",objs);
     }
+
+
 
     /**
      * @type {Map<string, Achievement>}
      */
     achievements = new Map();
-    /**
-     * @type {Date[]}
-     */
-    obtainedAchievements=[];
 }
 
 //export as a singleton
