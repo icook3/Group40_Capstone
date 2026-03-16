@@ -12,8 +12,9 @@ class AchievementManager {
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
         this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!",""));
+        this.achievements.set("Test",new Achievement("Test Achievement!","This is a test!",""));
 
-
+        window.achievementManager=this;
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
             let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
@@ -28,8 +29,15 @@ class AchievementManager {
             }
         }
     }
+
+    currentIdx;
+
     clearAllAchievements() {
         this.achievements.forEach((value)=>{
+            value.unlocked=false;
+            value.dateObtained=null;
+        });
+        this.indexedAchievements.forEach((value)=>{
             value.unlocked=false;
             value.dateObtained=null;
         });
@@ -43,9 +51,6 @@ class AchievementManager {
         });
         localStorage.setItem("AchievementsObtained",objs);
     }
-
-
-
     /**
      * @type {Map<string, Achievement>}
      */

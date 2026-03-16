@@ -1,4 +1,4 @@
-import { achievementManager } from "./achievementManager.js";
+//import { achievementManager } from "./achievementManager.js";
 
 export class Achievement {
     /**
@@ -14,10 +14,10 @@ export class Achievement {
      */
     imagePath;
     unlockAchievement() {
-        if (!unlocked) {
-            unlocked=true;
-            unlockDate = new Date();
-            achievementManager.storeAchievementsInLocalStorage();
+        if (!this.unlocked) {
+            this.unlocked=true;
+            this.unlockDate = new Date();
+            //achievementManager.storeAchievementsInLocalStorage();
             return true;
         }
         return false;
@@ -30,6 +30,7 @@ export class Achievement {
      * @type {Date}
      */
     unlockDate;
+
     /**
      * 
      * @param {string} name 
