@@ -1,6 +1,6 @@
-import { achievementManager } from "./achievementManager";
+import { achievementManager } from "./achievementManager.js";
 
-class Achievement {
+export class Achievement {
     /**
      * @type {string}
      */
@@ -18,7 +18,9 @@ class Achievement {
             unlocked=true;
             unlockDate = new Date();
             achievementManager.storeAchievementsInLocalStorage();
+            return true;
         }
+        return false;
     }
     /**
      * @type {boolean}

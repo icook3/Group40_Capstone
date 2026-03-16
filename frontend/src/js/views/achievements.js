@@ -1,3 +1,4 @@
+import { achievementManager } from "../achievements/achievementManager.js";
 export class achievementsView {
   content;
   ready = false;
@@ -16,7 +17,6 @@ export class achievementsView {
 
   setPage() {
     document.getElementById("mainDiv").innerHTML = this.content;
-
   }
   reset() {}
 }

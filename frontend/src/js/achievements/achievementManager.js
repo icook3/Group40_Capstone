@@ -1,8 +1,19 @@
 import {Achievement} from './achievement.js'
+/**
+ * This class manages achievements
+ * It is a singleton class. 
+ * To add new achievements, start by creating them in the constructor. 
+ * Use the code this.achievements.set(unique ID, new Achievement("name", "desc", "imgPath"));
+ * Place an image in the resources folder to represent the achievement. 
+ * When the achievement is to be unlocked, call achievementManager.achievements.get(unique ID).unlockAchievement();
+ * The return value is true if the achievement was previously locked, false otherwise. 
+ */
 class AchievementManager {
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
         this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!",""));
+
+
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
             let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
@@ -13,7 +24,7 @@ class AchievementManager {
                     [{ID: ID, completed: true, completedDate: Date}]
                 */
                 this.achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
-                this.achievements.get(obtainedAchievements[i].ID).unlockDate = obtainedAchievements[i].completedDate;
+                this.achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
             }
         }
     }
@@ -22,6 +33,7 @@ class AchievementManager {
             value.unlocked=false;
             value.dateObtained=null;
         });
+        this.storeAchievementsInLocalStorage();
     }
     storeAchievementsInLocalStorage() {
         let objs = [];
