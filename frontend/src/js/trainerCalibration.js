@@ -287,7 +287,7 @@ export class TrainerCalibration {
   }
 
   returnToMenu() {
-    window.location.href = "./mainMenu.html";
+    viewManager.setView(viewManager.views.mainMenu);
   }
 }
 

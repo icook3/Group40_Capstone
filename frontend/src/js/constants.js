@@ -1,3 +1,5 @@
+import config from "./config/configLoader.js";
+
 /**
  * Constants class is a singleton that stores various important constants
  * It also currently stores other variables - this is something to change later
@@ -30,16 +32,8 @@ class Constants {
   }
   slope = 0; // road grade (decimal)
   lastTime = Date.now();
-  // keyboard mode values - should go in own class for keyboard mode
-  keyboardMode = false;
-  keyboardSpeed = this.kmhToMs(100);
-  keyboardHalfSpeed = this.kmhToMs(50);
-  wKeyDown = false;
-  sKeyDown = false;
-  qKeyDown = false;
-  aKeyDown = false;
 
-  riderState = { power: 0, speed: 0, calories: 0 };
+  riderState = { power: 0, speed: 0, calories: 0, distanceMeters: 0 };
   pacerStarted = false;
   dragCoefficient = 1.0;
   bikeWheelRadius = 0.22;
@@ -76,7 +70,7 @@ class Constants {
   // Colors can be refactored out once grid is fully abandoned
   groundColor1 = "#5a7d3a";
   groundColor2 = "#7c5a3a";
-  gridWidth = 12; // 12 tiles wide (120 units)
+  gridWidth = 27; // 12 tiles wide (120 units)
   gridDepth = 80; // 80 tiles deep (800 units)
   height = 1;
   roughness = 0.97;
@@ -95,6 +89,7 @@ class Constants {
 
   farthestSpawn = 1;
   trackPoints = [];
+  sceneryItems = [];
   currentTrackPiece = 0;
   pacerCurrentTrackPiece = 0;
 
@@ -108,9 +103,26 @@ class Constants {
   // Constants to locate the peerServer
   // If you change the backend environment variables, change this
   // Also change this before hosting it publicly
-  peerHost = "127.0.0.1";
-  peerPath = "/peerServer";
-  peerPort = "9000";
+  peerHost = config.PEER_HOST;
+  peerPath = config.PEER_PATH;
+  peerPort = config.PEER_PORT;
 }
+
+export const features = {
+    peerEnabled: Boolean(
+        config.PEER_HOST &&
+        config.PEER_PORT &&
+        config.PEER_PATH
+    ),
+
+    stravaEnabled: Boolean(
+        config.STRAVA_BACKEND_URL &&
+        config.STRAVA_CLIENT_ID
+    ),
+
+    crashReporterEnabled: Boolean(
+        config.CRASH_REPORTER_BACKEND_URL
+    )
+};
 
 export const constants = new Constants();

@@ -1,4 +1,6 @@
-const BACKEND_URL = "https://YOUR-BACKEND.com"; // TODO
+import config from "./config/configLoader.js";
+
+const BACKEND_URL = config.CRASH_REPORTER_BACKEND_URL;
 const INTAKE_CRASH = "/intake";
 const HEALTH_CHECK = "/crashLoggingHealth";
 
@@ -6,6 +8,10 @@ let cachedWebGLInfo = null;
 let staticEnv = null;
 
 async function isCrashReporterBackendUp() {
+    if (!BACKEND_URL) {
+        return false;
+    }
+
     try {
         const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
             method: "GET",

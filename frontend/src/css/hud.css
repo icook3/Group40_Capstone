@@ -1,3 +1,8 @@
+  /* Hides the full-screen/VR button on the top left for a-frame */
+.a-enter-vr {
+  display: none !important;
+}
+
 /* ========================================
    Custom font imports
    ======================================== */
@@ -130,13 +135,12 @@
 .stats-row {
   position: relative;
   display: flex;
-  gap: 20px;
+  gap: 12px;
   align-items: center;
 
   /* Gradient background */
   background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
-  padding: 15px clamp(20px, 8vw, 100px);
-
+  padding: 15px clamp(20px, 6vw, 80px);
   /* Custom SVG shape mask */
   mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
     100%;
@@ -190,8 +194,7 @@
 
 /* Power text size */
 .stats-row .stat-item:nth-child(2) .stat-value {
-  /* Minimum font size: 3em, Maximum font size: 7em */
-  font-size: clamp(3em, 10cqi, 7em); 
+  font-size: clamp(3em, 10cqi, 7em);
   margin: -20px 0;
 }
 
@@ -204,37 +207,26 @@
 /* Speed/distance value text size */
 .stats-row .stat-item:nth-child(1) .stat-value,
 .stats-row .stat-item:nth-child(3) .stat-value {
-  /* Minimum font size: 1em, Maximum font size: 2em */
-  font-size: clamp(1em, 3cqi, 2em);
+  /* Minimum font size: 1em, Maximum font size: 1.5em */
+    font-size: clamp(1em, 2.2cqi, 2em);
 }
 
 /* Speed/distance unit text size */
 .stats-row .stat-item:nth-child(1) .stat-unit,
 .stats-row .stat-item:nth-child(3) .stat-unit {
     /* Minimum font size: 0.6em, Maximum font size: 1em */
-font-size: clamp(0.8em, 1.5cqi, 1em);
+font-size: clamp(0.6em, 1.2cqi, 0.9em);
 }
 
 /* ========================================
    Bottom part of HUD
    ======================================== */
-#hud-bottom {
-  /* Background color */
-  background: rgb(53, 72, 79);
 
-  padding: 15px;
-  border-radius: 30px;
-
-  width: fit-content;
-  /* This keeps consistent width heights when switching views, e.g. Trainer vs Main options */
-  min-width: 180px;
-  min-height: 230px; 
-}
-
-/* Stack buttons vertically */
+/* Stack buttons horizontally */
 .control-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 0px;
 }
 
@@ -244,6 +236,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 
 /* Style for bottom buttons */
 .hud-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -254,7 +247,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   font-size: 1em;
   color: rgb(220, 229, 222);
 
-  padding: 8px 12px;
+  padding: clamp(4px, min(1vw, 1.5vh), 12px) clamp(5px, min(1.2vw, 2vh), 16px);
 
   /* Remove default style */
   background: none;
@@ -280,8 +273,8 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
    ======================================== */
 .hud-btn::before {
   content: "";
-  width: 24px;
-  height: 24px;
+  width: clamp(14px, min(2.5vw, 4vh), 30px);
+  height: clamp(14px, min(2.5vw, 4vh), 30px);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -326,8 +319,8 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 /* Dev controls icons */
 #pacer::before {
   content: "";
-  width: 24px;
-  height: 24px;
+  width: clamp(14px, min(2.5vw, 4vh), 30px);
+  height: clamp(14px, min(2.5vw, 4vh), 30px);
   background-image: url("../../resources/images/pacer.svg");
   background-size: contain;
   background-repeat: no-repeat;
@@ -338,8 +331,8 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 
 #weight::before {
   content: "";
-  width: 24px;
-  height: 24px;
+  width: clamp(14px, min(2.5vw, 4vh), 30px);
+  height: clamp(14px, min(2.5vw, 4vh), 30px);
   background-image: url("../../resources/images/weight.svg");
   background-size: contain;
   background-repeat: no-repeat;
@@ -354,42 +347,52 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 
 /* Divider between trainer and game buttons */
 .hud-divider {
-  height: 1px;
+  width: 1px;
+  height: clamp(14px, min(2.5vw, 4vh), 30px);
   background: rgba(220, 229, 222, 0.3);
-  margin: 8px 0;
+  margin: 0 8px;
+  align-self: center;
 }
 
 /* ========================================
    Dev hud section
    ======================================== */
+.dev-controls-wrapper {
+  position: relative;
+  margin-left: 8px;
+}
+
+.dev-controls-wrapper[hidden] {
+  display: none;
+}
+
+#dev-toggle-btn::before {
+  background-image: url("../../resources/images/dev.svg");
+}
+
+
 #dev-controls-hud {
-  background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
 
-  width: fit-content;
-  min-width: 180px;
-
-  /* Stack controls vertically */
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
+  gap: 4px;
+
+  background: rgba(53, 72, 79, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid rgba(220, 229, 222, 0.08);
+  box-shadow: 0 2px 16px rgba(53, 72, 79, 0.3);
+  white-space: nowrap;
 }
 
 /* Hide when hidden attribute is on */
 #dev-controls-hud[hidden] {
   display: none;
-}
-/* "DEV Mode" title */
-#dev-controls-hud::before {
-  content: "DEV Mode";
-  color: rgb(220, 229, 222);
-  font-family: "Fugaz One", sans-serif;
-  font-size: 1em;
-  font-weight: 400;
-  text-align: center;
-  margin-bottom: 8px;
 }
 
 /* Style for dev items */
@@ -413,7 +416,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 /* Style for input fields */
 #dev-controls-hud #pacer-speed,
 #dev-controls-hud #rider-weight {
-  width: 45px;
+  width: 50px;
   padding: 6px 8px;
   border: 1px solid rgba(220, 229, 222, 0.3);
   background: rgba(0, 0, 0, 0.2);
@@ -482,24 +485,105 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
 /* ========================================
    Pause overlay style
    ======================================== */
+
 #pause-overlay {
   position: fixed;
   inset: 0;
   display: none;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 9999;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 #pause-overlay .pause-dialog {
-  pointer-events: none;
-  font-family: "Nunito", sans-serif;
-  font-weight: 600;
-  font-size: 50px;
-  color: rgb(220, 229, 222);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
 }
+
+#pause-overlay .pause-branding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#pause-overlay .pause-subtitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: "Fugaz One", sans-serif;
+  font-weight: 500;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.759);
+  letter-spacing: 0.35em;
+}
+
+#pause-overlay .pause-logo {
+  height: 1.8rem;
+  width: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.759;
+  transform: translateY(6px);
+}
+
+#pause-overlay .pause-title {
+  font-family: "Fugaz One", sans-serif;
+  font-size: 3.5rem;
+  color: #e0f7ef;
+  letter-spacing: 0.15em;
+  display: block;
+}
+
+#pause-overlay .pause-accent {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #32ee80, #27ae5f39);
+  border-radius: 2px;
+  margin-top: -16px;
+}
+
+#pause-overlay .pause-resume-btn {
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px 52px;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #e0f7ef;
+  cursor: pointer;
+}
+
+#pause-overlay .pause-resume-btn:hover {
+  background: #2d8e8e;
+}
+
+#pause-overlay .pause-dialog.zoom-in {
+  animation: pauseZoomIn 0.35s ease both;
+}
+
+#pause-overlay .pause-dialog.zoom-out {
+  animation: pauseZoomOut 0.25s ease both;
+}
+
+@keyframes pauseZoomIn {
+  from { opacity: 0; transform: scale(2); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pauseZoomOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(2); }
+}
+
 
 #milestone-notifications {
   position: fixed;
@@ -516,8 +600,7 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   padding: 20px;
   margin: 10px;
   font-size: 20px;
-  min-width: 400px;
-  text-align: center;
+  min-width: min(400px, 92vw);  text-align: center;
   border-radius: 25px;
 
   /* animate toast notification */
@@ -598,10 +681,178 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
   color: #ff5252; /* red when below target */
 }
 
+
+
+
 /* ========================================
-   Responsive layout for small screens
+   Bottom HUD container - wraps dev menu and main game options
    ======================================== */
-@media (max-width: 600px) {
+#hud-bottom-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
+  background: transparent;
+
+
+  /* Layout: left, center, right, uses full availablewidth */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+}
+
+/* Left area — Trainer button */
+.hud-area-left {
+  display: flex;
+  align-items: center;
+}
+
+/* Center — sync, pause, stop */
+.hud-area-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: rgba(53, 72, 79, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: clamp(4px, min(0.8vw, 1.2vh), 10px) clamp(8px, min(1.5vw, 2.5vh), 20px);
+  border: 1px solid rgba(220, 229, 222, 0.08);
+  box-shadow: 0 2px 16px rgba(53, 72, 79, 0.3);
+}
+
+/* Right area — Exit  */
+.hud-area-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Standalone buttons (trainer, exit)*/
+.hud-area-left .icon-only,
+.hud-area-right .icon-only {
+    background: rgba(53, 72, 79, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(220, 229, 222, 0.08);
+  padding: clamp(5px, min(1.2vw, 2vh), 14px);
+}
+
+.hud-area-left .icon-only:hover,
+.hud-area-right .icon-only:hover {
+  background: rgba(53, 72, 79, 0.8);
+}
+
+/* Hide button text by default — icon only */
+.icon-only .btn-text {
+  display: none;
+}
+
+/* Tooltip — appears on hover/tap, so that the layout does not shift */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgb(53, 72, 79);
+  color: #dce5de;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1001;
+}
+
+/* Tooltip arrow */
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgb(53, 72, 79);
+}
+
+/* Show tooltip on hover and active (for touchscreen devices) */
+.hud-btn:hover .tooltip,
+.hud-btn:active .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========================================
+   Trainer controls - expandable section
+   ======================================== */
+.trainer-controls {
+  position: relative;
+}
+
+.trainer-menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  background: rgba(53, 72, 79, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid rgba(220, 229, 222, 0.08);
+  box-shadow: 0 2px 16px rgba(53, 72, 79, 0.3);
+  white-space: nowrap;
+}
+
+.trainer-menu[hidden] {
+  display: none;
+}
+
+/* ========================================
+   Bottom HUD style switcher - icons only on small screens
+   ======================================== */
+@media (max-width: 700px), (max-height: 700px) {
+  /* Hide button text */
+  .hud-btn .btn-text {
+    display: none;
+  }
+
+  
+  #dev-controls-hud label,
+  #dev-controls-hud .speed-unit,
+  #dev-controls-hud .weight-unit {
+    display: none;
+  }
+
+  /* Buttons go horizontal */
+  .control-buttons {
+    flex-direction: row;
+    gap: 0;
+  }
+}
+
+/* ========================================
+   Very small screens - shrink icons
+   ======================================== */
+@media (max-width: 1200px), (max-height: 450px) {
+
+  /* Layout change — move time/calories below center */
   #hud-top {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
@@ -625,181 +876,35 @@ font-size: clamp(0.8em, 1.5cqi, 1em);
     padding-right: 20px;
   }
 
-  /* This sets slightly larger minimums for center stats on narrow screens after it hits the threshold width*/
+  .hud-section.left,
+  .hud-section.right {
+    font-size: clamp(0.8em, 2cqi, 1.2em);
+  }
+
+  /* Font shrinking */
   .stats-row .stat-item:nth-child(2) .stat-value {
-    font-size: clamp(4em, 12cqi, 7em);
+    font-size: clamp(1.2em, 6cqi, 4em);
+    margin: -14px 0;
   }
 
   .stats-row .stat-item:nth-child(1) .stat-value,
   .stats-row .stat-item:nth-child(3) .stat-value {
-    font-size: clamp(1.5em, 4cqi, 2em);
+    font-size: clamp(0.6em, 1.6cqi, 1.4em);
+  }
+
+  /* Makes power unit smaller than value  */
+  .stats-row .stat-item:nth-child(2) .stat-unit {
+    font-size: clamp(0.7em, 2cqi, 1.4em);
+  }
+
+  /* Makes speed/distance units smaller than values  */
+  .stats-row .stat-item:nth-child(1) .stat-unit,
+  .stats-row .stat-item:nth-child(3) .stat-unit {
+    font-size: clamp(0.5em, 1cqi, 0.8em);
   }
 
   .stats-row {
-    padding: 15px clamp(40px, 10vw, 100px);
-  }
-
-  /* This sets slightly larger minimums for time and calories after it hits the thershold width*/
-  .hud-section.left,
-  .hud-section.right {
-    font-size: clamp(1.2em, 3cqi, 1.5em);
-  }
-}
-
-/* ========================================
-   Bottom HUD container - wraps dev menu and main game options
-   ======================================== */
-#hud-bottom-container {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1000;
-  
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 15px;
-  align-items: flex-start;
-}
-
-/* ========================================
-   Trainer controls - expandable section
-   ======================================== */
-.trainer-controls {
-  position: relative;
-}
-
-.trainer-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding-left: 12px;
-  border-left: 2px solid rgba(220, 229, 222, 0.2);
-  margin-left: 8px;
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
-.trainer-menu[hidden] {
-  display: none;
-}
-
-/* ========================================
-   Bottom HUD style switcher - icons only on small screens
-   ======================================== */
-@media (max-width: 700px), (max-height: 700px) {
-  /* Hide button text */
-  .hud-btn .btn-text {
-    display: none;
-  }
-
-  /* Center icons when text is hidden */
-  .hud-btn {
-    justify-content: center;
-    padding: 10px;
-  }
-
-  /* Buttons go horizontal */
-  .control-buttons {
-    flex-direction: row;
-    gap: 0;
-  }
-
-/* Divider goes vertical */
-.hud-divider {
-  width: 1px;
-  height: 24px;
-  margin: 0 8px;
-  align-self: center;
-}
-
-  /* Shrink the containers */
-  #hud-bottom {
-    min-width: auto;
-    min-height: auto;
-    width: auto;
-  }
-
-  /* Stack HUDs horizontally */
-  #hud-bottom-container {
-    flex-direction: row;
-    align-items: flex-end;
-  }
-
-  /* Dev HUD: hide labels and units, keep icons and inputs */
-  #dev-controls-hud {
-    min-width: auto;
-    width: auto;
-    padding: 10px;
-    flex-direction: row;
-    gap: 4px;
-  }
-
-  #dev-controls-hud::before {
-    display: none; /* Hide "DEV Mode" title */
-  }
-
-  #dev-controls-hud #pacer,
-  #dev-controls-hud #weight {
-    padding: 10px;
-    justify-content: center;
-  }
-
-  #dev-controls-hud #pacer label,
-  #dev-controls-hud #pacer .speed-unit,
-  #dev-controls-hud #weight label,
-  #dev-controls-hud #weight .weight-unit {
-    display: none;
-  }
-}
-
-/* ========================================
-   Very small screens - shrink icons
-   ======================================== */
-@media (max-width: 600px), (max-height: 450px) {
-  /* Smaller icons */
-  .hud-btn::before {
-    width: 18px;
-    height: 18px;
-  }
-
-  /* Less padding */
-  .hud-btn {
-    padding: 6px;
-  }
-
-  /* Smaller divider */
-  .hud-divider {
-    height: 18px;
-    margin: 0 4px;
-  }
-
-  /* Tighter container padding */
-  #hud-bottom {
-    padding: 10px;
-    border-radius: 20px;
-  }
-
-  #dev-controls-hud {
-    padding: 8px;
-    border-radius: 20px;
-  }
-
-  /* Smaller dev inputs */
-  #dev-controls-hud #pacer-speed,
-  #dev-controls-hud #rider-weight {
-    width: 35px;
-    padding: 4px 6px;
-    font-size: 0.85em;
-  }
-
-  #dev-controls-hud #pacer::before,
-  #dev-controls-hud #weight::before {
-    width: 18px;
-    height: 18px;
-  }
-
-  #dev-controls-hud #pacer,
-  #dev-controls-hud #weight {
-    padding: 6px;
+    gap: 8px;
+    padding: 10px clamp(15px, 5vw, 50px);
   }
 }

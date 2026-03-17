@@ -26,10 +26,12 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `images` — Contains a number of important images for different pages.
 		- `back.svg` — An icon to indicate going back to a previous page.
 		- `background.png` — The background for the peer menu and the changelog (temporary).
+		- `backgroundA.png` - The background used for the peer menu and changelog
 		- `calibrateTrainer.svg` — An icon used for the calibrate trainer button.
 		- `calories.svg` — The icon used to represent calories in the hud.
 		- `center-hud.svg` — A mask to shape the center of the hud, alongside some buttons on other pages.
 		- `connectTrainer.svg` — An icon used for the connect to peer button.
+		- `dev.svg` - Icon used for a toggle button
 		- `exit.svg` — An icon used for the exit to main menu button.
 		- `license.pdf` — The license for the calories and time images.
 		- `pacer.svg` — An icon used for the pacer speed input.
@@ -64,6 +66,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 - `src` — Stores all source code for the project.
 	- `css` — Stores CSS source code.
 		- `changelog.css` — Handles CSS styles for the changelog page.
+		- `generalCSS.css` — A set of useful CSS styles used throughout Zlow
 		- `hud.css` — Handles CSS styles for the modern HUD.
 		- `menu.css` — Handles CSS styles for the main menu.
 		- `peerToPeer.css` — Handles CSS styles for the peer-to-peer menu.
@@ -74,16 +77,21 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `html` — Stores HTML source code.
 		- `changelog.html` — Screen for the Zlow changelog
 		- `connectToPeers.html` — Screen for connecting via the peer-to-peer network
+		- `index.html` — The page that is loaded, and is filled in by the other pages to create a Single-Page application. 
 		- `mainMenu.html` — Main entry point, allows connecting the trainer, and provides access to various settings.
 		- `playerCustomization.html` — Screen for customizing the player.
 		- `zlow.html` — Loads A-Frame scene and UI.
 	- `js` — Contains JavaScript code.
+		- `config` - Directory for configuration files
+			- `config.js` - Configuration file
+			- `configLoader.js` - Handles loading the configuration file
 		- `scene` - Handles scene generation.
 			- `core` — core utilities for scene generation.
 				- `Terrain.js` — Handles Terrain generation.
 				- `util.js` — Contains several utilities for scene generation.
 			- `env` — Handles the overall environment.
 				- `Cloud.js` — Handles creating the clouds above the scene.
+				- `GroundInstanced.js` - An instanced version of the ground plane
 				- `SceneryBand.js` — Handles creating the bands and object placement within.
 				- `SceneryManager.js` — Loads the config files from /policy.
 				- `Track.js` — Handles creating track template pieces.
@@ -102,6 +110,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `test_multiband_cfg.js` — A test policy for multiple bands in one config file.
 			- `camera.js` — Handles updating various properties involving the camera.
 			- `index.js` — Sets up and updates the A-Frame 3D world.
+			- `mainMenuBackground.js` - Sets up the background for the main menu
 		- `units` — Handles various units and unit conversions.
 			- `index.js` — Sets up units, and provides references to the currently used unit conversions.
 			- `kg.js` — Handles unit conversions for Kilograms - the default weight unit.
@@ -112,22 +121,33 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `mph.js` — Handles unit conversions for Miles per Hour.
 			- `units.md` — Documentation on different units.
 			- `W.js` — Handles unit conversions for Watts - the default power unit.
+		- `views` — Stores different views, and switching between them.
+			- `changelog.js` — Stores the changelog, and handles setting it up. 
+			- `connectToPeers.js` — Stores the peer to peer connection menu, and handles setting it up. 
+			- `mainMenu.js` — Stores the main menu, and handles setting it up. 
+			- `playerCustomization.js` — Stores the player customization screen, and handles setting it up. 
+			- `viewManager.js` — Handles switching between different views. 
+			- `views.md` — Documentation of how to switch between views, and how views are laid out. 
+			- `zlow.js` — Stores the main application, and handles setting it up when workouts are started. 
 		- `workouts` — Stores different workouts
 			- `RampTestController.js` — Handles a workout involving going up ramps
-	    - `avatarCreator.js` — Sets up A-Frame 3D avatar.
+			- `SprintIntervalController.js` - Handles the sprint interval workout
+			- `workouts.md` - Description of the workouts interface
+	  - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 		- `avatarMovement.js` — Updates A-Frame 3D avatar.
 		- `bluetooth.js` — Handles Bluetooth device connection and data polling.
 		- `connectionProtocol.md` — Documentation on the protocol for peer-to-peer connection
 		- `constants.js` — Stores important constants for the program execution.
-		- `crashReporter.js` — Handles checking for crashes, and reporting them to the backend. 
+		- `crashReporter.js` — Handles checking for crashes, and reporting them to the backend.
+		- `download.js` — Handles downloading TCX files
 		- `hud.js` — Renders the heads-up display overlay.
 		- `keyboardMode.js` — Handles keyboard mode functionalities and variables.
-		- `main.js` — Main app entry point.
-		- `menu.js` — Handles event listeners on the main menu.
+		- `main.js` — Handles various important functions for the application
 		- `milestones.js` — Handles tracking for various milestones.
 		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
-		- `peerConnector.js` — Handles event listeners on the peer connection menu, and ensuring that the peer actually exists before you start cycling.
+		- `PhysicsEngine.js` - Handles the physics for the simulation
+		- `rideFile.js` — Handles creating TCX files. 
 		- `rideHistory.js` — Handles storing past ride data.
 		- `rideHistoryStore.js` — Creates a singleton rideHistory object for other objects to access. 
 		- `simulationstate.js` — Handles tracking the state of the simulation.
@@ -135,6 +155,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `strava.js` — Handles Strava OAuth and activity upload.
 		- `trainerCalibration.js` — Handles calibrating and connecting the trainer.
 		- `workoutChoice.js` — Handles the dropdown menu for choosing workouts
+		- `workoutMenu.js` - Handles the menu for workout choice
 		- `workoutSession.js` — Handles tracking statistics across a workout
 		- `workoutStorage.js` — Handles storing and loading workout data for best/worst
 		- `workoutSummary.js` — Handles the workout summary page

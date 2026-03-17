@@ -1,0 +1,20 @@
+
+
+.bodyStyle {
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
+
+html { font-size: 16px; }
+
+@media (min-resolution: 2dppx), (hover: none) and (pointer: coarse) {
+  html { font-size: 18px; }
+}
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}

@@ -1,4 +1,4 @@
-import { getPos, setPos } from '../core/util.js';
+import { getPos, setPos, getSign } from '../core/util.js';
 import { constants } from "../../constants.js";
 
 export class Cloud {
@@ -112,9 +112,3 @@ export function spawnCloud(zone) {
 
   return cloud;
 }
-
-// Decide whether the number should be positive or negative
-function getSign() {
-    let randomNo = Math.floor(Math.random() * 10);
-    return randomNo % 2 === 0;
-  }

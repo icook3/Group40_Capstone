@@ -1,4 +1,3 @@
-// Tree.js
 import { setPos } from "../../core/util.js";
 
 function sampleTreeX() {
@@ -31,8 +30,8 @@ export const TreeKind = {
     // get glb model
     obj.setAttribute("gltf-model", `#${modelId}`);
 
-    //testing light
-    obj.addEventListener("model-loaded", () => {
+    // testing 
+    const onModelLoaded = () => {
       const mesh = obj.getObject3D("mesh");
       if (mesh) {
         mesh.traverse((node) => {
@@ -49,7 +48,12 @@ export const TreeKind = {
           }
         });
       }
-    });
+
+      // IMPORTANT: avoid retaining a closure/listener forever
+      obj.removeEventListener("model-loaded", onModelLoaded);
+    };
+
+    obj.addEventListener("model-loaded", onModelLoaded);
 
     // rotate tree randomly as well
     const rotation = Math.random() * 360;
@@ -74,24 +78,3 @@ export const TreeKind = {
     return sampleTreeX();
   },
 };
-
-/*
-    Old primitive shape code
-    const trunk = document.createElement('a-entity');
-    trunk.setAttribute('geometry', 'primitive: cylinder; radius: 0.4; height: 2.5');
-    trunk.setAttribute('material', 'color: #7c4a02');
-    trunk.setAttribute('position', `0 1.25 0`);
-
-    const foliage = document.createElement('a-entity');
-    foliage.setAttribute('geometry', `primitive: sphere; radius: ${1.2 + Math.random() * 0.8}`);
-    foliage.setAttribute('material', 'color: #2e7d32');
-    foliage.setAttribute('position', `0 2.7 0`);
-
-    obj.appendChild(trunk);
-    obj.appendChild(foliage);
-    setPos(obj, { x, y: 0, z });
-    sceneEl.appendChild(obj);
-    return obj;
-  },
-  resampleX() { return sampleTreeX(); }
-}; */

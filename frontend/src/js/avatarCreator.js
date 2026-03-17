@@ -228,7 +228,7 @@ export class AvatarCreator {
             this.bikeGrips = model.getObjectByName("Grips");
             this.bikeSeat = model.getObjectByName("Seat")
             this.bikePedals = model.getObjectByName("Pedals")
-
+            console.log("loading model");
             //Assign bike bones
             model.traverse((child) => {
                 if (child.isSkinnedMesh && child.skeleton) {

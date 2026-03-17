@@ -27,11 +27,11 @@ export class RampTestController {
     this.earlyExitDurationSec = 30;
     this.aboveThresholdAccumSec = 0;
     this.lastUpdateMs = nowMs;
-
+    this.warmupSeconds = warmupSeconds;
     // Kick off warmup countdown in the overlay
     if (this.hud && typeof this.hud.showWarmupCountdown === "function") {
       this.hud.showWarmupCountdown({
-        seconds: warmupSeconds,
+        seconds: this.warmupSeconds,
         onDone: () => {
           this._startRamp();
         },
@@ -126,6 +126,9 @@ export class RampTestController {
     return this.ftpResult;
   }
 
+  startWorkout(nowMs = Date.now()) {
+    this._startRamp(nowMs);
+  }
   _startRamp(nowMs = Date.now()) {
     console.log("Ramp starting");
 
@@ -150,7 +153,7 @@ export class RampTestController {
 
   _announceStep(stepNumber, targetWatts) {
     if (!this.hud || typeof this.hud.showWorkoutMessage !== "function") return;
-
+    
     const label = stepNumber === 1
       ? `Ramp start – target ${targetWatts} W`
       : `Ramp step ${stepNumber} – target ${targetWatts} W`;
