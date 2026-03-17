@@ -159,16 +159,11 @@ export class zlowScreen {
           break;
         case "syncPlayers":
           if (this.scene && this.rider && this.pacer) {
-            const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
-            const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
-            pacerSyncPos.z = riderSyncPos.z;
-            
+      
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-            document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-            this.pacer.avatarEntity.removeAttribute("animation__2");
-            this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
-            this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+            document.getElementById('pacer-speed').value = constants.riderState.speed;
+            update_pacer_animation(this.scene.scene, true)
           }
           break;
       }
@@ -583,9 +578,6 @@ export class zlowScreen {
       pacerSyncBtn.addEventListener("click", () => {
         //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
-          const riderSyncPos = this.rider.avatarEntity.position;
-          const pacerSyncPos = this.pacer.avatarEntity.position;
-          pacerSyncPos.z = riderSyncPos.z;
     
           // Set pacer constants to rider constants and adjust animation
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
