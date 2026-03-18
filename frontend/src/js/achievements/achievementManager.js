@@ -17,6 +17,7 @@ class AchievementManager {
         window.achievementManager=this;
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
+            try {
             let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
             for (let i=0;i<obtainedAchievements.length;i++) {
                 //set the unlock status of the achievement
@@ -26,6 +27,10 @@ class AchievementManager {
                 */
                 this.achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
                 this.achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
+            }
+            } catch (e) {
+                console.log("INVALID JSON!");
+                this.clearAllAchievements();
             }
         }
     }
@@ -37,10 +42,6 @@ class AchievementManager {
             value.unlocked=false;
             value.dateObtained=null;
         });
-        this.indexedAchievements.forEach((value)=>{
-            value.unlocked=false;
-            value.dateObtained=null;
-        });
         this.storeAchievementsInLocalStorage();
     }
     storeAchievementsInLocalStorage() {
@@ -49,7 +50,12 @@ class AchievementManager {
             let obj={ID:key,completed:value.unlocked,completedDate:value.unlockDate}
             objs.push(obj);
         });
-        localStorage.setItem("AchievementsObtained",objs);
+        console.log(JSON.stringify(objs));
+        localStorage.setItem("AchievementsObtained",JSON.stringify(objs));
+    }
+    obtainAchievement(achievement) {
+        this.achievements.get(achievement).unlockAchievement();
+        this.storeAchievementsInLocalStorage();
     }
     /**
      * @type {Map<string, Achievement>}
