@@ -28,17 +28,19 @@ export class achievementsView {
 
     console.log("row count = ",rowCount,"col count=",colCount);
     let arr=this.createAchievementsArr();
+    let achCount=0;
     for (let i=0;i<rowCount;i++) {
         //create a table column
         HTML=HTML+"<tr>";
         for (let j=0;j<colCount;j++) {
             HTML=HTML+"<td class=\"achievementsTableSpot\"><div class=\"achievementsTableOuterDiv\">";
-            HTML=HTML+this.createAchievementNode(arr[(j+1)*(i+1)-1]);
+            HTML=HTML+this.createAchievementNode(arr[achCount]);
+            achCount++;
             HTML=HTML+"</div></td>";
         }
         HTML=HTML+"</tr>";
     }
-    console.log("Adding HTML ",HTML);
+    //console.log("Adding HTML ",HTML);
     document.getElementById("achievementsTable").innerHTML=HTML;
   }
   reset() {}
@@ -56,7 +58,7 @@ export class achievementsView {
    * @param {Achievement} achievement 
    */
     createAchievementNode(achievement) {
-        console.log("Creating achievement node for achievement ",achievement);
+        //console.log("Creating achievement node for achievement ",achievement);
         if (achievement==undefined) {
             return "";
         }

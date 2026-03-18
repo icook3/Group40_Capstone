@@ -12,8 +12,11 @@ class AchievementManager {
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
         this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("Test",new Achievement("Test Achievement!","This is a test!","../../resources/favicons/ZlowFavicon-dark.svg"));
-
+        this.achievements.set("Test",new Achievement("Test Achievement!","This is a test 1!","../../resources/favicons/ZlowFavicon-dark.svg"));
+        this.achievements.set("Test2",new Achievement("Test Achievement!","This is a test 2!","../../resources/favicons/ZlowFavicon-dark.svg"));
+        this.achievements.set("Test3",new Achievement("Test Achievement!","This is a test 3!","../../resources/favicons/ZlowFavicon-dark.svg"));
+        this.achievements.set("Test4",new Achievement("Test Achievement!","This is a test 4!","../../resources/favicons/ZlowFavicon-dark.svg"));
+        this.achievements.set("Test5",new Achievement("Test Achievement!","This is a test 5!","../../resources/favicons/ZlowFavicon-dark.svg"));
         window.achievementManager=this;
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
