@@ -14,13 +14,17 @@
     font-family: "Fugaz One", sans-serif;
     font-size: 1.5em;
 }
-
-#achievementsTable {
-    position:fixed;
+#achievementsTableWrapper {
+    position: fixed;
+    height:75%;
+    overflow-y: scroll;
     top:25%;
     left:10%;
-    border-collapse: collapse;
     width:75%;
+    overflow-x:scroll;
+}
+#achievementsTable {
+    border-collapse: collapse;
     table-layout: fixed;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
