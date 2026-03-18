@@ -11,8 +11,8 @@ import {Achievement} from './achievement.js'
 class AchievementManager {
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
-        this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!",""));
-        this.achievements.set("Test",new Achievement("Test Achievement!","This is a test!",""));
+        this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("Test",new Achievement("Test Achievement!","This is a test!","../../resources/favicons/ZlowFavicon-dark.svg"));
 
         window.achievementManager=this;
         //get completed achievements out of local storage

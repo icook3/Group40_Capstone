@@ -38,10 +38,12 @@ export class achievementsView {
         }
         HTML=HTML+"</tr>";
     }
+    console.log("Adding HTML ",HTML);
     document.getElementById("achievementsTable").innerHTML=HTML;
   }
   reset() {}
 
+  //used so I can index achievements
   createAchievementsArr() {
     let arr = [];
     achievementManager.achievements.forEach((value)=> {
