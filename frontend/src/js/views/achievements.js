@@ -194,14 +194,33 @@ export class achievementsView {
             loader
         );
 
-        // Bike
+        // rider
+        let playerData=JSON.parse(localStorage.getItem("playerData"));
+        if (playerData.model=="male") {
+            this.loadModel(
+                `${modelBasePath}/playermodels/maleV5.glb`,
+                { x: -2.6, y: 0, z: 2.3 },
+                { x: 0, y: 90, z: 0 },
+                0.1,
+                loader
+            );
+        } else {
+            this.loadModel(
+                `${modelBasePath}/playermodels/femaleV6.glb`,
+                { x: -2.6, y: 0, z: 2.3 },
+                { x: 0, y: 90, z: 0 },
+                0.1,
+                loader
+            );            
+        }
+        // Helmet
         this.loadModel(
-            `${modelBasePath}/playermodels/bikeV4.glb`,
-            { x: -2.65, y: 0, z: 2 },
-            { x: 0, y: -10, z: -20 },
+            `${modelBasePath}/playermodels/helmet.glb`,
+            { x: -2.6, y: 0.6, z: 2.3 },
+            { x: 0, y: 90, z: 0 },
             0.1,
-            loader
-        );
+            loader            
+        )
 
         // Bush
         this.loadModel(
