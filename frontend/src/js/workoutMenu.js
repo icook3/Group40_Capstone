@@ -85,7 +85,7 @@ export function workoutMenu () {
 function launchWorkout(workout) {
   sessionStorage.setItem("SelectedWorkout", workout);
   const ps = document.getElementById("pacer-speed");
-  if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
+  if (ps) localStorage.setItem("pacer-speed", ps.value);
 
   if (workout === "peerServer") {
     window.viewManager.setView(window.viewManager.views.peerConnect);
