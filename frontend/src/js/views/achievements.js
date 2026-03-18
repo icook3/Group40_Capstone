@@ -32,9 +32,9 @@ export class achievementsView {
         //create a table column
         HTML=HTML+"<tr>";
         for (let j=0;j<colCount;j++) {
-            HTML=HTML+"<td class=\"achievementsTableSpot\">";
+            HTML=HTML+"<td class=\"achievementsTableSpot\"><div class=\"achievementsTableInnerDiv\">";
             HTML=HTML+this.createAchievementNode(arr[(j+1)*(i+1)-1]);
-            HTML=HTML+"</td>";
+            HTML=HTML+"</div></td>";
         }
         HTML=HTML+"</tr>";
     }
@@ -64,7 +64,11 @@ export class achievementsView {
         //add the image
         HTML=HTML+"<img src=\"";
         HTML=HTML+achievement.imagePath;
-        HTML=HTML+"\" />"
+        if (achievement.unlocked) {
+            HTML=HTML+"\" class=\"achievementImg\"/>";
+        } else {
+            HTML=HTML+"\" class=\"achievementImg achievementNotObtainedImg\"/>";
+        }
         HTML=HTML+"<br/>";
         HTML=HTML+"<span class=\"achievementName\">";
         //add the name

@@ -18,12 +18,29 @@
 #achievementsTable {
     position:fixed;
     top:25%;
-    left:25%;
+    left:10%;
     border-collapse: collapse;
+    width:75%;
+    table-layout: fixed;
 }
 
 .achievementsTableSpot {
     border-color:black;
     border-width: 5px;
     border-style:solid;
+    aspect-ratio: 1 / 1;
+    text-align:center;
+    vertical-align: middle;
+
 }
+.achievementImg {
+    scale:50%;
+}
+
+.achievementNotObtainedImg {
+    filter:grayscale(100%);
+}
+
+/*.achievementsTableInnerDiv {
+    aspect-ratio: 1 / 1;
+}*/
