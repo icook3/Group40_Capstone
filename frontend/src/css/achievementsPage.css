@@ -22,18 +22,18 @@
     border-collapse: collapse;
     width:75%;
     table-layout: fixed;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .achievementsTableSpot {
     border-color:black;
     border-width: 5px;
     border-style:solid;
-
 }
 .achievementImg {
     width:100%;
     display:block;
-    
 }
 
 .achievementNotObtainedImg {
