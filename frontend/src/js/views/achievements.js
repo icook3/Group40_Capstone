@@ -32,7 +32,7 @@ export class achievementsView {
         //create a table column
         HTML=HTML+"<tr>";
         for (let j=0;j<colCount;j++) {
-            HTML=HTML+"<td class=\"achievementsTableSpot\"><div class=\"achievementsTableInnerDiv\">";
+            HTML=HTML+"<td class=\"achievementsTableSpot\"><div class=\"achievementsTableOuterDiv\">";
             HTML=HTML+this.createAchievementNode(arr[(j+1)*(i+1)-1]);
             HTML=HTML+"</div></td>";
         }
@@ -69,7 +69,7 @@ export class achievementsView {
         } else {
             HTML=HTML+"\" class=\"achievementImg achievementNotObtainedImg\"/>";
         }
-        HTML=HTML+"<br/>";
+        HTML=HTML+"<div class=\"achievementsTableInnerDiv\">";
         HTML=HTML+"<span class=\"achievementName\">";
         //add the name
         HTML=HTML+achievement.name;
@@ -86,7 +86,7 @@ export class achievementsView {
             HTML=HTML+"UNOBTAINED";
         }
         HTML=HTML+"</span>";
-        HTML=HTML+"<br/>";
+        HTML=HTML+"</div>";
         //add the description
         HTML=HTML+"<span class=\"achievementDescription\">";
         HTML=HTML+achievement.description;
