@@ -22,7 +22,6 @@ class AchievementManager {
         this.achievements.set("Test8",new Achievement("Test Achievement!","This is a test 8!","../../resources/favicons/ZlowFavicon-dark.svg"));
         this.achievements.set("Test9",new Achievement("Test Achievement!","This is a test 9!","../../resources/favicons/ZlowFavicon-dark.svg"));
         this.achievements.set("Test10",new Achievement("Test Achievement!","This is a test 10!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        window.achievementManager=this;
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
             try {
