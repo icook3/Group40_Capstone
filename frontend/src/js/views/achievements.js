@@ -32,7 +32,7 @@ export class achievementsView {
         //create a table column
         HTML=HTML+"<tr>";
         for (let j=0;j<colCount;j++) {
-            HTML=HTML+"<td>";
+            HTML=HTML+"<td class=\"achievementsTableSpot\">";
             HTML=HTML+this.createAchievementNode(arr[(j+1)*(i+1)-1]);
             HTML=HTML+"</td>";
         }
@@ -66,8 +66,11 @@ export class achievementsView {
         HTML=HTML+achievement.imagePath;
         HTML=HTML+"\" />"
         HTML=HTML+"<br/>";
+        HTML=HTML+"<span class=\"achievementName\">";
         //add the name
         HTML=HTML+achievement.name;
+        HTML=HTML+"</span>";
+        HTML=HTML+"<span class=\"achievementDate\">";
         //add the date
         if (achievement.unlocked) {
             HTML=HTML+achievement.unlockDate.getMonth();
@@ -78,9 +81,12 @@ export class achievementsView {
         } else {
             HTML=HTML+"UNOBTAINED";
         }
+        HTML=HTML+"</span>";
         HTML=HTML+"<br/>";
         //add the description
+        HTML=HTML+"<span class=\"achievementDescription\">";
         HTML=HTML+achievement.description;
+        HTML=HTML+"</span>";
         return HTML;
     }
 }

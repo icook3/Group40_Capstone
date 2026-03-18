@@ -1,0 +1,29 @@
+#menuAchievementsBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 250px;
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
+
+#achievementsTable {
+    position:fixed;
+    top:25%;
+    left:25%;
+    border-collapse: collapse;
+}
+
+.achievementsTableSpot {
+    border-color:black;
+    border-width: 5px;
+    border-style:solid;
+}
