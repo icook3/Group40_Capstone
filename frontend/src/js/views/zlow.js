@@ -29,34 +29,91 @@ export class zlowScreen {
     ready=false;
 
     //other variables used in the main zlow app
+    /**
+     * @type {WorkoutStorage}
+     */
     workoutStorage;
+    /**
+     * @type {WorkoutSession}
+     */
     workoutSession;
+    /**
+     * @type {NotificationManager}
+     */
     notificationManager;
+    /**
+     * @type {MilestoneTracker}
+     */
     milestoneTracker;
+    /**
+     * @type {AvatarMovement}
+     */
     rider;
+    /**
+     * @type {AvatarMovement}
+     */
     pacer;
+    /**
+     * @type {PhysicsEngine}
+     */
     physics;
+    /**
+     * @type {PhysicsEngine}
+     */
     pacerPhysics;
+    /**
+     * @type {KeyboardMode}
+     */
     keyboardMode;
+    /**
+     * @type {StandardMode}
+     */
     standardMode;
+    /**
+     * @type {ZlowScene}
+     */
     scene;
+    /**
+     * @type {HUD}
+     */
     hud;
-
+    /**
+     * Can actually be any type of workout controller
+     * They all have the same methods
+     * @type {RampTestController}
+     */
     workoutController;
-
+    /**
+     * @type {string}
+     */
     selectedWorkout;
+    /**
+     * @type {string}
+     */
     workoutName;
     
     isRecording = false;
     rideElapsedMs=0;
+    /**
+     * @type {WorkoutSummary}
+     */
     workoutSummary;
+    /**
+     * @type {PauseCountdown}
+     */
     countdown;
     //0: not in peer-peer mode
     //1: host
     //2: peer
     peerState=0;
     connected = false;
+    /**
+     * @type {Peer}
+     */
     peer;
+    /**
+     * @type {Connection}
+     */
     conn;
 
     loopRunning=false;
@@ -606,7 +663,9 @@ export class zlowScreen {
         pacerSyncBtn.innerHTML = "Sync Players";
       }
     }
-
+    checkIfAchievementsUnlocked() {
+      
+    }
     
     /**
      * MAIN ZLOW FLOW
