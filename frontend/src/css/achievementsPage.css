@@ -14,6 +14,22 @@
     font-family: "Fugaz One", sans-serif;
     font-size: 1.5em;
 }
+#clearAllAchievements {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 250px;
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
 #achievementsTableWrapper {
     position: fixed;
     height:75%;
