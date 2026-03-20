@@ -664,13 +664,13 @@ export class zlowScreen {
       }
     }
     checkIfAchievementsUnlocked() {
-        if(constants.msToKmh(constants.riderState.distanceMeters)>=25) {
+        if(this.hud.totalDistance>=25) {
           achievementManager.obtainAchievement("DistanceMilestone1");
         }
-        if(constants.msToKmh(constants.riderState.distanceMeters)>=50) {
+        if(this.hud.totalDistance>=50) {
           achievementManager.obtainAchievement("DistanceMilestone2");
         }
-        if(constants.msToKmh(constants.riderState.distanceMeters)>=100) {
+        if(this.hud.totalDistance>=100) {
           achievementManager.obtainAchievement("DistanceMilestone2");
         }
         if (constants.riderState.power>=75) {
