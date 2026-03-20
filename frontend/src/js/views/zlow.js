@@ -22,6 +22,7 @@ import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
+import { achievementManager } from "../achievements/achievementManager.js";
 
 export class zlowScreen {
     content;
@@ -74,6 +75,8 @@ export class zlowScreen {
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
+        //the first time you do a Zlow ride, unlock the welcome achievement
+        achievementManager.obtainAchievement("Welcome");
         this.initZlowApp();
         window.testNotifications = new NotificationManager();
     }

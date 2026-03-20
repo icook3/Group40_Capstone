@@ -75,13 +75,14 @@ class AchievementManager {
     }
     /**
      * 
-     * @param {Achievement} achievement 
+     * @param {string} achievement 
      */
     obtainAchievement(achievement) {
-        let notAlreadyObtained=this.achievements.get(achievement).unlockAchievement();
+        let thisAchievement=this.achievements.get(achievement)
+        let notAlreadyObtained=thisAchievement.unlockAchievement();
         if (notAlreadyObtained) {
             this.storeAchievementsInLocalStorage();
-            this.notificationManager.show("Achievement "+achievement.name+" unlocked!",true);
+            this.notificationManager.show("Achievement "+thisAchievement.name+" unlocked!",true);
         }
     }
     /**
