@@ -664,7 +664,53 @@ export class zlowScreen {
       }
     }
     checkIfAchievementsUnlocked() {
-      
+        if(constants.msToKmh(constants.riderState.distanceMeters)>=25) {
+          achievementManager.obtainAchievement("DistanceMilestone1");
+        }
+        if(constants.msToKmh(constants.riderState.distanceMeters)>=50) {
+          achievementManager.obtainAchievement("DistanceMilestone2");
+        }
+        if(constants.msToKmh(constants.riderState.distanceMeters)>=100) {
+          achievementManager.obtainAchievement("DistanceMilestone2");
+        }
+        if (constants.riderState.power>=75) {
+          achievementManager.obtainAchievement("PowerMilestone1");
+        }
+        if (constants.riderState.power>=150) {
+          achievementManager.obtainAchievement("PowerMilestone2");
+        }
+        if (constants.riderState.power>=300) {
+          achievementManager.obtainAchievement("PowerMilestone3");
+        }
+        if (constants.riderState.calories>=400) {
+          achievementManager.obtainAchievement("CaloriesMilestone1");
+        }
+        if (constants.riderState.calories>=800) {
+          achievementManager.obtainAchievement("CaloriesMilestone2");
+        }
+        if (constants.riderState.calories>=1500) {
+          achievementManager.obtainAchievement("CaloriesMilestone3");
+        }
+        if (this.workoutStorage.getCurrentStreak()>=7) {
+          achievementManager.obtainAchievement("StreakMilestone1");
+        }
+        if (this.workoutStorage.getCurrentStreak()>=14) {
+          achievementManager.obtainAchievement("StreakMilestone2");
+        }
+        if (this.workoutStorage.getCurrentStreak()>=30) {
+          achievementManager.obtainAchievement("StreakMilestone3");
+        }
+        //time
+        const elapsed = Math.floor((Date.now() - this.hud.startTime) / 1000);
+        if (elapsed>=30*60) {
+          achievementManager.obtainAchievement("TimeMilestone1");
+        }
+        if (elapsed>=1*60*60) {
+          achievementManager.obtainAchievement("TimeMilestone2");
+        }
+        if (elapsed>=2*60*60) {
+          achievementManager.obtainAchievement("TimeMilestone3");
+        }
     }
     
     /**
@@ -793,6 +839,7 @@ export class zlowScreen {
           constants.riderState.distanceMeters || 0 // meters
         );
       }
+      owner.checkIfAchievementsUnlocked();
       owner.sendPeerDataOver(constants.riderState.speed);
       requestAnimationFrameFn(() =>
           owner.loop({ getElement, requestAnimationFrameFn, owner })
