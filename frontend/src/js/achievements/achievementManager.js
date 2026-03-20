@@ -38,16 +38,16 @@ class AchievementManager {
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
             try {
-            let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
-            for (let i=0;i<obtainedAchievements.length;i++) {
-                //set the unlock status of the achievement
-                /*
-                    achievements in local storage are formatted as a JSON array like this
-                    [{ID: ID, completed: true, completedDate: Date}]
-                */
-                this.achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
-                this.achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
-            }
+                let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
+                for (let i=0;i<obtainedAchievements.length;i++) {
+                    //set the unlock status of the achievement
+                    /*
+                        achievements in local storage are formatted as a JSON array like this
+                        [{ID: ID, completed: true, completedDate: Date}]
+                    */
+                    this.achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
+                    this.achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
+                }
             } catch (e) {
                 console.log("INVALID JSON!");
                 this.clearAllAchievements();
@@ -71,7 +71,7 @@ class AchievementManager {
             let obj={ID:key,completed:value.unlocked,completedDate:value.unlockDate}
             objs.push(obj);
         });
-        console.log(JSON.stringify(objs));
+        //console.log(JSON.stringify(objs));
         localStorage.setItem("AchievementsObtained",JSON.stringify(objs));
     }
     /**
