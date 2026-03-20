@@ -12,25 +12,25 @@ class AchievementManager {
     notificationManager;
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
-        this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("CreateACharacter", new Achievement("Created A Character", "Create a character in the customizer!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("PeerToPeer", new Achievement("Ride Together!", "Ride with a friend!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("TCXExport", new Achievement("Better Shared!", "Export your ride as a TCX file, or to Strava!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("DistanceMilestone1", new Achievement("Rode 25 km!", "Ride 25 km!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("DistanceMilestone2", new Achievement("Rode 50 km!", "Ride 50 km!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("DistanceMilestone3", new Achievement("Rode 100 km!", "Ride 100 km!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("TimeMilestone1", new Achievement("Rode For 30 Minutes!", "Ride for 30 minutes!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("TimeMilestone2", new Achievement("Rode For 1 Hour!", "Ride for 1 hour!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("TimeMilestone3", new Achievement("Rode For 2 Hours!", "Ride for 2 hours!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("StreakMilestone1", new Achievement("Rode For 7 Days in a Row!", "Ride for 7 days in a row!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("StreakMilestone2", new Achievement("Rode For 14 Days in a Row!", "Ride for 14 days in a row!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("StreakMilestone3", new Achievement("Rode For 30 Days in a Row!", "Ride for 30 days in a row!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("PowerMilestone1", new Achievement("Reached 75 Watts!", "Reach 75 watts while riding","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("PowerMilestone2", new Achievement("Reached 150 Watts!", "Reach 150 watts while riding","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("PowerMilestone3", new Achievement("Reached 300 Watts!", "Reach 300 watts while riding","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("CaloriesMilestone1", new Achievement("Burned 400 Calories!", "Burn 400 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("CaloriesMilestone2", new Achievement("Burned 800 Calories!", "Burn 800 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("CaloriesMilestone3", new Achievement("Burned 1,500 Calories!", "Burn 1,500 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","../../resources/images/achievementImages/Welcome.png"));
+        this.achievements.set("CreateACharacter", new Achievement("Created A Character", "Create a character in the customizer!","../../resources/images/achievementImages/CreateACharacter.png"));
+        this.achievements.set("PeerToPeer", new Achievement("Ride Together!", "Ride with a friend!","../../resources/images/achievementImages/PeerToPeer.png"));
+        this.achievements.set("TCXExport", new Achievement("Better Shared!", "Export your ride as a TCX file, or to Strava!","../../resources/images/achievementImages/TCXExport.png"));
+        this.achievements.set("DistanceMilestone1", new Achievement("Rode 25 km!", "Ride 25 km!","../../resources/images/achievementImages/DistanceMilestone1.png"));
+        this.achievements.set("DistanceMilestone2", new Achievement("Rode 50 km!", "Ride 50 km!","../../resources/images/achievementImages/DistanceMilestone2.png"));
+        this.achievements.set("DistanceMilestone3", new Achievement("Rode 100 km!", "Ride 100 km!","../../resources/images/achievementImages/DistanceMilestone3.png"));
+        this.achievements.set("TimeMilestone1", new Achievement("Rode For 30 Minutes!", "Ride for 30 minutes!","../../resources/images/achievementImages/TimeMilestone1.png"));
+        this.achievements.set("TimeMilestone2", new Achievement("Rode For 1 Hour!", "Ride for 1 hour!","../../resources/images/achievementImages/TimeMilestone2.png"));
+        this.achievements.set("TimeMilestone3", new Achievement("Rode For 2 Hours!", "Ride for 2 hours!","../../resources/images/achievementImages/TimeMilestone3.png"));
+        this.achievements.set("StreakMilestone1", new Achievement("Rode For 7 Days in a Row!", "Ride for 7 days in a row!","../../resources/images/achievementImages/StreakMilestone1.png"));
+        this.achievements.set("StreakMilestone2", new Achievement("Rode For 14 Days in a Row!", "Ride for 14 days in a row!","../../resources/images/achievementImages/StreakMilestone2.png"));
+        this.achievements.set("StreakMilestone3", new Achievement("Rode For 30 Days in a Row!", "Ride for 30 days in a row!","../../resources/images/achievementImages/StreakMilestone3.png"));
+        this.achievements.set("PowerMilestone1", new Achievement("Reached 75 Watts!", "Reach 75 watts while riding","../../resources/images/achievementImages/PowerMilestone1.png"));
+        this.achievements.set("PowerMilestone2", new Achievement("Reached 150 Watts!", "Reach 150 watts while riding","../../resources/images/achievementImages/PowerMilestone2.png"));
+        this.achievements.set("PowerMilestone3", new Achievement("Reached 300 Watts!", "Reach 300 watts while riding","../../resources/images/achievementImages/PowerMilestone3.png"));
+        this.achievements.set("CaloriesMilestone1", new Achievement("Burned 400 Calories!", "Burn 400 calories while riding","../../resources/images/achievementImages/CaloriesMilestone1.png"));
+        this.achievements.set("CaloriesMilestone2", new Achievement("Burned 800 Calories!", "Burn 800 calories while riding","../../resources/images/achievementImages/CaloriesMilestone2.png"));
+        this.achievements.set("CaloriesMilestone3", new Achievement("Burned 1,500 Calories!", "Burn 1,500 calories while riding","../../resources/images/achievementImages/CaloriesMilestone3.png"));
 
 
         this.notificationManager=new NotificationManager();
