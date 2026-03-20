@@ -63,6 +63,7 @@ class AchievementManager {
             value.dateObtained=null;
         });
         this.storeAchievementsInLocalStorage();
+        window.viewManager.setView(window.viewManager.views.achievements);
     }
     storeAchievementsInLocalStorage() {
         let objs = [];

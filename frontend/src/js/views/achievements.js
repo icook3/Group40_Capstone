@@ -54,7 +54,7 @@ export class achievementsView {
     canvas.style.zIndex = "-1";
     document.getElementById("achievementsBackground").appendChild(canvas);
     //canvas.style.filter = "blur(3px)";  // blurs the background
-    document.getElementById("clearAllAchievements").addEventListener(onclick,()=> {
+    document.getElementById("clearAllAchievements").addEventListener("click",()=> {
         achievementManager.clearAllAchievements();
     });
   }
