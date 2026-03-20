@@ -147,6 +147,8 @@ export class zlowScreen {
           if (this.peerState==1) {
             this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
+          //Unlock the peer-to-peer achievement
+          achievementManager.obtainAchievement("PeerToPeer");
           break;
         case "speed":
           //console.log("Set pacer speed to "+data.data);
