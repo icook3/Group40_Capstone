@@ -13,6 +13,10 @@ export class Achievement {
      * @type {string}
      */
     imagePath;
+    /**
+     * 
+     * @returns true if the achievement was not previously unlocked. False otherwise
+     */
     unlockAchievement() {
         if (!this.unlocked) {
             this.unlocked=true;

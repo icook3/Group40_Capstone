@@ -1,4 +1,5 @@
 import {Achievement} from './achievement.js'
+import { NotificationManager } from '../notifications.js';
 /**
  * This class manages achievements
  * It is a singleton class. 
@@ -8,6 +9,7 @@ import {Achievement} from './achievement.js'
  * When the achievement is to be unlocked, call achievementManager.obtainAchievement(unique ID);
  */
 class AchievementManager {
+    notificationManager;
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
         this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","../../resources/favicons/ZlowFavicon.svg"));
@@ -29,6 +31,9 @@ class AchievementManager {
         this.achievements.set("CaloriesMilestone1", new Achievement("Burned 400 Calories!", "Burn 400 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
         this.achievements.set("CaloriesMilestone2", new Achievement("Burned 800 Calories!", "Burn 800 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
         this.achievements.set("CaloriesMilestone3", new Achievement("Burned 1,500 Calories!", "Burn 1,500 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
+
+
+        this.notificationManager=new NotificationManager();
 
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
@@ -68,9 +73,16 @@ class AchievementManager {
         console.log(JSON.stringify(objs));
         localStorage.setItem("AchievementsObtained",JSON.stringify(objs));
     }
+    /**
+     * 
+     * @param {Achievement} achievement 
+     */
     obtainAchievement(achievement) {
-        this.achievements.get(achievement).unlockAchievement();
-        this.storeAchievementsInLocalStorage();
+        let notAlreadyObtained=this.achievements.get(achievement).unlockAchievement();
+        if (notAlreadyObtained) {
+            this.storeAchievementsInLocalStorage();
+            this.notificationManager.show("Achievement "+achievement.name+" unlocked!",true);
+        }
     }
     /**
      * @type {Map<string, Achievement>}
