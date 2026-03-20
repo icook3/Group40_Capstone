@@ -5,23 +5,31 @@ import {Achievement} from './achievement.js'
  * To add new achievements, start by creating them in the constructor. 
  * Use the code this.achievements.set(unique ID, new Achievement("name", "desc", "imgPath"));
  * Place an image in the resources folder to represent the achievement. 
- * When the achievement is to be unlocked, call achievementManager.achievements.get(unique ID).unlockAchievement();
- * The return value is true if the achievement was previously locked, false otherwise. 
+ * When the achievement is to be unlocked, call achievementManager.obtainAchievement(unique ID);
  */
 class AchievementManager {
     constructor() {
         //CREATE NEW ACHIEVEMENTS HERE
         this.achievements.set("Welcome",new Achievement("Welcome to Zlow!","Start Zlow for the first time!","../../resources/favicons/ZlowFavicon.svg"));
-        this.achievements.set("Test",new Achievement("Test Achievement!","This is a test 1!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test2",new Achievement("Test Achievement!","This is a test 2!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test3",new Achievement("Test Achievement!","This is a test 3!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test4",new Achievement("Test Achievement!","This is a test 4!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test5",new Achievement("Test Achievement!","This is a test 5!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test6",new Achievement("Test Achievement!","This is a test 6!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test7",new Achievement("Test Achievement!","This is a test 7!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test8",new Achievement("Test Achievement!","This is a test 8!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test9",new Achievement("Test Achievement!","This is a test 9!","../../resources/favicons/ZlowFavicon-dark.svg"));
-        this.achievements.set("Test10",new Achievement("Test Achievement!","This is a test 10!","../../resources/favicons/ZlowFavicon-dark.svg"));
+        this.achievements.set("CreateACharacter", new Achievement("Created A Character", "Create a character in the customizer!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("PeerToPeer", new Achievement("Ride Together!", "Ride with a friend!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("TCXExport", new Achievement("Better Shared!", "Export your ride as a TCX file, or to Strava!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("DistanceMilestone1", new Achievement("Rode 25 km!", "Ride 25 km!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("DistanceMilestone2", new Achievement("Rode 50 km!", "Ride 50 km!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("DistanceMilestone3", new Achievement("Rode 100 km!", "Ride 100 km!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("TimeMilestone1", new Achievement("Rode For 30 Minutes!", "Ride for 30 minutes!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("TimeMilestone2", new Achievement("Rode For 1 Hour!", "Ride for 1 hour!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("TimeMilestone3", new Achievement("Rode For 2 Hours!", "Ride for 2 hours!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("StreakMilestone1", new Achievement("Rode For 7 Days in a Row!", "Ride for 7 days in a row!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("StreakMilestone2", new Achievement("Rode For 14 Days in a Row!", "Ride for 14 days in a row!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("StreakMilestone3", new Achievement("Rode For 30 Days in a Row!", "Ride for 30 days in a row!","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("PowerMilestone1", new Achievement("Reached 75 Watts!", "Reach 75 watts while riding","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("PowerMilestone2", new Achievement("Reached 150 Watts!", "Reach 150 watts while riding","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("PowerMilestone3", new Achievement("Reached 300 Watts!", "Reach 300 watts while riding","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("CaloriesMilestone1", new Achievement("Burned 400 Calories!", "Burn 400 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("CaloriesMilestone2", new Achievement("Burned 800 Calories!", "Burn 800 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
+        this.achievements.set("CaloriesMilestone3", new Achievement("Burned 1,500 Calories!", "Burn 1,500 calories while riding","../../resources/favicons/ZlowFavicon.svg"));
+
         //get completed achievements out of local storage
         if (localStorage.getItem("AchievementsObtained")!=null) {
             try {
