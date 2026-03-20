@@ -43,8 +43,9 @@ export class Track {
 
     // As each animation completes, start the next one
     this.update_rider_animation = this.update_rider_animation.bind(this);
-
-  this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+    this.update_pacer_animation = this.update_pacer_animation.bind(this);
+    
+    this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
   destroy() {
@@ -149,7 +150,9 @@ update_pacer_animation() {
 
   // Calculate pacer's duration and set attributes
   // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
+  const pacerSpeedInput = document.getElementById('pacer-speed');
+  const rawPacerSpeed = Number(pacerSpeedInput?.value);
+  const pacerSpeed = Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
   pacer.removeAttribute("animation__2");
