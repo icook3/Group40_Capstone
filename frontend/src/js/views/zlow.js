@@ -447,7 +447,6 @@ export class zlowScreen {
     }
 
     initPauseBtn() {
-      let savedPacerSpeed;
       const pauseBtn = document.getElementById("pause-btn");
       const resumeBtn = document.getElementById("pause-resume-btn");
       const overlay = document.getElementById("pause-overlay");
@@ -456,8 +455,8 @@ export class zlowScreen {
       const pauseGame = () => {
         simulationState.isPaused = true;
         this.hud.pause();
-        savedPacerSpeed = this.pacerPhysics.getSpeed();
-        this.setPacerSpeed(0);
+        constants.pacerTween.pause();
+        constants.riderTween.pause();
         overlay.style.display = "flex";
         overlay.setAttribute("aria-hidden", "false");
         dialog.classList.remove("zoom-out");
@@ -479,7 +478,8 @@ export class zlowScreen {
         simulationState.isPaused = false;
         constants.lastTime = Date.now();
         this.hud.resume();
-        this.setPacerSpeed(savedPacerSpeed);
+        constants.pacerTween.resume();
+        constants.riderTween.resume();
       };
 
       pauseBtn.addEventListener("click", () => {
