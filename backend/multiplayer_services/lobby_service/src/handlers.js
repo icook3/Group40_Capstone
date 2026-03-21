@@ -43,7 +43,8 @@ function lobbyStatePayload(lobby) {
         players: lobby.players.map(p => ({
             player_id: p.player_id,
             display_name: p.display_name,
-            ready: p.ready
+            ready: p.ready,
+            player_data: p.player_data
         }))
     };
 }
@@ -93,6 +94,7 @@ async function handleAuth(ws, payload) {
         ws.isAuthenticated = true;
         ws.player_id = decoded.player_id;
         ws.display_name = decoded.display_name;
+        ws.player_data = payload.player_data || null;
 
         clearTimeout(ws.authTimeout);
 
@@ -133,7 +135,8 @@ async function handleCreateLobby(ws, payload) {
             name,
             max_players,
             duration_minutes,
-            password_hash
+            password_hash,
+            player_data: ws.player_data
         });
 
         send(ws, 'LOBBY_CREATED', lobbyStatePayload(lobby));
@@ -184,7 +187,7 @@ async function handleJoinLobby(ws, payload) {
             }
         }
 
-        const updatedLobby = await addPlayer(lobby_id, ws.player_id, ws.display_name);
+        const updatedLobby = await addPlayer(lobby_id, ws.player_id, ws.display_name, ws.player_data);
 
         broadcast(updatedLobby.players, 'LOBBY_STATE', lobbyStatePayload(updatedLobby));
     } catch (err) {
@@ -260,7 +263,12 @@ async function handleStartGame(ws) {
                     session_id,
                     session_url,
                     token: tokens[player.player_id],
-                    expires_in: 30
+                    expires_in: 30,
+                    players: lobby.players.map(p => ({
+                        player_id: p.player_id,
+                        display_name: p.display_name,
+                        player_data: p.player_data
+                    }))
                 });
             }
         }

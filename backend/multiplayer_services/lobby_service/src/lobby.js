@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const LOBBY_TTL = 3600; // 1 hour, lobbies auto expire from Redis if abandoned
 
-async function createLobby({ player_id, display_name, name, max_players, duration_minutes, password_hash }) {
+async function createLobby({ player_id, display_name, name, max_players, duration_minutes, password_hash, player_data }) {
     const lobby_id = `lby_${uuidv4().slice(0, 8)}`
 
     const lobby = {
@@ -14,7 +14,12 @@ async function createLobby({ player_id, display_name, name, max_players, duratio
         password_protected: !!password_hash,
         password_hash: password_hash || '',
         host_id: player_id,
-        players: JSON.stringify([{ player_id, display_name, ready: false }])
+        players: JSON.stringify([{
+            player_id,
+            display_name,
+            ready: false,
+            player_data: JSON.stringify(player_data)
+        }])
     };
 
     // Store lobby as a Redis hash
@@ -63,14 +68,19 @@ async function getPublicLobbies() {
     }));
 }
 
-async function addPlayer(lobby_id, player_id, display_name) {
+async function addPlayer(lobby_id, player_id, display_name, player_data) {
     const lobby = await getLobby(lobby_id);
     if (!lobby) {
         throw new Error('Lobby not found');
     }
 
     const players = lobby.players;
-    players.push({ player_id, display_name, ready: false });
+    players.push({
+        player_id,
+        display_name,
+        ready: false,
+        player_data: JSON.stringify(player_data)
+    })
 
     // Update players list in Redis
     await redis.hset(`lobby:${lobby_id}`, 'players', JSON.stringify(players));
@@ -130,6 +140,8 @@ async function getPlayerLobby(player_id) {
 }
 
 function formatLobby(raw) {
+    const players = typeof raw.players === 'string' ? JSON.parse(raw.players) : raw.players
+
     return {
         lobby_id: raw.lobby_id,
         name: raw.name,
@@ -138,7 +150,10 @@ function formatLobby(raw) {
         password_protected: raw.password_protected === 'true' || raw.password_protected === true,
         password_hash: raw.password_hash,
         host_id: raw.host_id,
-        players: typeof raw.players === 'string' ? JSON.parse(raw.players) : raw.players
+        players: players.map(p => ({
+            ...p,
+            player_data: typeof p.player_data === 'string' ? JSON.parse(p.player_data) : p.player_data
+        }))
     };
 }
 
