@@ -1,6 +1,6 @@
 const http = require('http');
 const WebSocket = require('ws');
-const { handleMessage } = require('./handlers');
+const { handleMessage, handleDisconnect } = require('./handlers');
 const { authGuest } = require('./auth')
 
 const PORT = process.env.PORT || 4000;
@@ -47,12 +47,13 @@ wss.on('connection', (ws) => {
 
     ws.on('message', (data) => {
         handleMessage(ws, data);
-    })
+    });
 
     ws.on('close', () => {
         clearTimeout(ws.authTimeout);
-    })
-})
+        handleDisconnect(ws);
+    });
+});
 
 server.listen(PORT, () => {
     console.log(`Lobby service running on port ${PORT}`);
