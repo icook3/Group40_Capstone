@@ -8,7 +8,7 @@ import  {activatePacer } from '../../main.js'
 
 export class Track {
 
-  constructor({ sceneEl }) {
+  constructor({ sceneEl, getPacerSpeed }) {
     // ---- SINGLETON GUARD / CLEANUP PREVIOUS INSTANCE ----
     if (window.__zlowTrackInstance) {
       window.__zlowTrackInstance.destroy?.();
@@ -16,6 +16,7 @@ export class Track {
     window.__zlowTrackInstance = this;
     this.sceneEl = sceneEl;
 
+    this.getPacerSpeed = getPacerSpeed;
     // Create a-entity for the path and set ID
     let path_element = document.getElementById('track');
     this._ownsPath = !path_element;
@@ -150,10 +151,10 @@ update_pacer_animation() {
 
   // Calculate pacer's duration and set attributes
   // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const pacerSpeedInput = document.getElementById('pacer-speed');
-  const rawPacerSpeed = Number(pacerSpeedInput?.value);
-  const pacerSpeed = Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+  const rawPacerSpeed = Number(this.getPacerSpeed?.());
+  const pacerSpeed =
+    Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
+    const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
   pacer.removeAttribute("animation__2");
   pacer.setAttribute(

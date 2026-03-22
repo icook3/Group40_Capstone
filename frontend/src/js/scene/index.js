@@ -5,8 +5,8 @@ import { SceneryManager } from './env/SceneryManager.js';
 import { constants } from '../constants.js';
 
 export class ZlowScene {
-  constructor(_, { getElement = (id) => document.getElementById(id) } = {}) {
-    // If a previous scene exists, tear it down first
+  constructor(_, { getElement = (id) => document.getElementById(id), getPacerSpeed } = {}) {   
+   // If a previous scene exists, tear it down first
     if (window.__zlowSceneInstance) {
       window.__zlowSceneInstance.destroy?.();
     }
@@ -23,7 +23,7 @@ export class ZlowScene {
     }
     constants.worldZ=0;
     // Generate a new object field, track, and clouds
-    this.track = new Track({ sceneEl: this.scene });        
+    this.track = new Track({ sceneEl: this.scene , getPacerSpeed});        
     this.clouds = new Cloud({ sceneEl: this.scene });
 
     this.objectField = new ObjectField({

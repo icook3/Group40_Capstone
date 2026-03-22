@@ -171,7 +171,9 @@ export class zlowScreen {
             
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-            document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
+            const riderSpeed = Number(constants.riderState.speed) || 0;
+            this.setPacerSpeed(riderSpeed);
+            document.getElementById('pacer-speed').value = riderSpeed;
             this.pacer.avatarEntity.removeAttribute("animation__2");
             this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
             this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
@@ -380,7 +382,10 @@ export class zlowScreen {
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        this.scene = new ZlowScene(Number(pacerSpeedInput.value));
+        this.scene = new ZlowScene(Number(pacerSpeedInput.value), {
+          getPacerSpeed: () => this.pacerPhysics?.getSpeed?.() ?? 0
+        });
+
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
@@ -390,11 +395,15 @@ export class zlowScreen {
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val);
+          this.scene = new ZlowScene(val, {
+            getPacerSpeed: () => this.pacerPhysics?.getSpeed?.() ?? 0
+          });
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val);
+          this.scene = new ZlowScene(val, {
+            getPacerSpeed: () => this.pacerPhysics?.getSpeed?.() ?? 0
+          });
           this.setPacerSpeed(val);
         }
       }
@@ -582,26 +591,57 @@ export class zlowScreen {
     
     setupPacerSyncButton() {
       const pacerSyncBtn = document.getElementById("pacer-sync-btn");
+
       pacerSyncBtn.addEventListener("click", () => {
-        //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
           const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
           const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
+
+          // Snap pacer to rider z
           pacerSyncPos.z = riderSyncPos.z;
-    
-          // Set pacer constants to rider constants and adjust animation
+
+          // Match pacer speed to rider speed
+          const riderSpeed = Number(constants.riderState.speed) || 0;
+          this.setPacerSpeed(riderSpeed);
+
+          // Update dev input so UI reflects the same value
+          const pacerSpeedInput = document.getElementById("pacer-speed");
+          if (pacerSpeedInput) {
+            pacerSpeedInput.value = riderSpeed;
+          }
+
+          // Sync track piece index
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = constants.riderState.speed;
-          //pacerPhysics.setSpeed(constants.riderState.speed);
+
+          const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+          if (!tp) {
+            console.warn("[Pacer Sync] Missing track point:", constants.pacerCurrentTrackPiece);
+            return;
+          }
+
+          const rawPacerSpeed = Number(this.pacerPhysics?.getSpeed?.());
+          const pacerSpeed =
+            Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
+
+          const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
           this.pacer.avatarEntity.removeAttribute("animation__2");
-          this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay: true;`);
-          this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+          this.pacer.avatarEntity.setAttribute(
+            "position",
+            `${pacerSyncPos.x} ${pacerSyncPos.y} ${pacerSyncPos.z}`
+          );
+          this.pacer.avatarEntity.setAttribute(
+            "animation__2",
+            `property: position; to: ${tp.x + 0.5} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`
+          );
         }
+
         if (this.connected) {
-          this.conn.send({name: "syncPlayers", data: {}});
+          this.conn.send({ name: "syncPlayers", data: {} });
         }
       });
-      if (this.peerState!=0) {
+
+      if (this.peerState != 0) {
         pacerSyncBtn.innerHTML = "Sync Players";
       }
     }
