@@ -22,6 +22,7 @@ import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
+import { PacerController } from "../pacer.js";
 
 export class zlowScreen {
     content;
@@ -140,7 +141,14 @@ export class zlowScreen {
             isPacer: false,
           });
           this.pacer.creator.loadOtherData(data.data);
+          
           this.pacerPhysics = new PhysicsEngine();
+          if (this.pacerController) {
+            this.pacerController.attach({
+              avatar: this.pacer,
+              physics: this.pacerPhysics,
+            });
+          }    
           if (this.peerState==1) {
             this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
@@ -741,13 +749,7 @@ export class zlowScreen {
       this.peerState=0;
       this.loopRunning=false;
       this.connected=false;
-      /*AFRAME.registerComponent("no-cull", {
-        init() {
-          this.el.addEventListener("model-loaded", () => {
-            this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
-          });
-        },
-      });*/
+      this.pacerController = new PacerController();
       
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
@@ -814,6 +816,13 @@ export class zlowScreen {
         this.pacerPhysics = new PhysicsEngine();
         this.pacer.creator.setPacerColors();
       }
+      if (this.pacerController && this.pacer && this.pacerPhysics) {
+        this.pacerController.attach({
+          avatar: this.pacer,
+          physics: this.pacerPhysics,
+        });
+      }
+
       this.keyboardMode = new KeyboardMode();
       this.standardMode = new StandardMode();
     
