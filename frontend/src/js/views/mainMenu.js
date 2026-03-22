@@ -73,6 +73,11 @@ export class mainMenuView {
         resizeInput(pacerSpeedInput);
         restrictNumberInput(pacerSpeedInput, 2, 1, 99.9);
 
+        // Pacer watts input
+        const pacerWattsInput = document.getElementById("pacer-watts");
+        resizeInput(pacerWattsInput);
+        restrictNumberInput(pacerWattsInput, 4, 0, 2000);
+
         // Weight input
         const riderWeightInput = document.getElementById("rider-weight");
         resizeInput(riderWeightInput)

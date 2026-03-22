@@ -425,6 +425,22 @@ export class zlowScreen {
       }
     }
 
+    initializePacerWattsInput() {
+      const pacerWattsInput = document.getElementById("pacer-watts");
+      if (!pacerWattsInput) return;
+
+      const storedWatts = sessionStorage.getItem("PacerWatts");
+      const val = storedWatts !== null ? Number(storedWatts) : Number(pacerWattsInput.value);
+
+      pacerWattsInput.value = val;
+      this.setPacerWatts(val);
+
+      pacerWattsInput.addEventListener("input", () => {
+        const nextVal = Number(pacerWattsInput.value);
+        this.setPacerWatts(nextVal);
+      });
+    }
+
     initializeWorkouts() {
       // Set up ramp test controller if applicable
       if (this.selectedWorkout === "ramp") {
@@ -904,6 +920,7 @@ export class zlowScreen {
         });
       }
       this.initializePacerSpeedInput();    
+      this.initializePacerWattsInput();
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
 

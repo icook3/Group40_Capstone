@@ -397,6 +397,7 @@ font-size: clamp(0.6em, 1.2cqi, 0.9em);
 
 /* Style for dev items */
 #dev-controls-hud #pacer,
+#dev-controls-hud #pacer-watts-row,
 #dev-controls-hud #weight {
   color: rgb(220, 229, 222);
   font-family: "Nunito", sans-serif;
@@ -415,8 +416,9 @@ font-size: clamp(0.6em, 1.2cqi, 0.9em);
 
 /* Style for input fields */
 #dev-controls-hud #pacer-speed,
+#dev-controls-hud #pacer-watts,
 #dev-controls-hud #rider-weight {
-  width: 50px;
+  width: 80px;
   padding: 6px 8px;
   border: 1px solid rgba(220, 229, 222, 0.3);
   background: rgba(0, 0, 0, 0.2);
@@ -431,6 +433,7 @@ font-size: clamp(0.6em, 1.2cqi, 0.9em);
 
 
 #dev-controls-hud #pacer-speed:focus,
+#dev-controls-hud #pacer-watts:focus,
 #dev-controls-hud #rider-weight:focus {
   outline: none;
   border-color: rgba(220, 229, 222, 0.6);
@@ -476,6 +479,7 @@ font-size: clamp(0.6em, 1.2cqi, 0.9em);
 /* DEV HUD: make any buttons inside the pacer/weight rows show a hand */
 #dev-controls-hud #pacer button,
 #dev-controls-hud #weight button,
+#dev-controls-hud #pacer-watts button,
 #dev-controls-hud #pacer .arrow-btn,
 #dev-controls-hud #weight .arrow-btn {
   cursor: pointer;

@@ -52,6 +52,7 @@ export function workoutMenu () {
     sessionStorage.clear();
     localStorage.clear();
     document.getElementById("pacer-speed").value = 20;
+    document.getElementById("pacer-watts").value = 150;
     document.getElementById("rider-weight").value = 70;
     document.getElementById("name-input").value = "";
     document.getElementById("dev-toggle").checked = false;
@@ -86,6 +87,8 @@ function launchWorkout(workout) {
   sessionStorage.setItem("SelectedWorkout", workout);
   const ps = document.getElementById("pacer-speed");
   if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
+  const pw = document.getElementById("pacer-watts");
+  if (pw) sessionStorage.setItem("PacerWatts", pw.value);
 
   if (workout === "peerServer") {
     window.viewManager.setView(window.viewManager.views.peerConnect);
