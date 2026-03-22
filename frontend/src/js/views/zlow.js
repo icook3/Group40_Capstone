@@ -385,6 +385,8 @@ export class zlowScreen {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
         });
+
+        this.setPacerSpeed(Number(pacerSpeedInput.value));
       } else {
         if (sessionStorage.getItem("PacerSpeed") !== null) {
           const val = Number(sessionStorage.getItem("PacerSpeed"));

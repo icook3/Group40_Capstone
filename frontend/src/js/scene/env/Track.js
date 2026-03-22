@@ -156,7 +156,10 @@ update_pacer_animation() {
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
   pacer.removeAttribute("animation__2");
-  pacer.setAttribute("animation__2", `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`);
+  pacer.setAttribute(
+    "animation__2",
+    `property: position; to: ${tp.x + 0.5} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false;`
+  );
 
   // If rider is within 200 units of the end, spawn some more track pieces
   // (this can stay as-is; it’s your "keep ahead" logic)
@@ -172,7 +175,10 @@ update_pacer_animation() {
       this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
       document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
       this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:true;`);
+      document.getElementById("pacer-entity").setAttribute(
+        "animation__2",
+        `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:true;`
+      );
       activatePacer();
       
     });
