@@ -1,7 +1,8 @@
 export class PacerController {
   constructor() {
-    this.mode = "manual";   // later: manual, sync, targetWatts
+    this.mode = "manual";
     this.currentSpeed = 0;
+    this.currentWatts = 0;
     this.avatar = null;
     this.physics = null;
   }
@@ -33,5 +34,14 @@ export class PacerController {
 
   getSpeed() {
     return this.currentSpeed;
+  }
+
+  setWatts(watts) {
+    const nextWatts = Number(watts);
+    this.currentWatts = Number.isFinite(nextWatts) ? nextWatts : 0;
+  }
+
+  getWatts() {
+    return this.currentWatts;
   }
 }

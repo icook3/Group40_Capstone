@@ -119,7 +119,23 @@ export class zlowScreen {
         this.pacerPhysics.setSpeed(speed);
       }
     }
+
+    setPacerWatts(watts) {
+      this.pacerController?.setWatts(watts);
+    }
+
+    getPacerWatts() {
+      return this.pacerController?.getWatts?.() ?? 0;
+    }
     
+    setPacerTargets({ speed, watts }) {
+      if (speed !== undefined) {
+        this.setPacerSpeed(speed);
+      }
+      if (watts !== undefined) {
+        this.setPacerWatts(watts);
+      }
+    }
 
 
     //used for frequent updates in update method
