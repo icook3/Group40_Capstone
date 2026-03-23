@@ -318,4 +318,4 @@ async function handleDisconnect(ws) {
     await handleLeaveLobby(ws);
 }
 
-module.exports = { handleMessage, handleDisconnect }
+module.exports = { handleMessage, handleDisconnect, clients }

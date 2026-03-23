@@ -55,6 +55,10 @@ wss.on('connection', (ws) => {
     });
 });
 
-server.listen(PORT, () => {
-    console.log(`Lobby service running on port ${PORT}`);
-})
+if (require.main === module) {
+    server.listen(PORT, () => {
+        console.log(`Lobby service running on port ${PORT}`)
+    })
+}
+
+module.exports = { server, wss }
