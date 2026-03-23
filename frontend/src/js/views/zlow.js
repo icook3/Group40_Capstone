@@ -163,6 +163,7 @@ export class zlowScreen {
           this.pacer.setSpeed(Number(data.data));
           this.pacerPhysics.setSpeed(Number(data.data));
           //console.log("Setting pacer speed to ",data.data,this.pacerPhysics.getSpeed());
+          
           break;
         case "syncPlayers":
           if (this.scene && this.rider && this.pacer) {
@@ -705,9 +706,11 @@ export class zlowScreen {
         // Apply the computed speed to the pacer avatar
         owner.pacer.setSpeed(pacerSpeed);
         owner.pacerPhysics.setSpeed(pacerSpeed);
+        //owner.pacer.update(dt);
+      }
+      if (owner.pacer!=undefined) {
         owner.pacer.update(dt);
       }
-    
       // Let the ramp controller advance its state
       if (owner.workoutController) {
         const power = constants.riderState.power || 0;
