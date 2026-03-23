@@ -94,6 +94,7 @@ export class zlowScreen {
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
         
+        this.cleanup();
     }
 
     activatePacer() {
@@ -783,7 +784,7 @@ export class zlowScreen {
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
         onClose: () => {
-          this.cleanup();
+          //this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
@@ -916,7 +917,7 @@ export class zlowScreen {
       const menuBtn = getElement("menu-btn");
       menuBtn.addEventListener("click", () => {
         if (confirm("Return to Main Menu? Gameplay data will be lost.")) {
-          this.cleanup();
+          //this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
           }
         });
@@ -975,7 +976,7 @@ export class zlowScreen {
         window.__zlowTrackInstance = null;
 
         // Reset all constants
-        this.reset();
+        //this.reset();
 
         // Null out references so nothing carries over
         this.rider = null;
