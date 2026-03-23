@@ -160,16 +160,14 @@ export class zlowScreen {
           break;
         case "syncPlayers":
           if (this.scene && this.rider && this.pacer) {
-            const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
-            const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
+            const riderSyncPos = this.rider.avatarEntity.position;
+            const pacerSyncPos = this.pacer.avatarEntity.position;
             pacerSyncPos.z = riderSyncPos.z;
             
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
             document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-            this.pacer.avatarEntity.removeAttribute("animation__2");
-            this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
-            this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+            update_pacer_animation(this.scene.scene, true);
           }
           break;
       }
@@ -590,8 +588,12 @@ export class zlowScreen {
     
           // Set pacer constants to rider constants and adjust animation
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = constants.riderState.speed;
-          update_pacer_animation(this.scene.scene, true)
+          if (!this.connected) {
+            document.getElementById('pacer-speed').value = constants.riderState.speed;
+          } else {
+            document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
+          }
+          update_pacer_animation(this.scene.scene, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
