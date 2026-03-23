@@ -152,7 +152,7 @@ export class Track {
     }
 
     this.update_rider_animation();
-    update_pacer_animation(this.scene);
+    update_pacer_animation(this.scene, this);
     activatePacer();
   }
 
@@ -318,9 +318,9 @@ export function spawn_track(trackSystem) {
   }
 }
 
-export function update_pacer_animation(scene, update=false) {
+export function update_pacer_animation(scene, trackSystem, update=false) {
   if (constants.riderState.speed === 0) {
-      setTimeout(() => update_pacer_animation(scene), 500);
+      setTimeout(() => update_pacer_animation(scene, trackSystem), 500);
       return;
     }
 
@@ -331,7 +331,7 @@ export function update_pacer_animation(scene, update=false) {
 
   const BUFFER_POINTS = 10;
   if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track(this);
+    spawn_track(trackSystem);
   }
 
   const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
@@ -355,7 +355,7 @@ export function update_pacer_animation(scene, update=false) {
    const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
     pacer.position.set(coords.x, coords.y, coords.z);
   }).onComplete(() => {
-    update_pacer_animation(scene);
+    update_pacer_animation(scene, trackSystem);
   }).start();
   if (update) {console.log(animatePacer)}
   constants.pacerTween = animatePacer;
@@ -365,8 +365,7 @@ export function update_pacer_animation(scene, update=false) {
     requestAnimationFrame(animate);
   }
   requestAnimationFrame(animate);
-
-  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track(this);
+  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {    
+    spawn_track(trackSystem);
   }
 }

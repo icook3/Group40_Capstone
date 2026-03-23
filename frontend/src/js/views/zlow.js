@@ -39,6 +39,9 @@ export class zlowScreen {
     pacerPhysics;
     keyboardMode;
     standardMode;
+    /**
+     * @type {ZlowScene}
+     */
     scene;
     hud;
 
@@ -127,7 +130,7 @@ export class zlowScreen {
     sendPeerDataOver(speed) {
       //console.log("sending data: "+this.connected);
       if (this.connected&&this.conn.open) {
-        this.conn.send({name:"speed",data:speed})
+        this.conn.send({name:"speed",data:speed});
       }
     }
     
@@ -147,16 +150,19 @@ export class zlowScreen {
           if (this.peerState==1) {
             this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
+          //for debugging
+          window.pacer=this.pacer;
+          window.pacerPhysics=this.pacerPhysics;
           break;
         case "speed":
           //console.log("Set pacer speed to "+data.data);
           if (this.pacer==null) {
             return;
           }
-          this.activatePacer();
+          //this.activatePacer();
           this.pacer.setSpeed(Number(data.data));
           this.pacerPhysics.setSpeed(Number(data.data));
-          //console.log(this.pacer.speed);
+          //console.log("Setting pacer speed to ",data.data,this.pacerPhysics.getSpeed());
           break;
         case "syncPlayers":
           if (this.scene && this.rider && this.pacer) {
@@ -167,7 +173,7 @@ export class zlowScreen {
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
             document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-            update_pacer_animation(this.scene.scene, true);
+            update_pacer_animation(this.scene.scene, this.scene.track, true);
           }
           break;
       }
@@ -593,7 +599,7 @@ export class zlowScreen {
           } else {
             document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
           }
-          update_pacer_animation(this.scene.scene, true);
+          update_pacer_animation(this.scene.scene, this.scene.track, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
@@ -741,7 +747,7 @@ export class zlowScreen {
       getElement = (id) => document.getElementById(id),
       requestAnimationFrameFn = window.requestAnimationFrame,
     } = {}) {
-      this.reset();
+      //this.reset();
 
       window.__zlow = window.__zlow || {};
       window.__zlow.constants = constants;
@@ -818,6 +824,7 @@ export class zlowScreen {
       });
       this.physics = new PhysicsEngine();
     
+      //if you are in single-player mode, create the pacer
       if (this.peerState == 0) {
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
