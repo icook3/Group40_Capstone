@@ -35,6 +35,44 @@ export class PhysicsEngine {
     getSpeed() {
         return this.speed;
     }
+
+    static speedToWatts(speedKph, mass = constants.mass) {
+        if (!Number.isFinite(speedKph) || speedKph <= 0) return 0;
+
+        const v = constants.kmhToMs(speedKph);
+
+        // Drag force
+        const drag = constants.windResistance(v);
+
+        // Rolling resistance
+        const rolling = constants.crr * mass * constants.g;
+
+        // Total opposing force
+        const totalForce = drag + rolling;
+
+        // Power = force * velocity
+        return totalForce * v;
+    }
+
+    static wattsToSteadySpeed(targetWatts, mass = constants.mass) {
+        if (!Number.isFinite(targetWatts) || targetWatts <= 0) return 0;
+
+        let low = 0;
+        let high = 60; // km/h upper bound (safe for cycling)
+
+        for (let i = 0; i < 25; i++) {
+            const mid = (low + high) / 2;
+            const wattsAtMid = PhysicsEngine.speedToWatts(mid, mass);
+
+            if (wattsAtMid > targetWatts) {
+            high = mid;
+            } else {
+            low = mid;
+            }
+        }
+
+        return (low + high) / 2;
+    }
 }
 
 // Calculates acceleration to make speed increases gradual and more realistic
@@ -98,3 +136,4 @@ function calculateCoastingSpeed(currentSpeed, dt) {
     // Convert speed to km/s
     return constants.msToKmh(finalSpeed_ms);
 }
+
