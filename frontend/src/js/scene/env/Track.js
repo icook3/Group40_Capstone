@@ -336,10 +336,7 @@ export function update_pacer_animation(scene, update=false) {
       setTimeout(() => update_pacer_animation(scene), 500);
       return;
     }
-
-  constants.pacerCurrentTrackPiece += 1;
   const pacer = scene.getObjectByName("pacer-entity");
-  
   if (!pacer) return;
 
   const BUFFER_POINTS = 10;
@@ -353,9 +350,14 @@ export function update_pacer_animation(scene, update=false) {
     return;
   }
 
-  // Get pacer speed and determine next endpoint
+  // Get pacer and pacer speed and determine next endpoint
   const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
   if (pacerSpeed === 0) return;
+
+  // Increment track piece if not syncing players
+  if (!update) {
+    constants.pacerCurrentTrackPiece += 1;
+  }
 
   let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
   const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
@@ -372,10 +374,21 @@ export function update_pacer_animation(scene, update=false) {
   constants.pacerTween = animatePacer;
   }
 
-  // If the tween does exist, update it
+  // If syncing pacer/players, move pacer to the rider's position using tween
+  else if (update) {
+    const rider = scene.getObjectByName("rider");
+    constants.pacerTween.stop();
+    constants.pacerTween.to({ x: rider.position.x + 1, y: rider.position.y, z: rider.position.z }, 1).start();
+  }
+
+  // If the tween does exist, update it and check to see if more track is needed
   else {
       constants.pacerTween.stop();
       constants.pacerTween.to(endpoint, pacerDuration).start();
+
+      if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+        spawn_track(this);
+      }
     }
 
   // Helper function to animate pacer
@@ -384,8 +397,4 @@ export function update_pacer_animation(scene, update=false) {
     requestAnimationFrame(animate);
   }
   requestAnimationFrame(animate);
-
-  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track(this);
-  }
 }
