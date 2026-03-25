@@ -184,15 +184,39 @@ export class zlowScreen {
             const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
             const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
             pacerSyncPos.z = riderSyncPos.z;
-            
+
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+
             const riderSpeed = Number(constants.riderState.speed) || 0;
             this.setPacerSpeed(riderSpeed);
-            document.getElementById('pacer-speed').value = riderSpeed;
+
+            const pacerSpeedInput = document.getElementById("pacer-speed");
+            if (pacerSpeedInput) {
+              pacerSpeedInput.value = riderSpeed;
+            }
+
+            const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+            if (!tp) {
+              console.warn("[Peer Sync] Missing track point:", constants.pacerCurrentTrackPiece);
+              break;
+            }
+
+            const rawPacerSpeed = Number(this.pacerPhysics?.getSpeed?.());
+            const pacerSpeed =
+              Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
+
+            const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
             this.pacer.avatarEntity.removeAttribute("animation__2");
-            this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.pacerCurrentTrackPiece].x + 0.5} ${constants.trackPoints[constants.pacerCurrentTrackPiece].y} ${constants.trackPoints[constants.pacerCurrentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay:true;`);
-            this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+            this.pacer.avatarEntity.setAttribute(
+              "position",
+              `${pacerSyncPos.x} ${pacerSyncPos.y} ${pacerSyncPos.z}`
+            );
+            this.pacer.avatarEntity.setAttribute(
+              "animation__2",
+              `property: position; to: ${tp.x + 0.5} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay:true;`
+            );
           }
           break;
       }
