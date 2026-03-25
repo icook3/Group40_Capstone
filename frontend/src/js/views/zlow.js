@@ -913,10 +913,16 @@ export class zlowScreen {
       this.setupStopButton();
       
       document.addEventListener("keydown", (e) => {
+        if (keyboardMode==null) {
+          return;
+        }
         if (!this.keyboardMode.keyboardMode) return;
         this.keyboardMode.keyboardInputActive(e.key);
       });
       document.addEventListener("keyup", (e) => {
+        if (keyboardMode==null) {
+          return;
+        }
         if (!this.keyboardMode.keyboardMode) return;
         this.keyboardMode.stopKeyboardMode(e.key.toLowerCase());
       });
