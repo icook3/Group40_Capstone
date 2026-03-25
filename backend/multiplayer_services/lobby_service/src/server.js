@@ -1,39 +1,39 @@
 const http = require('http');
 const WebSocket = require('ws');
 const { handleMessage, handleDisconnect } = require('./handlers');
-const { authGuest } = require('./auth')
+const { authGuest } = require('./auth');
 
 const PORT = process.env.PORT || 4000;
 
 function sendJSON(res, status, data) {
-    res.writeHead(status, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify(data))
+    res.writeHead(status, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(data));
 }
 
 const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.url === '/auth/guest') {
-        let body = ''
+        let body = '';
 
         // Collect incoming request body chunks
-        req.on('data', chunk => body += chunk)
+        req.on('data', chunk => body += chunk);
 
         req.on('end', async () => {
             try {
-                const { display_name } = JSON.parse(body)
-                const result = await authGuest(display_name)
-                sendJSON(res, 200, result)
+                const { display_name } = JSON.parse(body);
+                const result = await authGuest(display_name);
+                sendJSON(res, 200, result);
             } catch (err) {
-                sendJSON(res, 400, { error: err.message })
+                sendJSON(res, 400, { error: err.message });
             }
-        })
+        });
     } else {
-        sendJSON(res, 404, { error: 'Not found' })
+        sendJSON(res, 404, { error: 'Not found' });
     }
 })
 
 // WebSocket server shares the same port as the HTTP server
 // ws handles the HTTP upgrade to WebSocket automatically
-const wss = new WebSocket.Server({ server })
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
     ws.isAuthenticated = false;
@@ -57,7 +57,7 @@ wss.on('connection', (ws) => {
 
 if (require.main === module) {
     server.listen(PORT, () => {
-        console.log(`Lobby service running on port ${PORT}`)
+        console.log(`Lobby service running on port ${PORT}`);
     })
 }
 
