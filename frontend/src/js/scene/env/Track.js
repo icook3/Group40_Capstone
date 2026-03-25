@@ -125,7 +125,6 @@ export class Track {
         .onComplete(() => {
           this.update_rider_animation();
         }).start();
-
     function animate(time) {
       animateRider.update(time);
       requestAnimationFrame(animate);
@@ -152,7 +151,7 @@ export class Track {
     }
 
     this.update_rider_animation();
-    update_pacer_animation(this.scene, this);
+    update_pacer_animation(this.scene, this,window.viewManager.viewStorage.zlowScreen);
     activatePacer();
   }
 
@@ -318,9 +317,9 @@ export function spawn_track(trackSystem) {
   }
 }
 
-export function update_pacer_animation(scene, trackSystem, update=false) {
+export function update_pacer_animation(scene, trackSystem, zlowView, update=false) {
   if (constants.riderState.speed === 0) {
-      setTimeout(() => update_pacer_animation(scene, trackSystem), 500);
+      setTimeout(() => update_pacer_animation(scene, trackSystem, zlowView), 500);
       return;
     }
 
@@ -340,7 +339,8 @@ export function update_pacer_animation(scene, trackSystem, update=false) {
     return;
   }
 
-  const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
+  //THIS IS WRONG - NEED TO ACCOUNT FOR MULTIPLAYER
+  const pacerSpeed = zlowView.pacerPhysics.speed;
   if (pacerSpeed === 0) return;
 
   let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
@@ -348,6 +348,7 @@ export function update_pacer_animation(scene, trackSystem, update=false) {
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
   if (update) {
+    console.log(constants.pacerTween)
     constants.pacerTween.stop();
     constants.pacerTween = null;
   }
@@ -355,9 +356,10 @@ export function update_pacer_animation(scene, trackSystem, update=false) {
    const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
     pacer.position.set(coords.x, coords.y, coords.z);
   }).onComplete(() => {
-    update_pacer_animation(scene, trackSystem);
+    update_pacer_animation(scene, trackSystem,zlowView);
   }).start();
   if (update) {console.log(animatePacer)}
+  console.log("Animate Pacer=",animatePacer);
   constants.pacerTween = animatePacer;
   
   function animate(time) {

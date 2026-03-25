@@ -173,8 +173,7 @@ export class zlowScreen {
             
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-            document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
-            update_pacer_animation(this.scene.scene, this.scene.track, true);
+            update_pacer_animation(this.scene.scene, this.scene.track, this, true);
           }
           break;
       }
@@ -597,10 +596,8 @@ export class zlowScreen {
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
           if (!this.connected) {
             document.getElementById('pacer-speed').value = constants.riderState.speed;
-          } else {
-            document.getElementById('pacer-speed').value = this.pacerPhysics.getSpeed();
           }
-          update_pacer_animation(this.scene.scene, this.scene.track, true);
+          update_pacer_animation(this.scene.scene, this.scene.track,this, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});

@@ -111,7 +111,7 @@ export class AvatarMovement {
             return;
         }
         //THIS IS CORRECT???
-        console.log("Avatar speed=",this.speed);
+        //console.log("Avatar speed=",this.speed);
         if (this.creator.leftPedalBone!=null) {
             this.animatePedalingBike(dt);
             this.animatePedalingPerson(dt);
