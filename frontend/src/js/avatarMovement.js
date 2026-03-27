@@ -119,11 +119,7 @@ export class AvatarMovement {
 
     //Setter for avatar speed
     setSpeed(speed) {
-        if (this.isPacer) {
-            this.speed = units.speedUnit.convertFrom(speed);
-        } else {
-            this.speed = speed;
-        }
+        this.speed = speed;
     }
 
     //Setter for avatar power
