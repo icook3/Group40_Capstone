@@ -20,7 +20,6 @@ import { NotificationManager } from "../notifications.js";
 import {initCrashReporter} from "../crashReporter.js";
 import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
-import { update_pacer_animation } from "../scene/env/Track.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
 
@@ -173,7 +172,7 @@ export class zlowScreen {
             
             // Set pacer constants to rider constants and adjust animation
             constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-            update_pacer_animation(this.scene.scene, this.scene.track, this, true);
+            this.scene.track.update_pacer_animation(this.scene.scene, this, true);
           }
           break;
       }
@@ -598,7 +597,7 @@ export class zlowScreen {
           if (!this.connected) {
             document.getElementById('pacer-speed').value = constants.riderState.speed;
           }
-          update_pacer_animation(this.scene.scene, this.scene.track,this, true);
+          this.scene.track.update_pacer_animation(this.scene.scene, this, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});

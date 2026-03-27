@@ -32,8 +32,6 @@ export class Track {
     this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
 
     this.update_rider_animation = this.update_rider_animation.bind(this);
-    this.update_pacer_animation = update_pacer_animation.bind(this);
-
     const geometry = new THREE.BoxGeometry(
       constants.pathWidth,
       constants.pathHeight,
@@ -136,8 +134,67 @@ export class Track {
     if (avatar.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track(this);
     }
-}
+  }
+  /**
+  * 
+  * @param {ZlowScene} scene 
+  * @param {zlowScreen} zlowView 
+  * @param {boolean} update 
+  * @returns void
+  */
+  update_pacer_animation(scene, zlowView, update=false) {
+    if (constants.riderState.speed === 0&&zlowView.connected==false) {
+      console.log("Not updating pacer animation - rider speed=0")
+      setTimeout(() => this.update_pacer_animation(scene, zlowView), 500);
+      return;
+    }
 
+    const pacer = scene.getObjectByName("pacer-entity");
+  
+    if (!pacer) return;
+
+    const BUFFER_POINTS = 10;
+    if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+      spawn_track(this);
+    }
+
+    const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+    if (!tp) {
+      console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
+      return;
+    }
+    console.log(zlowView);
+    constants.pacerCurrentTrackPiece += 1;
+    const pacerSpeed = zlowView.pacerPhysics.speed;
+    let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
+    const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
+    const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
+    if (update) {
+      console.log(constants.pacerTween);
+      constants.pacerTween.stop();
+      constants.pacerTween = null;
+    }
+    
+    //if (pacerSpeed === 0) return;
+    const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
+      pacer.position.set(coords.x, coords.y, coords.z);
+    }).onComplete(() => {
+      this.update_pacer_animation(scene,zlowView);
+    }).start();
+    if (update) {console.log(animatePacer)}
+    //console.log("Animate Pacer=",animatePacer);
+    constants.pacerTween = animatePacer;
+  
+    function animate(time) {
+      animatePacer.update(time);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+    if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {    
+      spawn_track(this);
+    }
+  }
 
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
@@ -154,7 +211,7 @@ export class Track {
 
     this.update_rider_animation();
 
-    update_pacer_animation(this.scene, this,window.viewManager.viewStorage.zlowScreen);
+    this.update_pacer_animation(this.scene,window.viewManager.viewStorage.zlowScreen);
     activatePacer();
   }
 
@@ -171,6 +228,7 @@ export class Track {
   _getPacer() {
     return this.scene.getObjectByName("pacer-entity");
   }
+
 }
 
 // Create and append a track piece curving to the right
@@ -317,68 +375,5 @@ export function spawn_track(trackSystem) {
         break; // stop if we've reached pieces the rider hasn't passed
       }
     }
-  }
-}
-
-/**
- * 
- * @param {ZlowScene} scene 
- * @param {Track} trackSystem 
- * @param {zlowScreen} zlowView 
- * @param {boolean} update 
- * @returns void
- */
-export function update_pacer_animation(scene, trackSystem, zlowView, update=false) {
-  if (constants.riderState.speed === 0&&zlowView.connected==false) {
-      console.log("Not updating pacer animaation - rider speed=0")
-      setTimeout(() => update_pacer_animation(scene, trackSystem, zlowView), 500);
-      return;
-    }
-
-  constants.pacerCurrentTrackPiece += 1;
-  const pacer = scene.getObjectByName("pacer-entity");
-  
-  if (!pacer) return;
-
-  const BUFFER_POINTS = 10;
-  if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track(trackSystem);
-  }
-
-  const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
-  if (!tp) {
-    console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
-    return;
-  }
-  console.log(zlowView.pacerPhysics.speed);
-  const pacerSpeed = zlowView.pacerPhysics.speed;
-  //if (pacerSpeed === 0) return;
-
-  let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
-  const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-  if (update) {
-    console.log(constants.pacerTween);
-    constants.pacerTween.stop();
-    constants.pacerTween = null;
-  }
-
-   const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
-    pacer.position.set(coords.x, coords.y, coords.z);
-  }).onComplete(() => {
-    update_pacer_animation(scene, trackSystem,zlowView);
-  }).start();
-  if (update) {console.log(animatePacer)}
-  //console.log("Animate Pacer=",animatePacer);
-  constants.pacerTween = animatePacer;
-  
-  function animate(time) {
-    animatePacer.update(time);
-    requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
-  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {    
-    spawn_track(trackSystem);
   }
 }
