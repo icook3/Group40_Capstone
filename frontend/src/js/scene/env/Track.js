@@ -7,6 +7,8 @@ import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.j
 import { constants } from "../../constants.js";
 import {getSign} from '../core/util.js';
 import  {activatePacer} from '../../main.js'
+import { ZlowScene } from "../index.js";
+import { zlowScreen } from "../../views/zlow.js";
 
 export class Track {
   constructor({ scene }) {
@@ -318,9 +320,16 @@ export function spawn_track(trackSystem) {
   }
 }
 
+/**
+ * 
+ * @param {ZlowScene} scene 
+ * @param {Track} trackSystem 
+ * @param {zlowScreen} zlowView 
+ * @param {boolean} update 
+ * @returns void
+ */
 export function update_pacer_animation(scene, trackSystem, zlowView, update=false) {
-  console.log("Calling update pacer animation function");
-  if (constants.riderState.speed === 0) {
+  if (constants.riderState.speed === 0&&zlowView.connected==false) {
       console.log("Not updating pacer animaation - rider speed=0")
       setTimeout(() => update_pacer_animation(scene, trackSystem, zlowView), 500);
       return;
@@ -341,17 +350,16 @@ export function update_pacer_animation(scene, trackSystem, zlowView, update=fals
     console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
     return;
   }
-  console.log(zlowView);
-  //THIS IS WRONG - NEED TO ACCOUNT FOR MULTIPLAYER
+  console.log(zlowView.pacerPhysics.speed);
   const pacerSpeed = zlowView.pacerPhysics.speed;
-  if (pacerSpeed === 0) return;
+  //if (pacerSpeed === 0) return;
 
   let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
   const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
   if (update) {
-    console.log(constants.pacerTween)
+    console.log(constants.pacerTween);
     constants.pacerTween.stop();
     constants.pacerTween = null;
   }
@@ -362,7 +370,7 @@ export function update_pacer_animation(scene, trackSystem, zlowView, update=fals
     update_pacer_animation(scene, trackSystem,zlowView);
   }).start();
   if (update) {console.log(animatePacer)}
-  console.log("Animate Pacer=",animatePacer);
+  //console.log("Animate Pacer=",animatePacer);
   constants.pacerTween = animatePacer;
   
   function animate(time) {
