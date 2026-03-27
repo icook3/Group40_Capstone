@@ -40,6 +40,21 @@ function encodeSessionJoin(player_id, player_count, duration_seconds) {
     return buf;
 }
 
+function encodeRiderInput(player_id, power, speed, x, y) {
+    const payloadLen = RIDER_SIZE;
+    const buf = Buffer.allocUnsafe(HEADER_SIZE + payloadLen);
+
+    writeHeader(buf, MSG.RIDER_INPUT, 0, payloadLen);
+
+    buf.writeUInt8(player_id, 7);
+    buf.writeUInt16BE(power, 8);
+    buf.writeUInt16BE(speed, 10);
+    buf.writeInt32BE(x, 12);
+    buf.writeInt32BE(y, 16);
+
+    return buf;
+}
+
 function encodeWorldState(riders, tickId) {
     // Payload: rider_count(1) + riders(13 each)
     const payloadLen = 1 + (riders.length * RIDER_SIZE);
@@ -134,7 +149,8 @@ module.exports = {
         sessionJoin: encodeSessionJoin,
         worldState: encodeWorldState,
         sessionEnd: encodeSessionEnd,
-        error: encodeError
+        error: encodeError,
+        riderInput:  encodeRiderInput
     },
     decode
 };
