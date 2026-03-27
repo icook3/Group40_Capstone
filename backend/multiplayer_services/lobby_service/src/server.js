@@ -3,7 +3,7 @@ const WebSocket = require('ws');
 const { handleMessage, handleDisconnect } = require('./handlers');
 const { authGuest } = require('./auth');
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.LOBBY_PORT || 4000;
 
 function sendJSON(res, status, data) {
     res.writeHead(status, { 'Content-Type': 'application/json' });

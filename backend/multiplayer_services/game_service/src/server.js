@@ -2,7 +2,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const { handleConnect, handleDisconnect, handleMessage, createSession } = require('./session');
 
-const PORT = process.env.PORT || 4003;
+const PORT = process.env.GAME_PORT || 4003;
 
 function sendJSON(res, status, data) {
     res.writeHead(status, { 'Content-Type': 'application/json' });
