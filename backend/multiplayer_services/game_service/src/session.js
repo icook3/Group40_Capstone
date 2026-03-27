@@ -97,9 +97,9 @@ async function handleConnect(ws) {
 
         // Start tick loop once one player has connected
         if (session.players.size === 1) {
-            session.started_at = Date.now()
+            session.started_at = Date.now();
             session.tick_interval = startTick(session, () => {
-                endSession(session_id, 0x01) // Duration reached
+                endSession(session_id, 0x01); // Duration reached
             });
         }
     } catch (err) {
