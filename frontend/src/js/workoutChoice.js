@@ -174,7 +174,7 @@ export function workoutChoice() {
     startBtn.addEventListener("click", () => {
       sessionStorage.setItem("SelectedWorkout", selected);
       const ps = document.getElementById("pacer-speed");
-      if (ps) sessionStorage.setItem("PacerSpeed", ps.value);
+      if (ps) localStorage.setItem("pacer-speed", ps.value);
       // Navigate into your app (same as your current file)
       if (sessionStorage.getItem("SelectedWorkout")==='peerServer') {
           viewManager.setView(viewManager.views.peerConnect);

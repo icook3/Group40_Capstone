@@ -13,7 +13,7 @@ class Units {
     weightUnit = new kg();
     setUnits() {
         //speed
-        switch(sessionStorage.getItem("SpeedUnit")) {
+        switch(localStorage.getItem("SpeedUnit")) {
             case "mph":
                 this.speedUnit = new mph();
                 break;
@@ -22,7 +22,7 @@ class Units {
                 break;
         }
         //distance
-        switch(sessionStorage.getItem("SpeedUnit")) {
+        switch(localStorage.getItem("SpeedUnit")) {
             case "mph":
                 this.distanceUnit = new mi();
                 break;
@@ -32,7 +32,7 @@ class Units {
         }
         //power - not fully implemented
         this.powerUnit = new W();
-        /*switch(sessionStorage.getItem("PowerUnit")) {
+        /*switch(localStorage.getItem("PowerUnit")) {
             case "mph":
                 break;
             default:
@@ -40,7 +40,7 @@ class Units {
                 break;
         }*/
         //weight
-        switch(sessionStorage.getItem("WeightUnit")) {
+        switch(localStorage.getItem("WeightUnit")) {
             case "lb":
                 this.weightUnit = new lb();
                 break;
