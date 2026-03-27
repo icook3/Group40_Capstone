@@ -4,6 +4,7 @@ import { changelogView } from "./changelog.js";
 import { constants } from "../constants.js";
 import { playerCustomizationView } from "./playerCustomization.js";
 import { connectToPeersView } from "./connectToPeers.js";
+import { cameraPref } from "./cameraPref.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -13,7 +14,7 @@ class ViewStorage {
     zlowScreen;
 }
 export class ViewManager {
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
+    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", cameraPref: "cameraPref"};
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
@@ -39,6 +40,7 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.changelog:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -46,6 +48,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(true);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
                 break;
             case this.views.peerConnect:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -53,6 +57,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(true);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
                 break;
             case this.views.playerCustomization:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -60,6 +66,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(true);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
                 break;
             case this.views.mainZlow:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -67,6 +75,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
                 break;
             default:
                 console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
@@ -75,6 +85,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
                 this.currentView=this.views.mainMenu;
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
@@ -100,6 +112,9 @@ export class ViewManager {
                 break;
             case this.views.connectToPeersView:
                 this.viewStorage.peerConnectScreen.reset();
+                break;
+            case this.views.cameraPref:
+                this.viewStorage.cameraPref.reset();
                 break;
         }
         //set the current page
@@ -127,6 +142,11 @@ export class ViewManager {
             case this.views.peerConnect:
                 if (this.viewStorage.peerConnectScreen.ready) {
                     this.viewStorage.peerConnectScreen.setPage();
+                }
+                break;
+            case this.views.cameraPref:
+                if (this.viewStorage.cameraPref.ready) {
+                    this.viewStorage.cameraPref.setPage();
                 }
                 break;
             default: 
