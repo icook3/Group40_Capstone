@@ -81,7 +81,7 @@ export class mainMenuView {
         // Units input
         // Speed unit toggle
         const speedBtns = document.querySelectorAll('.seg-btn[data-group="speed"]');
-        const savedSpeed = sessionStorage.getItem("SpeedUnit");
+        const savedSpeed = localStorage.getItem("SpeedUnit");
         if (savedSpeed) {
             speedBtns.forEach(btn => {
                 btn.classList.toggle("active", btn.dataset.unit === savedSpeed);
@@ -91,7 +91,7 @@ export class mainMenuView {
             btn.addEventListener("click", () => {
             speedBtns.forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            sessionStorage.setItem("SpeedUnit", btn.dataset.unit);
+            localStorage.setItem("SpeedUnit", btn.dataset.unit);
             let elements = document.getElementsByClassName("speedUnit");
                 for (let i = 0; i < elements.length; i++) {
                     elements.item(i).innerHTML = btn.dataset.unit;
@@ -100,7 +100,7 @@ export class mainMenuView {
         });
         // Weight unit toggle
         const weightBtns = document.querySelectorAll('.seg-btn[data-group="weight"]');
-        const savedWeight = sessionStorage.getItem("WeightUnit");
+        const savedWeight = localStorage.getItem("WeightUnit");
         if (savedWeight) {
             weightBtns.forEach(btn => {
                 btn.classList.toggle("active", btn.dataset.unit === savedWeight);
@@ -110,7 +110,7 @@ export class mainMenuView {
             btn.addEventListener("click", () => {
                 weightBtns.forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
-                sessionStorage.setItem("WeightUnit", btn.dataset.unit);
+                localStorage.setItem("WeightUnit", btn.dataset.unit);
                 let elements = document.getElementsByClassName("weightUnit");
                 for (let i = 0; i < elements.length; i++) {
                     elements.item(i).innerHTML = btn.dataset.unit;
@@ -204,7 +204,7 @@ function restrictNumberInput(input, maxDigits, min, max) {
 
         resizeInput(input);
 
-        sessionStorage.setItem(input.id, input.value);
+        localStorage.setItem(input.id, input.value);
     });
 
     input.addEventListener("change", () => {
