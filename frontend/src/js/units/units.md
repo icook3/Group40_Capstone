@@ -4,7 +4,7 @@ A class using the **Units** interface represents a unit conversion to/from the d
 
 ## Required methods/fields
 - **name** → `String`
-    - Returns the name of the unit. This is what is passed into sessionStorage when changing units, and what is displayed on the HUD
+    - Returns the name of the unit. This is what is passed into localStorage when changing units, and what is displayed on the HUD
 - **convertTo(Number)** → `Number`
     - Converts from the parameter in the default units to the new unit
 - **convertFrom(Number)** → `Number`

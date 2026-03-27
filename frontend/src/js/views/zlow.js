@@ -446,8 +446,8 @@ export class zlowScreen {
           this.setPacerSpeed(val);
         });
       } else {
-        if (sessionStorage.getItem("PacerSpeed") !== null) {
-          const val = Number(sessionStorage.getItem("PacerSpeed"));
+        if (localStorage.getItem("pacer-speed") !== null) {
+          const val = Number(localStorage.getItem("pacer-speed"));
           this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         } else {
@@ -661,6 +661,16 @@ export class zlowScreen {
       });
       if (this.peerState!=0) {
         pacerSyncBtn.innerHTML = "Sync Players";
+      }
+    }
+
+    setRiderWeight() {
+      if (localStorage.getItem("rider-weight")!=null) {
+        let weightNum = Number(localStorage.getItem("rider-weight"));
+        //ensure that it is a number
+        if (!isNaN(weightNum)) {
+          constants.riderMass = units.weightUnit.convertFrom(weightNum);
+        }
       }
     }
     checkIfAchievementsUnlocked() {
@@ -890,7 +900,7 @@ export class zlowScreen {
       // start notification manager and milestone tracker
       this.notificationManager = new NotificationManager();
       this.milestoneTracker = new MilestoneTracker(this.workoutSession, this.workoutStorage);
-      
+      this.setRiderWeight();
       //let tempWorkoutStorage=this.workoutStorage;
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
@@ -898,7 +908,7 @@ export class zlowScreen {
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
-    
+      
       this.workoutSession.start();
       this.milestoneTracker.reset();
     
