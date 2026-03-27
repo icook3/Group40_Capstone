@@ -149,12 +149,14 @@ export class Track {
           
           // Store as a constant to allow for reuse
           constants.riderTween = animateRider;
+          constants.riderStart = Date.now();
         }
         
-    // If the tween does exist, update it -- REM you don't need to update it's update and complete behavior, just where it's going
+    // If the tween does exist, update it
     else {
       constants.riderTween.stop();
       constants.riderTween.to(endpoint, riderDuration).start();
+      constants.riderStart = Date.now();
     }
 
     // Helper function animating using time
@@ -331,7 +333,7 @@ export function spawn_track(trackSystem) {
   }
 }
 
-export function update_pacer_animation(scene, update=false) {
+export function update_pacer_animation(scene, update=false, bridge=false) {
   if (constants.riderState.speed === 0) {
       setTimeout(() => update_pacer_animation(scene), 500);
       return;
@@ -361,7 +363,12 @@ export function update_pacer_animation(scene, update=false) {
 
   let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
   const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+  let pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
+  // If pacer was synced immediately prior to this loop, calculate remaining duration
+  if (bridge) {
+    pacerDuration = Math.round((tp.length / pacerSpeed) * 1500) * (1-((Date.now() - constants.riderStart)/constants.riderTween._duration))
+  }
 
   // If the tween governing the pacer doesn't exist, create it and store in constants
   if (!constants.pacerTween) {
@@ -374,17 +381,21 @@ export function update_pacer_animation(scene, update=false) {
   constants.pacerTween = animatePacer;
   }
 
-  // If syncing pacer/players, move pacer to the rider's position using tween
+  // If syncing pacer/players, move pacer to the rider's position using tween and trigger bridge animation
   else if (update) {
     const rider = scene.getObjectByName("rider");
     constants.pacerTween.stop();
-    constants.pacerTween.to({ x: rider.position.x + 1, y: rider.position.y, z: rider.position.z }, 1).start();
+    constants.pacerTween.to({ x: rider.position.x + 1, y: rider.position.y, z: rider.position.z }, 1).onComplete(() => {
+      update_pacer_animation(scene, false, true);
+    }).start();
   }
 
   // If the tween does exist, update it and check to see if more track is needed
   else {
       constants.pacerTween.stop();
-      constants.pacerTween.to(endpoint, pacerDuration).start();
+      constants.pacerTween.to(endpoint, pacerDuration).onComplete(() => {
+        update_pacer_animation(scene);
+      }).start();
 
       if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
         spawn_track(this);
