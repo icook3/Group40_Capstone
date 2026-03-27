@@ -144,13 +144,14 @@ export class Track {
     const rider = this._getRider();
     const pacer = this._getPacer();
 
-    if (!rider || !pacer) {
+    if (!rider) {
       // Retry if avatars haven't loaded yet
       setTimeout(() => this.initialize_animation(), 1000);
       return;
     }
 
     this.update_rider_animation();
+
     update_pacer_animation(this.scene, this,window.viewManager.viewStorage.zlowScreen);
     activatePacer();
   }
@@ -318,7 +319,9 @@ export function spawn_track(trackSystem) {
 }
 
 export function update_pacer_animation(scene, trackSystem, zlowView, update=false) {
+  console.log("Calling update pacer animation function");
   if (constants.riderState.speed === 0) {
+      console.log("Not updating pacer animaation - rider speed=0")
       setTimeout(() => update_pacer_animation(scene, trackSystem, zlowView), 500);
       return;
     }
@@ -338,7 +341,7 @@ export function update_pacer_animation(scene, trackSystem, zlowView, update=fals
     console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
     return;
   }
-
+  console.log(zlowView);
   //THIS IS WRONG - NEED TO ACCOUNT FOR MULTIPLAYER
   const pacerSpeed = zlowView.pacerPhysics.speed;
   if (pacerSpeed === 0) return;
