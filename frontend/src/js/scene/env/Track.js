@@ -143,14 +143,12 @@ export class Track {
   * @returns void
   */
   update_pacer_animation(scene, zlowView, update=false) {
-    if (constants.riderState.speed === 0&&zlowView.connected==false) {
-      console.log("Not updating pacer animation - rider speed=0")
+    if (constants.riderState.speed === 0 && zlowView.connected==false) {
       setTimeout(() => this.update_pacer_animation(scene, zlowView), 500);
       return;
     }
 
-    const pacer = scene.getObjectByName("pacer-entity");
-  
+    const pacer = this._getPacer();
     if (!pacer) return;
 
     const BUFFER_POINTS = 10;
@@ -158,17 +156,35 @@ export class Track {
       spawn_track(this);
     }
 
+    // Guard against out-of-range and undefined track points
     const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
     if (!tp) {
-      console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
+      console.warn(
+        "[Track] Missing pacer track point:", 
+        constants.pacerCurrentTrackPiece,
+        "trackPoints length:",
+        constants.trackPoints.length
+      );
       return;
     }
+
+
     console.log(zlowView);
-    constants.pacerCurrentTrackPiece += 1;
     const pacerSpeed = zlowView.pacerPhysics.speed;
+
+    // Increment current track piece and define starting and ending coordinates
+    constants.pacerCurrentTrackPiece += 1;
     let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
-    const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
-    const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+    if (constants.pacerCurrentTrackPiece > 0) {
+      const prev=constants.trackPoints[constants.pacerCurrentTrackPiece-1];
+      coords = { x: pacer.position.x+prev.x, y: pacer.position.y+prev.y, z: pacer.position.z+prev.z };
+    }
+
+    const next = constants.trackPoints[constants.pacerCurrentTrackPiece];
+    if (!next) return;
+
+    const endpoint = { x: next.x + 0.5, y: next.y, z: next.z };
+    const pacerDuration = Math.round((next.length / pacerSpeed) * 1500);
 
     if (update) {
       console.log(constants.pacerTween);
