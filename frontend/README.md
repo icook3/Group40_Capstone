@@ -26,10 +26,12 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 	- `images` — Contains a number of important images for different pages.
 		- `back.svg` — An icon to indicate going back to a previous page.
 		- `background.png` — The background for the peer menu and the changelog (temporary).
+		- `backgroundA.png` - The background used for the peer menu and changelog
 		- `calibrateTrainer.svg` — An icon used for the calibrate trainer button.
 		- `calories.svg` — The icon used to represent calories in the hud.
 		- `center-hud.svg` — A mask to shape the center of the hud, alongside some buttons on other pages.
 		- `connectTrainer.svg` — An icon used for the connect to peer button.
+		- `dev.svg` - Icon used for a toggle button
 		- `exit.svg` — An icon used for the exit to main menu button.
 		- `license.pdf` — The license for the calories and time images.
 		- `pacer.svg` — An icon used for the pacer speed input.
@@ -80,12 +82,16 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `playerCustomization.html` — Screen for customizing the player.
 		- `zlow.html` — Loads A-Frame scene and UI.
 	- `js` — Contains JavaScript code.
+		- `config` - Directory for configuration files
+			- `config.js` - Configuration file
+			- `configLoader.js` - Handles loading the configuration file
 		- `scene` - Handles scene generation.
 			- `core` — core utilities for scene generation.
 				- `Terrain.js` — Handles Terrain generation.
 				- `util.js` — Contains several utilities for scene generation.
 			- `env` — Handles the overall environment.
 				- `Cloud.js` — Handles creating the clouds above the scene.
+				- `GroundInstanced.js` - An instanced version of the ground plane
 				- `SceneryBand.js` — Handles creating the bands and object placement within.
 				- `SceneryManager.js` — Loads the config files from /policy.
 				- `Track.js` — Handles creating track template pieces.
@@ -104,6 +110,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 				- `test_multiband_cfg.js` — A test policy for multiple bands in one config file.
 			- `camera.js` — Handles updating various properties involving the camera.
 			- `index.js` — Sets up and updates the A-Frame 3D world.
+			- `mainMenuBackground.js` - Sets up the background for the main menu
 		- `units` — Handles various units and unit conversions.
 			- `index.js` — Sets up units, and provides references to the currently used unit conversions.
 			- `kg.js` — Handles unit conversions for Kilograms - the default weight unit.
@@ -124,7 +131,9 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `zlow.js` — Stores the main application, and handles setting it up when workouts are started. 
 		- `workouts` — Stores different workouts
 			- `RampTestController.js` — Handles a workout involving going up ramps
-	    - `avatarCreator.js` — Sets up A-Frame 3D avatar.
+			- `SprintIntervalController.js` - Handles the sprint interval workout
+			- `workouts.md` - Description of the workouts interface
+	  - `avatarCreator.js` — Sets up A-Frame 3D avatar.
 		- `avatarMovement.js` — Updates A-Frame 3D avatar.
 		- `bluetooth.js` — Handles Bluetooth device connection and data polling.
 		- `connectionProtocol.md` — Documentation on the protocol for peer-to-peer connection
@@ -137,6 +146,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `milestones.js` — Handles tracking for various milestones.
 		- `notifications.js` — Handles displaying notifications on the screen. 
 		- `pause_countdown.js` — Handles the countdown when the simulation is paused.
+		- `PhysicsEngine.js` - Handles the physics for the simulation
 		- `rideFile.js` — Handles creating TCX files. 
 		- `rideHistory.js` — Handles storing past ride data.
 		- `rideHistoryStore.js` — Creates a singleton rideHistory object for other objects to access. 
@@ -145,6 +155,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `strava.js` — Handles Strava OAuth and activity upload.
 		- `trainerCalibration.js` — Handles calibrating and connecting the trainer.
 		- `workoutChoice.js` — Handles the dropdown menu for choosing workouts
+		- `workoutMenu.js` - Handles the menu for workout choice
 		- `workoutSession.js` — Handles tracking statistics across a workout
 		- `workoutStorage.js` — Handles storing and loading workout data for best/worst
 		- `workoutSummary.js` — Handles the workout summary page
