@@ -22,6 +22,7 @@ import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
+import { achievementManager } from "../achievements/achievementManager.js";
 import { PacerController } from "../pacer.js";
 
 export class zlowScreen {
@@ -29,34 +30,91 @@ export class zlowScreen {
     ready=false;
 
     //other variables used in the main zlow app
+    /**
+     * @type {WorkoutStorage}
+     */
     workoutStorage;
+    /**
+     * @type {WorkoutSession}
+     */
     workoutSession;
+    /**
+     * @type {NotificationManager}
+     */
     notificationManager;
+    /**
+     * @type {MilestoneTracker}
+     */
     milestoneTracker;
+    /**
+     * @type {AvatarMovement}
+     */
     rider;
+    /**
+     * @type {AvatarMovement}
+     */
     pacer;
+    /**
+     * @type {PhysicsEngine}
+     */
     physics;
+    /**
+     * @type {PhysicsEngine}
+     */
     pacerPhysics;
+    /**
+     * @type {KeyboardMode}
+     */
     keyboardMode;
+    /**
+     * @type {StandardMode}
+     */
     standardMode;
+    /**
+     * @type {ZlowScene}
+     */
     scene;
+    /**
+     * @type {HUD}
+     */
     hud;
-
+    /**
+     * Can actually be any type of workout controller
+     * They all have the same methods
+     * @type {RampTestController}
+     */
     workoutController;
-
+    /**
+     * @type {string}
+     */
     selectedWorkout;
+    /**
+     * @type {string}
+     */
     workoutName;
     
     isRecording = false;
     rideElapsedMs=0;
+    /**
+     * @type {WorkoutSummary}
+     */
     workoutSummary;
+    /**
+     * @type {PauseCountdown}
+     */
     countdown;
     //0: not in peer-peer mode
     //1: host
     //2: peer
     peerState=0;
     connected = false;
+    /**
+     * @type {Peer}
+     */
     peer;
+    /**
+     * @type {Connection}
+     */
     conn;
 
     loopRunning=false;
@@ -75,6 +133,8 @@ export class zlowScreen {
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
+        //the first time you do a Zlow ride, unlock the welcome achievement
+        achievementManager.obtainAchievement("Welcome");
         this.initZlowApp();
         window.testNotifications = new NotificationManager();
     }
@@ -168,6 +228,8 @@ export class zlowScreen {
           if (this.peerState==1) {
             this.conn.send({name:"playerData", data:localStorage.getItem('playerData')});
           }
+          //Unlock the peer-to-peer achievement
+          achievementManager.obtainAchievement("PeerToPeer");
           break;
         case "speed":
           //console.log("Set pacer speed to "+data.data);
@@ -433,11 +495,9 @@ export class zlowScreen {
 
         this.setPacerSpeed(Number(pacerSpeedInput.value));
       } else {
-        if (sessionStorage.getItem("PacerSpeed") !== null) {
-          const val = Number(sessionStorage.getItem("PacerSpeed"));
-          this.scene = new ZlowScene(val, {
-            getPacerSpeed: () => this.pacerPhysics?.getSpeed?.() ?? 0
-          });
+        if (localStorage.getItem("pacer-speed") !== null) {
+          const val = Number(localStorage.getItem("pacer-speed"));
+          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         } else {
           const val = 20;
@@ -702,6 +762,64 @@ export class zlowScreen {
       }
     }
 
+    setRiderWeight() {
+      if (localStorage.getItem("rider-weight")!=null) {
+        let weightNum = Number(localStorage.getItem("rider-weight"));
+        //ensure that it is a number
+        if (!isNaN(weightNum)) {
+          constants.riderMass = units.weightUnit.convertFrom(weightNum);
+        }
+      }
+    }
+    checkIfAchievementsUnlocked() {
+        if(this.hud.totalDistance>=25) {
+          achievementManager.obtainAchievement("DistanceMilestone1");
+        }
+        if(this.hud.totalDistance>=50) {
+          achievementManager.obtainAchievement("DistanceMilestone2");
+        }
+        if(this.hud.totalDistance>=100) {
+          achievementManager.obtainAchievement("DistanceMilestone2");
+        }
+        if (constants.riderState.power>=75) {
+          achievementManager.obtainAchievement("PowerMilestone1");
+        }
+        if (constants.riderState.power>=150) {
+          achievementManager.obtainAchievement("PowerMilestone2");
+        }
+        if (constants.riderState.power>=300) {
+          achievementManager.obtainAchievement("PowerMilestone3");
+        }
+        if (constants.riderState.calories>=400) {
+          achievementManager.obtainAchievement("CaloriesMilestone1");
+        }
+        if (constants.riderState.calories>=800) {
+          achievementManager.obtainAchievement("CaloriesMilestone2");
+        }
+        if (constants.riderState.calories>=1500) {
+          achievementManager.obtainAchievement("CaloriesMilestone3");
+        }
+        if (this.workoutStorage.getCurrentStreak()>=7) {
+          achievementManager.obtainAchievement("StreakMilestone1");
+        }
+        if (this.workoutStorage.getCurrentStreak()>=14) {
+          achievementManager.obtainAchievement("StreakMilestone2");
+        }
+        if (this.workoutStorage.getCurrentStreak()>=30) {
+          achievementManager.obtainAchievement("StreakMilestone3");
+        }
+        //time
+        const elapsed = Math.floor((Date.now() - this.hud.startTime) / 1000);
+        if (elapsed>=30*60) {
+          achievementManager.obtainAchievement("TimeMilestone1");
+        }
+        if (elapsed>=1*60*60) {
+          achievementManager.obtainAchievement("TimeMilestone2");
+        }
+        if (elapsed>=2*60*60) {
+          achievementManager.obtainAchievement("TimeMilestone3");
+        }
+    }
     
     /**
      * MAIN ZLOW FLOW
@@ -829,6 +947,7 @@ export class zlowScreen {
           constants.riderState.distanceMeters || 0 // meters
         );
       }
+      owner.checkIfAchievementsUnlocked();
       owner.sendPeerDataOver(constants.riderState.speed);
       requestAnimationFrameFn(() =>
           owner.loop({ getElement, requestAnimationFrameFn, owner })
@@ -873,7 +992,7 @@ export class zlowScreen {
       // start notification manager and milestone tracker
       this.notificationManager = new NotificationManager();
       this.milestoneTracker = new MilestoneTracker(this.workoutSession, this.workoutStorage);
-      
+      this.setRiderWeight();
       //let tempWorkoutStorage=this.workoutStorage;
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
@@ -881,7 +1000,7 @@ export class zlowScreen {
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
-    
+      
       this.workoutSession.start();
       this.milestoneTracker.reset();
     
