@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { AvatarCreator } from "../avatarCreator.js";
+import { achievementManager } from "../achievements/achievementManager.js";
 export class playerCustomizationView {
     content;
     ready=false;
@@ -180,6 +181,7 @@ export class playerCustomizationView {
                 owner.models[currentModelIndex].toLowerCase(),
                 scene
             );
+            achievementManager.obtainAchievement("CreateACharacter");
         }
 
         owner.leftArrow.addEventListener("click", () => {
@@ -234,7 +236,7 @@ export class playerCustomizationView {
                     shoes = color;
                     break;
                 }
-
+                achievementManager.obtainAchievement("CreateACharacter");
                 //Apply all colors
                 avatar.setPlayerColors(skin, shirt, shorts, shoes);
             });
@@ -288,7 +290,7 @@ export class playerCustomizationView {
                         pedalCrank = color;
                         break;
                 }
-
+                achievementManager.obtainAchievement("CreateACharacter");
                 //Apply all bike colors
                 avatar.setBikeColors(
                     frame,
@@ -332,7 +334,7 @@ export class playerCustomizationView {
                         padding = color;
                         break;
                 }
-
+                achievementManager.obtainAchievement("CreateACharacter");
                 avatar.setHelmetColors(helmet, padding);
             });
         });
