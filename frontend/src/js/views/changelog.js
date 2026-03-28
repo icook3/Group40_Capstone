@@ -25,7 +25,7 @@ export class changelogView {
         if (this.useOrbitDebugMode) {
             const controls = new OrbitControls(this.camera, document.getElementById("changelogBody"));
             controls.target.set( 0, 5, 0 );
-	        controls.update();
+            controls.update();
         }
         document.getElementById("changelogBody").appendChild(this.renderer.domElement);
         this.renderer.setAnimationLoop((time)=>this.animate(time, this));
@@ -147,9 +147,9 @@ export class changelogView {
                     console.log(error);
                 });
             }
-            
+
         }
-        
+
     }
     placeOldTrees() {
         for (let i=0;i<this.oldTreeCount;i++) {
@@ -239,16 +239,16 @@ export class changelogView {
                     this.scene.add(gltf.scene);
                 }, undefined, function(error) {
                     console.log(error);
-                });                
+                });
             }
-            
+
         }
     }
     //place the track running along the back
     placeTrack() {
         const geometry = new THREE.BoxGeometry(1, 2, 0.1);
         const loader = new THREE.TextureLoader();
-        let texture = loader.load('../../../resources/textures/Track.jpeg', (texture) => {
+        let texture = loader.load('../../resources/textures/Track.jpeg', (texture) => {
             texture.colorSpace = THREE.SRGBColorSpace;
             const texMat = new THREE.MeshBasicMaterial({map: texture});
             for (let i=-this.grassX; i<this.grassX;i++) {
@@ -266,7 +266,7 @@ export class changelogView {
         const material1 = new THREE.MeshBasicMaterial({color:constants.groundColor1});
         const material2 = new THREE.MeshBasicMaterial({color:constants.groundColor2});
         const loader = new THREE.TextureLoader();
-        let texture = loader.load('../../../resources/textures/Grass.jpeg', (texture) => {
+        let texture = loader.load('../../resources/textures/Grass.jpeg', (texture) => {
             texture.colorSpace = THREE.SRGBColorSpace;
             const texMat = new THREE.MeshBasicMaterial({map: texture});
             let currentlyMat1=true;
@@ -324,7 +324,7 @@ export class changelogView {
                     currentlyMat1=!currentlyMat1;
                 }
                 currentlyMat1=!currentlyMat1;
-            }        
+            }
             //only new style grass
             for (let i=Math.round(this.grassX*0.25);i<this.grassX;i++) {
                 for (let j=-this.grassY;j<this.grassY;j++) {
@@ -332,10 +332,10 @@ export class changelogView {
                     grassPiece.position.x=i;
                     grassPiece.position.y=j;
                     this.scene.add(grassPiece);
-                    currentlyMat1=!currentlyMat1;                
+                    currentlyMat1=!currentlyMat1;
                 }
             }
-        });    
+        });
     }
     createBG() {
         this.scene = new THREE.Scene();

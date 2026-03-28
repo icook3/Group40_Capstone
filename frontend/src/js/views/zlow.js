@@ -2,7 +2,7 @@ import { TrainerBluetooth } from "../bluetooth.js";
 import { ZlowScene } from "../scene/index.js";
 import { HUD } from "../hud.js";
 import { Strava } from "../strava.js";
-import { constants } from "../constants.js";
+import {constants, features} from "../constants.js";
 import { AvatarMovement } from "../avatarMovement.js";
 import { KeyboardMode } from "../keyboardMode.js";
 import { StandardMode } from "../standardMode.js";
@@ -20,6 +20,7 @@ import { NotificationManager } from "../notifications.js";
 import {initCrashReporter} from "../crashReporter.js";
 import { PhysicsEngine } from "../PhysicsEngine.js";
 import { exportToStrava, saveTCX } from "../main.js";
+import { update_pacer_animation } from "../scene/env/Track.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
 import { achievementManager } from "../achievements/achievementManager.js";
@@ -153,6 +154,7 @@ export class zlowScreen {
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
         
+        this.cleanup();
     }
 
     activatePacer() {
@@ -198,6 +200,7 @@ export class zlowScreen {
           this.pacer = new AvatarMovement("pacer-entity", {
             position: { x: 0.5, y: 1, z: 0 },
             isPacer: false,
+              scene: this.scene.scene
           });
           this.pacer.creator.loadOtherData(data.data);
           this.pacerPhysics = new PhysicsEngine();
@@ -246,31 +249,31 @@ export class zlowScreen {
             let pacerPos = null;
     
             try {
-                const riderEl = document.getElementById("rider");
-                const pacerEl = document.getElementById("pacer");
-    
-                riderPos = riderEl?.getAttribute("position") || null;
-                pacerPos = pacerEl?.getAttribute("position") || null;
+                const rider = this.scene?.scene?.getObjectByName("rider");
+                const pacer = this.scene?.scene?.getObjectByName("pacer-entity");
+
+                if (rider) riderPos = { x: rider.position.x, y: rider.position.y, z: rider.position.z };
+                if (pacer) pacerPos = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
             } catch {}
     
-            let aframeStats = null;
+            let rendererStats = null;
     
             try {
-                const rideScene = AFRAME?.scenes?.[0];
-                const info = rideScene?.renderer?.info;
-    
-                if (rideScene && info) {
-                    aframeStats = {
+                const renderer = this.scene?.renderer;
+                const info = renderer?.info;
+
+                if (info) {
+                    rendererStats = {
                         geometries: info.memory?.geometries,
                         textures: info.memory?.textures,
                         programs: info.programs?.length,
                         drawCalls: info.render?.calls,
                         triangles: info.render?.triangles,
-                        entities: rideScene.querySelectorAll('a-entity')?.length,
+                        sceneObjects: this.scene?.scene?.children?.length,
                     };
                 }
             } catch (e) {
-                aframeStats = { error: "failed to read aframe stats" };
+                rendererStats = { error: "failed to read renderer stats" };
             }
 
             let tempPeerState = this.peerState;
@@ -285,7 +288,7 @@ export class zlowScreen {
                 riderPosition: riderPos,
                 pacerPosition: pacerPos,
     
-                aframe: aframeStats,
+                renderer: rendererStats,
     
                 testMode: localStorage.getItem("testMode"),
                 trainerConnected: !!this.standardMode?.trainer?.isConnected,
@@ -431,10 +434,13 @@ export class zlowScreen {
       }
     }
 
+    initializeScene() {
+        this.scene = new ZlowScene();
+    }
+
     initializePacerSpeedInput() {
       if (localStorage.getItem("testMode") == "true") {
         const pacerSpeedInput = document.getElementById("pacer-speed");
-        this.scene = new ZlowScene(Number(pacerSpeedInput.value));
         pacerSpeedInput.addEventListener("input", () => {
           const val = Number(pacerSpeedInput.value);
           this.setPacerSpeed(val);
@@ -452,7 +458,6 @@ export class zlowScreen {
           this.setPacerSpeed(val);
         } else {
           const val = 20;
-          this.scene = new ZlowScene(val);
           this.setPacerSpeed(val);
         }
       }
@@ -600,8 +605,7 @@ export class zlowScreen {
                 
             // Reset pacer
             this.setPacerSpeed(0);
-            const startPos = { x: 0.5, y: 1, z: -2 };
-            this.pacer.avatarEntity.setAttribute("position", startPos);
+            this.pacer.avatarEntity.position.set(0.5, 1, -2);
             constants.pacerStarted = false;
     
             // Start a new session for next workout
@@ -643,17 +647,14 @@ export class zlowScreen {
       pacerSyncBtn.addEventListener("click", () => {
         //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
-          const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
-          const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
+          const riderSyncPos = this.rider.avatarEntity.position;
+          const pacerSyncPos = this.pacer.avatarEntity.position;
           pacerSyncPos.z = riderSyncPos.z;
     
           // Set pacer constants to rider constants and adjust animation
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
           document.getElementById('pacer-speed').value = constants.riderState.speed;
-          //pacerPhysics.setSpeed(constants.riderState.speed);
-          this.pacer.avatarEntity.removeAttribute("animation__2");
-          this.pacer.avatarEntity.setAttribute("animation__2", `property: position; to: ${constants.trackPoints[constants.currentTrackPiece].x + 0.5} ${constants.trackPoints[constants.currentTrackPiece].y} ${constants.trackPoints[constants.currentTrackPiece].z}; dur: ${this.rider.avatarEntity.getAttribute("animation__1").dur}; easing: linear; loop: false; autoplay: true;`);
-          this.pacer.avatarEntity.setAttribute("position", pacerSyncPos);
+          update_pacer_animation(this.scene.scene, true)
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
@@ -879,8 +880,9 @@ export class zlowScreen {
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
       
-      this.createCrashReporter();
-    
+      if (features.crashReporterEnabled) {
+          this.createCrashReporter();
+      }
       // initialize peer-to-peer connection
       this.initPeerToPeer();
       this.selectedWorkout = sessionStorage.getItem("SelectedWorkout") || "free";
@@ -905,6 +907,7 @@ export class zlowScreen {
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
         onClose: () => {
+          //this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
@@ -926,10 +929,13 @@ export class zlowScreen {
       }
     
       this.countdown = new PauseCountdown({ getElement, limit: 10 });
-    
+
+      this.initializeScene();
+
       this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },
         isPacer: false,
+        scene: this.scene.scene
       });
       this.physics = new PhysicsEngine();
     
@@ -937,6 +943,7 @@ export class zlowScreen {
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
           isPacer: true,
+          scene: this.scene.scene
         });
         this.pacerPhysics = new PhysicsEngine();
         this.pacer.creator.setPacerColors();
@@ -963,9 +970,9 @@ export class zlowScreen {
           devHud.hidden = !devHud.hidden;
         });
       }
-      this.initializePacerSpeedInput();    
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
+      this.initializePacerSpeedInput();
 
       // Dismiss trainer and dev menus when clicking outsideof their pop up
       document.addEventListener("click", (e) => {
@@ -1030,6 +1037,14 @@ export class zlowScreen {
       this.loop();
       this.setupPacerSyncButton();
 
+      const menuBtn = getElement("menu-btn");
+      menuBtn.addEventListener("click", () => {
+        if (confirm("Return to Main Menu? Gameplay data will be lost.")) {
+          //this.cleanup();
+          viewManager.setView(viewManager.views.mainMenu);
+          }
+        });
+
 
     
       // Calorie reset button
@@ -1065,5 +1080,41 @@ export class zlowScreen {
           rideHistory.lastSecond = val; },
         getLastHistorySecond: () => rideHistory.lastSecond,
       };
+    }
+
+    cleanup() {
+        // Stop the loop first
+        this.loopRunning = false;
+
+        // Destroy the scene (renderer, ground, track, clouds, scenery)
+        this.scene?.destroy();
+        this.scene = null;
+
+        // Remove the Three.js canvas from the DOM
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.remove();
+
+        // Clear singleton guards so fresh instances are created
+        window.__zlowSceneInstance = null;
+        window.__zlowTrackInstance = null;
+
+        // Reset all constants
+        //this.reset();
+
+        // Null out references so nothing carries over
+        this.rider = null;
+        this.pacer = null;
+        this.physics = null;
+        this.pacerPhysics = null;
+        this.hud = null;
+        this.rampController = null;
+        this.workoutSession = null;
+        this.workoutStorage = null;
+        this.milestoneTracker = null;
+        this.notificationManager = null;
+        this.keyboardMode = null;
+        this.standardMode = null;
+        this.countdown = null;
+        this.workoutSummary = null;
     }
 }
