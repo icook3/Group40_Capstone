@@ -1,0 +1,78 @@
+#menuAchievementsBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 250px;
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
+#clearAllAchievements {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    /* Background color */
+    background: rgb(53, 72, 79);
+    padding: 15px;
+    border-radius: 30px;
+    width: 250px;
+    margin: 0;
+    font-family: sans-serif;
+    color: #fff;
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.5em;
+}
+#achievementsTableWrapper {
+    position: fixed;
+    height:75%;
+    overflow-y: scroll;
+    top:25%;
+    left:10%;
+    width:75%;
+    overflow-x:scroll;
+}
+#achievementsTable {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.achievementsTableSpot {
+    border-color:black;
+    border-width: 5px;
+    border-style:solid;
+}
+.achievementImg {
+    width:100%;
+    display:block;
+}
+
+.achievementNotObtainedImg {
+    filter:grayscale(100%);
+}
+.achievementName {
+    left:0%;
+}
+.achievementsTableInnerDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+}
+.achievementsTableOuterDiv {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
