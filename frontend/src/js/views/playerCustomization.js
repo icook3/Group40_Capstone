@@ -19,11 +19,13 @@ export class playerCustomizationView {
         document.getElementById("mainDiv").innerHTML=this.content;
         this.stopLoop=false;
         this.createAvatar();
-        const colorPicker = document.getElementById("colorPicker");
-        this.createGenderLabels();
+        this.initBackButton();
+        this.initTabs();
+        this.initGenderToggle();
         this.initPlayerColors();
         this.initBikeColors();
         this.initHelmetColors();
+        this.initSwatchHitboxes();
 
         this.setInitialPickerValues();
 
@@ -35,9 +37,7 @@ export class playerCustomizationView {
     avatar;
     scene;
     models;
-    genderLabel;
-    leftArrow;
-    rightArrow;
+
     stopLoop = true;
     createAvatar() {
         this.scene = document.querySelector("#playerCustomizerScene");
@@ -61,45 +61,68 @@ export class playerCustomizationView {
         );
     }
 
-    createGenderLabels() {
-        this.models = ["Male", "Female"];
 
-        this.genderLabel = document.getElementById("genderLabel");
-        this.leftArrow = document.getElementById("leftArrow");
-        this.rightArrow = document.getElementById("rightArrow");
-        this.initGenderLabel();
+
+    initBackButton() {
+        document.getElementById("customize-back").addEventListener("click", () => {
+            viewManager.setView(viewManager.views.mainMenu);
+        });
     }
 
-    initGenderLabel({owner=this}={}) {
+    initTabs() {
+        const tabButtons = document.querySelectorAll("#customize-tabs .seg-btn");
+        const playerTab = document.getElementById("player-tab");
+        const bikeTab = document.getElementById("bike-tab");
+
+        tabButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                // Update active button
+                tabButtons.forEach((b) => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                // Show the matching tab
+                if (btn.dataset.tab === "player") {
+                    playerTab.style.display = "";
+                    bikeTab.style.display = "none";
+                } else {
+                    playerTab.style.display = "none";
+                    bikeTab.style.display = "";
+                }
+            });
+        });
+    }
+
+    initGenderToggle({owner=this}={}) {
         if (owner.stopLoop) {
             return;
         }
         if (!window.avatarInstance) {
-            requestAnimationFrame(()=>owner.initGenderLabel({owner}));
+            requestAnimationFrame(()=>owner.initGenderToggle({owner}));
             return;
         }
 
-        const savedModel = window.avatarInstance.playerModel || "male";
-        let currentModelIndex = savedModel.toLowerCase() === "female" ? 1 : 0;
-        this.genderLabel.textContent = this.models[currentModelIndex];
+        const maleBtn = document.getElementById("gender-male");
+        const femaleBtn = document.getElementById("gender-female");
 
-        function updateGenderDisplay() {
-            owner.genderLabel.textContent = owner.models[currentModelIndex];
-            window.avatarInstance.setPlayerModel(
-                owner.models[currentModelIndex].toLowerCase()
-            );
-            achievementManager.obtainAchievement("CreateACharacter");
+        // Sets initial state from saved char
+        const savedModel = window.avatarInstance.playerModel || "male";
+        if (savedModel.toLowerCase() === "female") {
+            maleBtn.classList.remove("active");
+            femaleBtn.classList.add("active");
         }
 
-        owner.leftArrow.addEventListener("click", () => {
-            currentModelIndex =
-                (currentModelIndex - 1 + owner.models.length) % owner.models.length;
-            updateGenderDisplay();
+        maleBtn.addEventListener("click", () => {
+            maleBtn.classList.add("active");
+            femaleBtn.classList.remove("active");
+            window.avatarInstance.setPlayerModel("male");
+            achievementManager.obtainAchievement("CreateACharacter");
         });
 
-        this.rightArrow.addEventListener("click", () => {
-            currentModelIndex = (currentModelIndex + 1) % owner.models.length;
-            updateGenderDisplay();
+        femaleBtn.addEventListener("click", () => {
+            femaleBtn.classList.add("active");
+            maleBtn.classList.remove("active");
+            window.avatarInstance.setPlayerModel("female");
+            achievementManager.obtainAchievement("CreateACharacter");
         });
     }
 
@@ -113,7 +136,7 @@ export class playerCustomizationView {
         }
 
         const colorPickers = document.querySelectorAll(
-            "#playerControls .color-picker"
+            "#player-tab .color-picker"
         );
 
         colorPickers.forEach((picker) => {
@@ -159,7 +182,7 @@ export class playerCustomizationView {
         }
 
         const colorPickers = document.querySelectorAll(
-            "#bikeControls .color-picker"
+            "#bike-tab .color-picker"
         );
 
         colorPickers.forEach((picker) => {
@@ -221,7 +244,7 @@ export class playerCustomizationView {
         }
 
         const colorPickers = document.querySelectorAll(
-            '#playerControls .color-picker[data-mat="Helmet"], #playerControls .color-picker[data-mat="Padding"]'
+            '#player-tab .color-picker[data-mat="Helmet"], #player-tab .color-picker[data-mat="Padding"]'
         );
 
         colorPickers.forEach((picker) => {
@@ -248,6 +271,19 @@ export class playerCustomizationView {
         });
     }
 
+    initSwatchHitboxes() {
+        const swatches = document.querySelectorAll(".customize-swatch");
+        swatches.forEach((swatch) => {
+            swatch.addEventListener("click", (e) => {
+                // This prevents it from triggering if already triggered
+                if (e.target.tagName === "INPUT") return;
+                const input = swatch.querySelector("input[type='color']");
+                if (input) input.click();
+            });
+        });
+    }
+
+
     setInitialPickerValues({owner=this}={}) {
         if (owner.stopLoop) {
             return;
@@ -260,42 +296,42 @@ export class playerCustomizationView {
         const avatar = window.avatarInstance;
 
         document.querySelector(
-            '#playerControls .color-picker[data-mat="Skin"]'
+            '#player-tab .color-picker[data-mat="Skin"]'
         ).value = avatar.skinColor;
         document.querySelector(
-            '#playerControls .color-picker[data-mat="Shirt"]'
+            '#player-tab .color-picker[data-mat="Shirt"]'
         ).value = avatar.shirtColor;
         document.querySelector(
-            '#playerControls .color-picker[data-mat="Shorts"]'
+            '#player-tab .color-picker[data-mat="Shorts"]'
         ).value = avatar.shortsColor;
         document.querySelector(
-            '#playerControls .color-picker[data-mat="Shoes"]'
+            '#player-tab .color-picker[data-mat="Shoes"]'
         ).value = avatar.shoesColor;
 
         document.querySelector(
-            '#bikeControls .color-picker[data-mat="Frame_Mat"]'
+            '#bike-tab .color-picker[data-mat="Frame_Mat"]'
         ).value = avatar.bikeFrameColor;
         document.querySelector(
-            '#bikeControls .color-picker[data-mat="Tire_Mat"]'
+            '#bike-tab .color-picker[data-mat="Tire_Mat"]'
         ).value = avatar.bikeTireColor;
         document.querySelector(
-            '#bikeControls .color-picker[data-mat="Grip_Mat"]'
+            '#bike-tab .color-picker[data-mat="Grip_Mat"]'
         ).value = avatar.bikeGripColor;
         document.querySelector(
-            '#bikeControls .color-picker[data-mat="Seat_Mat"]'
+            '#bike-tab .color-picker[data-mat="Seat_Mat"]'
         ).value = avatar.bikeSeatColor;
         document.querySelector(
-            '#bikeControls .color-picker[data-mat="Pedal_Mat"]'
+            '#bike-tab .color-picker[data-mat="Pedal_Mat"]'
         ).value = avatar.bikePedalColor;
         document.querySelector(
-            '#bikeControls .color-picker[data-mat="PedalCrank_Mat"]'
+            '#bike-tab .color-picker[data-mat="PedalCrank_Mat"]'
         ).value = avatar.bikeCrankColor;
 
         document.querySelector(
-            '#playerControls .color-picker[data-mat="Helmet"]'
+            '#player-tab .color-picker[data-mat="Helmet"]'
         ).value = avatar.helmetColor;
         document.querySelector(
-            '#playerControls .color-picker[data-mat="Padding"]'
+            '#player-tab .color-picker[data-mat="Padding"]'
         ).value = avatar.helmetPaddingColor;
     }
 }
