@@ -1,4 +1,5 @@
 import { AvatarCreator } from "../avatarCreator.js";
+import { achievementManager } from "../achievements/achievementManager.js";
 export class playerCustomizationView {
     content;
     ready=false;
@@ -114,12 +115,14 @@ export class playerCustomizationView {
             maleBtn.classList.add("active");
             femaleBtn.classList.remove("active");
             window.avatarInstance.setPlayerModel("male");
+            achievementManager.obtainAchievement("CreateACharacter");
         });
 
         femaleBtn.addEventListener("click", () => {
             femaleBtn.classList.add("active");
             maleBtn.classList.remove("active");
             window.avatarInstance.setPlayerModel("female");
+            achievementManager.obtainAchievement("CreateACharacter");
         });
     }
 
@@ -163,7 +166,7 @@ export class playerCustomizationView {
                     shoes = color;
                     break;
                 }
-
+                achievementManager.obtainAchievement("CreateACharacter");
                 //Apply all colors
                 avatar.setPlayerColors(skin, shirt, shorts, shoes);
             });
@@ -218,7 +221,7 @@ export class playerCustomizationView {
                         pedalCrank = color;
                         break;
                 }
-
+                achievementManager.obtainAchievement("CreateACharacter");
                 //Apply all bike colors
                 avatar.setBikeColors(
                     frame,
@@ -262,7 +265,7 @@ export class playerCustomizationView {
                         padding = color;
                         break;
                 }
-
+                achievementManager.obtainAchievement("CreateACharacter");
                 avatar.setHelmetColors(helmet, padding);
             });
         });
