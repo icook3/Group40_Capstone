@@ -1,3 +1,4 @@
+import { achievementManager } from "./achievements/achievementManager.js";
 export function buildTCX({ samples, kmhToMs }) {
     if (!samples || samples.length < 2) return null;
 
@@ -5,7 +6,7 @@ export function buildTCX({ samples, kmhToMs }) {
         xmlTCXHeader() +
         buildActivity(samples, kmhToMs) +
         xmlTCXFooter();
-
+    achievementManager.obtainAchievement("TCXExport");
     return tcx;
 }
 

@@ -4,6 +4,7 @@ import { changelogView } from "./changelog.js";
 import { constants } from "../constants.js";
 import { playerCustomizationView } from "./playerCustomization.js";
 import { connectToPeersView } from "./connectToPeers.js";
+import { achievementsView } from "./achievements.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -11,9 +12,10 @@ class ViewStorage {
     peerConnectScreen;
     playerCustomizationScreen;
     zlowScreen;
+    achievements;
 }
 export class ViewManager {
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow"};
+    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", achievements: "achievements"};
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
@@ -38,6 +40,7 @@ export class ViewManager {
                 this.viewStorage.zlowScreen = new zlowScreen(false);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 break;
             case this.views.changelog:
@@ -45,6 +48,7 @@ export class ViewManager {
                 this.viewStorage.zlowScreen = new zlowScreen(false);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(true);
                 break;
             case this.views.peerConnect:
@@ -52,6 +56,7 @@ export class ViewManager {
                 this.viewStorage.zlowScreen = new zlowScreen(false);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(true);
+                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 break;
             case this.views.playerCustomization:
@@ -59,6 +64,7 @@ export class ViewManager {
                 this.viewStorage.zlowScreen = new zlowScreen(false);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(true);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 break;
             case this.views.mainZlow:
@@ -66,6 +72,15 @@ export class ViewManager {
                 this.viewStorage.zlowScreen = new zlowScreen(true);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                break;
+            case this.views.achievements:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(true);
                 this.viewStorage.changelog = new changelogView(false);
                 break;
             default:
@@ -79,8 +94,6 @@ export class ViewManager {
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
         }
-        
-
     }
 
     setView(view) {
@@ -100,6 +113,9 @@ export class ViewManager {
                 break;
             case this.views.connectToPeersView:
                 this.viewStorage.peerConnectScreen.reset();
+                break;
+            case this.views.achievements:
+                this.viewStorage.achievements.reset();
                 break;
         }
         //set the current page
@@ -129,12 +145,16 @@ export class ViewManager {
                     this.viewStorage.peerConnectScreen.setPage();
                 }
                 break;
+            case this.views.achievements:
+                if (this.viewStorage.achievements.ready) {
+                    this.viewStorage.achievements.setPage();
+                }
+                break;
             default: 
-                console.log("This view is not available!");
+                console.error("This view is not available!");
                 return;
                 break;
         }
-
         this.currentView=view;
         sessionStorage.setItem("currentView",this.currentView);
     }
