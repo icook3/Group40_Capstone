@@ -220,6 +220,52 @@ export class zlowScreen {
       };
     }
 
+    syncPacerToRiderPositionAndSpeed() {
+      if (!this.scene || !this.rider || !this.pacer) {
+        return;
+      }
+
+      const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
+      const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
+
+      // Snap pacer to rider z
+      pacerSyncPos.z = riderSyncPos.z;
+
+      // Match pacer speed to rider speed
+      const riderSpeed = Number(constants.riderState.speed) || 0;
+      this.setPacerSpeed(riderSpeed);
+
+      // Update dev input so UI reflects the same value
+      const pacerSpeedInput = document.getElementById("pacer-speed");
+      if (pacerSpeedInput) {
+        pacerSpeedInput.value = riderSpeed;
+      }
+
+      // Sync track piece index
+      constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
+
+      const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+      if (!tp) {
+        console.warn("[Pacer Sync] Missing track point:", constants.pacerCurrentTrackPiece);
+        return;
+      }
+
+      const rawPacerSpeed = Number(this.pacerPhysics?.getSpeed?.());
+      const pacerSpeed =
+        Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
+
+      const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
+      this.pacer.avatarEntity.removeAttribute("animation__2");
+      this.pacer.avatarEntity.setAttribute(
+        "position",
+        `${pacerSyncPos.x} ${pacerSyncPos.y} ${pacerSyncPos.z}`
+      );
+      this.pacer.avatarEntity.setAttribute(
+        "animation__2",
+        `property: position; to: ${tp.x + 0.5} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`
+      );
+    }
 
     //used for frequent updates in update method
     sendPeerDataOver(speed) {
@@ -265,44 +311,7 @@ export class zlowScreen {
           //console.log(this.pacer.speed);
           break;
         case "syncPlayers":
-          if (this.scene && this.rider && this.pacer) {
-            const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
-            const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
-            pacerSyncPos.z = riderSyncPos.z;
-
-            // Set pacer constants to rider constants and adjust animation
-            constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-
-            const riderSpeed = Number(constants.riderState.speed) || 0;
-            this.setPacerSpeed(riderSpeed);
-
-            const pacerSpeedInput = document.getElementById("pacer-speed");
-            if (pacerSpeedInput) {
-              pacerSpeedInput.value = riderSpeed;
-            }
-
-            const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
-            if (!tp) {
-              console.warn("[Peer Sync] Missing track point:", constants.pacerCurrentTrackPiece);
-              break;
-            }
-
-            const rawPacerSpeed = Number(this.pacerPhysics?.getSpeed?.());
-            const pacerSpeed =
-              Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
-
-            const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-            this.pacer.avatarEntity.removeAttribute("animation__2");
-            this.pacer.avatarEntity.setAttribute(
-              "position",
-              `${pacerSyncPos.x} ${pacerSyncPos.y} ${pacerSyncPos.z}`
-            );
-            this.pacer.avatarEntity.setAttribute(
-              "animation__2",
-              `property: position; to: ${tp.x + 0.5} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay:true;`
-            );
-          }
+          this.syncPacerToRiderPositionAndSpeed();
           break;
       }
     }
@@ -752,56 +761,10 @@ export class zlowScreen {
     }
     
     setupPacerSyncButton() {
-      const pacerSyncBtn = document.getElementById("pacer-sync-btn");
-
-      pacerSyncBtn.addEventListener("click", () => {
-        if (this.scene && this.rider && this.pacer) {
-          const riderSyncPos = this.rider.avatarEntity.getAttribute("position");
-          const pacerSyncPos = this.pacer.avatarEntity.getAttribute("position");
-
-          // Snap pacer to rider z
-          pacerSyncPos.z = riderSyncPos.z;
-
-          // Match pacer speed to rider speed
-          const riderSpeed = Number(constants.riderState.speed) || 0;
-          this.setPacerSpeed(riderSpeed);
-
-          // Update dev input so UI reflects the same value
-          const pacerSpeedInput = document.getElementById("pacer-speed");
-          if (pacerSpeedInput) {
-            pacerSpeedInput.value = riderSpeed;
-          }
-
-          // Sync track piece index
-          constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-
-          const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
-          if (!tp) {
-            console.warn("[Pacer Sync] Missing track point:", constants.pacerCurrentTrackPiece);
-            return;
-          }
-
-          const rawPacerSpeed = Number(this.pacerPhysics?.getSpeed?.());
-          const pacerSpeed =
-            Number.isFinite(rawPacerSpeed) && rawPacerSpeed > 0 ? rawPacerSpeed : 1;
-
-          const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-          this.pacer.avatarEntity.removeAttribute("animation__2");
-          this.pacer.avatarEntity.setAttribute(
-            "position",
-            `${pacerSyncPos.x} ${pacerSyncPos.y} ${pacerSyncPos.z}`
-          );
-          this.pacer.avatarEntity.setAttribute(
-            "animation__2",
-            `property: position; to: ${tp.x + 0.5} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`
-          );
-        }
-
+        this.syncPacerToRiderPositionAndSpeed();
         if (this.connected) {
           this.conn.send({ name: "syncPlayers", data: {} });
         }
-      });
 
       if (this.peerState != 0) {
         pacerSyncBtn.innerHTML = "Sync Players";
