@@ -197,6 +197,29 @@ export class zlowScreen {
       }
     }
 
+    getPacerFrameTarget() {
+      if (!this.workoutController) {
+        return {
+          mode: "manual",
+          targetWatts: null,
+        };
+      }
+
+      const targetWatts = this.workoutController.getCurrentTargetWatts();
+
+      if (targetWatts == null) {
+        return {
+          mode: "match-rider",
+          targetWatts: null,
+        };
+      }
+
+      return {
+        mode: "target-watts",
+        targetWatts,
+      };
+    }
+
 
     //used for frequent updates in update method
     sendPeerDataOver(speed) {
@@ -896,19 +919,13 @@ export class zlowScreen {
         //console.log("Inside if statement");
         // Start from whatever speed the pacer currently has
         let pacerSpeed = owner.pacerPhysics.getSpeed();
-        if (owner.workoutController) {
-          const targetWatts = owner.workoutController.getCurrentTargetWatts();
-          if (targetWatts == null) {
-            // Warmup or finished:
-            // Pacer exactly matches the rider so it stays beside you.
-            pacerSpeed = constants.riderState.speed;
-            owner.pacerPhysics.setSpeed(pacerSpeed);
-          } else {
-            // Active workout:
-            // Pacer behaves like an ideal rider holding target watts,
-            // using the same physics as the real rider for smooth changes.
-            pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
-          }
+        const pacerTarget = owner.getPacerFrameTarget();
+
+        if (pacerTarget.mode === "match-rider") {
+          pacerSpeed = constants.riderState.speed;
+          owner.pacerPhysics.setSpeed(pacerSpeed);
+        } else if (pacerTarget.mode === "target-watts") {
+          pacerSpeed = owner.pacerPhysics.update(pacerTarget.targetWatts, dt);
         }
         // If workoutController is null (free ride, peer-to-peer),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
