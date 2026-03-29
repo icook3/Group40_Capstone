@@ -548,6 +548,29 @@ export class zlowScreen {
       });
     }
 
+    getPacerWorkoutState() {
+  if (!this.workoutController) {
+    return {
+      mode: "manual",
+      watts: null,
+    };
+  }
+
+  const targetWatts = this.workoutController.getCurrentTargetWatts();
+
+      if (targetWatts == null) {
+        return {
+          mode: "match-rider",
+          watts: null,
+        };
+      }
+
+      return {
+        mode: "target-watts",
+        watts: targetWatts,
+      };
+    }
+
     initializeWorkouts() {
       // Set up ramp test controller if applicable
       if (this.selectedWorkout === "ramp") {
@@ -915,27 +938,21 @@ export class zlowScreen {
     
       owner.rider.update(dt);
     
-      if (constants.pacerStarted&&owner.peerState==0) {
-        //console.log("Inside if statement");
-        // Start from whatever speed the pacer currently has
-        let pacerSpeed = owner.pacerPhysics.getSpeed();
-        const pacerTarget = owner.getPacerFrameTarget();
+      if (constants.pacerStarted && owner.peerState == 0) {
+        const pacerState = owner.getPacerWorkoutState();
 
-        if (pacerTarget.mode === "match-rider") {
-          pacerSpeed = constants.riderState.speed;
-          owner.pacerPhysics.setSpeed(pacerSpeed);
-        } else if (pacerTarget.mode === "target-watts") {
-          pacerSpeed = owner.pacerPhysics.update(pacerTarget.targetWatts, dt);
+        owner.pacerController.setMode(pacerState.mode);
+        owner.pacerController.setRiderSpeed(constants.riderState.speed || 0);
+
+        if (pacerState.watts != null) {
+          owner.pacerController.setWatts(pacerState.watts);
         }
-        // If workoutController is null (free ride, peer-to-peer),
-        // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
-    
-        // Apply the computed speed to the pacer avatar
-        owner.pacer.setSpeed(pacerSpeed);
-        owner.pacerPhysics.setSpeed(pacerSpeed);
+
+        owner.pacerController.update(dt);
         owner.pacer.update(dt);
       }
-    
+
+                
       // Let the ramp controller advance its state
       if (owner.workoutController) {
         const power = constants.riderState.power || 0;
@@ -944,6 +961,7 @@ export class zlowScreen {
         const target = owner.workoutController.getCurrentTargetWatts();
         constants.riderState.targetWatts = target || 0;        
       }
+      
     
       owner.hud.update(constants.riderState, dt);
       if (localStorage.getItem("testMode") == null) {

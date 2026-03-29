@@ -3,6 +3,7 @@ export class PacerController {
     this.mode = "manual";
     this.currentSpeed = 0;
     this.currentWatts = 0;
+    this.riderSpeed = 0;
     this.avatar = null;
     this.physics = null;
   }
@@ -18,6 +19,11 @@ export class PacerController {
 
   getMode() {
     return this.mode;
+  }
+
+  setRiderSpeed(speed) {
+    const nextSpeed = Number(speed);
+    this.riderSpeed = Number.isFinite(nextSpeed) ? nextSpeed : 0;
   }
 
   setSpeed(speed) {
@@ -43,5 +49,32 @@ export class PacerController {
 
   getWatts() {
     return this.currentWatts;
+  }
+
+  update(dt) {
+    if (!this.physics) {
+      return this.currentSpeed;
+    }
+
+    let nextSpeed = this.physics.getSpeed();
+
+    if (this.mode === "match-rider") {
+      nextSpeed = this.riderSpeed;
+      this.physics.setSpeed(nextSpeed);
+    } else if (this.mode === "target-watts") {
+      nextSpeed = this.physics.update(this.currentWatts, dt);
+    }
+    // manual mode intentionally leaves current speed alone
+
+    this.currentSpeed = nextSpeed;
+
+    if (this.avatar) {
+      this.avatar.setSpeed(nextSpeed);
+    }
+    if (this.physics) {
+      this.physics.setSpeed(nextSpeed);
+    }
+
+    return nextSpeed;
   }
 }
