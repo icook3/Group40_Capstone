@@ -11,3 +11,7 @@ services:
     build: ./crash_logging_service
     ports:
       - 3000:3000
+  achievements-service:
+    build: ./achievements_service
+    ports:
+      - 4000:4000
