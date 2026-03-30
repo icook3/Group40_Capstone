@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 
 import achievementRoutes from "./routes/achievements.js";
+import userRoutes from "./routes/newUser.js"
 
 const app = express(); // Create express app
 
@@ -29,5 +30,12 @@ app.use("/achievements", express.json({
     limit: process.env.MAX_PAYLOAD_SIZE || "200kb"
 }));
 app.use("/achievements", achievementRoutes);
+
+app.use("/newUser", cors({
+    origin: process.env.FRONTEND_URI,
+    methods: ["POST", "GET"],
+    allowedHeaders: ["Content-Type"],
+}));
+app.use("/newUser", userRoutes);
 
 export default app;

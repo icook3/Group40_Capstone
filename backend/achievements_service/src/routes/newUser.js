@@ -66,3 +66,4 @@ router.delete("/", (req, res) => {
         res.status(400).send("invalid achievement ID");
     }
 });
+export default router;
