@@ -12,6 +12,7 @@ class ViewStorage {
     peerConnectScreen;
     playerCustomizationScreen;
     zlowScreen;
+    cameraPref;
 }
 export class ViewManager {
     views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", cameraPref: "cameraPref"};
@@ -50,7 +51,6 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(true);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
-                break;
             case this.views.peerConnect:
                 this.viewStorage.mainMenu = new mainMenuView(false);
                 this.viewStorage.zlowScreen = new zlowScreen(false);
@@ -58,7 +58,6 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(true);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
-                break;
                 break;
             case this.views.playerCustomization:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -68,7 +67,6 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
-                break;
             case this.views.mainZlow:
                 this.viewStorage.mainMenu = new mainMenuView(false);
                 this.viewStorage.zlowScreen = new zlowScreen(true);
@@ -76,7 +74,6 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
-                break;
                 break;
             default:
                 console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
@@ -91,8 +88,6 @@ export class ViewManager {
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
         }
-        
-
     }
 
     setView(view) {
@@ -152,7 +147,6 @@ export class ViewManager {
             default: 
                 console.log("This view is not available!");
                 return;
-                break;
         }
 
         this.currentView=view;
