@@ -3,7 +3,7 @@ import express from "express";
 import logger from "../util/logger.js";
 
 import {checkRateLimit} from "../services/rateLimitService.js";
-import {achievements, getAchievementPercentage} from "../services/internalStorageService.js";
+import {achievements, getAchievementsPercentage} from "../services/internalStorageService.js";
 import {storeAchievements} from "../services/storageService.js";
 
 
@@ -15,15 +15,19 @@ router.post("/", (req, res) => {
     try {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
-        if (!(typeof req.body === 'string')) {
-            throw new Error("Payload must be a string");
-        }
+
         if (achievements.get(req.body)==undefined) {
             achievements.set(req.body,1);
+        } else if ((req.body.find  == undefined)) {
+            throw new Error("Payload must be an array");
         } else {
-            achievements.set(req.body,achievements.get(req.body)+1);
+            console.log("Adding achievements",req.body.length);
+            for (let i=0;i<req.body.length;i++) {
+                achievements.set(req.body[i],achievements.get(req.body[i])+1);
+            }
         }
         storeAchievements();
+        res.status(200).send("Achievements Unlocked!");
         logger.info("achievementUnlocked",{
             id:req.body,
             ip: req.ip
@@ -51,15 +55,18 @@ router.delete("/", (req, res) => {
     try {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
-        if (!(typeof req.body === 'string')) {
-            throw new Error("Payload must be a string");
-        }
+
         if (achievements.get(req.body)==undefined) {
-            achievements.set(req.body,1);
+            achievements.set(req.body,0);
+        } else if ((req.body.find  == undefined)) {
+            throw new Error("Payload must be an array");
         } else {
-            achievements.set(req.body,achievements.get(req.body)-1);
+            for (let i=0;i<req.body.length;i++) {
+                achievements.set(req.body[i],achievements.get(req.body[i])-1);
+            }
         }
         storeAchievements();
+        res.status(200).send("Achievements Locked!");
         logger.info("achievementLocked",{
             id:req.body,
             ip: req.ip
@@ -87,10 +94,8 @@ router.get('/',(req, res)=> {
     try {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
-        if (!(typeof req.body === 'string')) {
-            throw new Error("Payload must be a string");
-        }
-        res.status(200).send(getAchievementPercentage(req.body));
+        //get a map with each achievement percentage
+        res.status(200).send(getAchievementsPercentage());
     } catch (err) {
         logger.warn("achievementReqRejected", {
             ip: req.ip,

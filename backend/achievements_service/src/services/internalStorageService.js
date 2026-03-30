@@ -10,7 +10,7 @@ export let userCount = 0;
  * @param {string} achievement 
  * @returns number
  */
-export function getAchievementPercentage(achievement) {
+function getAchievementPercentage(achievement) {
     if (userCount==0) {
         return 100;
     } else if (achievements.get(achievement)==undefined) {
@@ -18,6 +18,17 @@ export function getAchievementPercentage(achievement) {
     } else {
         return 100 * (achievements.get(achievement)/userCount);
     }
+}
+
+/**
+ * @returns {string}
+ */
+export function getAchievementsPercentage() {
+    let percentMap = new Map();
+    achievements.forEach((value, key)=> {
+        percentMap.set(key, getAchievementPercentage(key));
+    });
+    return JSON.stringify(Object.fromEntries(percentMap));
 }
 
 export function storeAsJSON() {

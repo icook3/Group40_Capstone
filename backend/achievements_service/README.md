@@ -72,3 +72,12 @@ You can verify if it is running at `http://localhost:4000/achievementsHealth` or
 You should get back `ok`
 
 ### 5. Test unlocking achievements
+```bash
+Invoke-RestMethod -Uri "http://localhost:4000/achievements" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '["Unlocked1", "Unlocked2"]'
+```
+
+### 6. Test getting achievements
+You can go to `http://localhost:4000/achievements`, and you should get a map with every unlocked achievement currently. 
