@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import {achievements} from "./internalStorageService.js";
+import {storeAsJSON, getFromJSON} from "./internalStorageService.js";
 import logger from "../util/logger.js";
 
 const DATA_DIR = process.env.DATA_DIR;
@@ -13,7 +13,7 @@ export function storeAchievements() {
     const filePath = path.join(achievementDir, fileName);
     fs.writeFileSync(
         filePath,
-        JSON.stringify(Object.fromEntries(achievements), null, 2)
+        storeAsJSON()
     );
 }
 
@@ -24,7 +24,7 @@ export function retrieveAchievements() {
     const fileName = `achievementsStorage.json`;
     const filePath = path.join(achievementDir, fileName);
     try {
-        achievements = new Map(Object.entries(JSON.parse(fs.readFileSync(filePath,{encoding:"utf-8"}))));    
+        getFromJSON(fs.readFileSync(filePath,{encoding:"utf-8"}));
     } catch (err) {
         logger.warn("achievementsDoNotExist", {
             error: err.message

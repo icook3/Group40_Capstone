@@ -3,7 +3,7 @@
  * @type {Map<string, Number>}
  */
 export let achievements = new Map();
-let userCount = 0;
+export let userCount = 0;
 
 /**
  * 
@@ -18,4 +18,15 @@ export function getAchievementPercentage(achievement) {
     } else {
         return 100 * (achievements.get(achievement)/userCount);
     }
+}
+
+export function storeAsJSON() {
+    let map = Object.fromEntries(achievements);
+    let object = {"map": map, "userCount": userCount};
+    return JSON.stringify(object, null, 2);
+}
+export function getFromJSON(json) {
+    let object = JSON.parse(json);
+    userCount=object.userCount;
+    achievements = new Map(Object.entries(object.map));
 }
