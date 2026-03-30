@@ -3,8 +3,9 @@ import express from "express";
 import logger from "../util/logger.js";
 
 import {checkRateLimit} from "../services/rateLimitService.js";
-import {achievements} from "../services/internalStorageService.js";
+import {achievements, getAchievementPercentage} from "../services/internalStorageService.js";
 import {storeAchievements} from "../services/storageService.js";
+
 
 const router = express.Router();
 
@@ -47,6 +48,29 @@ router.post("/", (req, res) => {
 });
 
 router.get('/',(req, res)=> {
-    res.status(200).send("TEST");
+    try {
+        // 1. Check if rate limit has been hit
+        checkRateLimit(req.ip);
+        if (!(typeof req.body === 'string')) {
+            throw new Error("Payload must be a string");
+        }
+        res.status(200).send(getAchievementPercentage(req.body));
+    } catch (err) {
+        logger.warn("achievementReqRejected", {
+            ip: req.ip,
+            error: err.message
+        });
+
+        if (err.message === "Rate limit exceeded") {
+            return res.status(429).send("rate limit exceeded");
+        }
+
+        // file write errors
+        if (err.message.includes("ENOENT") || err.message.includes("EACCES")) {
+            return res.status(500).send("storage failure");
+        }
+
+        res.status(400).send("invalid achievement ID");
+    }
 });
 export default router;
