@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Camera } from "./Camera.js";
+import { Camera } from "./camera.js";
 import { ObjectField } from "./objects/ObjectField.js";
 import { Track } from "./env/Track.js";
 import { Cloud } from "./env/Cloud.js";
@@ -30,6 +30,11 @@ export class ZlowScene {
 
         // Camera
         this.cam = new Camera(this.scene);
+
+        // Set starting camera position
+        this.cam.rig.position.x = -0.5;
+        this.cam.rig.position.y = 3;
+        this.cam.rig.position.z = -0.5;
 
         // Lighting
         const ambient = new THREE.AmbientLight(0xffffff, 0.6);

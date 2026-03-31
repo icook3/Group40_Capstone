@@ -19,6 +19,7 @@ export class ViewManager {
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
+    
     /**
     * Initializes different views
     */
