@@ -816,6 +816,9 @@ export class zlowScreen {
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
     
         // Apply the computed speed to the pacer avatar
+
+        constants.pacerState.speed = pacerSpeed;
+        
         owner.pacer.setSpeed(pacerSpeed);
         owner.pacerPhysics.setSpeed(pacerSpeed);
         owner.pacer.update(dt);

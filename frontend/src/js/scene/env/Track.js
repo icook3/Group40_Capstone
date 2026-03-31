@@ -149,7 +149,7 @@ update_pacer_animation() {
 
   // Calculate pacer's duration and set attributes
   // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
+  const pacerSpeed = Math.max(constants.riderState.speed || 0, 0.1);
   const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
   pacer.removeAttribute("animation__2");

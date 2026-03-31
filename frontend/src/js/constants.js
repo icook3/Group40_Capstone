@@ -15,6 +15,7 @@ class Constants {
     return ms * this.MS_TO_KMH;
   }
 
+  pacerState = { speed: 0 };
   cda = 0.45; // drag area (m^2) - slightly higher for realism
   crr = 0.004; // rolling resistance coefficient - slightly higher for realism
   airDensity = 1.225; // kg/m^3
