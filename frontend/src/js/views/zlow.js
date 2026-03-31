@@ -142,6 +142,7 @@ export class zlowScreen {
         this.loopRunning=false;
         constants.riderState={power: 0,speed: 0,calories: 0, distanceMeters: 0};
         constants.pacerStarted = false;
+        constants.pacerState={speed: 0, targetWatts: null};
         constants.farthestSpawn=1;
         constants.currentTrackPiece=0;
         constants.pacerCurrentTrackPiece=0;
@@ -179,6 +180,9 @@ export class zlowScreen {
       }
     }
     
+    setPacerTargetWatts(watts) {
+      constants.pacerState.targetWatts = watts;
+    }
 
 
     //used for frequent updates in update method
@@ -800,6 +804,8 @@ export class zlowScreen {
         let pacerSpeed = owner.pacerPhysics.getSpeed();
         if (owner.workoutController) {
           const targetWatts = owner.workoutController.getCurrentTargetWatts();
+          owner.setPacerTargetWatts(targetWatts);
+          
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
@@ -818,7 +824,7 @@ export class zlowScreen {
         // Apply the computed speed to the pacer avatar
 
         constants.pacerState.speed = pacerSpeed;
-        
+
         owner.pacer.setSpeed(pacerSpeed);
         owner.pacerPhysics.setSpeed(pacerSpeed);
         owner.pacer.update(dt);
