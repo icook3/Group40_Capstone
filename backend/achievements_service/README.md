@@ -14,8 +14,8 @@ This service provides a minimal service to track the percentage of users who hav
         - `storageService.js` — Reads and writes achievement data to the filesystem. 
     - `util` — Provides various utilities
         - `logger.js` — Centralized structured logging for service events and errors
-    - `app.js` — 
-    - `server.js` — 
+    - `app.js` — Configures Express application
+    - `server.js` — Application entry point
 - `.dockerignore` — Excludes secrets and build artifacts
 - `.env.example` — Template for required environment variables
 - `Dockerfile` — Container definition
@@ -79,5 +79,18 @@ Invoke-RestMethod -Uri "http://localhost:4000/achievements" `
   -Body '["Unlocked1", "Unlocked2"]'
 ```
 
+### 6. Test adding new users
+```bash
+Invoke-RestMethod -Uri "http://localhost:4000/newUser" `
+  -Method POST
+```
+
 ### 6. Test getting achievements
 You can go to `http://localhost:4000/achievements`, and you should get a map with every unlocked achievement currently. 
+
+### Deployment Notes
+This service is deployment-agnostic and works anywhere Docker runs.
+The only requirement is that the path defined by DATA_DIR is backed by persistent storage.
+
+### Security Notes
+All of the endpoints are intentionally unauthenticated to allow client side submission and retrieval of data. 
