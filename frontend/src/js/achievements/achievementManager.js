@@ -1,5 +1,6 @@
 import {Achievement} from './achievement.js'
 import { NotificationManager } from '../notifications.js';
+import config from "../config/configLoader.js";
 /**
  * This class manages achievements
  * It is a singleton class. 
@@ -90,6 +91,27 @@ class AchievementManager {
      * @type {Map<string, Achievement>}
      */
     achievements = new Map();
+    
+    //backend tools
+    BACKEND_URL = config.ACHIEVEMENTS_BACKEND_URL;
+    HEALTH_CHECK = "/achievementsHealth";
+    ADD_NEW_ACHIEVEMENTS = "/achievements";
+    ADD_NEW_USER = "/newUser";
+    async isAchievementsBackendUp() {
+        if (!BACKEND_URL) {
+            return false;
+        }
+
+        try {
+            const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
+                method: "GET",
+            });
+
+            return res.ok;
+        } catch {
+            return false;
+        }
+    }
 }
 
 //export as a singleton

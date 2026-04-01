@@ -13,4 +13,7 @@ window.APP_CONFIG = window.APP_CONFIG || {
 
     // Crash Reporter configuration variables
     CRASH_REPORTER_BACKEND_URL: null, // Example: "https://YOUR-BACKEND.com"
+
+    // Achievements backend configuration variables
+    ACHIEVEMENTS_BACKEND_URL: null // Example: "https://YOUR-BACKEND.com"
 };

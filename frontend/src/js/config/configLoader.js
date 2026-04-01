@@ -31,6 +31,11 @@ function validateConfig(cfg) {
     if (cfg.CRASH_REPORTER_BACKEND_URL && !isValidUrl(cfg.CRASH_REPORTER_BACKEND_URL)) {
         throw new Error("CRASH_REPORTER_BACKEND_URL must be a valid URL.");
     }
+
+    // Achievements backend validation
+    if (cfg.ACHIEVEMENTS_BACKEND_URL && !isValidUrl(cfg.ACHIEVEMENTS_BACKEND_URL)) {
+        throw new Error("ACHIEVEMENTS_BACKEND_URL must be a valid URL.")
+    }
 }
 
 function isValidUrl(value) {
