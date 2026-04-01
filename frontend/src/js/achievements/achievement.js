@@ -14,6 +14,10 @@ export class Achievement {
      */
     imagePath;
     /**
+     * @type {number}
+     */
+    percentage;
+    /**
      * 
      * @returns true if the achievement was not previously unlocked. False otherwise
      */

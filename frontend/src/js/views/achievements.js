@@ -27,7 +27,6 @@ export class achievementsView {
     //adjust based on screen size
     let colCount = 5;
     //let table = getElementById("achievementsTable");
-    let HTML="";
     let rowCount = Math.ceil(achievementCount/colCount);
 
     console.log("row count = ",rowCount,"col count=",colCount);
@@ -35,17 +34,20 @@ export class achievementsView {
     let achCount=0;
     for (let i=0;i<rowCount;i++) {
         //create a table column
-        HTML=HTML+"<tr>";
+        let column = document.createElement('tr');
         for (let j=0;j<colCount;j++) {
-            HTML=HTML+"<td class=\"achievementsTableSpot\"><div class=\"achievementsTableOuterDiv\">";
-            HTML=HTML+this.createAchievementNode(arr[achCount]);
+            let cell = document.createElement('td');
+            cell.classList.add("achievementsTableSpot");
+            cell.appendChild(this.createAchievementNode(arr[achCount]));
+            //achievementsTableOuterDiv.innerHTML=this.createAchievementNode(arr[achCount]);
             achCount++;
-            HTML=HTML+"</div></td>";
+            //cell.appendChild(achievementsTableOuterDiv);
+            column.appendChild(cell);
         }
-        HTML=HTML+"</tr>";
+        document.getElementById("achievementsTable").appendChild(column);
     }
     //console.log("Adding HTML ",HTML);
-    document.getElementById("achievementsTable").innerHTML=HTML;
+    //document.getElementById("achievementsTable").appendChild;
     // Three.js background
     const canvas = this.initBackground();
     canvas.style.position = "fixed";
@@ -55,7 +57,7 @@ export class achievementsView {
     document.getElementById("achievementsBackground").appendChild(canvas);
     //canvas.style.filter = "blur(3px)";  // blurs the background
     document.getElementById("clearAllAchievements").addEventListener("click",()=> {
-        achievementManager.clearAllAchievements();
+        achievementManager.clearAllAchievements(true);
     });
   }
   reset() {}
@@ -69,47 +71,54 @@ export class achievementsView {
     return arr;
   }
 
-  /**
-   * @param {Achievement} achievement 
-   */
+    /**
+    * @param {Achievement} achievement 
+    */
     createAchievementNode(achievement) {
+        let achievementsTableOuterDiv = document.createElement('div');
+        achievementsTableOuterDiv.classList.add("achievementsTableOuterDiv");
         //console.log("Creating achievement node for achievement ",achievement);
         if (achievement==undefined) {
-            return "";
+            return achievementsTableOuterDiv;
         }
-        let HTML="";
         //add the image
-        HTML=HTML+"<img src=\"";
-        HTML=HTML+achievement.imagePath;
-        if (achievement.unlocked) {
-            HTML=HTML+"\" class=\"achievementImg\"/>";
-        } else {
-            HTML=HTML+"\" class=\"achievementImg achievementNotObtainedImg\"/>";
+        let achievementImg = document.createElement('img');
+        achievementImg.src=achievement.imagePath;
+        achievementImg.classList.add("achievementImg");
+        if (!achievement.unlocked) {
+            achievementImg.classList.add("achievementNotObtainedImg");
         }
-        HTML=HTML+"<div class=\"achievementsTableInnerDiv\">";
-        HTML=HTML+"<span class=\"achievementName\">";
-        //add the name
-        HTML=HTML+achievement.name;
-        HTML=HTML+"</span>";
-        HTML=HTML+"<span class=\"achievementDate\">";
-        //add the date
+        achievementsTableOuterDiv.appendChild(achievementImg);
+
+
+        let achievementsTableInnerDiv = document.createElement('div');
+        achievementsTableInnerDiv.classList.add("achievementsTableInnerDiv");
+
+        let achievementName = document.createElement('span');
+        achievementName.classList.add("achievementName");
+        achievementName.innerText=achievement.name;
+        achievementsTableInnerDiv.appendChild(achievementName);
+
+        let achievementDate = document.createElement('span');
+        achievementDate.classList.add("achievementDate");
         if (achievement.unlocked) {
-            HTML=HTML+achievement.unlockDate.getMonth();
-            HTML=HTML+"/";
-            HTML=HTML+achievement.unlockDate.getDate();
-            HTML=HTML+"/";
-            HTML=HTML+achievement.unlockDate.getFullYear();
+            achievementDate.innerText=achievement.unlockDate.getMonth()+"/"+achievement.unlockDate.getDate()+"/"+achievement.unlockDate.getFullYear();
         } else {
-            HTML=HTML+"UNOBTAINED";
+            achievementDate.innerText="UNOBTAINED";
         }
-        HTML=HTML+"</span>";
-        HTML=HTML+"</div>";
-        //add the description
-        HTML=HTML+"<span class=\"achievementDescription\">";
-        HTML=HTML+achievement.description;
-        HTML=HTML+"</span>";
-        return HTML;
+        achievementsTableInnerDiv.appendChild(achievementDate);
+
+        achievementsTableOuterDiv.appendChild(achievementsTableInnerDiv);
+
+        let achievementDescription = document.createElement('span');
+        achievementDescription.classList.add("achievementDescription");
+        achievementDescription.innerText=achievement.description;
+        achievementsTableOuterDiv.appendChild(achievementDescription);
+
+        return achievementsTableOuterDiv;
     }
+
+
     //THREE JS elements
     scene;
     renderer;

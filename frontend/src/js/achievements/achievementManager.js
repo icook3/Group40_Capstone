@@ -51,20 +51,29 @@ class AchievementManager {
                 }
             } catch (e) {
                 console.log("INVALID JSON!");
-                this.clearAllAchievements();
+                this.clearAllAchievements(true);
             }
         }
     }
 
     currentIdx;
 
-    clearAllAchievements() {
+    /**
+     * @param {boolean} resetView 
+     */
+    clearAllAchievements(resetView) {
         this.achievements.forEach((value)=>{
             value.unlocked=false;
             value.dateObtained=null;
         });
         this.storeAchievementsInLocalStorage();
-        window.viewManager.setView(window.viewManager.views.achievements);
+        this.isAchievementsBackendUp().then((val)=> {
+            console.log(val);
+            if (resetView) {
+                window.viewManager.setView(window.viewManager.views.achievements);
+            }
+        });
+
     }
     storeAchievementsInLocalStorage() {
         let objs = [];
@@ -98,12 +107,11 @@ class AchievementManager {
     ADD_NEW_ACHIEVEMENTS = "/achievements";
     ADD_NEW_USER = "/newUser";
     async isAchievementsBackendUp() {
-        if (!BACKEND_URL) {
+        if (!this.BACKEND_URL) {
             return false;
         }
-
         try {
-            const res = await fetch(`${BACKEND_URL}${HEALTH_CHECK}`, {
+            const res = await fetch(`${this.BACKEND_URL}${this.HEALTH_CHECK}`, {
                 method: "GET",
             });
 
