@@ -23,7 +23,7 @@ app.get("/achievementsHealth",
 
 app.use("/achievements", cors({
     origin: process.env.FRONTEND_URI,
-    methods: ["POST", "GET"],
+    methods: ["POST", "GET", "DELETE"],
     allowedHeaders: ["Content-Type"],
 }));
 app.use("/achievements", express.json({
@@ -33,7 +33,7 @@ app.use("/achievements", achievementRoutes);
 
 app.use("/newUser", cors({
     origin: process.env.FRONTEND_URI,
-    methods: ["POST", "GET"],
+    methods: ["POST", "DELETE"],
     allowedHeaders: ["Content-Type"],
 }));
 app.use("/newUser", userRoutes);

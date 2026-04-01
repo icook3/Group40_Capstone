@@ -17,7 +17,7 @@ RUN mkdir -p /data
 COPY . .
 
 # Expose port for documentation
-EXPOSE 3000
+EXPOSE 4000
 
 # Start the server
 CMD ["npm", "start"]
