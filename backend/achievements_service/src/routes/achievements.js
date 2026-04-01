@@ -10,20 +10,20 @@ import {storeAchievements} from "../services/storageService.js";
 const router = express.Router();
 
 //achievements endpoint
-//if posting, increment the achievement count for the one sent, and store it
+//if posting, increment the achievement count for the ones sent, and store it
 router.post("/", (req, res) => {
     try {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
-
-        if (achievements.get(req.body)==undefined) {
-            achievements.set(req.body,1);
-        } else if ((req.body.find  == undefined)) {
+        if ((req.body.find  == undefined)) {
             throw new Error("Payload must be an array");
         } else {
-            console.log("Adding achievements",req.body.length);
             for (let i=0;i<req.body.length;i++) {
-                achievements.set(req.body[i],achievements.get(req.body[i])+1);
+                if (achievements.get(req.body[i])==undefined) {
+                    achievements.set(req.body[i],1);
+                } else {
+                    achievements.set(req.body[i],achievements.get(req.body[i])+1);
+                }
             }
         }
         storeAchievements();
