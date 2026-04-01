@@ -5,6 +5,14 @@
 export let achievements = new Map();
 export let userCount = 0;
 
+export function incrementUserCount() {
+    userCount++;
+}
+
+export function decrementUserCount() {
+    userCount--;
+}
+
 /**
  * 
  * @param {string} achievement 

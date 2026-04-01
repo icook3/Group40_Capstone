@@ -3,7 +3,7 @@ import express from "express";
 import logger from "../util/logger.js";
 
 import {checkRateLimit} from "../services/rateLimitService.js";
-import {userCount} from "../services/internalStorageService.js";
+import {incrementUserCount, decrementUserCount} from "../services/internalStorageService.js";
 import {storeAchievements} from "../services/storageService.js";
 
 
@@ -13,14 +13,15 @@ router.post("/", (req, res) => {
     try {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
-        userCount++;
+        incrementUserCount();
         storeAchievements();
+        res.status(200).send("User Added!");
         logger.info("addUser",{
             id:req.body,
             ip: req.ip
         });
     } catch (err) {
-        logger.warn("achievementReqRejected", {
+        logger.warn("newUserRejected", {
             ip: req.ip,
             error: err.message
         });
@@ -34,7 +35,7 @@ router.post("/", (req, res) => {
             return res.status(500).send("storage failure");
         }
 
-        res.status(400).send("invalid achievement ID");
+        res.status(400).send("Failed to add new user");
     }
 });
 
@@ -42,14 +43,15 @@ router.delete("/", (req, res) => {
     try {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
-        userCount--;
+        decrementUserCount();
         storeAchievements();
+        res.status(200).send("User Removed!");
         logger.info("removeUser",{
             id:req.body,
             ip: req.ip
         });
     } catch (err) {
-        logger.warn("achievementReqRejected", {
+        logger.warn("newUserRejected", {
             ip: req.ip,
             error: err.message
         });
@@ -63,7 +65,7 @@ router.delete("/", (req, res) => {
             return res.status(500).send("storage failure");
         }
 
-        res.status(400).send("invalid achievement ID");
+        res.status(400).send("Failed to add new user");
     }
 });
 export default router;
