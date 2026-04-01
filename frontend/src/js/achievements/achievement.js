@@ -16,7 +16,7 @@ export class Achievement {
     /**
      * @type {number}
      */
-    percentage;
+    percentage=undefined;
     /**
      * 
      * @returns true if the achievement was not previously unlocked. False otherwise

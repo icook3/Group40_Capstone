@@ -30,22 +30,50 @@ export class achievementsView {
     let rowCount = Math.ceil(achievementCount/colCount);
 
     console.log("row count = ",rowCount,"col count=",colCount);
-    let arr=this.createAchievementsArr();
+    
     let achCount=0;
-    for (let i=0;i<rowCount;i++) {
-        //create a table column
-        let column = document.createElement('tr');
-        for (let j=0;j<colCount;j++) {
-            let cell = document.createElement('td');
-            cell.classList.add("achievementsTableSpot");
-            cell.appendChild(this.createAchievementNode(arr[achCount]));
-            //achievementsTableOuterDiv.innerHTML=this.createAchievementNode(arr[achCount]);
-            achCount++;
-            //cell.appendChild(achievementsTableOuterDiv);
-            column.appendChild(cell);
+    achievementManager.isAchievementsBackendUp().then((backendUp)=> {
+        if (backendUp) {
+            fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_ACHIEVEMENTS}`).then((retVal)=> {
+                return retVal.json();
+            }).then((val)=> {
+                console.log(val);
+                let testMap=new Map(Object.entries(val));
+                achievementManager.achievements.forEach((value, key)=> {
+                    value.percentage=testMap.get(key);
+                });
+            }).then(()=> {
+                let arr=this.createAchievementsArr();
+                for (let i=0;i<rowCount;i++) {
+                    //create a table column
+                    let column = document.createElement('tr');
+                    for (let j=0;j<colCount;j++) {
+                        let cell = document.createElement('td');
+                        cell.classList.add("achievementsTableSpot");
+                        cell.appendChild(this.createAchievementNode(arr[achCount]));
+                        achCount++;
+                        column.appendChild(cell);
+                    }
+                    document.getElementById("achievementsTable").appendChild(column);
+                }
+            });
+        } else {
+            let arr=this.createAchievementsArr();
+            for (let i=0;i<rowCount;i++) {
+                //create a table column
+                let column = document.createElement('tr');
+                for (let j=0;j<colCount;j++) {
+                    let cell = document.createElement('td');
+                    cell.classList.add("achievementsTableSpot");
+                    cell.appendChild(this.createAchievementNode(arr[achCount]));
+                    achCount++;
+                    column.appendChild(cell);
+                }
+                document.getElementById("achievementsTable").appendChild(column);
+            }
         }
-        document.getElementById("achievementsTable").appendChild(column);
-    }
+    });
+
     //console.log("Adding HTML ",HTML);
     //document.getElementById("achievementsTable").appendChild;
     // Three.js background
@@ -114,6 +142,13 @@ export class achievementsView {
         achievementDescription.classList.add("achievementDescription");
         achievementDescription.innerText=achievement.description;
         achievementsTableOuterDiv.appendChild(achievementDescription);
+
+        if (achievement.percentage!=undefined) {
+            let achievementPercentage = document.createElement('span');
+            achievementPercentage.classList.add("achievementPercentage");
+            achievementPercentage.innerText=achievement.percentage+"%";
+            achievementsTableOuterDiv.appendChild(achievementPercentage); 
+        }
 
         return achievementsTableOuterDiv;
     }
