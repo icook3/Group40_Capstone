@@ -262,8 +262,13 @@ class AchievementManager {
     HEALTH_CHECK = "/achievementsHealth";
     ADD_NEW_ACHIEVEMENTS = "/achievements";
     ADD_NEW_USER = "/newUser";
+    isBackendUp = true;
     async isAchievementsBackendUp() {
+        if (!this.isBackendUp) {
+            return false;
+        }
         if (!this.BACKEND_URL) {
+            this.isBackendUp=false;
             return false;
         }
         try {
@@ -273,6 +278,7 @@ class AchievementManager {
 
             return res.ok;
         } catch {
+            this.isBackendUp=false;
             return false;
         }
     }
