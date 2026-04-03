@@ -1,0 +1,23 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  lobby-service:
+    build: ./lobby_service
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  game-service:
+    build: ./game_service
+    ports:
+      - "4001:4001"
+    env_file:
+      - .env
+    depends_on:
+      - redis
