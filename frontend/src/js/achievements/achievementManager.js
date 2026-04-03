@@ -94,6 +94,25 @@ class AchievementManager {
         if (notAlreadyObtained) {
             this.storeAchievementsInLocalStorage();
             this.notificationManager.show("Achievement "+thisAchievement.name+" unlocked!",true);
+        
+            this.isAchievementsBackendUp().then((backendUp)=> {
+                if (backendUp) {
+                    console.log(JSON.stringify([achievement]));
+                    fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_ACHIEVEMENTS}`, {
+                        method: "POST",
+                        headers: {
+                            'content-Type': 'application/json'
+                        },
+                        body: JSON.stringify([achievement])
+                    }).then((retVal)=> {
+                        if (!retVal.ok) {
+                            throw new Error("FETCH ERROR");
+                        }
+                    }).catch(()=> {
+                        console.error("Unable to make request!");
+                    });
+                }
+            });
         }
     }
     /**
