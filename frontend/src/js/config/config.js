@@ -7,6 +7,10 @@ window.APP_CONFIG = window.APP_CONFIG || {
     PEER_PATH: null, // Example: "/peerServer"
     PEER_PORT: null, // Example: "9000"
 
+    // Full multiplayer experience configuration variables
+    LOBBY_HTTP_URL: null, // Example: "http://YOUR-BACKEND.com"
+    LOBBY_WS_URL: null, // Example: "ws://YOUR-BACKEND.com"
+
     // Strava configuration variables
     STRAVA_CLIENT_ID: null, // Example: 12345
     STRAVA_BACKEND_URL: null, // Example: "https://YOUR-BACKEND.com"
