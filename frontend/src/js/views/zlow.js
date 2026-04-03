@@ -439,28 +439,19 @@ export class zlowScreen {
     }
 
     initializePacerSpeedInput() {
-      if (localStorage.getItem("testMode") == "true") {
-        const pacerSpeedInput = document.getElementById("pacer-speed");
-        pacerSpeedInput.addEventListener("input", () => {
-          const val = Number(pacerSpeedInput.value);
-          this.setPacerSpeed(val);
-        });
-
-        this.setPacerSpeed(Number(pacerSpeedInput.value));
-        pacerSpeedInput.addEventListener("input", () => {
-          const val = Number(pacerSpeedInput.value);
-          this.setPacerSpeed(val);
-        });
-      } else {
-        if (localStorage.getItem("pacer-speed") !== null) {
-          const val = Number(localStorage.getItem("pacer-speed"));
-          this.scene = new ZlowScene(val);
-          this.setPacerSpeed(val);
+        if (localStorage.getItem("testMode") == "true") {
+            const pacerSpeedInput = document.getElementById("pacer-speed");
+            pacerSpeedInput.addEventListener("input", () => {
+                const val = Number(pacerSpeedInput.value);
+                this.setPacerSpeed(val);
+            });
+            this.setPacerSpeed(Number(pacerSpeedInput.value));
         } else {
-          const val = 20;
-          this.setPacerSpeed(val);
+            const val = localStorage.getItem("pacer-speed") !== null
+                ? Number(localStorage.getItem("pacer-speed"))
+                : 20;
+            this.setPacerSpeed(val);
         }
-      }
     }
 
     initializeWorkouts() {
@@ -1097,9 +1088,6 @@ export class zlowScreen {
         // Clear singleton guards so fresh instances are created
         window.__zlowSceneInstance = null;
         window.__zlowTrackInstance = null;
-
-        // Reset all constants
-        //this.reset();
 
         // Null out references so nothing carries over
         this.rider = null;
