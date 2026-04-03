@@ -37,17 +37,24 @@ class AchievementManager {
         this.notificationManager=new NotificationManager();
 
         //get completed achievements out of local storage
-        if (localStorage.getItem("AchievementsObtained")!=null) {
+        this.getAchievementsOutOfLocalStorage();
+        this.getAchievementsOutOfLocalStorage("UnsentAchievements",this.unsentAchievements);
+    }
+
+    currentIdx;
+
+    getAchievementsOutOfLocalStorage(location="AchievementsObtained",achievements=this.achievements) {
+        if (localStorage.getItem(location)!=null) {
             try {
-                let obtainedAchievements = JSON.parse(localStorage.getItem("AchievementsObtained"));
+                let obtainedAchievements = JSON.parse(localStorage.getItem(location));
                 for (let i=0;i<obtainedAchievements.length;i++) {
                     //set the unlock status of the achievement
                     /*
                         achievements in local storage are formatted as a JSON array like this
                         [{ID: ID, completed: true, completedDate: Date}]
                     */
-                    this.achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
-                    this.achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
+                    achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
+                    achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
                 }
             } catch (e) {
                 console.log("INVALID JSON!");
@@ -55,8 +62,6 @@ class AchievementManager {
             }
         }
     }
-
-    currentIdx;
 
     /**
      * @param {boolean} resetView 
@@ -75,14 +80,14 @@ class AchievementManager {
         });
 
     }
-    storeAchievementsInLocalStorage() {
+    storeAchievementsInLocalStorage(achievementsMap=this.achievements,storageLocation="AchievementsObtained") {
         let objs = [];
-        this.achievements.forEach((value, key)=>{
+        achievementsMap.forEach((value, key)=>{
             let obj={ID:key,completed:value.unlocked,completedDate:value.unlockDate}
             objs.push(obj);
         });
         //console.log(JSON.stringify(objs));
-        localStorage.setItem("AchievementsObtained",JSON.stringify(objs));
+        localStorage.setItem(storageLocation,JSON.stringify(objs));
     }
     /**
      * 
@@ -111,14 +116,22 @@ class AchievementManager {
                     }).catch(()=> {
                         console.error("Unable to make request!");
                     });
+                } else {
+                    this.unsentAchievements.set(achievement,thisAchievement)
+                    this.storeAchievementsInLocalStorage(this.unsentAchievements,"UnsentAchievements");
                 }
             });
         }
+    }
+
+    newUser() {
+
     }
     /**
      * @type {Map<string, Achievement>}
      */
     achievements = new Map();
+    unsentAchievements = new Map();
     
     //backend tools
     BACKEND_URL = config.ACHIEVEMENTS_BACKEND_URL;
