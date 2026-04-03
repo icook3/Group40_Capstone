@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Camera } from "./Camera.js";
+import { Camera } from "./camera.js";
 import { ObjectField } from "./objects/ObjectField.js";
 import { Track } from "./env/Track.js";
 import { Cloud } from "./env/Cloud.js";
