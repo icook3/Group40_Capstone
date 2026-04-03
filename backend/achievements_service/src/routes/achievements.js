@@ -56,13 +56,15 @@ router.delete("/", (req, res) => {
         // 1. Check if rate limit has been hit
         checkRateLimit(req.ip);
 
-        if (achievements.get(req.body)==undefined) {
-            achievements.set(req.body,0);
-        } else if ((req.body.find  == undefined)) {
+        if ((req.body.find  == undefined)) {
             throw new Error("Payload must be an array");
         } else {
             for (let i=0;i<req.body.length;i++) {
-                achievements.set(req.body[i],achievements.get(req.body[i])-1);
+                if (achievements.get(req.body[i])==undefined) {
+                    achievements.set(req.body[i],0);
+                } else {
+                    achievements.set(req.body[i],achievements.get(req.body[i])-1);
+                }
             }
         }
         storeAchievements();

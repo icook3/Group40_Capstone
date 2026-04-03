@@ -243,6 +243,10 @@ export class achievementsView {
 
         // rider
         let playerData=JSON.parse(localStorage.getItem("playerData"));
+        if (!playerData) {
+            playerData = {model: "male"};
+        }
+        
         if (playerData.model=="male") {
             this.loadModel(
                 `${modelBasePath}/playermodels/maleV5.glb`,

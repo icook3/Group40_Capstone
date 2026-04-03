@@ -39,6 +39,7 @@ class AchievementManager {
         //get completed achievements out of local storage
         this.getAchievementsOutOfLocalStorage();
         this.getAchievementsOutOfLocalStorage("UnsentAchievements",this.unsentAchievements);
+        this.getAchievementsOutOfLocalStorage("LockedAchievements",this.lockedAchievements);
     }
 
     currentIdx;
@@ -70,14 +71,54 @@ class AchievementManager {
      * @param {boolean} resetView 
      */
     clearAllAchievements(resetView) {
+        let arr = [];
+        this.achievements.forEach((value, key)=> {
+            if (value.unlocked) {
+                arr.push(key);
+            }
+        });
         this.achievements.forEach((value)=>{
             value.unlocked=false;
             value.dateObtained=null;
         });
         this.storeAchievementsInLocalStorage();
+        this.storeAchievementsInLocalStorage(this.unsentAchievements,"UnsentAchievements");
+        
+
+        console.log(arr);
         this.isAchievementsBackendUp().then((val)=> {
-            console.log(val);
+            if (val) {
+                //send it to the backend
+                fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_ACHIEVEMENTS}`, {
+                    method: "DELETE",
+                    headers: {
+                        'content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(arr)
+                }).then((retVal)=> {
+                    if (!retVal.ok) {
+                        throw new Error("FETCH ERROR");
+                    }
+                }).catch(()=> {
+                    console.error("Unable to make request!");
+                    arr.forEach((currentValue)=>{
+                        this.lockedAchievements.set(currentValue, new Achievement("","",""));
+                    },this);
+                        
+                    this.storeAchievementsInLocalStorage(this.lockedAchievements,"LockedAchievements");
+                });
+            } else {
+                //go through each element of the array, put it in "LockedAchievements"
+                arr.forEach((currentValue)=>{
+                    this.lockedAchievements.set(currentValue, new Achievement("","",""));
+                },this);
+                //console.log(this.lockedAchievements);
+                this.storeAchievementsInLocalStorage(this.lockedAchievements,"LockedAchievements");
+            }
         });
+        if (this.sentToBackend) {
+            localStorage.setItem("SentData",'True');
+        }
         if (resetView) {
             window.viewManager.setView(window.viewManager.views.achievements);
         }
@@ -131,7 +172,7 @@ class AchievementManager {
      */
     newUser() {
         let sent = localStorage.getItem("SentData");
-        if (sent==null||sent==undefined||sent=='False') {
+        if (sent!='True') {
             this.isAchievementsBackendUp().then((backendUp)=> {
                 if (backendUp) {
                     fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_USER}`, {
@@ -141,14 +182,16 @@ class AchievementManager {
                             throw new Error("FETCH ERROR");
                         } else {
                             localStorage.setItem("SentData",'True');
+                            this.sentToBackend=true;
                         }
                     }).catch(()=> {
                         console.error("Unable to make request!");
                     });
                 }
             });
+        } else {
+            this.sentToBackend=true;
         }
-
     }
     /**
      * If you are connected to the backend, send the unsent achievements
@@ -157,6 +200,10 @@ class AchievementManager {
         let Arr = [];
         this.unsentAchievements.forEach((value, key)=> {
             Arr.push(key);
+        });
+        let Arr2 = [];
+        this.lockedAchievements.forEach((value, key)=> {
+            Arr2.push(key);
         });
         console.log(Arr);
         this.isAchievementsBackendUp().then((backendUp)=> {
@@ -177,6 +224,23 @@ class AchievementManager {
                 }).catch(()=> {
                     console.error("Unable to make request!");
                 });
+
+                fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_ACHIEVEMENTS}`, {
+                    method: "DELETE",
+                    headers: {
+                        'content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Arr2)
+                }).then((retVal)=> {
+                    if (!retVal.ok) {
+                        throw new Error("FETCH ERROR");
+                    } else {
+                        this.unsentAchievements=new Map();
+                        this.storeAchievementsInLocalStorage(this.unsentAchievements,"UnsentAchievements");
+                    }
+                }).catch(()=> {
+                    console.error("Unable to make request!");
+                });
             }
         });
     }
@@ -184,8 +248,15 @@ class AchievementManager {
      * @type {Map<string, Achievement>}
      */
     achievements = new Map();
+    /**
+     * @type {Map<string, Achievement>}
+     */
     unsentAchievements = new Map();
-    
+    /**
+     * @type {Map<string, Achievement>}
+     */
+    lockedAchievements = new Map();
+    sentToBackend=false;
     //backend tools
     BACKEND_URL = config.ACHIEVEMENTS_BACKEND_URL;
     HEALTH_CHECK = "/achievementsHealth";

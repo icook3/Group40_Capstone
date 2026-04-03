@@ -1,3 +1,5 @@
+import { achievementManager } from "./achievements/achievementManager.js";
+
 export function workoutMenu () {
   const workoutsBtn = document.getElementById('workouts-btn');
   const workoutOptions = document.getElementById('workout-options');
@@ -48,7 +50,7 @@ export function workoutMenu () {
     }, 250);
   });
 
-    document.getElementById("clear-btn").addEventListener("click", () => {
+  document.getElementById("clear-btn").addEventListener("click", () => {
     sessionStorage.clear();
     localStorage.clear();
     document.getElementById("pacer-speed").value = 20;
@@ -62,6 +64,7 @@ export function workoutMenu () {
     });
     document.querySelectorAll(".speedUnit").forEach(el => el.textContent = "km/h");
     document.querySelectorAll(".weightUnit").forEach(el => el.textContent = "kg");
+    achievementManager.clearAllAchievements(false);
   });
   // Quick Ride
   document.getElementById("start-btn").addEventListener("click", () => {
