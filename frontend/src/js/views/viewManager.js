@@ -25,6 +25,7 @@ export class ViewManager {
     */
     initViews() {
         achievementManager.newUser();
+        achievementManager.tryToSendAchievements();
         //set up the favicon
         this.updateFavicon();
         this.darkMode.addEventListener("change", this.updateFavicon);

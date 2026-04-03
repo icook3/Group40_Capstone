@@ -53,12 +53,15 @@ class AchievementManager {
                         achievements in local storage are formatted as a JSON array like this
                         [{ID: ID, completed: true, completedDate: Date}]
                     */
+                    if (achievements.get(obtainedAchievements[i].ID)==undefined) {
+                        achievements.set(obtainedAchievements[i].ID,new Achievement("","",""));
+                    }
                     achievements.get(obtainedAchievements[i].ID).unlocked = obtainedAchievements[i].completed;
                     achievements.get(obtainedAchievements[i].ID).unlockDate = new Date(obtainedAchievements[i].completedDate);
                 }
             } catch (e) {
-                console.log("INVALID JSON!");
-                this.clearAllAchievements(true);
+                console.log("INVALID JSON!",e);
+                //this.clearAllAchievements(false);
             }
         }
     }
@@ -74,11 +77,10 @@ class AchievementManager {
         this.storeAchievementsInLocalStorage();
         this.isAchievementsBackendUp().then((val)=> {
             console.log(val);
-            if (resetView) {
-                window.viewManager.setView(window.viewManager.views.achievements);
-            }
         });
-
+        if (resetView) {
+            window.viewManager.setView(window.viewManager.views.achievements);
+        }
     }
     storeAchievementsInLocalStorage(achievementsMap=this.achievements,storageLocation="AchievementsObtained") {
         let objs = [];
@@ -124,6 +126,9 @@ class AchievementManager {
         }
     }
 
+    /**
+     * If you have not done so already, and are connected to the backend, send the new user request
+     */
     newUser() {
         let sent = localStorage.getItem("SentData");
         if (sent==null||sent==undefined||sent=='False') {
@@ -144,6 +149,36 @@ class AchievementManager {
             });
         }
 
+    }
+    /**
+     * If you are connected to the backend, send the unsent achievements
+     */
+    tryToSendAchievements() {
+        let Arr = [];
+        this.unsentAchievements.forEach((value, key)=> {
+            Arr.push(key);
+        });
+        console.log(Arr);
+        this.isAchievementsBackendUp().then((backendUp)=> {
+            if (backendUp) {
+                fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_ACHIEVEMENTS}`, {
+                    method: "POST",
+                    headers: {
+                        'content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Arr)
+                }).then((retVal)=> {
+                    if (!retVal.ok) {
+                        throw new Error("FETCH ERROR");
+                    } else {
+                        this.unsentAchievements=new Map();
+                        this.storeAchievementsInLocalStorage(this.unsentAchievements,"UnsentAchievements");
+                    }
+                }).catch(()=> {
+                    console.error("Unable to make request!");
+                });
+            }
+        });
     }
     /**
      * @type {Map<string, Achievement>}
