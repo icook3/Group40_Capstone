@@ -125,6 +125,24 @@ class AchievementManager {
     }
 
     newUser() {
+        let sent = localStorage.getItem("SentData");
+        if (sent==null||sent==undefined||sent=='False') {
+            this.isAchievementsBackendUp().then((backendUp)=> {
+                if (backendUp) {
+                    fetch(`${achievementManager.BACKEND_URL}${achievementManager.ADD_NEW_USER}`, {
+                        method: "POST"
+                    }).then((retVal)=> {
+                        if (!retVal.ok) {
+                            throw new Error("FETCH ERROR");
+                        } else {
+                            localStorage.setItem("SentData",'True');
+                        }
+                    }).catch(()=> {
+                        console.error("Unable to make request!");
+                    });
+                }
+            });
+        }
 
     }
     /**
