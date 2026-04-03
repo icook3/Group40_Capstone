@@ -14,4 +14,4 @@ services:
   achievements-service:
     build: ./achievements_service
     ports:
-      - 4000:4000
+      - 5000:5000

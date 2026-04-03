@@ -56,7 +56,7 @@ MAX_PAYLOAD_SIZE=200kb
 FRONTEND_URI=https://your-frontend.example.com
 
 # Port service listens on
-PORT=4000
+PORT=5000
 ```
 
 ### 3. Build the Docker Image
@@ -66,14 +66,14 @@ docker build -t achievements-service .
 
 ### 4. Run the Service in Docker
 ```bash
-docker run --rm -p 3000:3000 -v achievements-data:/data --env-file .env achievements-service
+docker run --rm -p 5000:5000 -v achievements-data:/data --env-file .env achievements-service
 ```
-You can verify if it is running at `http://localhost:4000/achievementsHealth` or `http://your-backend-example.com/achievementsHealth`
+You can verify if it is running at `http://localhost:5000/achievementsHealth` or `http://your-backend-example.com/achievementsHealth`
 You should get back `ok`
 
 ### 5. Test unlocking achievements
 ```bash
-Invoke-RestMethod -Uri "http://localhost:4000/achievements" `
+Invoke-RestMethod -Uri "http://localhost:5000/achievements" `
   -Method POST `
   -ContentType "application/json" `
   -Body '["Unlocked1", "Unlocked2"]'
@@ -81,12 +81,12 @@ Invoke-RestMethod -Uri "http://localhost:4000/achievements" `
 
 ### 6. Test adding new users
 ```bash
-Invoke-RestMethod -Uri "http://localhost:4000/newUser" `
+Invoke-RestMethod -Uri "http://localhost:5000/newUser" `
   -Method POST
 ```
 
 ### 6. Test getting achievements
-You can go to `http://localhost:4000/achievements`, and you should get a map with every unlocked achievement currently. 
+You can go to `http://localhost:5000/achievements`, and you should get a map with every unlocked achievement currently. 
 
 ### Deployment Notes
 This service is deployment-agnostic and works anywhere Docker runs.
