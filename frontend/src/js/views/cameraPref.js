@@ -21,7 +21,7 @@ export class cameraPref {
 
   initializeSlides() {
     
-    // Identify buttons and set event listeners for buttons
+    // Identify buttons and set event listeners
     const nextButton = document.getElementById("next");
     const prevButton = document.getElementById("previous");
 
@@ -39,7 +39,7 @@ export class cameraPref {
 
 showSlides(n) {
   let i;
-  let slides = document.getElementsByClassName("mySlides");
+  let slides = document.getElementsByClassName("cameraView");
 
   if (n > slides.length) {this.slideIndex = 1}
   if (n < 1) {this.slideIndex = slides.length}
@@ -47,20 +47,18 @@ showSlides(n) {
   for (i = 0; i < slides.length; i++) {
     slides[i].style.display = "none";
   }
-
+  
   slides[this.slideIndex-1].style.display = "block";
 }
 
-// Next/previous controls
 plusSlides(n) {
   this.showSlides(this.slideIndex += n);
 }
 
-// Thumbnail image controls
 currentSlide(n) {
   this.showSlides(this.slideIndex = n);
 }
 
   reset() {}
-}
 
+}
