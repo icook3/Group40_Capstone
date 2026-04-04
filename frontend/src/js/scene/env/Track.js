@@ -7,7 +7,6 @@ import { Tween } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm
 import { constants } from "../../constants.js";
 import { getSign } from '../core/util.js';
 import  { activatePacer } from '../../main.js';
-import { Camera } from '../camera.js'
 
 export class Track {
   constructor({ scene }) {
@@ -49,7 +48,8 @@ export class Track {
     constants.trackPoints.push({ x: 0, y: 1, z: -1, length: 1 });
 
     spawn_track(this);
-
+    // DEFAULT THIS TO SOMETHING IF THERES NO STORED COORDIATES
+    this.viewCoordinates = JSON.parse(localStorage.getItem("view"));
     this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
@@ -138,11 +138,11 @@ export class Track {
           const rig = this._getCamera();
           if (rig) {
 
-              // RUNS X Y Z - MUST BE TIED TO RIDER
+              // Set rider coordinates
               rig.position.set(
-                  avatar.position.x + 0 + 0.5, // Add 0.5 to make up for spawn position
-                  avatar.position.y + 1 - 1, // Subtract 1 to make up for spawn position
-                  avatar.position.z + 0
+                  avatar.position.x + this.viewCoordinates.x + 0.5, // Add 0.5 to make up for spawn position
+                  avatar.position.y + this.viewCoordinates.y - 1, // Subtract 1 to make up for spawn position
+                  avatar.position.z + this.viewCoordinates.z
               );
           }
           })
@@ -365,6 +365,7 @@ export function update_pacer_animation(scene, update=false, bridge=false) {
   }
 
   let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
+  // THIS MAY BE ANIMATING TO SOMEWHERE BEHIND THE PACER - Z IS THE SAME AS RIDER Z
   const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
   let pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
