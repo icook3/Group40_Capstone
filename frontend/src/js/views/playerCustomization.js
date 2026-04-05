@@ -1,8 +1,10 @@
+import * as THREE from 'three';
 import { AvatarCreator } from "../avatarCreator.js";
 import { achievementManager } from "../achievements/achievementManager.js";
 export class playerCustomizationView {
     content;
     ready=false;
+    
     constructor(setWhenDone) {
         fetch("../html/playerCustomization.html").then((content)=> {
             return content.text();
@@ -13,21 +15,112 @@ export class playerCustomizationView {
             }
             this.ready=true;
         });
+
+        // Add reference to scene
+        this.scene = null;
     }
 
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
+
+        // Add scene and append to DOM
+        const canvas = this.initCustomizationScene();
+        canvas.style.position = "fixed";
+        canvas.style.top = "0";
+        canvas.style.left = "0";
+        canvas.style.zIndex = "-1";
+        document.getElementById("mainDiv").appendChild(canvas);
+
         this.stopLoop=false;
-        this.createAvatar();
+        
         const colorPicker = document.getElementById("colorPicker");
         this.createGenderLabels();
         this.initPlayerColors();
         this.initBikeColors();
         this.initHelmetColors();
-
         this.setInitialPickerValues();
 
     }
+    // Create the scene used to display the avatar during customization
+    initCustomizationScene() {
+        // Create new scene
+        const scene = new THREE.Scene();
+        this.scene = scene;
+        this.objectsLoaded = false;
+        this.scene.name = "playerCustomizerScene";
+        this.createAvatar();
+
+        // Add background
+        this.scene.background = new THREE.Color(0x87CEEB);
+
+        // Camera
+          const camera = new THREE.PerspectiveCamera(
+            80,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          );
+
+          camera.position.set(-3.33, .18, 2.6);
+          camera.rotation.order = 'YXZ';
+          camera.rotation.y = THREE.MathUtils.degToRad(-20);
+          camera.rotation.x = THREE.MathUtils.degToRad(11);
+          this.camera = camera;
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        this.renderer = renderer;
+
+        // Brown platform base (sides)
+        const baseGeometry = new THREE.CylinderGeometry(2.5, 2.5, 0.1);
+        const baseMaterial = new THREE.MeshBasicMaterial( { color: "#725335"} );
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = -1.2
+        this.scene.add( base );
+
+        // Green top surface
+        const circleGeometry = new THREE.CylinderGeometry(2.5, 2.5, 0.001);
+        const circleMaterial = new THREE.MeshBasicMaterial( { color: "#477e23"} );
+        const circle = new THREE.Mesh( circleGeometry, circleMaterial );
+        circle.position.y = -1.1;
+        this.scene.add( circle )
+
+        // Point camera at center of scene
+        camera.lookAt(new THREE.Vector3(0,0,0));
+
+        // Lighting (same as main menu)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        this.scene.add(ambientLight);
+    
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(2, 5, 3);
+        this.scene.add(directionalLight);
+    
+        const pointLight = new THREE.PointLight(0xffffff, 1.0, 5);
+        pointLight.position.set(0, 1, -1);
+        this.scene.add(pointLight);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.render(this.scene, camera);
+        });
+
+        // Animate scene (will also re-render changes)
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        return renderer.domElement;
+    }
+
     reset() {
         this.stopLoop=true;
     }
@@ -40,7 +133,6 @@ export class playerCustomizationView {
     rightArrow;
     stopLoop = true;
     createAvatar() {
-        this.scene = document.querySelector("#playerCustomizerScene");
         if (!this.scene) {
           console.error("Scene not found!");
           return;
@@ -57,13 +149,13 @@ export class playerCustomizationView {
             avatarInstance.startRotationLoop();
 
             window.avatarInstance = avatarInstance;
-          }
+          },
+          this.scene,
         );
     }
 
     createGenderLabels() {
         this.models = ["Male", "Female"];
-
         this.genderLabel = document.getElementById("genderLabel");
         this.leftArrow = document.getElementById("leftArrow");
         this.rightArrow = document.getElementById("rightArrow");
@@ -83,10 +175,11 @@ export class playerCustomizationView {
         let currentModelIndex = savedModel.toLowerCase() === "female" ? 1 : 0;
         this.genderLabel.textContent = this.models[currentModelIndex];
 
-        function updateGenderDisplay() {
+        function updateGenderDisplay(scene) {
             owner.genderLabel.textContent = owner.models[currentModelIndex];
             window.avatarInstance.setPlayerModel(
-                owner.models[currentModelIndex].toLowerCase()
+                owner.models[currentModelIndex].toLowerCase(),
+                scene
             );
             achievementManager.obtainAchievement("CreateACharacter");
         }
@@ -94,12 +187,12 @@ export class playerCustomizationView {
         owner.leftArrow.addEventListener("click", () => {
             currentModelIndex =
                 (currentModelIndex - 1 + owner.models.length) % owner.models.length;
-            updateGenderDisplay();
+            updateGenderDisplay(this.scene);
         });
 
         this.rightArrow.addEventListener("click", () => {
             currentModelIndex = (currentModelIndex + 1) % owner.models.length;
-            updateGenderDisplay();
+            updateGenderDisplay(this.scene);
         });
     }
 
@@ -166,7 +259,6 @@ export class playerCustomizationView {
             picker.addEventListener("input", (e) => {
                 const mat = picker.dataset.mat; // Frame_Mat, Tire_Mat, Grip_Mat, etc.
                 const color = e.target.value;
-
                 const avatar = window.avatarInstance;
 
                 //Get current bike colors

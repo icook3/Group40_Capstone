@@ -92,6 +92,7 @@ class Constants {
   sceneryItems = [];
   currentTrackPiece = 0;
   pacerCurrentTrackPiece = 0;
+  pacerTween = null;
 
   // Constants governing cloud speed
   lastCloud = Date.now();
