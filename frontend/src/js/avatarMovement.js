@@ -1,40 +1,14 @@
 import { AvatarCreator } from "./avatarCreator.js";
-import { constants } from "./constants.js";
 import { units } from "./units/index.js";
 
 export class AvatarMovement {
     constructor(id, options = {}) {
-        this.creator = new AvatarCreator(id, options.position);
+        this.creator = new AvatarCreator(id, options.position, undefined, null, options.scene || window.__zlowSceneInstance?.scene);
         this.avatarEntity = this.creator.avatarEntity;
         this.speed = 0;
         this.power = 0;
         this.isPacer = options.isPacer || false;
-
-        // Fix camera to rider entity
-        if (id == "rider") {
-            this.addCamera();
-        }
     }
-
-    // Add point-of-view camera to rider using a rig
-    addCamera() {
-        // Spawn from class rather than creating new
-        this.rider = document.getElementById('rider');
-        if (!this.rider) return;
-
-        const rig = document.createElement('a-entity');
-        rig.setAttribute('id','rig');
-
-        const camera = document.createElement('a-camera');
-        camera.setAttribute('wasd-controls-enabled', 'false');
-        camera.setAttribute('id','camera');
-        camera.setAttribute('look-controls','');
-        camera.setAttribute('position','4 5 7');
-        camera.setAttribute('look-at','#rider');
-
-        rig.appendChild(camera);
-        this.rider.appendChild(rig);
-        }
 
     //Helper to interpolate smoothly between A and B
     cycleInterpolate (a, b, phase) {
@@ -137,21 +111,6 @@ export class AvatarMovement {
             return;
         }
 
-        // Emit either a start or a resume event based on worldZ
-        if (constants.worldZ === 0) {
-            document.getElementById('rider').emit('riderStarted');
-            document.getElementById('pacer-entity').emit('pacerStart');
-        }
-
-        else if (this.speed === 0 && constants.worldZ > 0) {
-            // Emit a stop event if speed is 0
-            document.getElementById('rider').emit('riderStopped');
-        }
-
-        // Emit a resume event if both speed and worldZ are greater than 0
-        else {
-            document.getElementById('rider').emit('riderResumed');
-        }
         if (this.creator.leftPedalBone!=null) {
             this.animatePedalingBike(dt);
             this.animatePedalingPerson(dt);
