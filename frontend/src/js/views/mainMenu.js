@@ -37,6 +37,7 @@ export class mainMenuView {
             console.error("init Strava button failed");
         });
         this.initPeerButtons();
+        this.initLobbyButtons();
     }
 
     reset() {}
@@ -189,6 +190,20 @@ export class mainMenuView {
             if (name.length === 0) {
                 alert("Name cannot be empty");
             }
+        });
+    }
+
+    initLobbyButtons() {
+        const lobbyBrowserBtn = document.getElementById("lobby-browser-btn");
+
+        // If lobby multiplayer not configured, hide it
+        if (!features.multiplayerEnabled) {
+            lobbyBrowserBtn.style.display = "none";
+            return;
+        }
+
+        lobbyBrowserBtn.addEventListener("click", () => {
+           viewManager.setView(viewManager.views.lobbyBrowser);
         });
     }
 }
