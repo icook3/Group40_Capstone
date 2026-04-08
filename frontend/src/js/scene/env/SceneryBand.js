@@ -1,5 +1,4 @@
 // js/scene/env/SceneryBand.js
-import { getPos, setPos } from '../core/util.js';
 import { TreeKind } from '../objects/kinds/Tree.js';
 import { BuildingKind } from '../objects/kinds/Building.js';
 
@@ -16,7 +15,7 @@ const SCENERY_BAND_DEFAULTS = {
 
 export class SceneryBand {
   constructor({
-    sceneEl,
+    scene,
     policy = null,
     name = 'band',
     treeX = SCENERY_BAND_DEFAULTS.treeX,
@@ -27,10 +26,9 @@ export class SceneryBand {
     buildingChance = SCENERY_BAND_DEFAULTS.buildingChance,
     jitter = SCENERY_BAND_DEFAULTS.jitter
   }) {
-    this.sceneEl = sceneEl;
+    this.scene = scene;
     this.policy = policy;
     this.name = name;
-
     this.treeX = treeX;
     this.buildingX = buildingX;
     this.zStart = zStart;
@@ -38,13 +36,13 @@ export class SceneryBand {
     this.step = step;
     this.buildingChance = buildingChance;
     this.jitter = jitter;
-
     this.items = [];
 
     // RNG (seeded if policy supplies one)
     const rand =
-      (typeof this.policy?.rng === 'function' ? this.policy.rng(this.name) : null) ||
-      Math.random;
+      (typeof this.policy?.rng === 'function'
+        ? this.policy.rng(this.name)
+        : null) || Math.random;
 
     // Bind-aware clamp so policy methods keep their `this`
     const clampXBound = (kindName, side, x) => {
@@ -133,17 +131,14 @@ export class SceneryBand {
 
         // Spawn
         const obj = isBuilding
-          ? BuildingKind.spawn(this.sceneEl, zPlace, this.policy)
-          : TreeKind.spawn(this.sceneEl, zPlace);
+          ? BuildingKind.spawn(this.scene, zPlace, this.policy)
+          : TreeKind.spawn(this.scene, zPlace);
 
-        obj.setAttribute('zlow-band', 'edge-line');
-        obj.setAttribute('zlow-side', side === 1 ? 'right' : 'left');
-        obj.setAttribute('zlow-edge-x', String(anchorX));
-        obj.setAttribute('zlow-band-name', this.name);
-        obj.setAttribute('zlow-kind', kindName);
-
-        // Position (X jitter, clamp, Y offset)
-        const pos = getPos(obj);
+        obj.userData.zlowBand = "edge-line";
+        obj.userData.zlowSide = side === 1 ? "right" : "left";
+        obj.userData.zlowEdgeX = anchorX;
+        obj.userData.bandName = this.name;
+        obj.userData.zlowKind = kindName;
 
         const jitterAmp = (() => {
           const f = this.policy?.jitterX;
@@ -159,14 +154,17 @@ export class SceneryBand {
         const yOff = (() => {
           const f = this.policy?.yOffset;
           if (typeof f === 'function') {
-            try { return f(this.name, kindName, zPlace) ?? 0; } catch { return f(kindName, zPlace) ?? 0; }
+            try { return f(this.name, kindName, zPlace) ?? 0; }
+            catch { return f(kindName, zPlace) ?? 0; }
           }
           return 0;
         })();
 
-        pos.x = x;
-        pos.y = (pos.y ?? 0) + yOff;
-        setPos(obj, pos);
+        obj.position.x = x;
+        if (x>0) {
+          obj.rotation.set(0,Math.PI,0);
+        }
+        obj.position.y += yOff;
 
         // Record placement & keep
         recordZ(side, zPlace);
@@ -176,7 +174,8 @@ export class SceneryBand {
         const density = (() => {
           const f = this.policy?.density;
           if (typeof f === 'function') {
-            try { return f(this.name, zPlace) ?? 0; } catch { return f() ?? 0; }
+            try { return f(this.name, zPlace) ?? 0; }
+            catch { return f() ?? 0; }
           }
           return 0;
         })();
@@ -203,16 +202,14 @@ export class SceneryBand {
               : (isBuilding2 ? this.buildingX : this.treeX) * secondSide;
 
             const obj2 = isBuilding2
-              ? BuildingKind.spawn(this.sceneEl, zPlace2, this.policy)
-              : TreeKind.spawn(this.sceneEl, zPlace2);
+              ? BuildingKind.spawn(this.scene, zPlace2, this.policy)
+              : TreeKind.spawn(this.scene, zPlace2);
 
-            obj2.setAttribute('zlow-band', 'edge-line');
-            obj2.setAttribute('zlow-side', secondSide === 1 ? 'right' : 'left');
-            obj2.setAttribute('zlow-edge-x', String(anchorX2));
-            obj2.setAttribute('zlow-band-name', this.name);
-            obj2.setAttribute('zlow-kind', kindName2);
-
-            const pos2 = getPos(obj2);
+            obj2.userData.zlowBand = "edge-line";
+            obj2.userData.zlowSide = secondSide === 1 ? "right" : "left";
+            obj2.userData.zlowEdgeX = anchorX2;
+            obj2.userData.bandName = this.name;
+            obj2.userData.zlowKind = kindName2;
 
             const jitterAmp2 = (() => {
               const f = this.policy?.jitterX;
@@ -233,9 +230,11 @@ export class SceneryBand {
               return 0;
             })();
 
-            pos2.x = x2;
-            pos2.y = (pos2.y ?? 0) + yOff2;
-            setPos(obj2, pos2);
+            obj2.position.x = anchorX2 + (rand() - 0.5) * jitter;
+            if (obj2.position.x>0) {
+              obj2.rotation.set(0,Math.PI,0);
+            }
+            obj2.position.y += yOff;
 
             recordZ(secondSide, zPlace2);
             this.items.push(obj2);

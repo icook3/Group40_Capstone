@@ -3,10 +3,12 @@ services:
     build: ./strava_service
     ports: 
       - 8080:8080
+
   peer-server-service:
     build: ./peer_service
     ports: 
       - 9000:9000
+
   crash-logging-service:
     build: ./crash_logging_service
     ports:
@@ -15,3 +17,26 @@ services:
     build: ./achievements_service
     ports:
       - 5000:5000
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  lobby-service:
+    build: ./multiplayer_services/lobby-service
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  game-service:
+    build: ./multiplayer_services/game-service
+    ports:
+      - "4001:4001"
+    env_file:
+      - .env
+    depends_on:
+      - redis
