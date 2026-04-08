@@ -69,6 +69,23 @@ export class Track {
       this.path_element.parent?.remove(this.path_element);
   }
 
+  // Initialize rider animation attribute using a very short section of track to avoid division by zero
+  // Pacer starts when rider starts. Delay ensures pacer finishes loading
+  initialize_animation() {
+    const rider = this._getRider();
+    const pacer = this._getPacer();
+
+    if (!rider || !pacer) {
+      // Retry if avatars haven't loaded yet
+      setTimeout(() => this.initialize_animation(), 1000);
+      return;
+    }
+
+    this.update_rider_animation();
+    update_pacer_animation(this.scene);
+    activatePacer();
+  }
+
   // Update animation speed and target based on current track piece
   update_rider_animation() {
     if (constants.riderState.speed === 0) {
@@ -96,9 +113,10 @@ export class Track {
       return;
     }
 
-    // Increment current track piece and define starting and ending coordinates
+    // Increment current track piece, define start- and endpoints, and calculate rider's duration
     constants.currentTrackPiece += 1;
     let coords = { x: -0.5, y: 0, z: 0 };
+    
     if (constants.currentTrackPiece > 0) {
       const prev = constants.trackPoints[constants.currentTrackPiece - 1];
       coords = { x: prev.x - 0.5, y: prev.y, z: prev.z };
@@ -110,24 +128,40 @@ export class Track {
     const endpoint = { x: next.x - 0.5, y: next.y, z: next.z };
     const riderDuration = Math.round((next.length / constants.riderState.speed) * 1500);
 
-    const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
-        avatar.position.set(coords.x, coords.y, coords.z);
+    // If the rider tween has not been initialized, create it
+    if (!constants.riderTween){
+      const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
+          avatar.position.set(coords.x, coords.y, coords.z);
 
-        const rig = this._getCamera();
-        if (rig) {
-            rig.position.set(
-                avatar.position.x,
-                avatar.position.y + 4,
-                avatar.position.z + 8
-            );
+          // Manage camera
+          const rig = this._getCamera();
+          if (rig) {
+              rig.position.set(
+                  avatar.position.x,
+                  avatar.position.y + 4,
+                  avatar.position.z + 8
+              );
+          }
+          })
+          .onComplete(() => {
+            this.update_rider_animation();
+          }).start();
+          
+          // Store as a constant to allow for reuse
+          constants.riderTween = animateRider;
+          constants.riderStart = Date.now();
         }
-        })
-        .onComplete(() => {
-          this.update_rider_animation();
-        }).start();
+        
+    // If the tween does exist, update it
+    else {
+      constants.riderTween.stop();
+      constants.riderTween.to(endpoint, riderDuration).start();
+      constants.riderStart = Date.now();
+    }
 
+    // Helper function animating using time
     function animate(time) {
-      animateRider.update(time);
+      constants.riderTween.update(time);
       requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
@@ -136,25 +170,6 @@ export class Track {
       spawn_track(this);
     }
 }
-
-
-
-  // Initialize rider animation attribute using a very short section of track to avoid division by zero
-  // Pacer starts when rider starts. Delay ensures pacer finishes loading
-  initialize_animation() {
-    const rider = this._getRider();
-    const pacer = this._getPacer();
-
-    if (!rider || !pacer) {
-      // Retry if avatars haven't loaded yet
-      setTimeout(() => this.initialize_animation(), 1000);
-      return;
-    }
-
-    this.update_rider_animation();
-    update_pacer_animation(this.scene);
-    activatePacer();
-  }
 
   // Helper to find rider and camera in the scene
   _getRider() {
@@ -319,15 +334,12 @@ export function spawn_track(trackSystem) {
   }
 }
 
-export function update_pacer_animation(scene, update=false) {
+export function update_pacer_animation(scene, update=false, bridge=false) {
   if (constants.riderState.speed === 0) {
       setTimeout(() => update_pacer_animation(scene), 500);
       return;
     }
-
-  constants.pacerCurrentTrackPiece += 1;
   const pacer = scene.getObjectByName("pacer-entity");
-  
   if (!pacer) return;
 
   const BUFFER_POINTS = 10;
@@ -341,33 +353,60 @@ export function update_pacer_animation(scene, update=false) {
     return;
   }
 
+  // Get pacer and pacer speed and determine next endpoint
   const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
   if (pacerSpeed === 0) return;
 
-  let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
-  const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-  if (update) {
-    constants.pacerTween.stop();
-    constants.pacerTween = null;
+  // Increment track piece if not syncing players
+  if (!update) {
+    constants.pacerCurrentTrackPiece += 1;
   }
 
-   const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
-    pacer.position.set(coords.x, coords.y, coords.z);
+  let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
+  const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
+  let pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
+  // If pacer was synced immediately prior to this loop, calculate remaining duration
+  if (bridge) {
+    pacerDuration = Math.round((tp.length / pacerSpeed) * 1500) * (1-((Date.now() - constants.riderStart)/constants.riderTween._duration))
+  }
+
+  // If the tween governing the pacer doesn't exist, create it and store in constants
+  if (!constants.pacerTween) {
+    const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
+      pacer.position.set(coords.x, coords.y, coords.z);
   }).onComplete(() => {
     update_pacer_animation(scene);
   }).start();
-  if (update) {console.log(animatePacer)}
+
   constants.pacerTween = animatePacer;
-  
+  }
+
+  // If syncing pacer/players, move pacer to the rider's position using tween and trigger bridge animation
+  else if (update) {
+    const rider = scene.getObjectByName("rider");
+    constants.pacerTween.stop();
+    constants.pacerTween.to({ x: rider.position.x + 1, y: rider.position.y, z: rider.position.z }, 1).onComplete(() => {
+      update_pacer_animation(scene, false, true);
+    }).start();
+  }
+
+  // If the tween does exist, update it and check to see if more track is needed
+  else {
+      constants.pacerTween.stop();
+      constants.pacerTween.to(endpoint, pacerDuration).onComplete(() => {
+        update_pacer_animation(scene);
+      }).start();
+
+      if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+        spawn_track(this);
+      }
+    }
+
+  // Helper function to animate pacer
   function animate(time) {
-    animatePacer.update(time);
+    constants.pacerTween.update(time);
     requestAnimationFrame(animate);
   }
   requestAnimationFrame(animate);
-
-  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track(this);
-  }
 }
