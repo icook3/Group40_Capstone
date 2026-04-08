@@ -141,6 +141,8 @@ export class zlowScreen {
 
     reset() {
         this.loopRunning=false;
+        constants.riderTween?.stop?.();
+        constants.pacerTween?.stop?.();
         constants.riderState={power: 0,speed: 0,calories: 0, distanceMeters: 0};
         constants.pacerStarted = false;
         constants.pacerState={speed: 0, targetWatts: null};
@@ -155,6 +157,9 @@ export class zlowScreen {
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
         
+        constants.riderTween = null;
+        constants.pacerTween = null;
+        constants.riderStart = 0;
     }
 
     activatePacer() {
@@ -1097,9 +1102,6 @@ export class zlowScreen {
         // Clear singleton guards so fresh instances are created
         window.__zlowSceneInstance = null;
         window.__zlowTrackInstance = null;
-
-        // Reset all constants
-        this.reset();
 
         // Null out references so nothing carries over
         this.rider = null;
