@@ -50,7 +50,6 @@ export class ObjectField {
     const kind = this._pickKind();
     const entity = kind.spawn(this.scene, z);
     this.items.push(entity);
-
     // CAP HERE (right after push)
     const MAX_ITEMS = 1200; // start high; tune later
 
@@ -103,7 +102,9 @@ export class ObjectField {
         // resample X per-kind (keeps trees closer than buildings)
         const kind = detectKind(obj);
         obj.position.x = kind.resampleX();
-
+        if (obj.position.x>0) {
+          obj.rotation.set(0,Math.PI,0);
+        }
         // update minZ so multiple recycled objects don't stack
         minZ = obj.position.z;
       }
@@ -151,8 +152,14 @@ export class ObjectField {
               x = band.policy.clampX(kindName, side, x);
             }
             obj.position.x = x;
+            if (x>0) {
+              obj.rotation.set(0,Math.PI,0);
+            }
           } else {
             obj.position.x = detectKind(obj).resampleX();
+            if (obj.position.x>0) {
+              obj.rotation.set(0,Math.PI,0);
+            }
           }
 
           bandMinZ = obj.position.z;

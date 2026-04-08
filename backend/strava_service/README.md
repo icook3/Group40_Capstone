@@ -74,7 +74,7 @@ docker run --rm -p 8080:8080 --env-file .env strava-service
 You can verify if it is running at `http://localhost:8080/health` or `http://your-backend-example.com/health`
 You should get back `ok`
 
-### 5. Deploy or Expose Publicly to Test with Strava
+### 5. Deploy or Expose Publicly to Connect with Strava
 
 Strava must be able to reach this service at a **public HTTPS URL**.
 For local development or production, this means one of the following:
