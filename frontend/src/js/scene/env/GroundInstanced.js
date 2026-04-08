@@ -15,7 +15,11 @@ export class GroundInstanced {
         );
 
         const texture = new THREE.TextureLoader().load("../../resources/textures/Grass.jpeg");
-        const mat = new THREE.MeshBasicMaterial({ map: texture });
+        const mat = new THREE.MeshStandardMaterial({
+            map: texture,
+            color: 0x90b858,
+            roughness: 1
+        });
 
         this.mesh = new THREE.InstancedMesh(geom, mat, count);
 

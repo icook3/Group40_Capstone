@@ -29,6 +29,19 @@ export class Track {
 
     this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
 
+    this.trackMaterial = new THREE.MeshStandardMaterial({
+        map: this.trackTexture,
+        color:0xc8c0b0,
+        roughness: 0.9
+    });
+
+    this.trackMaterialDouble = new THREE.MeshStandardMaterial({
+        map: this.trackTexture,
+        color: 0xc8c0b0,
+        roughness: 0.9,
+        side: THREE.DoubleSide
+    });
+
     this.update_rider_animation = this.update_rider_animation.bind(this);
     this.update_pacer_animation = update_pacer_animation.bind(this);
 
@@ -38,11 +51,8 @@ export class Track {
       15
     );
 
-    const material = new THREE.MeshStandardMaterial({
-      map: this.trackTexture
-    });
+    const track = new THREE.Mesh(geometry, this.trackMaterial);
 
-    const track = new THREE.Mesh(geometry, material);
     track.position.set(0, 0, 4);
     this.path_element.add(track);
     constants.trackPoints.push({ x: 0, y: 1, z: -1, length: 1 });
@@ -199,12 +209,8 @@ function curve_180_right(trackSystem) {
     THREE.MathUtils.degToRad(180)
   );
 
-  const material = new THREE.MeshStandardMaterial({
-    map: trackSystem.trackTexture,
-    side: THREE.DoubleSide
-  });
+  const track = new THREE.Mesh(geometry, trackSystem.trackMaterialDouble);
 
-  const track = new THREE.Mesh(geometry, material);
   track.position.set(-3.5, constants.pathHeight, pointZ-30);
   track.rotation.x = -Math.PI/2;
 
@@ -239,12 +245,8 @@ function curve_180_left(trackSystem) {
     THREE.MathUtils.degToRad(180)
   );
 
-  const material = new THREE.MeshStandardMaterial({
-    map: trackSystem.trackTexture,
-    side: THREE.DoubleSide
-  });
+  const track = new THREE.Mesh(geometry, trackSystem.trackMaterialDouble);
 
-  const track = new THREE.Mesh(geometry, material);
   track.position.set(3.5, constants.pathHeight, pointZ-30);
   track.rotation.x = -Math.PI/2;
 
@@ -264,11 +266,7 @@ function straightPiece(trackSystem) {
     constants.pathDepth
   );
 
-  const material = new THREE.MeshStandardMaterial({
-    map: trackSystem.trackTexture
-  });
-
-  const track = new THREE.Mesh(geometry, material);
+  const track = new THREE.Mesh(geometry, trackSystem.trackMaterial);
 
    track.position.set(
      constants.pathPositionX,

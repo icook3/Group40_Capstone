@@ -3,9 +3,9 @@
 // Use null for services that are not configured in this environment.
 window.APP_CONFIG = window.APP_CONFIG || {
     // Peer to Peer multiplayer configuration variables
-    PEER_HOST: null, // Example: "127.0.0.1"
-    PEER_PATH: null, // Example: "/peerServer"
-    PEER_PORT: null, // Example: "9000"
+    PEER_HOST: "127.0.0.1", // Example: "127.0.0.1"
+    PEER_PATH: "/peerServer", // Example: "/peerServer"
+    PEER_PORT: "9000", // Example: "9000"
 
     // Strava configuration variables
     STRAVA_CLIENT_ID: null, // Example: 12345
