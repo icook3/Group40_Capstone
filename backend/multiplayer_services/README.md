@@ -101,6 +101,9 @@ GAME_PORT=4001
 # Internal service URLs
 GAME_SERVICE_URL=http://game-service:4001
 GAME_SERVICE_WS_URL=ws://game-service:4001
+
+# External Frontend URL
+FRONTEND_URL=https://frontend.com
 ```
 
 ### 3. Build Services

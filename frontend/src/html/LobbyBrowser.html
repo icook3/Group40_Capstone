@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <p>Lobby Browser</p>
-</body>
-</html>
+<div id="display-name-prompt">
+    <h2>Enter your display name</h2>
+    <form id="display-name-form">
+        <input id="display-name-input" type="text" maxlength="32" placeholder="Display name" />
+        <button type="submit">Enter Lobby</button>
+    </form>
+    <p id="display-name-error" style="color: red;"></p>
+</div>
+
+<div id="lobby-browser-content" style="display: none;">
+    <p>Playing as <span id="current-player-name"></span></p>
+    <!-- lobby list goes here -->
+</div>
