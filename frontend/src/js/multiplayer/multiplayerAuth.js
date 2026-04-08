@@ -1,4 +1,4 @@
-import config from "./config/configLoader.js";
+import config from "../config/configLoader.js";
 
 const STORAGE_KEY = "multiplayer_auth";
 const LOBBY_HTTP_URL = config.LOBBY_HTTP_URL;
@@ -15,11 +15,11 @@ export function getStoredAuth() {
     }
 }
 
-export async function authenticateGuest(display_name) {
+export async function authenticateGuest(displayNme) {
     const res = await fetch(`${LOBBY_HTTP_URL}/auth/guest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ display_name })
+        body: JSON.stringify({ displayNme })
     });
 
     if (!res.ok) {

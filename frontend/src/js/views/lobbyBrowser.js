@@ -1,4 +1,4 @@
-import {authenticateGuest, getStoredAuth} from "../multiplayerAuth.js";
+import {authenticateGuest, getStoredAuth} from "../multiplayer/multiplayerAuth.js";
 
 export class lobbyBrowserView {
     content;
