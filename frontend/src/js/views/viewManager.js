@@ -85,6 +85,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
+
                 this.currentView=this.views.mainMenu;
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
