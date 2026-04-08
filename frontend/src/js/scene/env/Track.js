@@ -2,333 +2,372 @@
   Creates the path the rider travels and circular patterns superimposed on the road.
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
+import * as THREE from "three";
+import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 import { constants } from "../../constants.js";
-import { getPos, setPos, getSign } from '../core/util.js';
-import  {activatePacer } from '../../main.js'
+import {getSign} from '../core/util.js';
+import  {activatePacer} from '../../main.js'
 
 export class Track {
-
-  constructor({ sceneEl }) {
+  constructor({ scene }) {
     // ---- SINGLETON GUARD / CLEANUP PREVIOUS INSTANCE ----
     if (window.__zlowTrackInstance) {
       window.__zlowTrackInstance.destroy?.();
     }
     window.__zlowTrackInstance = this;
-    this.sceneEl = sceneEl;
+    this.scene = scene;
 
-    // Create a-entity for the path and set ID
-    let path_element = document.getElementById('track');
+    let path_element = scene.getObjectByName("track");
     this._ownsPath = !path_element;
 
     if (!path_element) {
-      path_element = document.createElement('a-entity');
-      path_element.setAttribute('id','track');
-      sceneEl.appendChild(path_element);
+      path_element = new THREE.Group();
+      path_element.name = "track";
+      scene.add(path_element);
     }
     this.path_element = path_element;
 
+    this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
 
-    // Get entities needed to create the timeline animation
-    this.rider = document.getElementById('rider');
-    this.pacer = document.getElementById('pacer-entity');
-
-    // Spawn decorative track behind the rider and pacer and initial track point, then call main spawn function
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: 15`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 1`);
-    track.setAttribute('position', `0 0 4`);
-    this.path_element.appendChild(track);
-    constants.trackPoints.push({x: 0, y: 1, z: -1, length: 1});
-    spawn_track();
-
-    // As each animation completes, start the next one
     this.update_rider_animation = this.update_rider_animation.bind(this);
+    this.update_pacer_animation = update_pacer_animation.bind(this);
 
-  this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+    const geometry = new THREE.BoxGeometry(
+      constants.pathWidth,
+      constants.pathHeight,
+      15
+    );
+
+    const material = new THREE.MeshStandardMaterial({
+      map: this.trackTexture
+    });
+
+    const track = new THREE.Mesh(geometry, material);
+    track.position.set(0, 0, 4);
+    this.path_element.add(track);
+    constants.trackPoints.push({ x: 0, y: 1, z: -1, length: 1 });
+
+    spawn_track(this);
+
+    this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
   destroy() {
-  // 1) Remove event listener we added
-  if (this.rider && this.update_rider_animation) {
-    this.rider.removeEventListener("animationcomplete__1", this.update_rider_animation);
-  }
-  if (this.pacer && this.update_pacer_animation) {
-    this.pacer.removeEventListener("animationcomplete__2", this.update_pacer_animation);
+    if (this._initTimer) clearTimeout(this._initTimer);
+
+    this.path_element.traverse(obj => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(m => m.dispose());
+        } else {
+            obj.material.dispose();
+        }
+      }
+    });
+
+      this.path_element.parent?.remove(this.path_element);
   }
 
-  // 2) Clear the delayed init timer
-  if (this._initTimer) {
-    clearTimeout(this._initTimer);
-    this._initTimer = null;
-  }
+  // Update animation speed and target based on current track piece
+  update_rider_animation() {
+    if (constants.riderState.speed === 0) {
+      setTimeout(() => this.update_rider_animation(), 500);
+      return;
+    }
 
-  // 3) If you want to fully remove the track entity from DOM, do it here.
-  //    Only do this if THIS instance owns it; otherwise you might break others.
-  //    (See “ownsPath” note below.)
-  if (this._ownsPath && this.path_element) {
-    disposeAFrameEl(this.path_element);
-    this.path_element.parentNode?.removeChild(this.path_element);
-  }
+    const avatar = this._getRider();
+    if (!avatar) return;
 
-  // 4) Clear singleton pointer if it's us
-  if (window.__zlowTrackInstance === this) {
-    window.__zlowTrackInstance = null;
-  }
+    const BUFFER_POINTS = 10;
+    if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+      spawn_track(this);
+    }
+
+    // Guard against out-of-range and undefined track points
+    const tp = constants.trackPoints[constants.currentTrackPiece];
+    if (!tp) {
+      console.warn(
+        "[Track] Missing track point:",
+        constants.currentTrackPiece,
+        "trackPoints length:",
+        constants.trackPoints.length
+      );
+      return;
+    }
+
+    // Increment current track piece and define starting and ending coordinates
+    constants.currentTrackPiece += 1;
+    let coords = { x: -0.5, y: 0, z: 0 };
+    if (constants.currentTrackPiece > 0) {
+      const prev = constants.trackPoints[constants.currentTrackPiece - 1];
+      coords = { x: prev.x - 0.5, y: prev.y, z: prev.z };
+    }
+
+    const next = constants.trackPoints[constants.currentTrackPiece];
+    if (!next) return;
+
+    const endpoint = { x: next.x - 0.5, y: next.y, z: next.z };
+    const riderDuration = Math.round((next.length / constants.riderState.speed) * 1500);
+
+    const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
+        avatar.position.set(coords.x, coords.y, coords.z);
+
+        const rig = this._getCamera();
+        if (rig) {
+            rig.position.set(
+                avatar.position.x,
+                avatar.position.y + 4,
+                avatar.position.z + 8
+            );
+        }
+        })
+        .onComplete(() => {
+          this.update_rider_animation();
+        }).start();
+
+    function animate(time) {
+      animateRider.update(time);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    if (avatar.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+      spawn_track(this);
+    }
 }
 
 
-// Update animation speed and target based on current track piece
-update_rider_animation() {
-  constants.currentTrackPiece += 1;
-  const avatar = document.getElementById('rider');
-
-  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
-  if (!avatar) return; 
-
-  // ---- NEW: ensure we have enough track points before reading the next one ----
-  // If we're close to the end of the array, spawn more now (before indexing).
-  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
-  if (constants.currentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track();
-  }
-
-  // ---- NEW: guard against out-of-range / undefined ----
-  const tp = constants.trackPoints[constants.currentTrackPiece];
-  if (!tp) {
-    console.warn(
-      "[Track] Missing track point:",
-      constants.currentTrackPiece,
-      "trackPoints length:",
-      constants.trackPoints.length
-    );
-    return;
-  }
-
-  // Calculate rider's duration and set attributes
-  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const riderDuration = Math.round((tp.length / constants.riderState.speed) * 1500);
-
-  avatar.removeAttribute("animation__1");
-  avatar.setAttribute(
-    "animation__1",
-    `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${riderDuration}; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`
-  );
-
-  // If rider is within 200 units of the end, spawn some more track pieces
-  // (this can stay as-is; it’s your "keep ahead" logic)
-  if (getPos(avatar).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track();
-  }
-}
-
-update_pacer_animation() {
-  constants.pacerCurrentTrackPiece += 1;
-  const pacer = document.getElementById('pacer-entity');
-
-  // ✅ guard: if rider/pacer aren't there, bail (prevents util.js crash)
-  if (!pacer) return; 
-
-  // ---- NEW: ensure we have enough track points before reading the next one ----
-  // If we're close to the end of the array, spawn more now (before indexing).
-  const BUFFER_POINTS = 10; // small buffer; raise if you still hit edge cases
-  if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
-    spawn_track();
-  }
-
-  // ---- NEW: guard against out-of-range / undefined ----
-  const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
-  if (!tp) {
-    console.warn(
-      "[Track] Missing track point:",
-      constants.pacerCurrentTrackPiece,
-      "trackPoints length:",
-      constants.trackPoints.length
-    );
-    return;
-  }
-
-  // Calculate pacer's duration and set attributes
-  // Remove animation element and reset it to ensure that it runs instead of blocking the animation execution chain
-  const pacerSpeed = Number(document.getElementById('pacer-speed').value) || 0;
-  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
-
-  pacer.removeAttribute("animation__2");
-  pacer.setAttribute("animation__2", `property: position; to: ${tp.x} ${tp.y} ${tp.z}; dur: ${pacerDuration}; easing: linear; loop: false; autoplay: true;`);
-
-  // If rider is within 200 units of the end, spawn some more track pieces
-  // (this can stay as-is; it’s your "keep ahead" logic)
-  if (getPos(pacer).z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
-    spawn_track();
-  }
-}
 
   // Initialize rider animation attribute using a very short section of track to avoid division by zero
   // Pacer starts when rider starts. Delay ensures pacer finishes loading
   initialize_animation() {
-    this.waitForElement('#pacer-entity', (element) => {
-      this.rider.addEventListener('animationcomplete__1', this.update_rider_animation);
-      document.getElementById("pacer-entity").addEventListener('animationcomplete__2', this.update_pacer_animation);
-      this.rider.setAttribute("animation__1", `property: position; to: ${constants.trackPoints[0].x} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; delay: 5000; easing: linear; loop: false; startEvents: riderStarted; pauseEvents: riderStopped; resumeEvents: riderResumed;`);
-      document.getElementById("pacer-entity").setAttribute("animation__2", `property: position; to: ${constants.trackPoints[0].x + 0.5} ${constants.trackPoints[0].y} ${constants.trackPoints[0].z}; dur: 1; easing: linear; loop: false; autoplay:true;`);
-      activatePacer();
-      
-    });
+    const rider = this._getRider();
+    const pacer = this._getPacer();
+
+    if (!rider || !pacer) {
+      // Retry if avatars haven't loaded yet
+      setTimeout(() => this.initialize_animation(), 1000);
+      return;
+    }
+
+    this.update_rider_animation();
+    update_pacer_animation(this.scene);
+    activatePacer();
   }
 
-  // Helper function to check for an element's existance
-  waitForElement(selector, callback) {
-    const observer = new MutationObserver((mutations, observer) => {
-        const element = document.querySelector(selector);
-        if (element) {
-            observer.disconnect();
-            callback(element);
-        }
-    });
+  // Helper to find rider and camera in the scene
+  _getRider() {
+    return this.scene.getObjectByName("rider");
+  }
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-    });
+  _getCamera() {
+    // Look for the rig first, fall back to any camera
+    return this.scene.getObjectByName("rig");
+  }
+
+  _getPacer() {
+    return this.scene.getObjectByName("pacer-entity");
   }
 }
 
-function disposeAFrameEl(el) {
-  if (!el) return;
+// Create and append a track piece curving to the right
+function curve_180_right(trackSystem) {
+  const path_element = trackSystem.path_element;
+  const pointZ = -1 * (constants.farthestSpawn);
 
-  // A-Frame keeps the THREE object tree at el.object3D
-  const root = el.object3D;
-  if (!root) return;
+  // Add necessary points based on current farthest spawn
+  constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 16.55});
+  constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 11.31});
+  constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 9.22});
+  constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 9.22});
+  constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 16.16});
+  constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 9.22});
+  constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8.54});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.61});
 
-  root.traverse((obj) => {
-    if (obj.geometry) obj.geometry.dispose?.();
+  // Update farthestSpan
+  constants.farthestSpawn += 62;
 
-    if (obj.material) {
-      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-      for (const m of mats) {
-        // dispose common texture slots
-        m.map?.dispose?.();
-        m.normalMap?.dispose?.();
-        m.roughnessMap?.dispose?.();
-        m.metalnessMap?.dispose?.();
-        m.aoMap?.dispose?.();
-        m.emissiveMap?.dispose?.();
-        m.dispose?.();
-      }
-    }
+  // Add graphical track representation
+  const geometry = new THREE.RingGeometry(
+    25,
+    35,
+    32,
+    1,
+    THREE.MathUtils.degToRad(270),
+    THREE.MathUtils.degToRad(180)
+  );
+
+  const material = new THREE.MeshStandardMaterial({
+    map: trackSystem.trackTexture,
+    side: THREE.DoubleSide
   });
+
+  const track = new THREE.Mesh(geometry, material);
+  track.position.set(-3.5, constants.pathHeight, pointZ-30);
+  track.rotation.x = -Math.PI/2;
+
+  path_element.add(track);
 }
 
-  // Create and append a track piece curving to the right
-  function curve_180_right() {
-    let path_element = document.getElementById('track');
-    const track = document.createElement('a-entity');
-    let pointZ = -1 * (constants.farthestSpawn);
+// Create and append a track piece curving to the left
+function curve_180_left(trackSystem) {
+  const path_element = trackSystem.path_element;
+  const pointZ = -1 * (constants.farthestSpawn);
 
-    // Add necessary points based on current farthest spawn
-    constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 16.55});
-    constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 11.31});
-    constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 9.22});
-    constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 9.22});
-    constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 16.16});
-    constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 9.22});
-    constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8.54});
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.61});
+  // Add necessary points based on current farthest spawn
+  constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 16.55});
+  constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 11.31});
+  constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 9.22});
+  constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 9.22});
+  constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 16.16});
+  constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 9.22});
+  constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8.54});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.62});
 
-    // Update farthestSpan
-    constants.farthestSpawn += 62;
+  // Update farthestSpan
+  constants.farthestSpawn += 62;
 
-    // Add graphical track representation
-    track.setAttribute('id', 'curve')
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 270`);
-    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
-    track.setAttribute('configuration', `curve_right_180`);
+  // Add graphical track representation
+  const geometry = new THREE.RingGeometry(
+    25,
+    35,
+    32,
+    1,
+    THREE.MathUtils.degToRad(90),
+    THREE.MathUtils.degToRad(180)
+  );
 
-    // Subract an additional 30 to compensate for centering mismatches
-    track.setAttribute('position', `-3.5 ${constants.pathHeight} ${pointZ-30}`);
-    track.setAttribute('rotation', '-90 0 0');
-    path_element.appendChild(track);
-  }
+  const material = new THREE.MeshStandardMaterial({
+    map: trackSystem.trackTexture,
+    side: THREE.DoubleSide
+  });
 
-  // Create and append a track piece curving to the left
-  function curve_180_left() {
-    let path_element = document.getElementById('track');
-    const track = document.createElement('a-entity');
-    let pointZ = -1 * (constants.farthestSpawn);
+  const track = new THREE.Mesh(geometry, material);
+  track.position.set(3.5, constants.pathHeight, pointZ-30);
+  track.rotation.x = -Math.PI/2;
 
-    // Add necessary points based on current farthest spawn
-    constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 16.55});
-    constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 11.31});
-    constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 9.22});
-    constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 9.22});
-    constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 16.16});
-    constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 9.22});
-    constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8.54});
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.62});
-
-    // Update farthestSpan
-    constants.farthestSpawn += 62;
-
-    // Add graphical track representation
-    track.setAttribute('id', 'curve')
-    track.setAttribute('geometry',`primitive: ring; radiusInner: 25; radiusOuter: 35; thetaLength: 180; thetaStart: 90`);
-    track.setAttribute('material', `src: #track-texture; repeat: 7.5 7.5`);
-    track.setAttribute('configuration', `curve_right_180`);
-
-    // Subract an additional 30 to compensate for centering mismatches
-    track.setAttribute('position', `3.5 ${constants.pathHeight} ${pointZ-30}`);
-    track.setAttribute('rotation', '-90 0 0');
-    path_element.appendChild(track);
-  }
-
-function straightPiece() {
-  let path_element = document.getElementById('track');
-    // Spawn track pieces in 5 unit increments
-    let pointZ = -1 * (constants.farthestSpawn + 5);
-
-    // Adjust Z spawn position to correct for centering of the box geometry
-    let trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
-    constants.farthestSpawn += 5;
-    constants.trackPoints.push({x: 0, y: 1, z: pointZ, length: 5});
-
-    const track = document.createElement('a-entity');
-    track.setAttribute('geometry',`primitive: box; width: ${constants.pathWidth}; height: ${constants.pathHeight}; depth: ${constants.pathDepth}`);
-    track.setAttribute('material', `src: #track-texture; repeat: 1 0.25`);
-    track.setAttribute('configuration', `straight_vertical`);
-    track.setAttribute('position', `${constants.pathPositionX} ${constants.pathPositionY} ${trackZ}`);
-    path_element.appendChild(track);
+  path_element.add(track);
 }
 
-  // Spawn track pieces in
-  export function spawn_track() {
-    for (let i = 0; i < 80; i++) {
-      // Spawn straight pieces in sets of three and more often than curved pieces
-      let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+function straightPiece(trackSystem) {
+  const path_element = trackSystem.path_element;
+  const pointZ = -1 * (constants.farthestSpawn + 5);
+  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+  constants.farthestSpawn += 5;
+  constants.trackPoints.push({ x: 0, y: 1, z: pointZ, length: 5 });
 
-      if (random % 15 == 0 && getSign()) {
-        straightPiece();
-        curve_180_right();
-        straightPiece();
-      }
-      else if (random % 15 == 0 && !getSign()) {
-        straightPiece();
-        curve_180_left();
-        straightPiece();
-      }
+  const geometry = new THREE.BoxGeometry(
+    constants.pathWidth,
+    constants.pathHeight,
+    constants.pathDepth
+  );
 
-      else {
-        straightPiece();
-        straightPiece();
-        straightPiece();
+  const material = new THREE.MeshStandardMaterial({
+    map: trackSystem.trackTexture
+  });
+
+  const track = new THREE.Mesh(geometry, material);
+
+   track.position.set(
+     constants.pathPositionX,
+     constants.pathPositionY,
+     trackZ
+   );
+
+   path_element.add(track);
+}
+
+// Spawn track pieces in
+export function spawn_track(trackSystem) {
+  for (let i = 0; i < 80; i++) {
+    // Spawn straight pieces in sets of three and more often than curved pieces
+    let random = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+
+    if (random % 15 === 0 && getSign()) {
+      straightPiece(trackSystem);
+      curve_180_right(trackSystem);
+      straightPiece(trackSystem);
+    } else if (random % 15 === 0 && !getSign()) {
+      straightPiece(trackSystem);
+      curve_180_left(trackSystem);
+      straightPiece(trackSystem);
+    } else {
+      straightPiece(trackSystem);
+      straightPiece(trackSystem);
+      straightPiece(trackSystem);
       }
     }
 
-    // Shorten track element array every time it exceeds 200 elements
-    let track_elements = document.getElementById('track').children;
-    if (track_elements.length > 200) {
-      for (let i = 0; i < 100; i++) {
-        if (track_elements[0].getAttribute('position').z > getPos(document.getElementById('rider')).z + 20) {
-          track_elements[0].parentNode.removeChild(track_elements[0]);
-        }
+  // Shorten track element array every time it exceeds 200 elements
+  let track_elements = trackSystem.path_element.children;
+  if (track_elements.length > 200) {
+    const riderObj = trackSystem.scene.getObjectByName("rider");
+    const riderZ = riderObj?.position.z ?? 0;
+    let removed = 0;
+    while (track_elements.length > 100 && removed < 100) {
+      const obj = track_elements[0];
+      // Only remove pieces that are behind the rider
+      if (obj.position.z > riderZ + 20) {
+        obj.parent.remove(obj);
+        removed++;
+      } else {
+        break; // stop if we've reached pieces the rider hasn't passed
       }
     }
   }
+}
+
+export function update_pacer_animation(scene, update=false) {
+  if (constants.riderState.speed === 0) {
+      setTimeout(() => update_pacer_animation(scene), 500);
+      return;
+    }
+
+  constants.pacerCurrentTrackPiece += 1;
+  const pacer = scene.getObjectByName("pacer-entity");
+  
+  if (!pacer) return;
+
+  const BUFFER_POINTS = 10;
+  if (constants.pacerCurrentTrackPiece + BUFFER_POINTS >= constants.trackPoints.length) {
+    spawn_track(this);
+  }
+
+  const tp = constants.trackPoints[constants.pacerCurrentTrackPiece];
+  if (!tp) {
+    console.warn("[Track] Missing pacer track point:", constants.pacerCurrentTrackPiece);
+    return;
+  }
+
+  const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
+  if (pacerSpeed === 0) return;
+
+  let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
+  const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
+  const pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
+
+  if (update) {
+    constants.pacerTween.stop();
+    constants.pacerTween = null;
+  }
+
+   const animatePacer = new Tween(coords, false).to(endpoint, pacerDuration).onUpdate(() => {
+    pacer.position.set(coords.x, coords.y, coords.z);
+  }).onComplete(() => {
+    update_pacer_animation(scene);
+  }).start();
+  if (update) {console.log(animatePacer)}
+  constants.pacerTween = animatePacer;
+  
+  function animate(time) {
+    animatePacer.update(time);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  if (pacer.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
+    spawn_track(this);
+  }
+}

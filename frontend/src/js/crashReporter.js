@@ -27,7 +27,7 @@ export function initCrashReporter(getMetadata) {
     let backendUp = false;
     let alreadyReporting = false;
     let memoryWatchdogFired = false;
-    let aframeWatchdogFired = false;
+    let threeJsWatchdogFired = false;
     let lastSnapshot = {};
 
     (async () => {
@@ -105,12 +105,12 @@ export function initCrashReporter(getMetadata) {
         }, 2000);
     }
 
-    function startAframeRenderWatchdog() {
+    function startThreeJsRenderWatchdog() {
         setInterval(() => {
-            if (aframeWatchdogFired) return;
+            if (threeJsWatchdogFired) return;
 
             try {
-                const info = AFRAME?.scenes?.[0]?.renderer?.info;
+                const info = window.__zlowSceneInstance?.renderer;
                 if (!info) return;
 
                 const geom = info.memory?.geometries || 0;
@@ -120,11 +120,11 @@ export function initCrashReporter(getMetadata) {
 
                 // These should roughly plateau after the scene loads
                 if (calls > 1500 || tris > 1000000 || geom > 1500 || tex > 400) {
-                    aframeWatchdogFired = true;
+                    threeJsWatchdogFired = true;
 
                     sendCrash(
                         `Renderer pressure detected: calls=${calls}, tris=${tris}, geom=${geom}, tex=${tex}`,
-                        "A-Frame render watchdog"
+                        "Three.js render watchdog"
                     );
                 }
             } catch {
@@ -148,7 +148,7 @@ export function initCrashReporter(getMetadata) {
     });
 
     startMemoryWatchdog();
-    startAframeRenderWatchdog();
+    startThreeJsRenderWatchdog();
 }
 
 export async function collectEnvironmentSnapshot() {
