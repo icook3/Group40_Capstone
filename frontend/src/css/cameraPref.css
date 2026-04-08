@@ -1,80 +1,56 @@
 /* Slideshow container */
 .slideshow-container {
-  position: relative;
-
-}
-
-/* Hide the images by default */
-.cameraView {
-  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 /* Next & previous buttons */
 .prev {
-  position: absolute;
-  bottom: 50%;
-  left: 0px;
-  width: 15%;
-  height: 10%;
+position: absolute;
+  top: 50%;
+  padding: 16px;
   text-align: center;
   justify-content: center;
-  color: white;
+  color: #1f6784;
   font-weight: bold;
-  font-size: 48px;
+  font-size: 60px;
   transition: 0.6s ease;
-  background-color: rgba(0,0,0,0.8);
 }
 
-/* Next & previous buttons */
 .next {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 15%;
-  height: 10%;
+  top: 50%;
+  padding: 16px;
+  right:0;
   text-align: center;
   justify-content: center;
-  color: white;
+  color: #1f6784;
   font-weight: bold;
-  font-size: 48px;
+  font-size: 60px;
   transition: 0.6s ease;
-  background-color: rgba(0,0,0,0.8);
 }
 
 .bottomDiv {
-  position: absolute;
-  bottom: 0; 
-  width: 70%;
-  height: 10%;
-  left: 15%;
-  text-align: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 48px;
-  background-color: rgba(0,0,0,0.8);
-  color: white;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  width: 6%;
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px clamp(32px, 6vw, 52px);
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  color: #e0f7ef;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
 }
 
 .prev:hover, .next:hover, .bottomDiv:hover {
   background-color: gray;
-}
-
-/* Number text (1/3 etc) */
-.numbertext {
-  color: #f2f2f2;
-  font-size: 12px;
-  padding: 8px 12px;
-  position: absolute;
-  top: 0;
-}
-
-/* Fading animation */
-.fade {
-  animation-name: fade;
-  animation-duration: 1.5s;
-}
-
-@keyframes fade {
-  from {opacity: .4}
-  to {opacity: 1}
 }

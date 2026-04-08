@@ -1,11 +1,8 @@
 import * as THREE from 'three';
-import { AvatarCreator } from "../avatarCreator.js";
 import { AvatarMovement } from "../avatarMovement.js";
-import { ObjectField } from "../scene/objects/ObjectField.js";
 import { Track } from "../scene/env/Track.js";
 import { Cloud } from "../scene/env/Cloud.js";
 import { SceneryManager } from "../scene/env/SceneryManager.js";
-import { constants } from "../constants.js";
 import {GroundInstanced} from "../scene/env/GroundInstanced.js";
 
 export class cameraPref {
@@ -39,7 +36,6 @@ export class cameraPref {
     // Assign this.viewCoordinates[0] to the relevant local storage variable
     localStorage.setItem("view", JSON.stringify(this.viewCoordinates[0]));
 
-
     const camera = new THREE.PerspectiveCamera(
       80,
       window.innerWidth / window.innerHeight,
@@ -50,6 +46,7 @@ export class cameraPref {
     // Get necessary buttons and add event listeners
     const nextButton = document.getElementById("next");
     const prevButton = document.getElementById("previous");
+    const selectButton = document.getElementById("selectButton");
 
     nextButton.addEventListener("click", () => {
       this.changeView(1, camera);
@@ -57,6 +54,15 @@ export class cameraPref {
 
     prevButton.addEventListener("click", () => {
       this.changeView(-1, camera);
+    });
+
+    // Save coordinates associated with view to local storage when selected; then return to main menu
+    selectButton.addEventListener("click", () => {
+      localStorage.setItem("view", JSON.stringify(this.viewCoordinates[this.viewIndex]));
+      this.reset();
+
+      //alert(JSON.parse(localStorage.getItem("view")).x);
+      viewManager.setView(viewManager.views.mainMenu);
     });
 
     // Create new canvas and generate Zlow scene
@@ -74,9 +80,6 @@ export class cameraPref {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-    // Create and configure camera
-    
 
     // Get coordinates and configure camera
     let coords = JSON.parse(localStorage.getItem("view"));
@@ -135,7 +138,7 @@ export class cameraPref {
     }
 
     else if (this.viewIndex + increment < 0) {
-      this.viewCoordinates.length - 1;
+      this.viewIndex = this.viewCoordinates.length - 1;
     }
 
     else {
@@ -146,8 +149,6 @@ export class cameraPref {
     camera.position.x = this.viewCoordinates[this.viewIndex].x;
     camera.position.y = this.viewCoordinates[this.viewIndex].y;
     camera.position.z = this.viewCoordinates[this.viewIndex].z;
-
-    // Re-render scene  -- IS THIS NECESSARY
 
   }
     
