@@ -98,22 +98,22 @@ export class GameClient {
 
     buildBinaryRiderInput(power, speed, x, y, view) {
         //player_id: 1B (u8)
-        view.setUint8(7, this.playerSlot);
+        view.setUint8(headerLength, this.playerSlot);
 
         // power: 2B (u16) - watts
-        view.setUint16(8, power, false);
+        view.setUint16(headerLength + 1, power, false);
 
         // speed: 2B (u16) - km/h × 10
         const speedTimes10 = Math.round(speed * 10);
-        view.setUint16(10, speedTimes10, false);
+        view.setUint16(headerLength + 3, speedTimes10, false);
 
         // x: 4B (s32) - meters × 10, negative = west
         const xTimes10 = Math.round(x * 10);
-        view.setInt32(12, xTimes10, false);
+        view.setInt32(headerLength + 5, xTimes10, false);
 
         // y: 4B (s32) - meters × 10, negative = south
         const yTimes10 = Math.round(y * 10);
-        view.setInt32(16, yTimes10, false);
+        view.setInt32(headerLength + 9, yTimes10, false);
     }
 
     on(messageType, handler) {
