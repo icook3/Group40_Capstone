@@ -652,9 +652,18 @@ export class zlowScreen {
         if (this.scene && this.rider && this.pacer) {
     
           // Set pacer constants to rider constants and adjust animation
+          const riderSpeed = constants.riderState.speed || 0;
+
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = constants.riderState.speed;
-          update_pacer_animation(this.scene.scene, true)
+          constants.pacerState.speed = riderSpeed;
+          this.setPacerSpeed(riderSpeed);
+
+          const pacerSpeedInput = document.getElementById("pacer-speed");
+          if (pacerSpeedInput) {
+            pacerSpeedInput.value = riderSpeed;
+          }
+
+          update_pacer_animation(this.scene.scene, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
@@ -814,6 +823,8 @@ export class zlowScreen {
             // using the same physics as the real rider for smooth changes.
             pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
           }
+        } else {
+          owner.setPacerTargetWatts(null);
         }
         // If workoutController is null (free ride, peer-to-peer),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
