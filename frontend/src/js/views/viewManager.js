@@ -6,6 +6,7 @@ import { playerCustomizationView } from "./playerCustomization.js";
 import { connectToPeersView } from "./connectToPeers.js";
 import { achievementsView } from "./achievements.js";
 import { lobbyBrowserView } from "./lobbyBrowser.js";
+import { lobbyRoomView } from "./lobbyRoom.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -15,6 +16,7 @@ class ViewStorage {
     zlowScreen;
     achievements;
     lobbyBrowser;
+    lobbyRoom;
 }
 
 export class ViewManager {
@@ -25,7 +27,8 @@ export class ViewManager {
         playerCustomization: "playerCustomization",
         mainZlow: "mainZlow",
         achievements: "achievements",
-        lobbyBowser: "lobbyBowser"
+        lobbyBowser: "lobbyBrowser",
+        lobbyRoom: "lobbyRoom"
     };
 
     viewStorage = new ViewStorage();
@@ -54,6 +57,7 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 break;
             case this.views.changelog:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -63,6 +67,7 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(true);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 break;
             case this.views.peerConnect:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -72,6 +77,7 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 break;
             case this.views.playerCustomization:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -81,6 +87,7 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 break;
             case this.views.mainZlow:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -90,6 +97,7 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 break;
             case this.views.achievements:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -99,6 +107,7 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(true);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 break;
             case this.views.lobbyBowser:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -108,6 +117,17 @@ export class ViewManager {
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(true);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                break;
+            case this.views.lobbyRoom:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(true);
                 break;
             default:
                 console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
@@ -116,6 +136,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.currentView=this.views.mainMenu;
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
@@ -144,7 +166,10 @@ export class ViewManager {
                 this.viewStorage.achievements.reset();
                 break;
             case this.views.lobbyBrowser:
-                this.viewStorage.lobbyBrowser.resets();
+                this.viewStorage.lobbyBrowser.reset();
+                break;
+            case this.views.lobbyRoom:
+                this.viewStorage.lobbyRoom.reset();
                 break;
         }
         //set the current page
@@ -184,10 +209,14 @@ export class ViewManager {
                     this.viewStorage.lobbyBrowser.setPage();
                 }
                 break;
+            case this.views.lobbyRoom:
+                if (this.viewStorage.lobbyRoom.ready) {
+                    this.viewStorage.lobbyRoom.setPage();
+                }
+                break;
             default: 
                 console.error("This view is not available!");
                 return;
-                break;
         }
         this.currentView=view;
         sessionStorage.setItem("currentView",this.currentView);

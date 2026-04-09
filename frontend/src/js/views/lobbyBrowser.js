@@ -80,6 +80,7 @@ export class lobbyBrowserView {
 
     initLobbyBrowser(auth) {
         this.lobbyClient = new LobbyClient();
+        window.__lobbyClient = this.lobbyClient
 
         this.allLobbies = [];
         this.activeFilter = 'all';
@@ -130,6 +131,12 @@ export class lobbyBrowserView {
 
         document.getElementById('pw-confirm-btn').addEventListener('click', () => {
             this.handlePasswordConfirm();
+        });
+
+        document.getElementById('browser-back-btn')?.addEventListener('click', () => {
+            this.lobbyClient?.disconnect();
+            window.__lobbyClient = null;
+            window.viewManager.setView(window.viewManager.views.mainMenu);
         });
     }
 
@@ -243,7 +250,16 @@ export class lobbyBrowserView {
 
     getPlayerData() {
         try {
-            return JSON.parse(localStorage.getItem('playerData'));
+            const data = JSON.parse(localStorage.getItem('playerData'));
+            if (data) return data;
+
+            // Return defaults matching AvatarCreator defaults
+            return {
+                model: 'male',
+                colors: { skin: '#c1591a', shirt: '#ff0000', shorts: '#000000', shoes: '#000000' },
+                bikeColors: { frame: '#ff5500', tires: '#333333', grip: '#000000', seat: '#222222', pedals: '#555555', pedalCrank: '#888888' },
+                helmetColors: { helmet: '#A7E800', padding: '#333333' }
+            }
         } catch { return null; }
     }
 
@@ -252,7 +268,7 @@ export class lobbyBrowserView {
     }
 
     reset() {
-        this.lobbyClient?.disconnect();
-        this.lobbyClient = null;
+        // Don't disconnect here. Lobby room reuses this connection
+        // Only disconnect if we're going back to main menu
     }
 }

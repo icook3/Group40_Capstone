@@ -1,0 +1,212 @@
+#mainDiv {
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* -- Lobby room screen -- */
+#lobby-room-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* -- Header -- */
+.lobby-room-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px 0;
+}
+
+.lobby-room-title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.lobby-room-name {
+    font-family: "Fugaz One", sans-serif;
+    font-size: 1.3rem;
+    color: #1a3a2a;
+}
+
+.lobby-room-meta {
+    font-size: 0.78rem;
+    color: rgba(26, 58, 42, 0.55);
+    font-family: "Nunito", sans-serif;
+    font-weight: 600;
+}
+
+/* -- Body -- */
+.lobby-room-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 24px 40px;
+    gap: 24px;
+    overflow-y: auto;
+}
+
+/* -- Player grid -- */
+.player-grid {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+    max-width: 720px;
+}
+
+/* Grid layouts based on max_players */
+.player-grid.grid-2  {
+    grid-template-columns: repeat(2, minmax(0, 140px));
+    justify-content: center;
+}
+.player-grid.grid-4  {
+    grid-template-columns: repeat(2, minmax(0, 140px));
+    justify-content: center;
+}
+.player-grid.grid-8  {
+    grid-template-columns: repeat(4, minmax(0, 140px));
+    justify-content: center;
+}
+.player-grid.grid-16 {
+    grid-template-columns: repeat(4, minmax(0, 140px));
+    justify-content: center;
+}
+
+
+/* -- Player slot -- */
+.player-slot {
+    background: rgb(53, 72, 79);
+    border-radius: 14px;
+    padding: 14px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
+    aspect-ratio: 3 / 4;
+    min-height: 50px;
+}
+
+.player-slot.ready {
+    border-color: #2d7a4a;
+}
+
+.player-slot.empty {
+    opacity: 0.4;
+}
+
+/* Slot number */
+.slot-number {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-family: "Nunito", sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(224, 224, 224, 0.4);
+}
+
+/* Host badge */
+.slot-host-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: "Nunito", sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #f0c040;
+}
+
+.slot-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 16px;
+    flex-shrink: 0;
+}
+
+.slot-display-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #e0f7ef;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    padding: 0 4px;
+    font-family: "Nunito", sans-serif;
+}
+
+.slot-ready-indicator {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #2d7a4a;
+    min-height: 12px;
+    font-family: "Nunito", sans-serif;
+}
+
+/* -- Actions -- */
+.lobby-room-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.lobby-start-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.05rem;
+}
+
+.lobby-room-hint {
+    font-family: "Nunito", sans-serif;
+    font-size: 0.8rem;
+    color: rgba(26, 58, 42, 0.5);
+    font-weight: 600;
+    text-align: center;
+    min-height: 18px;
+}
+
+/* -- Leave confirm overlay -- */
+.leave-confirm-msg {
+    font-family: "Nunito", sans-serif;
+    font-size: 0.85rem;
+    color: rgba(224, 224, 224, 0.7);
+    text-align: center;
+    line-height: 1.5;
+}
+
+.lobby-btn-danger {
+    background: rgb(160, 50, 50);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: #fff;
+    font-family: "Nunito", sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    flex: 2;
+}
+
+.lobby-btn-danger:hover {
+    background: rgb(180, 60, 60);
+}
+
