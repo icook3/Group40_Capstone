@@ -254,10 +254,10 @@ export class achievementsView {
         this.loadModel(`${modelBasePath}/bgmodels/TallBuilding.glb`,
             { x: -4, y: -0.25, z: -20 }, { x: 0, y: -50, z: 10 }, 1.0, loader);
 
-        this.loadModel(`${modelBasePath}/bgmodels/House.glb`,
+        this.loadModel(`${modelBasePath}/bgmodels/house.glb`,
             { x: 50, y: 0, z: -18 }, { x: 0, y: 180, z: 0 }, 2.0, loader);
 
-        this.loadModel(`${modelBasePath}/bgmodels/WideBuilding.glb`,
+        this.loadModel(`${modelBasePath}/bgmodels/wideBuilding.glb`,
             { x: -7, y: -0.25, z: -28 }, { x: 0, y: -50, z: 10 }, 1.2, loader);
 
         // Handle window resize

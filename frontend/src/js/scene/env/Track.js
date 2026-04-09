@@ -318,7 +318,8 @@ export function spawn_track(trackSystem) {
   // Shorten track element array every time it exceeds 200 elements
   let track_elements = trackSystem.path_element.children;
   if (track_elements.length > 200) {
-    const riderZ = document.getElementById('rider')?.object3D?.position.z ?? 0;
+    const riderObj = trackSystem.scene.getObjectByName("rider");
+    const riderZ = riderObj?.position.z ?? 0;
     let removed = 0;
     while (track_elements.length > 100 && removed < 100) {
       const obj = track_elements[0];

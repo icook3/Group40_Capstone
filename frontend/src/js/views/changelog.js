@@ -102,7 +102,7 @@ export class changelogView {
             //pick one out of 3 types
             let type = Math.random();
             if (type<0.33) {
-                loader.load('../../resources/models/bgmodels/House.glb', (gltf) => {
+                loader.load('../../resources/models/bgmodels/house.glb', (gltf) => {
                     //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0.25);
                     let position = this.setPosition(()=>{
                         return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0.25);
@@ -117,7 +117,7 @@ export class changelogView {
                     console.log(error);
                 });
             } else if (type<0.66) {
-                loader.load('../../resources/models/bgmodels/TallBuilding.glb', (gltf) => {
+                loader.load('../../resources/models/bgmodels/tallBuilding.glb', (gltf) => {
                     //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
                     let position = this.setPosition(()=>{
                         return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
@@ -132,7 +132,7 @@ export class changelogView {
                     console.log(error);
                 });
             } else {
-                loader.load('../../resources/models/bgmodels/WideBuilding.glb', (gltf) => {
+                loader.load('../../resources/models/bgmodels/wideBuilding.glb', (gltf) => {
                     //let position = new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
                     let position = this.setPosition(()=>{
                         return new THREE.Vector3((5+Math.random()*10), -20+Math.random()*30, 0);
