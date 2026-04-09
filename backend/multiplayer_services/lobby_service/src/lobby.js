@@ -26,10 +26,7 @@ async function createLobby({ player_id, display_name, name, max_players, duratio
     await redis.hset(`lobby:${lobby_id}`, lobby);
     await redis.expire(`lobby:${lobby_id}`, LOBBY_TTL);
 
-    // Add to public lobby list if not password protected
-    if (!password_hash) {
-        await redis.sadd('lobby:list', lobby_id);
-    }
+    await redis.sadd('lobby:list', lobby_id);
 
     // Track which lobby this player is in
     await redis.set(`player:${player_id}:lobby`, lobby_id);

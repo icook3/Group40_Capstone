@@ -1,13 +1,95 @@
-<div id="display-name-prompt">
-    <h2>Enter your display name</h2>
-    <form id="display-name-form">
-        <input id="display-name-input" type="text" maxlength="32" placeholder="Display name" />
-        <button type="submit">Enter Lobby</button>
-    </form>
-    <p id="display-name-error" style="color: red;"></p>
+<div id="sky-gradient"></div>
+
+<!-- Display name screen -->
+<div id="display-name-screen">
+    <div class="lobby-panel">
+        <button class="menu-link lobby-back-btn" onclick="viewManager.setView(viewManager.views.mainMenu);">← Back</button>
+        <p class="lobby-panel-title">Enter your display name</p>
+        <p class="lobby-panel-subtitle">Shown to other players in lobbies</p>
+        <input class="lobby-input" id="display-name-input" type="text" maxlength="32" placeholder="Display name" autocomplete="off" />
+        <div class="lobby-char-count"><span id="char-count">0</span> / 32</div>
+        <p class="lobby-error" id="dn-error"></p>
+        <button class="lobby-btn-primary" id="dn-confirm-btn">Enter Lobby Browser</button>
+    </div>
 </div>
 
-<div id="lobby-browser-content" style="display: none;">
-    <p>Playing as <span id="current-player-name"></span></p>
-    <!-- lobby list goes here -->
+<!-- Lobby browser -->
+<div id="lobby-browser-content">
+
+    <div class="lobby-browser-header">
+        <button class="menu-link" style="color:#1a3a2a;" onclick="viewManager.setView(viewManager.views.mainMenu);">← Back</button>
+        <div class="lobby-player-badge">Playing as <span id="current-player-name"></span></div>
+    </div>
+
+    <div class="lobby-browser-body">
+
+        <div class="lobby-toolbar">
+            <span class="lobby-browser-title">Lobbies</span>
+            <div class="lobby-toolbar-actions">
+                <div class="seg-toggle">
+                    <button class="seg-btn active" id="filter-all">All</button>
+                    <button class="seg-btn" id="filter-open">Open</button>
+                    <button class="seg-btn" id="filter-password">Password</button>
+                </div>
+                <button class="lobby-btn-secondary" id="refresh-btn">↻ Refresh</button>
+                <button class="lobby-btn-create" id="open-create-btn">+ Create Lobby</button>
+            </div>
+        </div>
+
+        <div id="lobby-list"></div>
+
+    </div>
+</div>
+
+<!-- Create lobby overlay -->
+<div id="create-lobby-overlay" class="lobby-overlay">
+    <div class="lobby-panel">
+        <button class="menu-link lobby-back-btn" id="create-cancel-btn">← Back</button>
+        <p class="lobby-panel-title">Create lobby</p>
+
+        <label class="lobby-label">Lobby name</label>
+        <label for="cl-name"></label><input class="lobby-input" id="cl-name" type="text" maxlength="32" placeholder="My Ride" />
+
+        <label class="lobby-label">Max players</label>
+        <label for="cl-max-players"></label><select class="lobby-input lobby-select" id="cl-max-players">
+            <option value="2">2 players</option>
+            <option value="4" selected>4 players</option>
+            <option value="8">8 players</option>
+            <option value="16">16 players</option>
+        </select>
+
+        <label class="lobby-label">Ride duration</label>
+        <label for="cl-duration"></label><select class="lobby-input lobby-select" id="cl-duration">
+            <option value="10">10 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="40">40 minutes</option>
+            <option value="50">50 minutes</option>
+            <option value="60" selected>60 minutes</option>
+            <option value="90">90 minutes</option>
+            <option value="120">120 minutes</option>
+            <option value="180">180 minutes</option>
+            <option value="240">240 minutes</option>
+        </select>
+
+        <label class="lobby-label">Password (optional)</label>
+        <label for="cl-password"></label><input class="lobby-input" id="cl-password" type="password" maxlength="64" placeholder="Leave blank for public" />
+
+        <p class="lobby-error" id="cl-error"></p>
+        <button class="lobby-btn-primary" id="create-confirm-btn">Create</button>
+    </div>
+</div>
+
+<!-- Password overlay -->
+<div id="password-overlay" class="lobby-overlay">
+    <div class="lobby-panel">
+        <p class="lobby-panel-title" id="pw-lobby-name"></p>
+        <label class="lobby-label">Password</label>
+        <label for="pw-input"></label><input class="lobby-input" id="pw-input" type="password" placeholder="Enter password" />
+        <p class="lobby-error" id="pw-error"></p>
+        <div class="lobby-overlay-actions">
+            <button class="lobby-btn-secondary" id="pw-cancel-btn">Cancel</button>
+            <button class="lobby-btn-primary lobby-btn-flex" id="pw-confirm-btn">Join</button>
+        </div>
+    </div>
 </div>

@@ -15,11 +15,11 @@ export function getStoredAuth() {
     }
 }
 
-export async function authenticateGuest(displayNme) {
+export async function authenticateGuest(displayName) {
     const res = await fetch(`${LOBBY_HTTP_URL}/auth/guest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayNme })
+        body: JSON.stringify({ display_name: displayName })
     });
 
     if (!res.ok) {
