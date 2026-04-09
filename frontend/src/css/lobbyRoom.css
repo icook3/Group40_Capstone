@@ -1,8 +1,3 @@
-#mainDiv {
-    overflow-y: auto;
-    height: 100vh;
-}
-
 /* -- Lobby room screen -- */
 #lobby-room-screen {
     min-height: 100vh;
