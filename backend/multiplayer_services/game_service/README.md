@@ -111,7 +111,7 @@ docker run -d -p 4002:6379 --name game-redis redis:7-alpine
 
 2. Run tests
 ```bash
-cd backend/multiplayer_service/game_service
+cd backend/multiplayer_services/game_service
 npm install
 npm test
 ```

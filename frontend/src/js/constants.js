@@ -92,6 +92,8 @@ class Constants {
   sceneryItems = [];
   currentTrackPiece = 0;
   pacerCurrentTrackPiece = 0;
+  riderStart = 0;
+  riderTween = null;
   pacerTween = null;
 
   // Constants governing cloud speed

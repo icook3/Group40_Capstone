@@ -200,13 +200,11 @@ describe('CONNECTION', () => {
             'EX', 30
         );
 
-        const ws1 = await connect(session_id, token1);
-        const ws2 = await connect(session_id, token2);
+        const ws1 = await connect(session_id, token1)
+        const buf1 = await waitForPacket(ws1, MSG.SESSION_JOIN)
 
-        const [buf1, buf2] = await Promise.all([
-            waitForPacket(ws1, MSG.SESSION_JOIN),
-            waitForPacket(ws2, MSG.SESSION_JOIN)
-        ]);
+        const ws2 = await connect(session_id, token2)
+        const buf2 = await waitForPacket(ws2, MSG.SESSION_JOIN)
 
         expect(buf1.readUInt8(7)).toBe(1); // slot 1
         expect(buf2.readUInt8(7)).toBe(2); // slot 2

@@ -161,6 +161,9 @@ export class SceneryBand {
         })();
 
         obj.position.x = x;
+        if (x>0) {
+          obj.rotation.set(0,Math.PI,0);
+        }
         obj.position.y += yOff;
 
         // Record placement & keep
@@ -228,6 +231,9 @@ export class SceneryBand {
             })();
 
             obj2.position.x = anchorX2 + (rand() - 0.5) * jitter;
+            if (obj2.position.x>0) {
+              obj2.rotation.set(0,Math.PI,0);
+            }
             obj2.position.y += yOff;
 
             recordZ(secondSide, zPlace2);
