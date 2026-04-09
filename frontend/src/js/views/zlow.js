@@ -817,6 +817,7 @@ export class zlowScreen {
             // Pacer exactly matches the rider so it stays beside you.
             pacerSpeed = constants.riderState.speed;
             owner.pacerPhysics.setSpeed(pacerSpeed);
+            constants.pacerState.speed = pacerSpeed;
           } else {
             // Active workout:
             // Pacer behaves like an ideal rider holding target watts,
