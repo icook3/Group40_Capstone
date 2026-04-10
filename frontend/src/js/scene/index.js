@@ -19,12 +19,34 @@ export class ZlowScene {
         this.objectsLoaded = false;
 
         // Sky
-        this.scene.background = new THREE.Color(0x87CEEB);
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+
+        // This is the gradient that makes up the sky
+        // This can be used to play around with how the sky looks - possibly
+        // to add different effects and simulate day parts along with lighting
+
+        gradient.addColorStop(0, '#5bbde0');
+        gradient.addColorStop(0.85, '#c4eeff');
+        gradient.addColorStop(1, '#f0e8d8');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1, 256);
+        const skyTexture = new THREE.CanvasTexture(canvas);
+        skyTexture.colorSpace = THREE.SRGBColorSpace;
+        this.scene.background = skyTexture;
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.0;
+
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         document.body.appendChild(this.renderer.domElement);
 
@@ -38,9 +60,9 @@ export class ZlowScene {
         this.cam.rig.position.z = this.viewCoordinates.z;
 
         // Lighting
-        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambient = new THREE.AmbientLight(0xffffff, 0.9);
         this.scene.add(ambient);
-        const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+        const sun = new THREE.DirectionalLight(0xffffff, 1.0);
         sun.position.set(5, 10, 7);
         this.scene.add(sun);
 
