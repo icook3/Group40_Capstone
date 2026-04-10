@@ -364,7 +364,6 @@ export function update_pacer_animation(scene, update=false, bridge=false) {
   }
 
   let coords = { x: pacer.position.x, y: pacer.position.y, z: pacer.position.z };
-  // THIS MAY BE ANIMATING TO SOMEWHERE BEHIND THE PACER - Z IS THE SAME AS RIDER Z
   const endpoint = { x: tp.x + 0.5, y: tp.y, z: tp.z };
   let pacerDuration = Math.round((tp.length / pacerSpeed) * 1500);
 
