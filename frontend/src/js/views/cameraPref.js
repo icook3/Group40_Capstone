@@ -3,6 +3,7 @@ import { AvatarMovement } from "../avatarMovement.js";
 import { Track } from "../scene/env/Track.js";
 import { Cloud } from "../scene/env/Cloud.js";
 import { SceneryManager } from "../scene/env/SceneryManager.js";
+import { constants } from "../constants.js"
 import {GroundInstanced} from "../scene/env/GroundInstanced.js";
 
 export class cameraPref {
@@ -28,6 +29,7 @@ export class cameraPref {
       this.viewCoordinates.push({x: 0, y: 4, z: 5});
       this.viewCoordinates.push({x: 0, y: 4, z: 12});
       this.viewCoordinates.push({x: -0.5, y: 3, z: -0.5});
+      this.renderer = null;
   }
 
   setPage() {
@@ -80,6 +82,7 @@ export class cameraPref {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer = renderer;
 
     // Get coordinates and configure camera
     let coords = JSON.parse(localStorage.getItem("view"));
@@ -118,8 +121,9 @@ export class cameraPref {
       requestAnimationFrame(animate);
       renderer.render(scene, camera);
     }
-    animate();
 
+    animate();
+    
     // Return final element for attachment to the page
     return renderer.domElement;
   }
@@ -133,7 +137,7 @@ export class cameraPref {
     }
     
     // Increment viewIndex
-    if ((this.viewIndex + increment) == (this.viewCoordinates.length - 1)) {
+    if ((this.viewIndex + increment) == (this.viewCoordinates.length)) {
       this.viewIndex = 0;
     }
 
@@ -149,21 +153,39 @@ export class cameraPref {
     camera.position.x = this.viewCoordinates[this.viewIndex].x;
     camera.position.y = this.viewCoordinates[this.viewIndex].y;
     camera.position.z = this.viewCoordinates[this.viewIndex].z;
-
   }
     
-  // This will probably not work without passing some stuff or getting stuck somehow.
   reset() {
-    // Destroy the scene (renderer, ground, track, clouds, scenery)
-    this.scene?.destroy();
-    this.scene = null;
+    if (this.renderer) {
+      this.renderer.dispose();
+    }
 
     // Remove the Three.js canvas from the DOM
-    const canvas = document.querySelector('canvas');
-    if (canvas) canvas.remove();
+      const canvas = document.querySelector('canvas');
+      if (canvas) canvas.remove();
 
-    // Null out references so nothing carries over
-    this.rider = null;
-    this.pacer = null;
+      // Destroy the scene (renderer, ground, track, clouds, scenery)
+      this.scene?.destroy();
+      this.scene = null;
+
+      // Clear singleton guards so fresh instances are created
+      window.__zlowSceneInstance = null;
+      window.__zlowTrackInstance = null;
+      
+      // Null out references so nothing carries over
+      this.rider = null;
+      this.pacer = null;
+
+      // Reset all constants
+      constants.pacerStarted = false;
+      constants.farthestSpawn=1;
+      constants.currentTrackPiece=0;
+      constants.pacerCurrentTrackPiece=0;
+      constants.trackPoints=[];
+      constants.lastTime=Date.now();
+      constants.worldZ=0;
+      constants.lastCloud = Date.now();
+      constants.cloudSpeed = 0;
+      constants.updateEvery=0;
   } 
 }
