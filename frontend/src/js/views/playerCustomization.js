@@ -54,8 +54,6 @@ export class playerCustomizationView {
         this.scene.name = "playerCustomizerScene";
         this.createAvatar();
 
-        // Add background
-        this.scene.background = new THREE.Color(0x87CEEB);
 
         // Camera
           const camera = new THREE.PerspectiveCamera(
@@ -72,7 +70,7 @@ export class playerCustomizationView {
           this.camera = camera;
 
         // Renderer
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.outputColorSpace = THREE.SRGBColorSpace;

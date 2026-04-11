@@ -15,7 +15,7 @@ div.customizeBody {
   width: 100vw;
   height: 100vh;
   z-index: -2;
-  background: linear-gradient(to bottom, #6cb4d1 0%, #c0edff 100%);
+  background: linear-gradient(to bottom, #3cb4eb 0%, #c4eeff 95%, #f0e8d8 100%);
 }
 
 a-scene.customizationScene {
@@ -255,31 +255,16 @@ input[type="color"] {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -1;
-  opacity: 0.09;
+  z-index: 1;
+  opacity: 0.10;
   transform: rotate(-20deg) scale(1.5);
   transform-origin: center;
   pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse at center 70%, transparent 30%, black 70%);
+  mask-image: radial-gradient(ellipse at center 70%, transparent 30%, black 70%);
 }
 
 #customize-pattern svg {
   width: 100%;
   height: 100%;
-}
-
-#customize-pattern::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, #2d7a4a, #7cd1f3, #2d7a4a);
-  background-size: 100% 300%;
-  mix-blend-mode: color;
-  pointer-events: none;
-  animation: patternShift 6s ease-in-out infinite;
-}
-
-@keyframes patternShift {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 0% 100%; }
-  100% { background-position: 0% 0%; }
 }
