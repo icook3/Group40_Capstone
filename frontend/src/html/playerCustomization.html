@@ -1,137 +1,200 @@
-
-  <div class="customizeBody">
-
-    <!-- Person Color Buttons -->
-    <div id="playerContainer">
-      <h2>Player Customization</h2>
-      <div id="playerControls">
-        <div id="genderSelector">
-          <button class="arrow-btn" id="leftArrow">⮜</button>
-          <span id="genderLabel">Male</span>
-          <button class="arrow-btn" id="rightArrow">⮞</button>
-        </div>
-        <div class="option">
-          <label
-            >Skin<input
-              type="color"
-              class="color-picker"
-              data-mat="Skin"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Shirt<input
-              type="color"
-              class="color-picker"
-              data-mat="Shirt"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Shorts<input
-              type="color"
-              class="color-picker"
-              data-mat="Shorts"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Shoes<input
-              type="color"
-              class="color-picker"
-              data-mat="Shoes"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Helmet<input
-              type="color"
-              class="color-picker"
-              data-mat="Helmet"
-              value="#A7E800"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Padding<input
-            type="color"
-            class="color-picker"
-            data-mat="Padding"
-            value="#333333"
-          /></label>
-        </div>
-      </div>
+<div class="customizeBody">
+    <div id="sky-gradient"></div>
+        <div id="customize-pattern">
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="zlow-pat" x="0" y="0" width="160" height="160" patternUnits="userSpaceOnUse">
+            <image
+              href="../../resources/favicons/ZlowFavicon.svg"
+              x="30" y="30"
+              width="100" height="100"
+            />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#zlow-pat)"/>
+      </svg>
     </div>
 
-    <!-- Bike Color Buttons -->
-    <div id="bikeContainer">
-      <h2>Bike Customization</h2>
-      <div id="bikeControls">
-        <div class="option">
-          <label
-            >Frame<input
-              type="color"
-              class="color-picker"
-              data-mat="Frame_Mat"
-              value="#ff0000"
-          /></label>
+
+    <!-- Avatar -->
+    <a-scene class="customizationScene"
+      id="playerCustomizerScene"
+      embedded
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+      "
+    >
+      <!-- Camera -->
+      <a-entity
+        camera
+        position="0 1.5 4"
+        look-controls="enabled: false"
+      ></a-entity>
+
+      <!-- 3d Assets -->
+      <a-assets>
+        <a-asset-item
+          id="bikeGLB"
+          src="../../resources/models/playermodels/bikeV4.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="maleGLB"
+          src="../../resources/models/playermodels/maleV5.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="femaleGLB"
+          src="../../resources/models/playermodels/femaleV6.glb"
+        ></a-asset-item>
+        <a-asset-item 
+          id="helmetGLB"
+          src="../../resources/models/playermodels/helmet.glb"
+          ></a-asset-item>
+      </a-assets>
+
+      <!-- Floor - solid color -->
+      <!-- I think it looks better without it - -->
+      <!-- <a-entity id="grid-floor">
+        Main floor
+        <a-plane
+          position="0 -.5 0"
+          rotation="-90 0 0"
+          width="30"
+          height="30"
+          color="#477e23"
+        ></a-plane>
+      </a-entity> -->
+
+      <!-- Brown platform base (sides) -->
+      <a-cylinder
+        position="0 -.3 -1"
+        radius="2.5"
+        height="0.1"
+        color="#725335"
+        metalness="0.3"
+        roughness="0.7"
+      ></a-cylinder>
+
+      <!-- Green top surface (grass) -->
+      <a-circle
+        position="0 -0.24 -1"
+        radius="2.5"
+        rotation="-90 0 0"
+        color="#477e23"
+        metalness="0.3"
+        roughness="1.0"
+      ></a-circle>
+
+      <!-- Lighting (same as main menu) -->
+      <a-light type="ambient" color="#FFF" intensity="0.8"></a-light>
+      <a-light
+        type="directional"
+        color="#FFF"
+        intensity=".8"
+        position="-2 5 3"
+      ></a-light>
+      <a-light
+        type="point"
+        color="#FFF"
+        intensity="1"
+        position="0 1 -1"
+        distance="2"
+      ></a-light>
+    </a-scene>
+
+    <!-- Customization Panel -->
+    <div id="customize-wrapper">
+
+      <div id="customize-panel">
+
+        <!-- Title -->
+        <div id="customize-title">Character Customization</div>
+
+        <!-- Top row: Back button + Player/Bike tabs -->
+        <div id="customize-top-row">
+          <div id="customize-back">
+            <span id="customize-back-btn">&larr;</span>
+            <span>Back</span>
+          </div>
+          <div class="customize-spacer"></div>
+          <div class="seg-toggle seg-toggle-lg" id="customize-tabs">
+            <button class="seg-btn active" data-tab="player">Player</button>
+            <button class="seg-btn" data-tab="bike">Bike</button>
+          </div>
         </div>
-        <div class="option">
-          <label
-            >Tires<input
-              type="color"
-              class="color-picker"
-              data-mat="Tire_Mat"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Grip<input
-              type="color"
-              class="color-picker"
-              data-mat="Grip_Mat"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Seat<input
-              type="color"
-              class="color-picker"
-              data-mat="Seat_Mat"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Pedals<input
-              type="color"
-              class="color-picker"
-              data-mat="Pedal_Mat"
-              value="#ff0000"
-          /></label>
-        </div>
-        <div class="option">
-          <label
-            >Pedal Crank<input
-              type="color"
-              class="color-picker"
-              data-mat="PedalCrank_Mat"
-              value="#ff0000"
-          /></label>
+
+        <!-- Bottom row: Gender + color pickers -->
+        <div id="customize-bottom-row">
+
+          <!-- === PLAYER TAB === -->
+          <div id="player-tab" class="customize-tab">
+            <div class="seg-toggle seg-toggle-sm">
+              <button class="seg-btn active" id="gender-male">Male</button>
+              <button class="seg-btn" id="gender-female">Female</button>
+            </div>
+            <div class="customize-divider-v"></div>
+            <!-- Player color pickers -->
+            <div class="customize-swatch">
+              <span class="swatch-label">Skin</span>
+              <input type="color" class="color-picker" data-mat="Skin" value="#d4956a">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Shirt</span>
+              <input type="color" class="color-picker" data-mat="Shirt" value="#ff0000">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Shorts</span>
+              <input type="color" class="color-picker" data-mat="Shorts" value="#1a1a2e">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Shoes</span>
+              <input type="color" class="color-picker" data-mat="Shoes" value="#8b4513">
+            </div>
+            <div class="customize-divider-v"></div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Helmet</span>
+              <input type="color" class="color-picker" data-mat="Helmet" value="#A7E800">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Padding</span>
+              <input type="color" class="color-picker" data-mat="Padding" value="#333333">
+            </div>
+          </div>
+
+          <!-- === BIKE TAB === -->
+          <div id="bike-tab" class="customize-tab" style="display: none;">
+            <!-- Bike color pickers -->
+            <div class="customize-swatch">
+              <span class="swatch-label">Frame</span>
+              <input type="color" class="color-picker" data-mat="Frame_Mat" value="#ff0000">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Tires</span>
+              <input type="color" class="color-picker" data-mat="Tire_Mat" value="#ff0000">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Grip</span>
+              <input type="color" class="color-picker" data-mat="Grip_Mat" value="#ff0000">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Seat</span>
+              <input type="color" class="color-picker" data-mat="Seat_Mat" value="#ff0000">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Pedals</span>
+              <input type="color" class="color-picker" data-mat="Pedal_Mat" value="#ff0000">
+            </div>
+            <div class="customize-swatch">
+              <span class="swatch-label">Pedal Crank</span>
+              <input type="color" class="color-picker" data-mat="PedalCrank_Mat" value="#ff0000">
+            </div>
+          </div>
+
         </div>
       </div>
-    </div>
-
-    <!-- Save Button -->
-    <div id="menu">
-      <button id="menuButton" onclick="viewManager.setView(viewManager.views.mainMenu);">
-        Main Menu
-      </button>
     </div>
   </div>
