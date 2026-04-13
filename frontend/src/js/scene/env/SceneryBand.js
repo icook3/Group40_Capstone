@@ -24,7 +24,8 @@ export class SceneryBand {
     zEnd = SCENERY_BAND_DEFAULTS.zEnd,
     step = SCENERY_BAND_DEFAULTS.step,
     buildingChance = SCENERY_BAND_DEFAULTS.buildingChance,
-    jitter = SCENERY_BAND_DEFAULTS.jitter
+    jitter = SCENERY_BAND_DEFAULTS.jitter,
+    idx = 0
   }) {
     this.scene = scene;
     this.policy = policy;
@@ -131,8 +132,8 @@ export class SceneryBand {
 
         // Spawn
         const obj = isBuilding
-          ? BuildingKind.spawn(this.scene, zPlace, this.policy)
-          : TreeKind.spawn(this.scene, zPlace);
+          ? BuildingKind.spawn(this.scene, zPlace, this.policy,idx)
+          : TreeKind.spawn(this.scene, zPlace,idx);
 
         obj.userData.zlowBand = "edge-line";
         obj.userData.zlowSide = side === 1 ? "right" : "left";
@@ -202,8 +203,8 @@ export class SceneryBand {
               : (isBuilding2 ? this.buildingX : this.treeX) * secondSide;
 
             const obj2 = isBuilding2
-              ? BuildingKind.spawn(this.scene, zPlace2, this.policy)
-              : TreeKind.spawn(this.scene, zPlace2);
+              ? BuildingKind.spawn(this.scene, zPlace2, this.policy,idx)
+              : TreeKind.spawn(this.scene, zPlace2,idx);
 
             obj2.userData.zlowBand = "edge-line";
             obj2.userData.zlowSide = secondSide === 1 ? "right" : "left";
