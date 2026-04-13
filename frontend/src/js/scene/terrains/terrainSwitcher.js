@@ -1,7 +1,9 @@
 import { DefaultTerrain } from "./DefaultTerrain.js";
+import { TestTerrain } from "./TestTerrain.js";
 class TerrainSwitcher {
     terrains = {
-        defaultTerrain: new DefaultTerrain()
+        defaultTerrain: new DefaultTerrain(),
+        testTerrain: new TestTerrain()
     };
     /**
      * @type {DefaultTerrain}

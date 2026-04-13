@@ -14,12 +14,7 @@ export class GroundInstanced {
             constants.tileSize
         );
 
-        const texture = new THREE.TextureLoader().load(`../../resources/textures/${terrainSwitcher.currentTerrain.grassImg}`);
-        const mat = new THREE.MeshStandardMaterial({
-            map: texture,
-            color: 0x90b858,
-            roughness: 1
-        });
+        const mat = terrainSwitcher.currentTerrain.groundMaterial;
 
         this.mesh = new THREE.InstancedMesh(geom, mat, count);
 

@@ -1,6 +1,6 @@
 import  cfg  from '../policy/edge_default_cfg.js';
 import * as THREE from "three";
-export class DefaultTerrain {
+export class TestTerrain {
     cfg=cfg;
     buildingSelect(idx) {
         const roll = Math.random();
@@ -56,22 +56,22 @@ export class DefaultTerrain {
         return {modelId: modelId, scale: scale, y: y};
     }
     grassTexture = new THREE.TextureLoader().load("../../resources/textures/Grass.jpeg");
-    groundMaterial=new THREE.MeshStandardMaterial({
+    trackMaterial=new THREE.MeshStandardMaterial({
         map: this.grassTexture,
         color: 0x90b858,
         roughness: 1
     });
 
     trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
-    trackMaterial = new THREE.MeshStandardMaterial({
+    groundMaterial = new THREE.MeshStandardMaterial({
         map: this.trackTexture,
         color:0xc8c0b0,
         roughness: 0.9
     });
     trackMaterialDouble = new THREE.MeshStandardMaterial({
-        map: this.trackTexture,
-        color: 0xc8c0b0,
-        roughness: 0.9,
+        map: this.grassTexture,
+        color: 0x90b858,
+        roughness: 1,
         side: THREE.DoubleSide
     });
     /**
@@ -89,9 +89,9 @@ export class DefaultTerrain {
         // This can be used to play around with how the sky looks - possibly
         // to add different effects and simulate day parts along with lighting
 
-        gradient.addColorStop(0, '#5bbde0');
-        gradient.addColorStop(0.85, '#c4eeff');
-        gradient.addColorStop(1, '#f0e8d8');
+        gradient.addColorStop(0, 'rgb(0, 1, 2)');
+        gradient.addColorStop(0.85, '#000000');
+        gradient.addColorStop(1, '#000000');
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 1, 256);

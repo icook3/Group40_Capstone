@@ -22,6 +22,16 @@ A class using the **Terrains** interface represents a possible terrain
     - The location of the track texture, starting from resources/textures/, and including the extension
 - **grassImg** → `string`
     - The location of the grass texture, starting from resources/textures/, and including the extension
+- **trackMaterial** → `THREE.MeshStandardMaterial`
+    - The material for the track
+- **trackMaterialDouble** → `THREE.MeshStandardMaterial`
+    - The double-sided material for the track
+- **groundMaterial** → `THREE.MeshStandardMaterial`
+    - The material for the ground
+- **sky** → `THREE.CanvasTexture`
+    - A texture for the sky in the background of scenes
+- **constructor()** → `Terrain`
+    - Initializes the colors for the sky
 
 ## Notes
 - To add new terrains, first create your terrain.js file. 
