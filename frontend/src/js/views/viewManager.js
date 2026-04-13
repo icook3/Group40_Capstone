@@ -92,6 +92,15 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
+            case this.views.cameraPref:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(true);
+                break;
             default:
                 console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
                 this.viewStorage.mainMenu = new mainMenuView(true);
