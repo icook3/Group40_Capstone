@@ -54,4 +54,6 @@ export class DefaultTerrain {
         }
         return {modelId: modelId, scale: scale, y: y};
     }
+    trackImg="Track.jpeg";
+    grassImg="Grass.jpeg";
 }

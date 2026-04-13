@@ -7,6 +7,7 @@ import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.j
 import { constants } from "../../constants.js";
 import {getSign} from '../core/util.js';
 import  {activatePacer} from '../../main.js'
+import { terrainSwitcher } from "../terrains/terrainSwitcher.js";
 
 export class Track {
   constructor({ scene }) {
@@ -27,7 +28,7 @@ export class Track {
     }
     this.path_element = path_element;
 
-    this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
+    this.trackTexture = new THREE.TextureLoader().load(`../../resources/textures/${terrainSwitcher.currentTerrain.trackImg}`);
 
     this.trackMaterial = new THREE.MeshStandardMaterial({
         map: this.trackTexture,
