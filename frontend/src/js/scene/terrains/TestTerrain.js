@@ -86,9 +86,7 @@ export class TestTerrain {
         const gradient = ctx.createLinearGradient(0, 0, 0, 256);
 
         // This is the gradient that makes up the sky
-        // This can be used to play around with how the sky looks - possibly
-        // to add different effects and simulate day parts along with lighting
-
+        // This can be used to play around with how the sky looks
         gradient.addColorStop(0, 'rgb(0, 1, 2)');
         gradient.addColorStop(0.85, '#000000');
         gradient.addColorStop(1, '#000000');
