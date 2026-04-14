@@ -1,4 +1,5 @@
 import { getStoredAuth } from "../multiplayer/multiplayerAuth.js";
+import { constants } from "../constants.js";
 
 export class lobbyRoomView {
     content;
@@ -81,6 +82,11 @@ export class lobbyRoomView {
 
         this.lobbyClient.on("GAME_STARTING", (payload) => {
             sessionStorage.setItem("gameStarting", JSON.stringify(payload));
+
+            // Set track scale based on max_players from current lobby
+            const maxPlayers = this.currentLobby.max_players;
+            constants.multiplayerTrackScale = maxPlayers / 2;
+
             // TODO: disconnect from lobby WS and connect to game service
             window.viewManager.setView(window.viewManager.views.mainZlow);
         });

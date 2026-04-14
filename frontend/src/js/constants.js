@@ -109,6 +109,9 @@ class Constants {
   peerHost = config.PEER_HOST;
   peerPath = config.PEER_PATH;
   peerPort = config.PEER_PORT;
+
+  // For multiplayer
+  multiplayerTrackScale =  1;
 }
 
 export const features = {

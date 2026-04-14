@@ -45,10 +45,12 @@ export class Track {
     this.update_rider_animation = this.update_rider_animation.bind(this);
     this.update_pacer_animation = update_pacer_animation.bind(this);
 
+    const scale = constants.multiplayerTrackScale;
+
     const geometry = new THREE.BoxGeometry(
-      constants.pathWidth,
+      constants.pathWidth * scale,
       constants.pathHeight,
-      15
+      15 * scale
     );
 
     const track = new THREE.Mesh(geometry, this.trackMaterial);
@@ -198,26 +200,30 @@ export class Track {
 
 // Create and append a track piece curving to the right
 function curve_180_right(trackSystem) {
+  const scale = constants.multiplayerTrackScale;
+  const innerRadius = 25 * scale;
+  const outerRadius = 35 * scale;
+
   const path_element = trackSystem.path_element;
   const pointZ = -1 * (constants.farthestSpawn);
 
   // Add necessary points based on current farthest spawn
-  constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 16.55});
-  constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 11.31});
-  constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 9.22});
-  constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 9.22});
-  constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 16.16});
-  constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 9.22});
-  constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8.54});
-  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.61});
+  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-7 * scale, length: 16.55 * scale});
+  constants.trackPoints.push({x: 23 * scale, y: 1, z: pointZ-15 * scale, length: 11.31 * scale});
+  constants.trackPoints.push({x: 25 * scale, y: 1, z: pointZ-24 * scale, length: 9.22 * scale});
+  constants.trackPoints.push({x: 27 * scale, y: 1, z: pointZ-33 * scale, length: 9.22 * scale});
+  constants.trackPoints.push({x: 21 * scale, y: 1, z: pointZ-48 * scale, length: 16.16 * scale});
+  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-55 * scale, length: 9.22 * scale});
+  constants.trackPoints.push({x: 7 * scale, y: 1, z: pointZ-58 * scale, length: 8.54 * scale});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 7.61 * scale});
 
   // Update farthestSpan
-  constants.farthestSpawn += 62;
+  constants.farthestSpawn += 62 * scale;
 
   // Add graphical track representation
   const geometry = new THREE.RingGeometry(
-    25,
-    35,
+    innerRadius,
+    outerRadius,
     32,
     1,
     THREE.MathUtils.degToRad(270),
@@ -226,7 +232,7 @@ function curve_180_right(trackSystem) {
 
   const track = new THREE.Mesh(geometry, trackSystem.trackMaterialDouble);
 
-  track.position.set(-3.5, constants.pathHeight, pointZ-30);
+  track.position.set(-3.5 * scale, constants.pathHeight, pointZ-30 * scale);
   track.rotation.x = -Math.PI/2;
 
   path_element.add(track);
@@ -234,26 +240,30 @@ function curve_180_right(trackSystem) {
 
 // Create and append a track piece curving to the left
 function curve_180_left(trackSystem) {
+  const scale = constants.multiplayerTrackScale;
+  const innerRadius = 25 * scale;
+  const outerRadius = 35 * scale;
+
   const path_element = trackSystem.path_element;
   const pointZ = -1 * (constants.farthestSpawn);
 
   // Add necessary points based on current farthest spawn
-  constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 16.55});
-  constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 11.31});
-  constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 9.22});
-  constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 9.22});
-  constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 16.16});
-  constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 9.22});
-  constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8.54});
-  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.62});
+  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-7 * scale, length: 16.55 * scale});
+  constants.trackPoints.push({x: -23 * scale, y: 1, z: pointZ-15 * scale, length: 11.31 * scale});
+  constants.trackPoints.push({x: -25 * scale, y: 1, z: pointZ-24 * scale, length: 9.22 * scale});
+  constants.trackPoints.push({x: -27 * scale, y: 1, z: pointZ-33 * scale, length: 9.22 * scale});
+  constants.trackPoints.push({x: -21 * scale, y: 1, z: pointZ-48 * scale, length: 16.16 * scale});
+  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-55 * scale, length: 9.22 * scale});
+  constants.trackPoints.push({x: -7 * scale, y: 1, z: pointZ-58 * scale, length: 8.54 * scale});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 7.62 * scale});
 
   // Update farthestSpan
-  constants.farthestSpawn += 62;
+  constants.farthestSpawn += 62 * scale;
 
   // Add graphical track representation
   const geometry = new THREE.RingGeometry(
-    25,
-    35,
+    innerRadius,
+    outerRadius,
     32,
     1,
     THREE.MathUtils.degToRad(90),
@@ -262,23 +272,27 @@ function curve_180_left(trackSystem) {
 
   const track = new THREE.Mesh(geometry, trackSystem.trackMaterialDouble);
 
-  track.position.set(3.5, constants.pathHeight, pointZ-30);
+  track.position.set(3.5 * scale, constants.pathHeight, pointZ-30 * scale);
   track.rotation.x = -Math.PI/2;
 
   path_element.add(track);
 }
 
 function straightPiece(trackSystem) {
+  const scale = constants.multiplayerTrackScale;
+  const scaledWidth = constants.pathWidth * scale
+  const scaledDepth = constants.pathDepth * scale;
+
   const path_element = trackSystem.path_element;
   const pointZ = -1 * (constants.farthestSpawn + 5);
-  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+  const trackZ = (-1 * constants.farthestSpawn) - scaledDepth;
   constants.farthestSpawn += 5;
   constants.trackPoints.push({ x: 0, y: 1, z: pointZ, length: 5 });
 
   const geometry = new THREE.BoxGeometry(
-    constants.pathWidth,
+    scaledWidth,
     constants.pathHeight,
-    constants.pathDepth
+    scaledDepth
   );
 
   const track = new THREE.Mesh(geometry, trackSystem.trackMaterial);
