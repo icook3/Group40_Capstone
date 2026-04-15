@@ -14,16 +14,23 @@ class TerrainSwitcher {
      * @param {{terrain: DefaultTerrain, name: string}} terrain 
      */
     setTerrain(terrain) {
+        if (terrain==undefined) {
+            localStorage.setItem("Terrain",this.terrains.defaultTerrain.name);
+            this.currentTerrain=this.terrains.defaultTerrain.terrain;
+            return;
+        }
         this.currentTerrain=terrain.terrain;
         localStorage.setItem("Terrain",terrain.name);
     }
     constructor() {
+        window.zlowTerrains=this;
         let startTerrain = localStorage.getItem("Terrain");
         if (startTerrain==null) {
             this.setTerrain(this.terrains.defaultTerrain);
         } else {
+            //console.log("StartTerrain!=null!",this.terrains[startTerrain],startTerrain)
             //use this syntax to avoid a lengthy switch statement
-            this.currentTerrain=this.terrains[startTerrain].terrain;
+            this.setTerrain(this.terrains[startTerrain]);
         }
     }
 }
