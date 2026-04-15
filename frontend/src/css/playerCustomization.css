@@ -1,255 +1,9 @@
 body.customizeBody {
   background-color: grey;
 }
-a-scene.customizationScene {
-  position: fixed;
-  right: 33%;
-  width: 100%;
+
+div.customizeBody {
   height: 100%;
-  z-index: 0;
-  background-color: transparent !important;
-  pointer-events: none;
-}
-
-#menuButton {
-  position: fixed;
-  display: flex;
-  align-items: center;
-  background: linear-gradient(to bottom, #ffb3ba 0%, #bae1d3 100%);
-
-  mask: url("../../resources/images/center-hud.svg") no-repeat center / 100%
-    100%;
-  -webkit-mask: url("../../resources/images/center-hud.svg") no-repeat center /
-    100% 100%;
-}
-
-#menuButton:hover {
-  filter: brightness(85%);
-}
-#genderSelector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.arrow-btn {
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: rgb(220, 229, 222);
-  width: 50px;
-  height: 50px;
-  font-size: 1.5em;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.arrow-btn:hover {
-  transform: scale(1.1);
-}
-
-#genderLabel {
-  min-width: 80px;
-  text-align: center;
-  color: rgb(220, 229, 222);
-  font-family: "Nunito", sans-serif;
-  font-size: 1em;
-  cursor: default;
-  user-select: none;
-}
-
-#playerContainer h2,
-#bikeContainer h2 {
-  margin-bottom: 10px;
-  text-shadow: 1px 1px 2px black;
-  color: white;
-  font-size: 1.8em;
-  font-family: "Fugaz One", sans-serif;
-}
-
-/*On tiny screens*/
-@media only screen and (max-aspect-ratio: 0.6) {
-  #playerContainer {
-    position: fixed;
-    left: 2%;
-    top: 20%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:75%;
-
-  }
-
-  #bikeContainer {
-    position: fixed;
-    left: 2%;
-    top: 80%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:75%;
-  }
-  #bikeControls, #playerControls {
-    width: 150px;
-  }
-  #menuButton {
-    bottom: 40%;
-    right: 2%;
-    font-size: small;
-    padding: 15px 100px;
-    gap: 20px;
-  }
-}
-
-/*Make the controls smaller on smaller screens*/
-@media only screen and (min-aspect-ratio: 0.6) {
-  #playerContainer {
-    position: fixed;
-    left: 2%;
-    top: 20%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:75%;
-
-  }
-
-  #bikeContainer {
-    position: fixed;
-    right: 2%;
-    top: 20%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:75%;
-  }
-  #bikeControls, #playerControls {
-    width: 150px;
-  }
-  #menuButton {
-    bottom: 2%;
-    right: 2%;
-    font-size: xx-large;
-    padding: 15px 100px;
-    gap: 20px;
-  }
-}
-/*Normal size controls on normal size screens*/
-@media only screen and (min-aspect-ratio: 1) {
-  #playerContainer {
-    position: fixed;
-    left: 2%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:130%;
-    width:200px;
-  }
-
-  #bikeContainer {
-    position: fixed;
-    right: 2%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:1.3em;
-  }
-
-  #bikeControls, #playerControls {
-    width: 200px;
-  }
-}
-/*Long, narrow screens*/
-@media only screen and (min-aspect-ratio: 3) {
-  #playerContainer {
-    position: fixed;
-    left: 2%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:130%;
-    width:200px;
-  }
-
-  #bikeContainer {
-    position: fixed;
-    right: 2%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size:130%;
-  }
-
-  #bikeControls, #playerControls {
-    width: 200px;
-  }
-  #menuButton {
-    bottom: 2%;
-    right: 60%;
-    font-size: xx-large;
-    padding: 15px 100px;
-    gap: 20px;
-  }
-  #playerContainer h2,
-  #bikeContainer h2 {
-    margin-bottom: 10px;
-    text-shadow: 1px 1px 2px black;
-    color: white;
-    font-size: 100%;
-    font-family: "Fugaz One", sans-serif;
-  }
-}
-#bikeControls,
-#playerControls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  background: rgb(53, 72, 79);
-  padding: 15px;
-  border-radius: 30px;  
-  gap: 8px;
-}
-
-#playerControls label,
-#bikeControls label {
-  display: flex;
-  align-items: center;
-  color: rgb(220, 229, 222);
-  font-family: "Nunito", sans-serif;
-  gap: 12px;
-}
-
-body.customizeBody {
   margin: 0;
   overflow: hidden;
 }
@@ -261,25 +15,256 @@ body.customizeBody {
   width: 100vw;
   height: 100vh;
   z-index: -2;
-  background: linear-gradient(to bottom, #6cb4d1 0%, #c0edff 100%);
+  background: linear-gradient(to bottom, #3cb4eb 0%, #c4eeff 95%, #f0e8d8 100%);
+}
+
+a-scene.customizationScene {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background-color: transparent !important;
+  pointer-events: none;
 }
 
 input[type="color"] {
   cursor: pointer;
 }
 
-/* Main Menu button should feel clickable */
-#menuButton {
+/* ===========================
+   Customization panel layout
+   =========================== */
+
+#customize-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+  padding: clamp(8px, 2vw, 16px);
+  padding-bottom: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- Title --- */
+
+#customize-title {
+  font-family: "Nunito", sans-serif;
+  font-size: clamp(1.1rem, 2.8vw, 1.6rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- Panel bar --- */
+
+#customize-panel {
+  background: rgb(53, 72, 79);
+  padding: clamp(12px, 2vw, 20px) clamp(16px, 3vw, 28px);
+  border-radius: clamp(10px, 2vw, 16px);
+
+  width: 100%;
+  max-width: 860px;
+
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.5vw, 14px);
+
+  color: #e0e0e0;
+  font-family: "Nunito", sans-serif;
+  font-size: clamp(0.75rem, 1.4vw, 0.85rem);
+  font-weight: 600;
+
+  pointer-events: auto;
+}
+
+/* --- Top row: back + tabs --- */
+
+#customize-top-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 14px);
+}
+
+.customize-spacer {
+  flex: 1;
+}
+
+/* --- Back button --- */
+
+#customize-back {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 8px);
+  font-size: clamp(0.82rem, 1.5vw, 0.95rem);
+  font-weight: 600;
+  color: #e0e0e0;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+#customize-back-btn {
+  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+  opacity: 0.7;
+}
+
+#customize-back:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Seg-toggles --- */
+
+.seg-toggle {
+  display: flex;
+  border-radius: clamp(6px, 1vw, 8px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.seg-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: rgba(224, 224, 224, 0.5);
+  font-family: "Nunito", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.seg-btn.active {
+  background: #2da2d8;
+  color: #fff;
+}
+
+.seg-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e0e0e0;
+}
+
+/* Large toggle (Player / Bike) */
+.seg-toggle-lg .seg-btn {
+  padding: clamp(5px, 1.2vw, 8px) clamp(16px, 3vw, 24px);
+  font-size: clamp(0.78rem, 1.5vw, 0.9rem);
+}
+
+/* Small toggle (Male / Female) */
+.seg-toggle-sm .seg-btn {
+  padding: clamp(2px, 0.5vw, 3px) clamp(6px, 1.2vw, 10px);
+  font-size: clamp(0.65rem, 1.1vw, 0.72rem);
+}
+
+/* --- Bottom row: gender + swatches --- */
+
+#customize-bottom-row {
+  padding-top: clamp(4px, 1vw, 6px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.customize-tab {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.8vw, 14px);
+  flex-wrap: wrap;
+}
+
+/* Vertical divider between groups */
+.customize-divider-v {
+  width: 1px;
+  height: clamp(18px, 2.5vw, 24px);
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+/* --- Compact swatch: label + circle --- */
+
+.customize-swatch {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 8px);
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.customize-swatch,
+.swatch-label {
   cursor: pointer;
 }
 
-#menuButton:hover {
-  filter: brightness(85%);
-  transition: filter 0.15s ease;
+.customize-swatch:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-div.customizeBody {
+.swatch-label {
+  font-size: clamp(0.68rem, 1.2vw, 0.78rem);
+  opacity: 0.5;
+}
+
+.customize-swatch input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: clamp(20px, 3vw, 28px);
+  height: clamp(20px, 3vw, 28px);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.customize-swatch input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.customize-swatch input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+.customize-swatch input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+/* --- Responsive: short screens --- */
+
+@media (max-height: 480px) {
+  #customize-title {
+    display: none;
+  }
+
+  #customize-panel {
+    padding: 10px 14px;
+    gap: 6px;
+  }
+}
+
+#customize-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  opacity: 0.10;
+  transform: rotate(-20deg) scale(1.5);
+  transform-origin: center;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse at center 70%, transparent 30%, black 70%);
+  mask-image: radial-gradient(ellipse at center 70%, transparent 30%, black 70%);
+}
+
+#customize-pattern svg {
+  width: 100%;
   height: 100%;
-  margin:0;
-  overflow:hidden;
 }

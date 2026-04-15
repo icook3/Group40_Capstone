@@ -7,6 +7,7 @@ import { connectToPeersView } from "./connectToPeers.js";
 import { achievementsView } from "./achievements.js";
 import { lobbyBrowserView } from "./lobbyBrowser.js";
 import { lobbyRoomView } from "./lobbyRoom.js";
+import { achievementManager } from "../achievements/achievementManager.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -37,6 +38,8 @@ export class ViewManager {
     * Initializes different views
     */
     initViews() {
+        achievementManager.newUser();
+        achievementManager.tryToSendAchievements();
         //set up the favicon
         this.updateFavicon();
         this.darkMode.addEventListener("change", this.updateFavicon);
