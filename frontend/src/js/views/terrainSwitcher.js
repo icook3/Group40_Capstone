@@ -24,11 +24,15 @@ export class terrainSelectionView {
         });
     }
     terrainIdx=0;
+    /**
+     * CHANGE THIS when adding new terrains
+     */
     terrains=["defaultTerrain","testTerrain"];
     renderer=null;
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
-        localStorage.setItem("terrain", this.terrains[0]);
+        localStorage.setItem("Terrain", this.terrains[0]);
+        terrainSwitcher.setTerrain(terrainSwitcher.terrains[this.terrains[0]]);
         /*let camera = new THREE.PerspectiveCamera(
             80,
             window.innerWidth / window.innerHeight,
@@ -54,19 +58,23 @@ export class terrainSelectionView {
     reset() {
         this.destroyScene();
     }
+    /**
+     * @type {ZlowScene}
+     */
+    scene;
     setPageBackground() {
-        let scene = new ZlowScene();
-        
+        this.scene = new ZlowScene();
+        let animateScene=this.scene;
         // Add animation function
         function animate() {
             requestAnimationFrame(animate);
-            scene.renderer.render(scene.scene, scene.cam.camera);
+            animateScene.renderer.render(animateScene.scene, animateScene.cam.camera);
         }
 
         animate();
     
         // Return final element for attachment to the page
-        return scene.renderer.domElement;
+        return this.scene.renderer.domElement;
     }
     destroyScene() {
         if (this.renderer) {
