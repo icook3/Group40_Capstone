@@ -442,19 +442,37 @@ export class zlowScreen {
     }
 
     initializePacerSpeedInput() {
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+
         if (localStorage.getItem("testMode") == "true") {
-            const pacerSpeedInput = document.getElementById("pacer-speed");
             pacerSpeedInput.addEventListener("input", () => {
                 const val = Number(pacerSpeedInput.value);
                 this.setPacerSpeed(val);
             });
             this.setPacerSpeed(Number(pacerSpeedInput.value));
         } else {
-            const val = localStorage.getItem("pacer-speed") !== null
-                ? Number(localStorage.getItem("pacer-speed"))
-                : 20;
-            this.setPacerSpeed(val);
+            this.setPacerSpeed(Number(pacerSpeedInput?.value) || 20);
         }
+    }
+
+        initializeRiderWeightInput() {
+        const riderWeightInput = document.getElementById("rider-weight");
+        if (!riderWeightInput) return;
+
+        const savedWeight = localStorage.getItem("rider-weight");
+        if (savedWeight !== null) {
+            riderWeightInput.value = savedWeight;
+        }
+
+        const applyWeight = () => {
+            localStorage.setItem("rider-weight", riderWeightInput.value);
+            this.setRiderWeight();
+        };
+
+        riderWeightInput.addEventListener("input", applyWeight);
+        riderWeightInput.addEventListener("change", applyWeight);
+
+        this.setRiderWeight();
     }
 
     initializeWorkouts() {
@@ -981,6 +999,7 @@ export class zlowScreen {
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
       this.initializePacerSpeedInput();
+      this.initializeRiderWeightInput();
 
       // Dismiss trainer and dev menus when clicking outsideof their pop up
       document.addEventListener("click", (e) => {

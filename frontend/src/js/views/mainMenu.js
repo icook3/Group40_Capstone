@@ -71,12 +71,16 @@ export class mainMenuView {
         // Pacer speed input
         const pacerSpeedInput = document.getElementById("pacer-speed");
         resizeInput(pacerSpeedInput);
-        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9);
+        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9, { persist: false });
 
         // Weight input
         const riderWeightInput = document.getElementById("rider-weight");
-        resizeInput(riderWeightInput)
-        restrictNumberInput(riderWeightInput, 3, 1, 999.9);
+        const savedRiderWeight = localStorage.getItem("rider-weight");
+        if (savedRiderWeight !== null) {
+            riderWeightInput.value = savedRiderWeight;
+        }
+        resizeInput(riderWeightInput);
+        restrictNumberInput(riderWeightInput, 3, 1, 999.9, { persist: true });
 
         // Units input
         // Speed unit toggle
@@ -193,7 +197,7 @@ export class mainMenuView {
     }
 }
 
-function restrictNumberInput(input, maxDigits, min, max) {
+function restrictNumberInput(input, maxDigits, min, max, { persist = false } = {}) {
     input.addEventListener("input", () => {
         const pattern = new RegExp(`^\\d{0,${maxDigits}}(\\.\\d{0,1})?$`);
 
@@ -204,18 +208,25 @@ function restrictNumberInput(input, maxDigits, min, max) {
 
         resizeInput(input);
 
-        localStorage.setItem(input.id, input.value);
+        if (persist) {
+            localStorage.setItem(input.id, input.value);
+        }
     });
 
     input.addEventListener("change", () => {
         let num = parseFloat(input.value);
         if (isNaN(num)) {
             input.value = min;
-            return;
+        } else {
+            num = Math.max(min, Math.min(max, num));
+            input.value = num;
         }
 
-        num = Math.max(min, Math.min(max, num));
-        input.value = num;
+        resizeInput(input);
+
+        if (persist) {
+            localStorage.setItem(input.id, input.value);
+        }
     });
 
     input.addEventListener("keydown", (e) => {
