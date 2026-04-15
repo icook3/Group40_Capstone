@@ -322,10 +322,10 @@ export function spawn_track(trackSystem) {
 }
 
 export function update_pacer_animation(scene, update=false, bridge=false) {
-  if (constants.riderState.speed === 0) {
-      setTimeout(() => update_pacer_animation(scene), 500);
-      return;
-    }
+  if ((constants.pacerState.speed || 0) === 0) {
+    setTimeout(() => update_pacer_animation(scene, update, bridge), 500);
+    return;
+  }
   const pacer = scene.getObjectByName("pacer-entity");
   if (!pacer) return;
 
@@ -341,9 +341,8 @@ export function update_pacer_animation(scene, update=false, bridge=false) {
   }
 
   // Get pacer and pacer speed and determine next endpoint
-  const pacerSpeed = Number(document.getElementById('pacer-speed')?.value) || 0;
-  if (pacerSpeed === 0) return;
-
+  const pacerSpeed = constants.pacerState.speed || 0;
+  if (pacerSpeed <= 0) return;
   // Increment track piece if not syncing players
   if (!update) {
     constants.pacerCurrentTrackPiece += 1;
