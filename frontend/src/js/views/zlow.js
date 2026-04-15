@@ -141,8 +141,11 @@ export class zlowScreen {
 
     reset() {
         this.loopRunning=false;
+        constants.riderTween?.stop?.();
+        constants.pacerTween?.stop?.();
         constants.riderState={power: 0,speed: 0,calories: 0, distanceMeters: 0};
         constants.pacerStarted = false;
+        constants.pacerState={speed: 0, targetWatts: null};
         constants.farthestSpawn=1;
         constants.currentTrackPiece=0;
         constants.pacerCurrentTrackPiece=0;
@@ -154,7 +157,9 @@ export class zlowScreen {
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
         
-        this.cleanup();
+        constants.riderTween = null;
+        constants.pacerTween = null;
+        constants.riderStart = 0;
     }
 
     activatePacer() {
@@ -181,6 +186,9 @@ export class zlowScreen {
       }
     }
     
+    setPacerTargetWatts(watts) {
+      constants.pacerState.targetWatts = watts;
+    }
 
 
     //used for frequent updates in update method
@@ -635,9 +643,18 @@ export class zlowScreen {
         if (this.scene && this.rider && this.pacer) {
     
           // Set pacer constants to rider constants and adjust animation
+          const riderSpeed = constants.riderState.speed || 0;
+
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = constants.riderState.speed;
-          update_pacer_animation(this.scene.scene, true)
+          constants.pacerState.speed = riderSpeed;
+          this.setPacerSpeed(riderSpeed);
+
+          const pacerSpeedInput = document.getElementById("pacer-speed");
+          if (pacerSpeedInput) {
+            pacerSpeedInput.value = riderSpeed;
+          }
+
+          update_pacer_animation(this.scene.scene, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
@@ -784,22 +801,30 @@ export class zlowScreen {
         let pacerSpeed = owner.pacerPhysics.getSpeed();
         if (owner.workoutController) {
           const targetWatts = owner.workoutController.getCurrentTargetWatts();
+          owner.setPacerTargetWatts(targetWatts);
+          
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
             pacerSpeed = constants.riderState.speed;
             owner.pacerPhysics.setSpeed(pacerSpeed);
+            constants.pacerState.speed = pacerSpeed;
           } else {
             // Active workout:
             // Pacer behaves like an ideal rider holding target watts,
             // using the same physics as the real rider for smooth changes.
             pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
           }
+        } else {
+          owner.setPacerTargetWatts(null);
         }
         // If workoutController is null (free ride, peer-to-peer),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
     
         // Apply the computed speed to the pacer avatar
+
+        constants.pacerState.speed = pacerSpeed;
+
         owner.pacer.setSpeed(pacerSpeed);
         owner.pacerPhysics.setSpeed(pacerSpeed);
         owner.pacer.update(dt);
@@ -890,7 +915,7 @@ export class zlowScreen {
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
         onClose: () => {
-          //this.cleanup();
+          this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
@@ -1023,7 +1048,7 @@ export class zlowScreen {
       const menuBtn = getElement("menu-btn");
       menuBtn.addEventListener("click", () => {
         if (confirm("Return to Main Menu? Gameplay data will be lost.")) {
-          //this.cleanup();
+          this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
           }
         });
