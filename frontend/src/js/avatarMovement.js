@@ -69,7 +69,8 @@ export class AvatarMovement {
 
         //Rotate crank and pedals
         if (this.creator.leftPedalBone && this.creator.rightPedalBone && this.creator.pedalCrankBone) {
-            if (this.creator.id === "pacer-entity") {
+            if (this.power !== 0) {
+                if (this.creator.id === "pacer-entity") {
                 //Rotate crank
                 const pacerCrankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
                 const pacerCrankRotationAmount = pacerCrankAngularSpeed * dt;
@@ -78,16 +79,18 @@ export class AvatarMovement {
                 //Rotate pedals
                 this.creator.leftPedalBone.rotation.y = this.creator.pedalCrankBone.rotation.x;
                 this.creator.rightPedalBone.rotation.y = -this.creator.pedalCrankBone.rotation.x;
-            } else {
-                //Rotate crank
-                const crankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
-                const crankRotationAmount = crankAngularSpeed * dt;
-                this.creator.pedalCrankBone.rotation.x -= crankRotationAmount;
+                } else {
+                    //Rotate crank
+                    const crankAngularSpeed = ((this.speed * angularSpeedAdjuster / baseSpeed * 1000 / 3600)) / 0.16;
+                    const crankRotationAmount = crankAngularSpeed * dt;
+                    this.creator.pedalCrankBone.rotation.x -= crankRotationAmount;
 
-                //Rotate pedals
-                this.creator.leftPedalBone.rotation.y = this.creator.pedalCrankBone.rotation.x;
-                this.creator.rightPedalBone.rotation.y = -this.creator.pedalCrankBone.rotation.x;
+                    //Rotate pedals
+                    this.creator.leftPedalBone.rotation.y = this.creator.pedalCrankBone.rotation.x;
+                    this.creator.rightPedalBone.rotation.y = -this.creator.pedalCrankBone.rotation.x;
+                }
             }
+            
         }
     }
 
@@ -113,6 +116,9 @@ export class AvatarMovement {
 
         if (this.creator.leftPedalBone!=null) {
             this.animatePedalingBike(dt);
+            if (this.power !== 0) {
+                this.animatePedalingPerson(dt);
+            }
             this.animatePedalingPerson(dt);
         }
     }
