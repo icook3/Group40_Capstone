@@ -1,4 +1,4 @@
-import { powerToSpeed, kmhToMs, msToKmh } from '../js/main.js';
+import { powerToSpeed, kmhToMs, msToKmh } from '../frontend/src/js/main.js';
 
 describe('powerToSpeed', () => {
   it('returns realistic speed for 200W (default params)', () => {

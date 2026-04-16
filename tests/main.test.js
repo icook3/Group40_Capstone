@@ -1,5 +1,5 @@
 // main.test.js: Basic tests for main.js (state management)
-import * as main from '../js/main.js';
+import * as main from '../frontend/src/js/main.js';
 
 describe('main.js basic exports', () => {
   test('should export initZlowApp function', () => {

@@ -1,5 +1,5 @@
 // bluetooth.test.js: Unit tests for TrainerBluetooth
-import { TrainerBluetooth } from '../js/bluetooth.js';
+import { TrainerBluetooth } from '../frontend/src/js/bluetooth.js';
 
 describe('TrainerBluetooth', () => {
   let trainer;

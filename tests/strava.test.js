@@ -1,5 +1,5 @@
 // strava.test.js: Basic tests for Strava logic
-import * as strava from '../js/strava.js';
+import * as strava from '../frontend/src/js/strava.js';
 
 describe('strava.js basic exports', () => {
   test('should export Strava class', () => {
