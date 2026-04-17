@@ -442,19 +442,46 @@ export class zlowScreen {
     }
 
     initializePacerSpeedInput() {
-        if (localStorage.getItem("testMode") == "true") {
-            const pacerSpeedInput = document.getElementById("pacer-speed");
-            pacerSpeedInput.addEventListener("input", () => {
-                const val = Number(pacerSpeedInput.value);
-                this.setPacerSpeed(val);
-            });
-            this.setPacerSpeed(Number(pacerSpeedInput.value));
-        } else {
-            const val = localStorage.getItem("pacer-speed") !== null
-                ? Number(localStorage.getItem("pacer-speed"))
-                : 20;
-            this.setPacerSpeed(val);
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+        if (!pacerSpeedInput) return;
+
+        const savedSpeed = localStorage.getItem("pacer-speed");
+        if (savedSpeed !== null) {
+            pacerSpeedInput.value = savedSpeed;
         }
+
+        const applySpeed = () => {
+            const val = Number(pacerSpeedInput.value);
+            if (isNaN(val)) return;
+
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
+            this.setPacerSpeed(val);
+        };
+
+        pacerSpeedInput.addEventListener("input", applySpeed);
+        pacerSpeedInput.addEventListener("change", applySpeed);
+
+        this.setPacerSpeed(Number(pacerSpeedInput.value) || 20);
+    }
+
+        initializeRiderWeightInput() {
+        const riderWeightInput = document.getElementById("rider-weight");
+        if (!riderWeightInput) return;
+
+        const savedWeight = localStorage.getItem("rider-weight");
+        if (savedWeight !== null) {
+            riderWeightInput.value = savedWeight;
+        }
+
+        const applyWeight = () => {
+            localStorage.setItem("rider-weight", riderWeightInput.value);
+            this.setRiderWeight();
+        };
+
+        riderWeightInput.addEventListener("input", applyWeight);
+        riderWeightInput.addEventListener("change", applyWeight);
+
+        this.setRiderWeight();
     }
 
     initializeWorkouts() {
@@ -652,6 +679,7 @@ export class zlowScreen {
           const pacerSpeedInput = document.getElementById("pacer-speed");
           if (pacerSpeedInput) {
             pacerSpeedInput.value = riderSpeed;
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
           }
 
           update_pacer_animation(this.scene.scene, true);
@@ -981,6 +1009,7 @@ export class zlowScreen {
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
       this.initializePacerSpeedInput();
+      this.initializeRiderWeightInput();
 
       // Dismiss trainer and dev menus when clicking outsideof their pop up
       document.addEventListener("click", (e) => {
