@@ -443,16 +443,25 @@ export class zlowScreen {
 
     initializePacerSpeedInput() {
         const pacerSpeedInput = document.getElementById("pacer-speed");
+        if (!pacerSpeedInput) return;
 
-        if (localStorage.getItem("testMode") == "true") {
-            pacerSpeedInput.addEventListener("input", () => {
-                const val = Number(pacerSpeedInput.value);
-                this.setPacerSpeed(val);
-            });
-            this.setPacerSpeed(Number(pacerSpeedInput.value));
-        } else {
-            this.setPacerSpeed(Number(pacerSpeedInput?.value) || 20);
+        const savedSpeed = localStorage.getItem("pacer-speed");
+        if (savedSpeed !== null) {
+            pacerSpeedInput.value = savedSpeed;
         }
+
+        const applySpeed = () => {
+            const val = Number(pacerSpeedInput.value);
+            if (isNaN(val)) return;
+
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
+            this.setPacerSpeed(val);
+        };
+
+        pacerSpeedInput.addEventListener("input", applySpeed);
+        pacerSpeedInput.addEventListener("change", applySpeed);
+
+        this.setPacerSpeed(Number(pacerSpeedInput.value) || 20);
     }
 
         initializeRiderWeightInput() {
@@ -670,6 +679,7 @@ export class zlowScreen {
           const pacerSpeedInput = document.getElementById("pacer-speed");
           if (pacerSpeedInput) {
             pacerSpeedInput.value = riderSpeed;
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
           }
 
           update_pacer_animation(this.scene.scene, true);

@@ -70,9 +70,12 @@ export class mainMenuView {
 
         // Pacer speed input
         const pacerSpeedInput = document.getElementById("pacer-speed");
+        const savedPacerSpeed = localStorage.getItem("pacer-speed");
+        if (savedPacerSpeed !== null) {
+            pacerSpeedInput.value = savedPacerSpeed;
+        }
         resizeInput(pacerSpeedInput);
-        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9, { persist: false });
-
+        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9, { persist: true });
         // Weight input
         const riderWeightInput = document.getElementById("rider-weight");
         const savedRiderWeight = localStorage.getItem("rider-weight");
