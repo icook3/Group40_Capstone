@@ -949,7 +949,7 @@ export class zlowScreen {
 
       const devToggleBtn = getElement("dev-toggle-btn");
       if (devToggleBtn && devHud) {
-        devToggleBtn.addEventListener("click", () => {
+          devToggleBtn.addEventListener("click", () => {
           devHud.hidden = !devHud.hidden;
         });
       }
