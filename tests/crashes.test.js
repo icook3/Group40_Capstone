@@ -1,13 +1,15 @@
 import { describe, expect, test } from '@jest/globals';
-
 //focus of the tests
 import {buildCrashReport} from '../backend/crash_logging_service/src/models/crashModel.js';
+import authenticateReportService from "../backend/crash_logging_service/src/services/authenticateReportService.js";
+import express from 'express';
 
 /**
  * You must run the crashlog server first using Docker
  * Set this to the expected URL - it is currently set at the defaults
  */
 let serverURL="http://localhost:3000/";
+let dummyKey="KEY";
 describe('Crashlog storage backend tests', () => {
     test('health returns OK',()=> {
         fetch(serverURL+"crashLoggingHealth").then((value)=> {
@@ -33,5 +35,28 @@ describe('Crashlog storage backend tests', () => {
         //check that metadata is filled correctly
         expect(report.metadata.otherData1).toBe("DATADATA");
         expect(report.metadata.otherData2).toBe("OTHERDATA");
+    });
+    test('authentication works properly',()=> {
+        let res = express.response;
+        console.log(res.status(401));
+        let req=new Request(new URL(serverURL));
+        console.log(req);
+        req.headers.authorization="Bearer "+dummyKey;
+        let next=(()=>{
+            return;
+        });
+        //test authenticating correctly - should return undefined
+        process.env.REPORT_API_KEY=dummyKey;
+        expect(authenticateReportService(req,res,next)).toBeUndefined();
+        //test no bearer
+        //res = express.response;
+        req.headers.authorization="";
+        console.log(res.json);
+        if (res.json("")==undefined) {
+            console.log("res.json is undefined!");
+        }
+        let response=authenticateReportService(req,res,next);
+        console.log(response);
+        
     });
 });
