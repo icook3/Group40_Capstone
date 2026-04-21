@@ -36,6 +36,12 @@ export class ZlowScene {
         // Camera
         this.cam = new Camera(this.scene);
 
+        // Set starting camera position
+        this.viewCoordinates = JSON.parse(localStorage.getItem("view"));
+        this.cam.rig.position.x = this.viewCoordinates.x;
+        this.cam.rig.position.y = this.viewCoordinates.y;
+        this.cam.rig.position.z = this.viewCoordinates.z;
+
         // Lighting
         const ambient = new THREE.AmbientLight(0xffffff, 0.9);
         this.scene.add(ambient);
