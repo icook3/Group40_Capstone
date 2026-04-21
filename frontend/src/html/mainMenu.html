@@ -26,6 +26,7 @@
           <button id="connect-btn" class="menu-link">Connect Trainer</button>
           <button id="customize-btn" class="menu-link" onclick="viewManager.setView(viewManager.views.playerCustomization);">Customize Character</button>
           <button id="achievementsBtn" class="menu-link" onclick="viewManager.setView(viewManager.views.achievements);">Achievements</button>
+          <button id="camera-btn" class="menu-link" onclick="viewManager.setView(viewManager.views.cameraPref);">Set Camera Position</button>
           <button id="settings-btn" class="menu-link">Settings</button>
         </div>
       </div>
@@ -62,12 +63,14 @@
             <input type="checkbox" id="peer-toggle" />
             <span class="toggle-slider"></span>
           </label>
-        </span>
+          </span>
+
           <span id="peer-name" class="hud-btn">
             <label for="name-input">Host name: </label>
             <input id="name-input" />
           </span>
         </div>
+          
         
         <span id="pacer" class="hud-btn">
           <label for="pacer-speed">Pacer:</label>

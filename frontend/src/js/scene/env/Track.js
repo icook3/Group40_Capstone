@@ -3,10 +3,10 @@
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
 import * as THREE from "three";
-import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
+import { Tween } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 import { constants } from "../../constants.js";
-import {getSign} from '../core/util.js';
-import  {activatePacer} from '../../main.js'
+import { getSign } from '../core/util.js';
+import  { activatePacer } from '../../main.js';
 
 export class Track {
   constructor({ scene }) {
@@ -58,7 +58,8 @@ export class Track {
     constants.trackPoints.push({ x: 0, y: 1, z: -1, length: 1 });
 
     spawn_track(this);
-
+    // DEFAULT THIS TO SOMETHING IF THERES NO STORED COORDIATES
+    this.viewCoordinates = JSON.parse(localStorage.getItem("view"));
     this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
@@ -143,13 +144,15 @@ export class Track {
       const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
           avatar.position.set(coords.x, coords.y, coords.z);
 
-          // Manage camera
+          // Set camera position
           const rig = this._getCamera();
           if (rig) {
+
+              // Set rider coordinates
               rig.position.set(
-                  avatar.position.x,
-                  avatar.position.y + 4,
-                  avatar.position.z + 8
+                  avatar.position.x + this.viewCoordinates.x + 0.5, // Add 0.5 to make up for spawn position
+                  avatar.position.y + this.viewCoordinates.y - 1, // Subtract 1 to make up for spawn position
+                  avatar.position.z + this.viewCoordinates.z
               );
           }
           })
