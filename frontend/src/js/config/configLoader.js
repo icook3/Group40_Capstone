@@ -1,11 +1,11 @@
 
-if (!window.APP_CONFIG) {
-    throw new Error("APP_CONFIG missing. Ensure config.js is loaded.");
-}
+//if (!window.APP_CONFIG) {
+    //throw new Error("APP_CONFIG missing. Ensure config.js is loaded.");
+//}
 
-const config = Object.freeze(window.APP_CONFIG);
+//const config = Object.freeze(window.APP_CONFIG);
 
-validateConfig(config);
+//validateConfig(config);
 
 function validateConfig(cfg) {
     // Peer to peer validation
@@ -47,4 +47,4 @@ function isValidUrl(value) {
     }
 }
 
-export default config;
+//export default config;

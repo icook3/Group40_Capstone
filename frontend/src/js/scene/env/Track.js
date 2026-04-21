@@ -59,8 +59,12 @@ export class Track {
     constants.trackPoints.push({ x: 0, y: 1, z: -1, length: 1 });
 
     spawn_track(this);
-
     this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
+  }
+
+  exportTestData() {
+    console.log(curve_180_right(this.scene))
+    //return curve_180_right();
   }
 
   destroy() {
@@ -180,7 +184,7 @@ export class Track {
     if (avatar.position.z < constants.trackPoints[constants.trackPoints.length - 1].z + 200) {
       spawn_track(this);
     }
-}
+  }
 
   // Helper to find rider and camera in the scene
   _getRider() {
@@ -230,7 +234,10 @@ function curve_180_right(trackSystem) {
   track.position.set(-3.5, constants.pathHeight, pointZ-30);
   track.rotation.x = -Math.PI/2;
 
-  path_element.add(track);
+  if (track) {
+    path_element.add(track);
+  }
+  
 }
 
 // Create and append a track piece curving to the left
@@ -292,6 +299,8 @@ function straightPiece(trackSystem) {
 
    path_element.add(track);
 }
+
+
 
 // Spawn track pieces in
 export function spawn_track(trackSystem) {
@@ -407,4 +416,5 @@ export function update_pacer_animation(scene, update=false, bridge=false) {
     requestAnimationFrame(animate);
   }
   requestAnimationFrame(animate);
+
 }
