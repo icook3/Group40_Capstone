@@ -4,6 +4,7 @@ import { changelogView } from "./changelog.js";
 import { constants } from "../constants.js";
 import { playerCustomizationView } from "./playerCustomization.js";
 import { connectToPeersView } from "./connectToPeers.js";
+import { cameraPref } from "./cameraPref.js";
 import { achievementsView } from "./achievements.js";
 import { achievementManager } from "../achievements/achievementManager.js";
 // a list of different views
@@ -13,13 +14,15 @@ class ViewStorage {
     peerConnectScreen;
     playerCustomizationScreen;
     zlowScreen;
+    cameraPref;
     achievements;
 }
 export class ViewManager {
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", achievements: "achievements"};
+    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", cameraPref: "cameraPref", achievements: "achievements"};
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
+    
     /**
     * Initializes different views
     */
@@ -45,6 +48,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.changelog:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -53,6 +57,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(true);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.peerConnect:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -61,6 +66,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(true);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.playerCustomization:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -69,14 +75,16 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.mainZlow:
                 this.viewStorage.mainMenu = new mainMenuView(false);
                 this.viewStorage.zlowScreen = new zlowScreen(true);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
-                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.changelog = new achievementsView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.achievements:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -85,6 +93,16 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(true);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
+            case this.views.cameraPref:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(true);
                 break;
             default:
                 console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
@@ -93,6 +111,9 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
+
                 this.currentView=this.views.mainMenu;
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
@@ -116,6 +137,9 @@ export class ViewManager {
                 break;
             case this.views.connectToPeersView:
                 this.viewStorage.peerConnectScreen.reset();
+                break;
+            case this.views.cameraPref:
+                this.viewStorage.cameraPref.reset();
                 break;
             case this.views.achievements:
                 this.viewStorage.achievements.reset();
@@ -148,6 +172,11 @@ export class ViewManager {
                     this.viewStorage.peerConnectScreen.setPage();
                 }
                 break;
+            case this.views.cameraPref:
+                if (this.viewStorage.cameraPref.ready) {
+                    this.viewStorage.cameraPref.setPage();
+                }
+                break;
             case this.views.achievements:
                 if (this.viewStorage.achievements.ready) {
                     this.viewStorage.achievements.setPage();
@@ -156,7 +185,6 @@ export class ViewManager {
             default: 
                 console.error("This view is not available!");
                 return;
-                break;
         }
         this.currentView=view;
         sessionStorage.setItem("currentView",this.currentView);
