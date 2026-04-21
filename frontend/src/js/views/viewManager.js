@@ -4,6 +4,7 @@ import { changelogView } from "./changelog.js";
 import { constants } from "../constants.js";
 import { playerCustomizationView } from "./playerCustomization.js";
 import { connectToPeersView } from "./connectToPeers.js";
+import { cameraPref } from "./cameraPref.js";
 import { achievementsView } from "./achievements.js";
 import { lobbyBrowserView } from "./lobbyBrowser.js";
 import { lobbyRoomView } from "./lobbyRoom.js";
@@ -15,6 +16,7 @@ class ViewStorage {
     peerConnectScreen;
     playerCustomizationScreen;
     zlowScreen;
+    cameraPref;
     achievements;
     lobbyBrowser;
     lobbyRoom;
@@ -27,6 +29,7 @@ export class ViewManager {
         mainMenu: "mainMenu",
         playerCustomization: "playerCustomization",
         mainZlow: "mainZlow",
+        cameraPref: "cameraPref",
         achievements: "achievements",
         lobbyBowser: "lobbyBrowser",
         lobbyRoom: "lobbyRoom"
@@ -34,6 +37,7 @@ export class ViewManager {
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
+
     /**
     * Initializes different views
     */
@@ -61,6 +65,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.changelog:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -71,6 +76,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(true);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.peerConnect:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -81,6 +87,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.playerCustomization:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -91,6 +98,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.mainZlow:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -101,6 +109,8 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.changelog = new achievementsView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.achievements:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -111,6 +121,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.lobbyBowser:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -121,6 +132,7 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(true);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.lobbyRoom:
                 this.viewStorage.mainMenu = new mainMenuView(false);
@@ -131,6 +143,16 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(true);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
+            case this.views.cameraPref:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.cameraPref = new cameraPref(true);
                 break;
             default:
                 console.log("View",this.currentView, "not available! Defaulting to the main menu view!");
@@ -141,6 +163,8 @@ export class ViewManager {
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
                 this.currentView=this.views.mainMenu;
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
@@ -164,6 +188,9 @@ export class ViewManager {
                 break;
             case this.views.connectToPeersView:
                 this.viewStorage.peerConnectScreen.reset();
+                break;
+            case this.views.cameraPref:
+                this.viewStorage.cameraPref.reset();
                 break;
             case this.views.achievements:
                 this.viewStorage.achievements.reset();
@@ -200,6 +227,11 @@ export class ViewManager {
             case this.views.peerConnect:
                 if (this.viewStorage.peerConnectScreen.ready) {
                     this.viewStorage.peerConnectScreen.setPage();
+                }
+                break;
+            case this.views.cameraPref:
+                if (this.viewStorage.cameraPref.ready) {
+                    this.viewStorage.cameraPref.setPage();
                 }
                 break;
             case this.views.achievements:

@@ -147,8 +147,11 @@ export class zlowScreen {
 
     reset() {
         this.loopRunning=false;
+        constants.riderTween?.stop?.();
+        constants.pacerTween?.stop?.();
         constants.riderState={power: 0,speed: 0,calories: 0, distanceMeters: 0};
         constants.pacerStarted = false;
+        constants.pacerState={speed: 0, targetWatts: null};
         constants.farthestSpawn=1;
         constants.currentTrackPiece=0;
         constants.pacerCurrentTrackPiece=0;
@@ -159,6 +162,10 @@ export class zlowScreen {
         constants.lastCloud = Date.now();
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
+        
+        constants.riderTween = null;
+        constants.pacerTween = null;
+        constants.riderStart = 0;
 
         constants.multiplayerTrackScale = 1;
 
@@ -189,6 +196,9 @@ export class zlowScreen {
       }
     }
     
+    setPacerTargetWatts(watts) {
+      constants.pacerState.targetWatts = watts;
+    }
 
 
     //used for frequent updates in update method
@@ -446,19 +456,46 @@ export class zlowScreen {
             return;
         }
 
-        if (localStorage.getItem("testMode") == "true") {
-            const pacerSpeedInput = document.getElementById("pacer-speed");
-            pacerSpeedInput.addEventListener("input", () => {
-                const val = Number(pacerSpeedInput.value);
-                this.setPacerSpeed(val);
-            });
-            this.setPacerSpeed(Number(pacerSpeedInput.value));
-        } else {
-            const val = localStorage.getItem("pacer-speed") !== null
-                ? Number(localStorage.getItem("pacer-speed"))
-                : 20;
-            this.setPacerSpeed(val);
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+        if (!pacerSpeedInput) return;
+
+        const savedSpeed = localStorage.getItem("pacer-speed");
+        if (savedSpeed !== null) {
+            pacerSpeedInput.value = savedSpeed;
         }
+
+        const applySpeed = () => {
+            const val = Number(pacerSpeedInput.value);
+            if (isNaN(val)) return;
+
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
+            this.setPacerSpeed(val);
+        };
+
+        pacerSpeedInput.addEventListener("input", applySpeed);
+        pacerSpeedInput.addEventListener("change", applySpeed);
+
+        this.setPacerSpeed(Number(pacerSpeedInput.value) || 20);
+    }
+
+        initializeRiderWeightInput() {
+        const riderWeightInput = document.getElementById("rider-weight");
+        if (!riderWeightInput) return;
+
+        const savedWeight = localStorage.getItem("rider-weight");
+        if (savedWeight !== null) {
+            riderWeightInput.value = savedWeight;
+        }
+
+        const applyWeight = () => {
+            localStorage.setItem("rider-weight", riderWeightInput.value);
+            this.setRiderWeight();
+        };
+
+        riderWeightInput.addEventListener("input", applyWeight);
+        riderWeightInput.addEventListener("change", applyWeight);
+
+        this.setRiderWeight();
     }
 
     initializeWorkouts() {
@@ -653,9 +690,19 @@ export class zlowScreen {
         if (this.scene && this.rider && this.pacer) {
     
           // Set pacer constants to rider constants and adjust animation
+          const riderSpeed = constants.riderState.speed || 0;
+
           constants.pacerCurrentTrackPiece = constants.currentTrackPiece;
-          document.getElementById('pacer-speed').value = constants.riderState.speed;
-          update_pacer_animation(this.scene.scene, true)
+          constants.pacerState.speed = riderSpeed;
+          this.setPacerSpeed(riderSpeed);
+
+          const pacerSpeedInput = document.getElementById("pacer-speed");
+          if (pacerSpeedInput) {
+            pacerSpeedInput.value = riderSpeed;
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
+          }
+
+          update_pacer_animation(this.scene.scene, true);
         }
         if (this.connected) {
           this.conn.send({name: "syncPlayers", data: {}});
@@ -800,29 +847,37 @@ export class zlowScreen {
       if (owner.multiplayerManager) {
         owner.multiplayerManager.update(dt);
       }
-    
+
       if (constants.pacerStarted&&owner.peerState==0) {
         //console.log("Inside if statement");
         // Start from whatever speed the pacer currently has
         let pacerSpeed = owner.pacerPhysics.getSpeed();
         if (owner.workoutController) {
           const targetWatts = owner.workoutController.getCurrentTargetWatts();
+          owner.setPacerTargetWatts(targetWatts);
+
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
             pacerSpeed = constants.riderState.speed;
             owner.pacerPhysics.setSpeed(pacerSpeed);
+            constants.pacerState.speed = pacerSpeed;
           } else {
             // Active workout:
             // Pacer behaves like an ideal rider holding target watts,
             // using the same physics as the real rider for smooth changes.
             pacerSpeed = owner.pacerPhysics.update(targetWatts, dt);
           }
+        } else {
+          owner.setPacerTargetWatts(null);
         }
         // If workoutController is null (free ride, peer-to-peer),
         // pacerSpeed stays whatever was set elsewhere (test mode slider, etc.).
     
         // Apply the computed speed to the pacer avatar
+
+        constants.pacerState.speed = pacerSpeed;
+
         owner.pacer.setSpeed(pacerSpeed);
         owner.pacerPhysics.setSpeed(pacerSpeed);
         owner.pacer.update(dt);
@@ -945,7 +1000,7 @@ export class zlowScreen {
               }
             });
         }
-    
+
       if (localStorage.getItem("testMode") !== "true") {
         const trainer = new TrainerBluetooth();
       } else {
@@ -988,7 +1043,7 @@ export class zlowScreen {
               console.error('[Multiplayer] Failed to start:', err);
           });
       }
-    
+
       // Show/hide dev hud based on testMode
       console.log("testMode value:", localStorage.getItem("testMode"));
       const devWrapper = getElement("dev-controls-wrapper");
@@ -1011,6 +1066,7 @@ export class zlowScreen {
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
       this.initializePacerSpeedInput();
+      this.initializeRiderWeightInput();
 
       // Dismiss trainer and dev menus when clicking outsideof their pop up
       document.addEventListener("click", (e) => {
