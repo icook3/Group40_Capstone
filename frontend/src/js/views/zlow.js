@@ -24,6 +24,7 @@ import { update_pacer_animation } from "../scene/env/Track.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
 import { achievementManager } from "../achievements/achievementManager.js";
+import {MultiplayerManager} from "../multiplayer/multiplayerManager.js";
 
 export class zlowScreen {
     content;
@@ -117,6 +118,11 @@ export class zlowScreen {
      */
     conn;
 
+    /**
+     * @type {MultiplayerManager}
+     */
+    multiplayerManager = null;
+
     loopRunning=false;
 
     constructor(setWhenDone) {
@@ -153,7 +159,9 @@ export class zlowScreen {
         constants.lastCloud = Date.now();
         constants.cloudSpeed = 0;
         constants.updateEvery=0;
-        
+
+        constants.multiplayerTrackScale = 1;
+
         this.cleanup();
     }
 
@@ -434,6 +442,10 @@ export class zlowScreen {
     }
 
     initializePacerSpeedInput() {
+        if (!this.pacer) {
+            return;
+        }
+
         if (localStorage.getItem("testMode") == "true") {
             const pacerSpeedInput = document.getElementById("pacer-speed");
             pacerSpeedInput.addEventListener("input", () => {
@@ -590,10 +602,12 @@ export class zlowScreen {
             const pauseBtn = document.getElementById("pause-btn");
                 
             // Reset pacer
-            this.setPacerSpeed(0);
-            this.pacer.avatarEntity.position.set(0.5, 1, -2);
-            constants.pacerStarted = false;
-    
+            if (this.pacer) {
+                this.setPacerSpeed(0);
+                this.pacer.avatarEntity.position.set(0.5, 1, -2);
+                constants.pacerStarted = false;
+            }
+
             // Start a new session for next workout
             this.workoutSession.start();
             this.milestoneTracker.reset();
@@ -631,6 +645,10 @@ export class zlowScreen {
     setupPacerSyncButton() {
       const pacerSyncBtn = document.getElementById("pacer-sync-btn");
       pacerSyncBtn.addEventListener("click", () => {
+        if (!this.pacer) {
+            return;
+        }
+
         //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
     
@@ -777,6 +795,11 @@ export class zlowScreen {
       owner.rider.setPower(constants.riderState.power);
     
       owner.rider.update(dt);
+
+      // Update other multiplayer players
+      if (owner.multiplayerManager) {
+        owner.multiplayerManager.update(dt);
+      }
     
       if (constants.pacerStarted&&owner.peerState==0) {
         //console.log("Inside if statement");
@@ -852,13 +875,6 @@ export class zlowScreen {
       this.peerState=0;
       this.loopRunning=false;
       this.connected=false;
-      /*AFRAME.registerComponent("no-cull", {
-        init() {
-          this.el.addEventListener("model-loaded", () => {
-            this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
-          });
-        },
-      });*/
       
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
@@ -897,17 +913,49 @@ export class zlowScreen {
       
       this.workoutSession.start();
       this.milestoneTracker.reset();
+
+      // Check if we're starting a multiplayer session
+      const gameStartingPayload = sessionStorage.getItem('gameStarting');
+      const isMultiplayer = !!gameStartingPayload;
+      const gameStartingParsed = gameStartingPayload ? JSON.parse(gameStartingPayload) : null;
+
+      if (gameStartingPayload) {
+          sessionStorage.removeItem('gameStarting');
+      }
+
+      if (gameStartingPayload) {
+          this.multiplayerManager = new MultiplayerManager({
+              onSessionEnd: (reason) => {
+                  const finalStats = this.workoutSession.end();
+                  this.isRecording = false;
+
+                  const {newRecords, streak} = this.workoutStorage.saveWorkout(finalStats);
+                  this.workoutSummary.show(finalStats, newRecords, streak);
+
+                  simulationState.isPaused = false;
+                  this.countdown.cancel();
+                  constants.riderState.power = 0;
+                  constants.riderState.distanceMeters = 0;
+                  this.rideElapsedMs = 0;
+                  this.physics.setSpeed(0);
+                  this.hud.resetWorkOut();
+
+                  this.workoutSession.start();
+                  this.milestoneTracker.reset();
+              }
+            });
+        }
     
       if (localStorage.getItem("testMode") !== "true") {
         const trainer = new TrainerBluetooth();
       } else {
         if (sessionStorage.getItem("Trainer") !== null) {
-          try {
-            //HOPEFULLY this works
-            const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
-          } catch {
-            console.log("JSON trainer did not work. This will need reworking :(");
-          }
+            try {
+                //HOPEFULLY this works
+                const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
+            } catch {
+                console.log("JSON trainer did not work. This will need reworking :(");
+            }
         }
       }
     
@@ -915,14 +963,14 @@ export class zlowScreen {
 
       this.initializeScene();
 
-      this.rider = new AvatarMovement("rider", {
+        this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },
         isPacer: false,
         scene: this.scene.scene
       });
       this.physics = new PhysicsEngine();
-    
-      if (this.peerState == 0) {
+
+        if (this.peerState === 0 && !isMultiplayer) {
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
           isPacer: true,
@@ -933,6 +981,13 @@ export class zlowScreen {
       }
       this.keyboardMode = new KeyboardMode();
       this.standardMode = new StandardMode();
+
+      if (isMultiplayer && gameStartingParsed) {
+          window.__multiplayerManager = this.multiplayerManager;
+          this.multiplayerManager.start(gameStartingParsed).catch(err => {
+              console.error('[Multiplayer] Failed to start:', err);
+          });
+      }
     
       // Show/hide dev hud based on testMode
       console.log("testMode value:", localStorage.getItem("testMode"));
@@ -1096,5 +1151,10 @@ export class zlowScreen {
         this.standardMode = null;
         this.countdown = null;
         this.workoutSummary = null;
+
+        // Multiplayer clean up
+        this.multiplayerManager?.cleanup();
+        this.multiplayerManager = null;
+        window.__multiplayerManager = null;
     }
 }

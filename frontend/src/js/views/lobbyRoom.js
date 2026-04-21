@@ -87,7 +87,11 @@ export class lobbyRoomView {
             const maxPlayers = this.currentLobby.max_players;
             constants.multiplayerTrackScale = maxPlayers / 2;
 
-            // TODO: disconnect from lobby WS and connect to game service
+            // Disconnect from lobby service
+            // Game service connection handled by MultiplayerManager in zlow.js
+            this.lobbyClient.disconnect();
+            window.__lobbyClient = null;
+
             window.viewManager.setView(window.viewManager.views.mainZlow);
         });
 
