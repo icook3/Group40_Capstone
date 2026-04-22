@@ -4,7 +4,8 @@ import express from 'express';
 import {buildCrashReport} from '../backend/crash_logging_service/src/models/crashModel.js';
 import authenticateReportService from "../backend/crash_logging_service/src/services/authenticateReportService.js";
 import { checkRateLimit } from '../backend/crash_logging_service/src/services/rateLimitService.js';
-
+import { storeCrashReport } from '../backend/crash_logging_service/src/services/storageService.js';
+import { validateCrashPayload } from '../backend/crash_logging_service/src/services/validationService.js';
 /**
  * You must run the crashlog server first using Docker
  * Set this to the expected URL - it is currently set at the defaults
@@ -67,9 +68,39 @@ describe('Crashlog storage backend tests', () => {
         process.env.RATE_LIMIT_MAX=rateLimit;
         process.env.RATE_LIMIT_WINDOW_MS=rateLimitWindow;
         //send requests up to RATE_LIMIT_MAX
+        //before that amount should not throw an error
+        //after that amount should throw an error
         for (let i=0;i<rateLimit;i++) {
             expect(()=>checkRateLimit(1000)).not.toThrowError();
         }
         expect(()=>checkRateLimit(1000)).toThrowError();
+    });
+    test('validation service works correctly',()=> {
+        let report = {errorMessage: "ERROR",stackTrace:"abc.js line 2\ncde.js line 3",otherData1: "DATADATA",otherData2: "OTHERDATA"};
+        //valid paylooad
+        expect(validateCrashPayload(report)).toBe(report);
+        //invalid payload - errorMessage and stackTrace do not exist
+        report = {err:"ERROR?",stk:"THERE IS A PROBLEM"};
+        expect(()=>validateCrashPayload(report)).toThrowError();
+        //invalid payload - properties are not strings
+        report = {errorMessage:1,stackTrace:{OBJECT1: "THIS IS NOT A STRING!"}};
+        expect(()=>validateCrashPayload(report)).toThrowError();
+        //invalid payload - metadata is not an object
+        report = {errorMessage: "ERROR",stackTrace:"abc.js line 2\ncde.js line 3",metadata:"METADATA!"};
+        expect(()=>validateCrashPayload(report)).toThrowError();
+    });
+    test('intake routes return the correct values',()=> {
+        fetch(serverURL+"intake",{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({errorMessage: "ERROR",stackTrace:"abc.js line 2\ncde.js line 3",otherData1: "DATADATA",otherData2: "OTHERDATA"})
+        }).then((value)=> {
+            return value.text();
+        }).then((value)=> {
+            //console.log(value);
+            expect(value).toBe('ok');
+        });
     });
 });
