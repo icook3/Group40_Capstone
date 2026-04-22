@@ -236,4 +236,35 @@ describe('dgehrke - zlowScreen integration', () => {
 
     nowSpy.mockRestore();
   });
+
+  test('loop does not record ride samples when paused', () => {
+    mockPushSample.mockClear();
+
+    const screen = new zlowScreen(false);
+    screen.isRecording = true;
+    screen.loopRunning = true;
+
+    simulationState.isPaused = true;
+
+    screen.physics = { update: mockPhysicsUpdate };
+    screen.scene = { update: mockSceneUpdate };
+    screen.hud = { update: mockHudUpdate, totalDistance: 0 };
+    screen.rider = { setSpeed: jest.fn(), setPower: jest.fn(), update: mockAvatarUpdate };
+    screen.pacer = { setSpeed: jest.fn(), update: jest.fn() };
+    screen.pacerPhysics = { getSpeed: jest.fn(() => 0), setSpeed: jest.fn(), update: jest.fn(() => 0) };
+    screen.keyboardMode = {};
+    screen.workoutSession = { isWorkoutActive: jest.fn(() => false) };
+    screen.milestoneTracker = { check: jest.fn(() => null) };
+    screen.notificationManager = { show: jest.fn() };
+    screen.sendPeerDataOver = jest.fn();
+    screen.checkIfAchievementsUnlocked = jest.fn();
+
+    screen.loop({
+      getElement: (id) => document.getElementById(id),
+      requestAnimationFrameFn: jest.fn(),
+      owner: screen,
+    });
+
+    expect(mockPushSample).not.toHaveBeenCalled();
+  });
 });
