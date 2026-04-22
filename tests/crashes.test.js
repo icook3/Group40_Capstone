@@ -1,8 +1,9 @@
 import { describe, expect, test } from '@jest/globals';
+import express from 'express';
 //focus of the tests
 import {buildCrashReport} from '../backend/crash_logging_service/src/models/crashModel.js';
 import authenticateReportService from "../backend/crash_logging_service/src/services/authenticateReportService.js";
-import express from 'express';
+import { checkRateLimit } from '../backend/crash_logging_service/src/services/rateLimitService.js';
 
 /**
  * You must run the crashlog server first using Docker
@@ -10,6 +11,8 @@ import express from 'express';
  */
 let serverURL="http://localhost:3000/";
 let dummyKey="KEY";
+let rateLimit=5;
+let rateLimitWindow=10000;
 describe('Crashlog storage backend tests', () => {
     test('health returns OK',()=> {
         fetch(serverURL+"crashLoggingHealth").then((value)=> {
@@ -38,9 +41,9 @@ describe('Crashlog storage backend tests', () => {
     });
     test('authentication works properly',()=> {
         let res = express.response;
-        console.log(res.status(401));
+        //console.log(res.status(401));
         let req=new Request(new URL(serverURL));
-        console.log(req);
+        //console.log(req);
         req.headers.authorization="Bearer "+dummyKey;
         let next=(()=>{
             return;
@@ -49,14 +52,24 @@ describe('Crashlog storage backend tests', () => {
         process.env.REPORT_API_KEY=dummyKey;
         expect(authenticateReportService(req,res,next)).toBeUndefined();
         //test no bearer
+        //DOES NOT CURRENTLY WORK
         //res = express.response;
         req.headers.authorization="";
         console.log(res.json);
-        if (res.json("")==undefined) {
-            console.log("res.json is undefined!");
-        }
+        //if (res.json("")==undefined) {
+        //    console.log("res.json is undefined!");
+        //}
         let response=authenticateReportService(req,res,next);
         console.log(response);
         
+    });
+    test('rate limit works correctly',()=> {
+        process.env.RATE_LIMIT_MAX=rateLimit;
+        process.env.RATE_LIMIT_WINDOW_MS=rateLimitWindow;
+        //send requests up to RATE_LIMIT_MAX
+        for (let i=0;i<rateLimit;i++) {
+            expect(()=>checkRateLimit(1000)).not.toThrowError();
+        }
+        expect(()=>checkRateLimit(1000)).toThrowError();
     });
 });
