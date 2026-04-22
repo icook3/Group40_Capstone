@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test, fn } from '@jest/globals';
 import express from 'express';
 //focus of the tests
 import {buildCrashReport} from '../backend/crash_logging_service/src/models/crashModel.js';
@@ -41,7 +41,11 @@ describe('Crashlog storage backend tests', () => {
         expect(report.metadata.otherData2).toBe("OTHERDATA");
     });
     test('authentication works properly',()=> {
-        let res = express.response;
+        //mock it so it actually works correctly
+        let res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn().mockReturnThis()
+        };
         //console.log(res.status(401));
         let req=new Request(new URL(serverURL));
         //console.log(req);
@@ -52,11 +56,11 @@ describe('Crashlog storage backend tests', () => {
         //test authenticating correctly - should return undefined
         process.env.REPORT_API_KEY=dummyKey;
         expect(authenticateReportService(req,res,next)).toBeUndefined();
-        //test no bearer
+        //test with no bearer
         //DOES NOT CURRENTLY WORK
         //res = express.response;
         req.headers.authorization="";
-        console.log(res.json);
+        console.log(res.json instanceof Function);
         //if (res.json("")==undefined) {
         //    console.log("res.json is undefined!");
         //}
