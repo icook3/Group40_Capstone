@@ -46,9 +46,7 @@ describe('Crashlog storage backend tests', () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn().mockReturnThis()
         };
-        //console.log(res.status(401));
         let req=new Request(new URL(serverURL));
-        //console.log(req);
         req.headers.authorization="Bearer "+dummyKey;
         let next=(()=>{
             return;
@@ -56,17 +54,16 @@ describe('Crashlog storage backend tests', () => {
         //test authenticating correctly - should return undefined
         process.env.REPORT_API_KEY=dummyKey;
         expect(authenticateReportService(req,res,next)).toBeUndefined();
+
         //test with no bearer
-        //DOES NOT CURRENTLY WORK
-        //res = express.response;
         req.headers.authorization="";
-        console.log(res.json instanceof Function);
-        //if (res.json("")==undefined) {
-        //    console.log("res.json is undefined!");
-        //}
         let response=authenticateReportService(req,res,next);
-        console.log(response);
+        expect(response.status).toHaveBeenCalledWith(401);
         
+        //test with incorrect code
+        req.headers.authorization="Bearer NOTAKEY";
+        response=authenticateReportService(req,res,next);
+        expect(response.status).toHaveBeenCalledWith(403);
     });
     test('rate limit works correctly',()=> {
         process.env.RATE_LIMIT_MAX=rateLimit;
