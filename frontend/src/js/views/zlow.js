@@ -559,8 +559,8 @@ export class zlowScreen {
       const pauseGame = () => {
         simulationState.isPaused = true;
         this.hud.pause();
-        constants.pacerTween.pause();
-        constants.riderTween.pause();
+        constants.pacerTween?.pause();
+        constants.riderTween?.pause();
         overlay.style.display = "flex";
         overlay.setAttribute("aria-hidden", "false");
         dialog.classList.remove("zoom-out");
@@ -582,8 +582,8 @@ export class zlowScreen {
         simulationState.isPaused = false;
         constants.lastTime = Date.now();
         this.hud.resume();
-        constants.pacerTween.resume();
-        constants.riderTween.resume();
+        constants.pacerTween?.resume();
+        constants.riderTween?.resume();
       };
 
       pauseBtn.addEventListener("click", () => {
@@ -1001,6 +1001,13 @@ export class zlowScreen {
             });
         }
 
+        if (isMultiplayer) {
+            const pauseBtn = document.getElementById("pause-btn");
+            const pacerSyncBtn = document.getElementById("pacer-sync-btn");
+            if (pauseBtn) pauseBtn.style.display = "none";
+            if (pacerSyncBtn) pacerSyncBtn.style.display = "none";
+        }
+
       if (localStorage.getItem("testMode") !== "true") {
         const trainer = new TrainerBluetooth();
       } else {
@@ -1037,13 +1044,6 @@ export class zlowScreen {
       this.keyboardMode = new KeyboardMode();
       this.standardMode = new StandardMode();
 
-      if (isMultiplayer && gameStartingParsed) {
-          window.__multiplayerManager = this.multiplayerManager;
-          this.multiplayerManager.start(gameStartingParsed).catch(err => {
-              console.error('[Multiplayer] Failed to start:', err);
-          });
-      }
-
       // Show/hide dev hud based on testMode
       console.log("testMode value:", localStorage.getItem("testMode"));
       const devWrapper = getElement("dev-controls-wrapper");
@@ -1067,6 +1067,13 @@ export class zlowScreen {
       this.hud.initTrainerToggle();
       this.initializePacerSpeedInput();
       this.initializeRiderWeightInput();
+
+      if (isMultiplayer && gameStartingParsed) {
+          window.__multiplayerManager = this.multiplayerManager;
+          this.multiplayerManager.start(gameStartingParsed).catch(err => {
+              console.error('[Multiplayer] Failed to start:', err);
+          });
+      }
 
       // Dismiss trainer and dev menus when clicking outsideof their pop up
       document.addEventListener("click", (e) => {

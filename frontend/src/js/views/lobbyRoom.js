@@ -92,7 +92,9 @@ export class lobbyRoomView {
             this.lobbyClient.disconnect();
             window.__lobbyClient = null;
 
-            window.viewManager.setView(window.viewManager.views.mainZlow);
+            setTimeout(() => {
+                window.viewManager.setView(window.viewManager.views.mainZlow);
+            }, 1000);
         });
 
         // Ready toggle — clicking your own slot toggles ready

@@ -205,3 +205,6 @@
     background: rgb(180, 60, 60);
 }
 
+.hidden {
+    display: none !important;
+}

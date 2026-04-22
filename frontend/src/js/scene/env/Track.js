@@ -88,15 +88,23 @@ export class Track {
     const rider = this._getRider();
     const pacer = this._getPacer();
 
-    if (!rider || !pacer) {
+    if (!rider) {
       // Retry if avatars haven't loaded yet
       setTimeout(() => this.initialize_animation(), 1000);
       return;
     }
 
-    this.update_rider_animation();
-    update_pacer_animation(this.scene);
-    activatePacer();
+      // Only wait for pacer if not multiplayer
+      if (!pacer && !window.__multiplayerManager) {
+          setTimeout(() => this.initialize_animation(), 1000);
+          return;
+      }
+
+      this.update_rider_animation();
+      if (pacer) {
+          update_pacer_animation(this.scene);
+          activatePacer();
+      }
   }
 
   // Update animation speed and target based on current track piece
@@ -143,21 +151,21 @@ export class Track {
 
     // If the rider tween has not been initialized, create it
     if (!constants.riderTween){
-      const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
-          avatar.position.set(coords.x, coords.y, coords.z);
+        const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
+            const avatar = this._getRider(); // re-fetch each frame instead of closing over it
+            if (!avatar) return; // scene was destroyed, stop updating
 
-          // Set camera position
-          const rig = this._getCamera();
-          if (rig) {
+            avatar.position.set(coords.x, coords.y, coords.z);
 
-              // Set rider coordinates
-              rig.position.set(
-                  avatar.position.x + this.viewCoordinates.x + 0.5, // Add 0.5 to make up for spawn position
-                  avatar.position.y + this.viewCoordinates.y - 1, // Subtract 1 to make up for spawn position
-                  avatar.position.z + this.viewCoordinates.z
-              );
-          }
-          })
+            const rig = this._getCamera();
+            if (rig) {
+                rig.position.set(
+                    avatar.position.x,
+                    avatar.position.y + 4,
+                    avatar.position.z + 8
+                );
+            }
+        })
           .onComplete(() => {
             this.update_rider_animation();
           }).start();
@@ -176,6 +184,7 @@ export class Track {
 
     // Helper function animating using time
     function animate(time) {
+      if (!window.__zlowTrackInstance) return; // stop if track was destroyed
       constants.riderTween.update(time);
       requestAnimationFrame(animate);
     }

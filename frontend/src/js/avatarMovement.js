@@ -3,7 +3,7 @@ import { units } from "./units/index.js";
 
 export class AvatarMovement {
     constructor(id, options = {}) {
-        this.creator = new AvatarCreator(id, options.position, undefined, null, options.scene || window.__zlowSceneInstance?.scene);
+        this.creator = new AvatarCreator(id, options.position, undefined, null, options.scene || window.__zlowSceneInstance?.scene, options.loadLocal !== false, options);
         this.avatarEntity = this.creator.avatarEntity;
         this.speed = 0;
         this.power = 0;

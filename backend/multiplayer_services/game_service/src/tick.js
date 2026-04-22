@@ -1,6 +1,6 @@
 const { encode, nextTick } = require('./packet')
 
-const TICK_RATE_MS = 200 // 5hz
+const TICK_RATE_MS = 50 // 20hz
 const HEARTBEAT_TIMEOUT_MS = 15000 // 15 seconds
 
 function startTick(session, onDurationReached) {

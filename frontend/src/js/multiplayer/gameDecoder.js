@@ -36,7 +36,7 @@ export function decodeSessionJoin(view) {
     // duration_seconds: 2B (u16) - ride duration (600–14400)
     const durationSeconds = view.getUint16(headerLength + 2, false);
 
-    return { playerId, playerCount, durationSeconds };
+    return { playerSlot: playerId, playerCount, durationSeconds };
 }
 
 export function decodeWorldState(view) {

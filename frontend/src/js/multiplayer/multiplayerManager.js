@@ -6,7 +6,7 @@ import { constants } from "../constants.js";
 
 const { serverMSG } = multiplayerConstants;
 
-const RIDER_INPUT_INTERVAL_MS = 200; // 5hz
+const RIDER_INPUT_INTERVAL_MS = 50; // 20hz
 const HEARTBEAT_INTERVAL_MS = 5000;  // 5 seconds
 
 export class MultiplayerManager {
@@ -66,15 +66,11 @@ export class MultiplayerManager {
         this.durationSeconds = durationSeconds;
         this.sessionStartTime = Date.now();
 
-        console.log(`[Multiplayer] Joined as slot ${playerSlot}, ${playerCount} players, ${durationSeconds}s`);
-
         const otherPlayerCount = this.playerInfo.size - 1; // exclude local
-        const spacing = 1;
+        const spacing = 4;
         const totalWidth = (otherPlayerCount - 1) * spacing;
         const startX = -(totalWidth / 2);
 
-        // Offset so nobody lands on -0.5 where local rider is
-        const LOCAL_RIDER_X = -0.5;
 
         let index = 0;
         this.playerInfo.forEach((info, player_id) => {
@@ -82,17 +78,18 @@ export class MultiplayerManager {
 
             let spawnX = startX + (index * spacing);
 
-            // Nudge if too close to local rider
-            if (Math.abs(spawnX - LOCAL_RIDER_X) < 0.4) {
-                spawnX += spacing;
-            }
-
             index++;
+
+            const data = typeof info.player_data === 'string'
+                ? JSON.parse(info.player_data)
+                : info.player_data;
 
             const avatar = new AvatarMovement(`mp-player-${player_id}`, {
                 position: { x: spawnX, y: 1, z: -5 },
                 isPacer: false,
-                scene: window.__zlowSceneInstance?.scene
+                scene: window.__zlowSceneInstance?.scene,
+                loadLocal: false,
+                model: data?.model || 'male'
             });
 
             // Apply their customization
@@ -107,7 +104,9 @@ export class MultiplayerManager {
                 slot: null,
                 lastSeen: Date.now(),
                 disconnected: false,
-                speed: 0
+                speed: 0,
+                targetX: spawnX,
+                targetZ: -5
             });
         });
 
@@ -123,13 +122,11 @@ export class MultiplayerManager {
 
         const localRider = window.__zlowSceneInstance?.scene?.getObjectByName('rider');
         const localZ = localRider?.position.z ?? 0;
-        const localX = localRider?.position.x ?? 0;
 
-        // Find local rider's protocol position
+        // Find local rider's protocol Y only
         riders.forEach(rider => {
             if (rider.playerSlot === this.playerSlot) {
                 this.localProtocolY = rider.y;
-                this.localProtocolX = rider.x;
             }
         });
 
@@ -147,33 +144,26 @@ export class MultiplayerManager {
             playerEntry.speed = rider.speed;
             playerEntry.disconnected = false;
 
-            // Z is relative to local rider — how far ahead or behind
-            const threeZ = localZ + (rider.y - this.localProtocolY);
+            // How far ahead/behind are they in meters
+            const zDelta = (rider.y - this.localProtocolY) / 10;
+            const targetZ = localZ + zDelta;
 
-            // X uses the local rider's curve offset plus their lane difference
-            // This keeps other players on the same curve as the local track
-            const laneOffset = (rider.x - this.localProtocolX) / 10;
-            const threeX = localX + laneOffset;
+            // Find the closest track point to targetZ
+            const trackPoint = this.findTrackPointAtZ(targetZ);
 
-            const threeY = 1;
+            // X follows the track curve + lane offset based on slot
+            const slotOffset = (rider.playerSlot - this.playerSlot) * 1;
+            const threeX = trackPoint ? trackPoint.x - 0.5 + slotOffset : slotOffset;
+            const threeZ = targetZ;
 
-            const avatarEntity = playerEntry.avatar?.creator?.avatarEntity;
-            if (avatarEntity) {
-                avatarEntity.position.set(threeX, threeY, threeZ);
-            }
+            playerEntry.targetX = threeX;
+            playerEntry.targetZ = threeZ;
 
-            playerEntry.avatar?.setSpeed(rider.speed / 10);
+            // Set speed and power for animations
+            playerEntry.avatar?.setSpeed(rider.speed);
+            playerEntry.avatar?.setPower(rider.power);
         });
 
-        // Check for disconnected players
-        this.otherPlayers.forEach((playerEntry) => {
-            if (!seenSlots.has(playerEntry.slot) && playerEntry.slot !== null) {
-                const timeSinceLastSeen = Date.now() - playerEntry.lastSeen;
-                if (timeSinceLastSeen > 3000) {
-                    playerEntry.disconnected = true;
-                }
-            }
-        });
 
         this.updateHUD(riders);
     }
@@ -191,7 +181,7 @@ export class MultiplayerManager {
 
     startRiderInputLoop() {
         this.riderInputInterval = setInterval(() => {
-            const speed  = Math.round(constants.riderState.speed * 10);
+            const speed = Math.round(constants.riderState.speed);
             const power  = Math.round(constants.riderState.power || 0);
             const rider  = window.__zlowSceneInstance?.scene?.getObjectByName('rider');
             const x      = Math.round((rider?.position.x ?? 0) * 10);
@@ -210,8 +200,17 @@ export class MultiplayerManager {
     }
 
     update(dt) {
+        const lerpTime = 0.07; // catch up in 70ms
+        const alpha = Math.min(1, dt / lerpTime);
+
         this.otherPlayers.forEach(playerEntry => {
             if (!playerEntry.disconnected) {
+                const avatarEntity = playerEntry.avatar?.creator?.avatarEntity;
+                if (avatarEntity && playerEntry.targetX !== undefined) {
+                    avatarEntity.position.x += (playerEntry.targetX - avatarEntity.position.x) * alpha;
+                    avatarEntity.position.z += (playerEntry.targetZ - avatarEntity.position.z) * alpha;
+                    avatarEntity.position.y = 1;
+                }
                 playerEntry.avatar?.update(dt);
             }
         });
@@ -234,6 +233,48 @@ export class MultiplayerManager {
         }
 
         return null;
+    }
+
+    findTrackPointAtZ(targetZ) {
+        const trackPoints = constants.trackPoints;
+        if (!trackPoints || trackPoints.length === 0) return null;
+
+        // Find the two track points surrounding targetZ
+        let before = null;
+        let after = null;
+
+        for (let i = 0; i < trackPoints.length - 1; i++) {
+            const a = trackPoints[i];
+            const b = trackPoints[i + 1];
+
+            // Track goes in negative Z direction
+            if (a.z >= targetZ && b.z <= targetZ) {
+                before = a;
+                after = b;
+                break;
+            }
+        }
+
+        if (!before || !after) {
+            // Fall back to closest
+            let closest = trackPoints[0];
+            let closestDist = Math.abs(trackPoints[0].z - targetZ);
+            for (let i = 1; i < trackPoints.length; i++) {
+                const dist = Math.abs(trackPoints[i].z - targetZ);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = trackPoints[i];
+                }
+            }
+            return closest;
+        }
+
+        // Interpolate between before and after based on Z
+        const t = (targetZ - before.z) / (after.z - before.z);
+        return {
+            x: before.x + (after.x - before.x) * t,
+            z: targetZ
+        };
     }
 
     initHUD() {
