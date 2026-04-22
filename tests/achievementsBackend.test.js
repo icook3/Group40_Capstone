@@ -57,4 +57,48 @@ describe('Achievements percentage backend tests', () => {
         decrementUserCount();
         decrementUserCount();
     });
+    test('setting achievements returns "Achievements Unlocked!"',()=> {
+        fetch(serverURL+"achievements",{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(["testAchievement1", "testAchievement2"])
+        }).then((value)=> {
+            return value.text();
+        }).then((value)=> {
+            //console.log(value);
+            expect(value).toBe('Achievements Unlocked!');
+        });
+    });
+    test('getting achievements returns an object with the achievements and their percentages',()=> {
+        fetch(serverURL+"achievements").then((value)=> {
+            return value.json();
+        }).then((value)=> {
+            expect(typeof value.testAchievement1).toBe('number');
+        });
+    });
+    test('deleting achievements returns "Achievements Locked!"',()=> {
+        fetch(serverURL+"achievements",{
+            method: 'DELETE',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(["testAchievement1", "testAchievement2"])
+        }).then((value)=> {
+            return value.text();
+        }).then((value)=> {
+            //console.log(value);
+            expect(value).toBe('Achievements Locked!');
+        });
+    });
+    test('adding a new user',()=> {
+        fetch(serverURL+"newUser",{
+            method:"POST"
+        }).then((value)=> {
+            return value.text();
+        }).then((value)=> {
+            expect(value).toBe('User Added!');
+        });
+    });
 });
