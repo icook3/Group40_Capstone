@@ -3,8 +3,8 @@
   Neither the road nor the pattern are added into the array used to update the scene as the rider moves.
 */
 import * as THREE from "three";
-//import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
-import {Tween} from '@tweenjs/tween.js'
+import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
+//import {Tween} from '@tweenjs/tween.js'
 import { constants } from "../../constants.js";
 import {getSign} from '../core/util.js';
 import  {activatePacer} from '../../main.js'

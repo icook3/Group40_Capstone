@@ -5,7 +5,6 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-
     "test": "jest --config jest.config.js"
   },
   "devDependencies": {
@@ -17,6 +16,7 @@
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
     "expr-eval-fork": "^3.0.0",
+    "selenium-webdriver": "^4.43.0",
     "three": "^0.183.2"
   }
 }
