@@ -40,10 +40,17 @@ export class MultiplayerManager {
 
         // Store player info from GAME_STARTING for avatar creation
         if (players) {
-            players.forEach(p => {
+            players.forEach((p, index) => {
                 this.playerInfo.set(p.player_id, p);
+                p.lobbyIndex = index;
             });
         }
+
+        // Build slot map where slot = lobbyIndex + 1
+        this.slotToPlayerId = new Map();
+        [...this.playerInfo.keys()].forEach((player_id, index) => {
+            this.slotToPlayerId.set(index + 1, player_id);
+        });
 
         // Store auth so for own player_id
         const auth = JSON.parse(sessionStorage.getItem('multiplayer_auth'));
@@ -66,17 +73,28 @@ export class MultiplayerManager {
         this.durationSeconds = durationSeconds;
         this.sessionStartTime = Date.now();
 
+        // Reposition local rider to their slot
+        const totalPlayers = this.playerInfo.size;
+        const spacing = 1;
+        const localRider = window.__zlowSceneInstance?.scene?.getObjectByName('rider');
+        if (localRider) {
+            const centerSlot = (totalPlayers + 1) / 2;
+            const slotX = (playerSlot - centerSlot) * spacing;
+            localRider.position.x = slotX;
+            localRider.userData.slotX = slotX; // store for tween use
+        }
+
         const otherPlayerCount = this.playerInfo.size - 1; // exclude local
-        const spacing = 4;
         const totalWidth = (otherPlayerCount - 1) * spacing;
         const startX = -(totalWidth / 2);
 
-
         let index = 0;
-        this.playerInfo.forEach((info, player_id) => {
-            if (player_id === this.localPlayerId) return;
+        for (const [slot, player_id] of [...this.slotToPlayerId.entries()].sort((a, b) => a[0] - b[0])) {
+            if (player_id === this.localPlayerId) continue;
+            const info = this.playerInfo.get(player_id);
 
-            let spawnX = startX + (index * spacing);
+            const centerSlot = (totalPlayers + 1) / 2;
+            const spawnX = (slot - centerSlot) * spacing;
 
             index++;
 
@@ -101,14 +119,14 @@ export class MultiplayerManager {
                 avatar,
                 player_id,
                 display_name: info.display_name,
-                slot: null,
+                slot: slot,
                 lastSeen: Date.now(),
                 disconnected: false,
                 speed: 0,
                 targetX: spawnX,
                 targetZ: -5
             });
-        });
+        }
 
         // Start sending rider input
         this.startRiderInputLoop();
@@ -144,26 +162,34 @@ export class MultiplayerManager {
             playerEntry.speed = rider.speed;
             playerEntry.disconnected = false;
 
-            // How far ahead/behind are they in meters
             const zDelta = (rider.y - this.localProtocolY) / 10;
             const targetZ = localZ + zDelta;
 
-            // Find the closest track point to targetZ
             const trackPoint = this.findTrackPointAtZ(targetZ);
+            const trackX = trackPoint ? trackPoint.x : 0;
 
-            // X follows the track curve + lane offset based on slot
-            const slotOffset = (rider.playerSlot - this.playerSlot) * 1;
-            const threeX = trackPoint ? trackPoint.x - 0.5 + slotOffset : slotOffset;
-            const threeZ = targetZ;
+            const totalPlayers = riders.length;
+            const spacing = 1;
+            const centerSlot = (totalPlayers + 1) / 2;
+            const slotOffset = (rider.playerSlot - centerSlot) * spacing;
+
+            const threeX = trackX + slotOffset;
 
             playerEntry.targetX = threeX;
-            playerEntry.targetZ = threeZ;
+            playerEntry.targetZ = targetZ;
 
             // Set speed and power for animations
             playerEntry.avatar?.setSpeed(rider.speed);
             playerEntry.avatar?.setPower(rider.power);
         });
 
+        this.otherPlayers.forEach((playerEntry) => {
+            if (!seenSlots.has(playerEntry.slot) && playerEntry.slot !== null) {
+                if (Date.now() - playerEntry.lastSeen > 3000) {
+                    playerEntry.disconnected = true;
+                }
+            }
+        });
 
         this.updateHUD(riders);
     }
@@ -200,15 +226,17 @@ export class MultiplayerManager {
     }
 
     update(dt) {
-        const lerpTime = 0.07; // catch up in 70ms
-        const alpha = Math.min(1, dt / lerpTime);
+        const zLerpTime = 0.05;
+        const xLerpTime = 0.25;
+        const zAlpha = Math.min(1, dt / zLerpTime);
+        const xAlpha = Math.min(1, dt / xLerpTime);
 
         this.otherPlayers.forEach(playerEntry => {
             if (!playerEntry.disconnected) {
                 const avatarEntity = playerEntry.avatar?.creator?.avatarEntity;
                 if (avatarEntity && playerEntry.targetX !== undefined) {
-                    avatarEntity.position.x += (playerEntry.targetX - avatarEntity.position.x) * alpha;
-                    avatarEntity.position.z += (playerEntry.targetZ - avatarEntity.position.z) * alpha;
+                    avatarEntity.position.x += (playerEntry.targetX - avatarEntity.position.x) * xAlpha;
+                    avatarEntity.position.z += (playerEntry.targetZ - avatarEntity.position.z) * zAlpha;
                     avatarEntity.position.y = 1;
                 }
                 playerEntry.avatar?.update(dt);
@@ -284,22 +312,23 @@ export class MultiplayerManager {
         const hud = document.createElement('div');
         hud.id = 'mp-hud';
         hud.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(53, 72, 79, 0.85);
-            border-radius: 14px;
-            padding: 12px 16px;
-            font-family: "Nunito", sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #e0e0e0;
-            z-index: 1000;
-            min-width: 160px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        `;
+        position: fixed;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(53, 72, 79, 0.85);
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-family: "Nunito", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #e0e0e0;
+        z-index: 1000;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    `;
 
         document.body.appendChild(hud);
         this.hudElement = hud;
@@ -310,12 +339,20 @@ export class MultiplayerManager {
 
         this.hudElement.innerHTML = '';
 
-        // Sort riders by y position descending (furthest ahead first)
-        const sorted = [...riders].sort((a, b) => b.y - a.y);
+        // Sort riders by y position ascending (furthest ahead first) (heading - direction)
+        const sorted = [...riders].sort((a, b) => a.y - b.y);
+
+        const localRiderY = riders.find(r => r.playerSlot === this.playerSlot)?.y ?? 0;
 
         sorted.forEach((rider, index) => {
             const isLocal = rider.playerSlot === this.playerSlot;
             const playerEntry = isLocal ? null : this.findPlayerEntryBySlot(rider.playerSlot);
+
+            // Calculate relative distance to local rider
+            const relativeZ = ((rider.y - localRiderY) / 10).toFixed(0);
+            const isAhead = rider.y > localRiderY;
+            const distColor = isAhead ? '#4caf82' : '#f09595';
+            const distLabel = isAhead ? `+${relativeZ}m` : `${relativeZ}m`;
 
             const row = document.createElement('div');
             row.style.cssText = `
@@ -342,8 +379,9 @@ export class MultiplayerManager {
                     color: ${isLocal ? '#e0f7ef' : (disconnected ? 'rgba(224,224,224,0.4)' : '#e0e0e0')};
                     text-decoration: ${disconnected ? 'line-through' : 'none'};
                 ">${displayName}</span>
-                ${disconnected ? '<span style="color:#f09595;font-size:0.7rem;">Left</span>' : ''}
-                ${isLocal ? '<span style="color:rgba(224,224,224,0.4);font-size:0.7rem;">You</span>' : ''}
+                <span style="color: ${isLocal ? 'rgba(224,224,224,0.4)' : (disconnected ? 'rgba(224,224,224,0.3)' : distColor)}; font-size: 0.7rem; min-width: 48px; text-align: right;">
+                    ${isLocal ? 'You' : (disconnected ? 'Left' : distLabel)}
+                </span>
             `;
 
             this.hudElement.appendChild(row);

@@ -136,17 +136,22 @@ export class Track {
 
     // Increment current track piece, define start- and endpoints, and calculate rider's duration
     constants.currentTrackPiece += 1;
-    let coords = { x: -0.5, y: 0, z: 0 };
-    
+
+    const rider = this._getRider();
+    const slotX = rider?.userData?.slotX ?? -0.5;
+
+    let coords = { x: slotX, y: 0, z: 0 };
+
     if (constants.currentTrackPiece > 0) {
       const prev = constants.trackPoints[constants.currentTrackPiece - 1];
-      coords = { x: prev.x - 0.5, y: prev.y, z: prev.z };
+      coords = { x: prev.x + slotX, y: prev.y, z: prev.z };
     }
 
     const next = constants.trackPoints[constants.currentTrackPiece];
     if (!next) return;
 
-    const endpoint = { x: next.x - 0.5, y: next.y, z: next.z };
+    const endpoint = { x: next.x + slotX, y: next.y, z: next.z };
+
     const riderDuration = Math.round((next.length / constants.riderState.speed) * 1500);
 
     // If the rider tween has not been initialized, create it
@@ -220,13 +225,21 @@ function curve_180_right(trackSystem) {
   const pointZ = -1 * (constants.farthestSpawn);
 
   // Add necessary points based on current farthest spawn
-  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-7 * scale, length: 16.55 * scale});
-  constants.trackPoints.push({x: 23 * scale, y: 1, z: pointZ-15 * scale, length: 11.31 * scale});
-  constants.trackPoints.push({x: 25 * scale, y: 1, z: pointZ-24 * scale, length: 9.22 * scale});
-  constants.trackPoints.push({x: 27 * scale, y: 1, z: pointZ-33 * scale, length: 9.22 * scale});
-  constants.trackPoints.push({x: 21 * scale, y: 1, z: pointZ-48 * scale, length: 16.16 * scale});
-  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-55 * scale, length: 9.22 * scale});
-  constants.trackPoints.push({x: 7 * scale, y: 1, z: pointZ-58 * scale, length: 8.54 * scale});
+  constants.trackPoints.push({x: 8 * scale, y: 1, z: pointZ-3.5 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-7 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: 19 * scale, y: 1, z: pointZ-11 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: 23 * scale, y: 1, z: pointZ-15 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: 24 * scale, y: 1, z: pointZ-19.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 25 * scale, y: 1, z: pointZ-24 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 26 * scale, y: 1, z: pointZ-28.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 27 * scale, y: 1, z: pointZ-33 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 24 * scale, y: 1, z: pointZ-40.5 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: 21 * scale, y: 1, z: pointZ-48 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: 18 * scale, y: 1, z: pointZ-51.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-55 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 11 * scale, y: 1, z: pointZ-56.5 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: 7 * scale, y: 1, z: pointZ-58 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: 3.5 * scale, y: 1, z: pointZ-59.5 * scale, length: 3.81 * scale});
   constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 7.61 * scale});
 
   // Update farthestSpan
@@ -260,14 +273,22 @@ function curve_180_left(trackSystem) {
   const pointZ = -1 * (constants.farthestSpawn);
 
   // Add necessary points based on current farthest spawn
-  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-7 * scale, length: 16.55 * scale});
-  constants.trackPoints.push({x: -23 * scale, y: 1, z: pointZ-15 * scale, length: 11.31 * scale});
-  constants.trackPoints.push({x: -25 * scale, y: 1, z: pointZ-24 * scale, length: 9.22 * scale});
-  constants.trackPoints.push({x: -27 * scale, y: 1, z: pointZ-33 * scale, length: 9.22 * scale});
-  constants.trackPoints.push({x: -21 * scale, y: 1, z: pointZ-48 * scale, length: 16.16 * scale});
-  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-55 * scale, length: 9.22 * scale});
-  constants.trackPoints.push({x: -7 * scale, y: 1, z: pointZ-58 * scale, length: 8.54 * scale});
-  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 7.62 * scale});
+  constants.trackPoints.push({x: -8 * scale, y: 1, z: pointZ-3.5 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-7 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: -19 * scale, y: 1, z: pointZ-11 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: -23 * scale, y: 1, z: pointZ-15 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: -24 * scale, y: 1, z: pointZ-19.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -25 * scale, y: 1, z: pointZ-24 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -26 * scale, y: 1, z: pointZ-28.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -27 * scale, y: 1, z: pointZ-33 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -24 * scale, y: 1, z: pointZ-40.5 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: -21 * scale, y: 1, z: pointZ-48 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: -18 * scale, y: 1, z: pointZ-51.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-55 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -11 * scale, y: 1, z: pointZ-56.5 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: -7 * scale, y: 1, z: pointZ-58 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: -3.5 * scale, y: 1, z: pointZ-59.5 * scale, length: 3.81 * scale});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 3.81 * scale});
 
   // Update farthestSpan
   constants.farthestSpawn += 62 * scale;
