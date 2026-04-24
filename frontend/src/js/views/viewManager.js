@@ -83,7 +83,7 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
-                this.viewStorage.changelog = new achievementsView(false);
+                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.achievements:
