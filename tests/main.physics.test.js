@@ -1,4 +1,9 @@
-import { powerToSpeed, kmhToMs, msToKmh } from '../frontend/src/js/main.js';
+/**
+ * @jest-environment jsdom
+ */
+import * as config from '../frontend/src/js/config/config.js';
+
+import { powerToSpeed} from '../frontend/src/js/main.js';
 
 describe('powerToSpeed', () => {
   it('returns realistic speed for 200W (default params)', () => {

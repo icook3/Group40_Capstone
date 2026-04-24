@@ -62,11 +62,6 @@ export class Track {
     this._initTimer = setTimeout(() => this.initialize_animation(), 5000);
   }
 
-  exportTestData() {
-    console.log(curve_180_right(this.scene))
-    //return curve_180_right();
-  }
-
   destroy() {
     if (this._initTimer) clearTimeout(this._initTimer);
 

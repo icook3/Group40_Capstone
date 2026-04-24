@@ -1,33 +1,40 @@
 /**
  * @jest-environment jsdom
  */
+//IMPORTING config, to prevent bugs
+import * as config from '../frontend/src/js/config/config.js';
+import { constants } from "../frontend/src/js/constants.js";
+import { describe, expect, test } from '@jest/globals';
+import { Track } from "../frontend/src/js/scene/env/Track.js"
 
-import {Track} from "../frontend/src/js/scene/env/Track.js";
-import {expect, jest, test, MeshStandardMaterial} from '@jest/globals';
-
-//import * as scene from "../frontend/src/js/scene/index.js"
-//import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const THREE = global.THREE = require('three');
-
-// you probably have to make a whole new scene and then put crap in it for this to work.
 const scene = new THREE.Scene();
 const track = new Track({ scene: scene });
 
+describe('track generation and properties', () => {
 
+  test('fundamental track properties', () => {
+    const MeshStandardMaterial = THREE.MeshStandardMaterial;
+    expect(track.path_element.name).toBe("track");
+    expect(track.path_element.type).toBe("Group");
+    expect(track._ownsPath).toBe(true);
+    expect(track.trackMaterial.isMeshStandardMaterial);
+    expect(track.trackMaterialDouble.isMeshStandardMaterial);
+  });
 
-test('fundamental track properties', () => {
-  // path element - name track, type group parent scene
-  //track children??
-  const MeshStandardMaterial = THREE.MeshStandardMaterial;
-  expect(track.path_element.name).toBe("track");
-  expect(track.path_element.type).toBe("Group");
-  expect(track._ownsPath).toBe(true);
-  expect(track.trackMaterial.isMeshStandardMaterial);
-  expect(track.trackMaterialDouble.isMeshStandardMaterial);
-});
+  test('at least 240 track pieces should be generated to start', () => {
+    // track test points should be at least 80 things long
+    expect(constants.trackPoints.length).toBeGreaterThan(240);
+  });
 
-test('generate track pieces', () => {
-  // go through constants - functions in track don't return right w/o the whole scene initialized
+  test('track should include both curved and straight pieces', () => {
+    expect(constants.trackPoints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({length: 5}),
+        expect.objectContaining({length: 16.55})
+      ])
+    );
+  });
 
-
+  // CHECK THAT TRACK IS POSITIONED PROPERLY
 });

@@ -1,4 +1,5 @@
 // scene.test.js: Basic tests for scene.js
+// These tests won't work anymore as scene has been extensively refactored.
 import * as scene from '../js/scene.js';
 
 describe('scene.js basic exports', () => {

@@ -1,4 +1,7 @@
-// main.test.js: Basic tests for main.js (state management)
+/**
+ * @jest-environment jsdom
+ */
+import * as config from '../frontend/src/js/config/config.js';
 import * as main from '../frontend/src/js/main.js';
 
 describe('main.js basic exports', () => {
