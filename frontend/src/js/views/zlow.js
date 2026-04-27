@@ -778,12 +778,14 @@ export class zlowScreen {
       }
       const dt = (now - constants.lastTime) / 1000;
       constants.lastTime = now;
+
       if (owner.isRecording) {
           owner.rideElapsedMs+=dt*1000;
       }
       const currentPower = constants.riderState.power || 0;
       constants.riderState.speed = owner.physics.update(currentPower, dt);
 
+  
       const speedMs = constants.kmhToMs(constants.riderState.speed);
       constants.riderState.distanceMeters += speedMs * dt;
       // Calculate calories burned using the following formula:
@@ -1070,6 +1072,8 @@ export class zlowScreen {
       });
       this.setupTrainerButtons();
       this.standardMode.init();
+      constants.lastTime = Date.now();
+
       this.loopRunning=true;
       this.loop();
       this.setupPacerSyncButton();

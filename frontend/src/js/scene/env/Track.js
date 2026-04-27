@@ -126,7 +126,10 @@ export class Track {
     if (!next) return;
 
     const endpoint = { x: next.x - 0.5, y: next.y, z: next.z };
-    const riderDuration = Math.round((next.length / constants.riderState.speed) * 1500);
+    const riderDuration = Math.min(
+      Math.round((next.length / constants.riderState.speed) * 1500),
+      500
+    );
 
     // If the rider tween has not been initialized, create it
     if (!constants.riderTween){
