@@ -1210,7 +1210,6 @@ export class zlowScreen {
         this.workoutStorage = null;
         this.milestoneTracker = null;
         this.notificationManager = null;
-        this.keyboardMode = null;
         this.standardMode = null;
         this.countdown = null;
         this.workoutSummary = null;
