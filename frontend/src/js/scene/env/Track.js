@@ -5,8 +5,9 @@
 import * as THREE from "three";
 import { Tween } from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 import { constants } from "../../constants.js";
-import { getSign } from '../core/util.js';
-import  { activatePacer } from '../../main.js';
+import {getSign} from '../core/util.js';
+import  {activatePacer} from '../../main.js'
+import { terrainSwitcher } from "../terrains/terrainSwitcher.js";
 
 export class Track {
   constructor({ scene }) {
@@ -27,20 +28,8 @@ export class Track {
     }
     this.path_element = path_element;
 
-    this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
-
-    this.trackMaterial = new THREE.MeshStandardMaterial({
-        map: this.trackTexture,
-        color:0xc8c0b0,
-        roughness: 0.9
-    });
-
-    this.trackMaterialDouble = new THREE.MeshStandardMaterial({
-        map: this.trackTexture,
-        color: 0xc8c0b0,
-        roughness: 0.9,
-        side: THREE.DoubleSide
-    });
+    this.trackMaterial = terrainSwitcher.currentTerrain.trackMaterial;
+    this.trackMaterialDouble = terrainSwitcher.currentTerrain.trackMaterialDouble;
 
     this.update_rider_animation = this.update_rider_animation.bind(this);
     this.update_pacer_animation = update_pacer_animation.bind(this);

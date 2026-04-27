@@ -1,5 +1,5 @@
 /* Slideshow container */
-.slideshow-container {
+.terrainSlideshowContainer {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -7,34 +7,34 @@
 }
 
 /* Next & previous buttons */
-.prev {
+.terrainPrev {
 position: absolute;
   top: 50%;
   padding: 16px;
   text-align: center;
   justify-content: center;
-  color: #1f6784;
+  color: #ffffff;
   font-weight: bold;
   font-size: 60px;
   transition: 0.6s ease;
   cursor: pointer;
 }
 
-.next {
+.terrainNext {
   position: absolute;
   top: 50%;
   padding: 16px;
   right:0;
   text-align: center;
   justify-content: center;
-  color: #1f6784;
+  color: #ffffff;
   font-weight: bold;
   font-size: 60px;
   transition: 0.6s ease;
   cursor: pointer;
 }
 
-.bottomDiv {
+.terrainBottomDiv {
   left: 0;
   right: 0;
   width: fit-content;
@@ -53,6 +53,6 @@ position: absolute;
   box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
 }
 
-.prev:hover, .next:hover, .bottomDiv:hover {
+.terrainPrev:hover, .terrainNext:hover, .terrainBottomDiv:hover {
   background-color: gray;
 }

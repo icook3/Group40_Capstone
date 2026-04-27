@@ -7,6 +7,7 @@ import { connectToPeersView } from "./connectToPeers.js";
 import { cameraPref } from "./cameraPref.js";
 import { achievementsView } from "./achievements.js";
 import { achievementManager } from "../achievements/achievementManager.js";
+import { terrainSelectionView } from "./terrainSwitcher.js";
 // a list of different views
 class ViewStorage {
     mainMenu;
@@ -16,9 +17,10 @@ class ViewStorage {
     zlowScreen;
     cameraPref;
     achievements;
+    terrainSelection;
 }
 export class ViewManager {
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", cameraPref: "cameraPref", achievements: "achievements"};
+    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", cameraPref: "cameraPref", achievements: "achievements", terrainSelect: "terrainSelect"};
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
@@ -48,6 +50,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.changelog:
@@ -57,6 +60,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(true);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.peerConnect:
@@ -66,6 +70,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(true);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.playerCustomization:
@@ -75,6 +80,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.mainZlow:
@@ -84,6 +90,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
                 this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.achievements:
@@ -93,6 +100,17 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(true);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
+            case this.views.terrainSelect:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(true);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.cameraPref:
@@ -102,6 +120,7 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(true);
                 break;
             default:
@@ -111,9 +130,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
-                break;
-
                 this.currentView=this.views.mainMenu;
                 sessionStorage.setItem("currentView",this.views.mainMenu);
                 break;
@@ -144,6 +162,8 @@ export class ViewManager {
             case this.views.achievements:
                 this.viewStorage.achievements.reset();
                 break;
+            case this.views.terrainSelect:
+                this.viewStorage.terrainSelection.reset();
         }
         //set the current page
         switch(view) {
@@ -180,6 +200,11 @@ export class ViewManager {
             case this.views.achievements:
                 if (this.viewStorage.achievements.ready) {
                     this.viewStorage.achievements.setPage();
+                }
+                break;
+            case this.views.terrainSelect:
+                if (this.viewStorage.terrainSelection.ready) {
+                    this.viewStorage.terrainSelection.setPage();
                 }
                 break;
             default: 
