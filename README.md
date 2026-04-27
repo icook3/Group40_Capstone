@@ -74,6 +74,11 @@ PORT=9000
     - STRAVA_CLIENT_ID = our Strava client id
     - this.STRAVA_BACKEND_URL = your ngrok URL
 16. Close ngrok/terminal windows when you are done using the service
+17. For full multiplayer you will need a secure public address (HTTPS/WSS), one for the port for game service, one for the port for lobby service, and the frontend. Follow the ngrok commands above. 
+    1. The game service default port is 4001
+    2. The lobby service default port is 4000
+18. Do steps 1 through 4 on the multiplayer services README
+19. Go to `frontend/src/js/config/config.js`, and replace the full multiplayer experience lobby urls
 
 Instead of doing steps 7 and 8, you can double-click on backend.bat. This will run the backend without needing to use the command line. You will still need to create your .env files, and change the values in constants.js.
 

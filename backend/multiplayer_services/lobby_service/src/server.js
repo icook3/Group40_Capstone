@@ -4,13 +4,29 @@ const { handleMessage, handleDisconnect } = require('./handlers');
 const { authGuest } = require('./auth');
 
 const PORT = process.env.LOBBY_PORT || 4000;
+const FRONTEND = process.env.FRONTEND_URL;
 
 function sendJSON(res, status, data) {
     res.writeHead(status, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(data));
 }
 
+function setCORSHeaders(res) {
+    res.setHeader('Access-Control-Allow-Origin', FRONTEND);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 const server = http.createServer(async (req, res) => {
+    setCORSHeaders(res);
+
+    // Browser sends OPTIONS preflight before POST
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
     if (req.method === 'POST' && req.url === '/auth/guest') {
         let body = '';
 

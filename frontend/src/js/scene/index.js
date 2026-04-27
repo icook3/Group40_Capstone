@@ -37,7 +37,7 @@ export class ZlowScene {
         this.cam = new Camera(this.scene);
 
         // Set starting camera position
-        this.viewCoordinates = JSON.parse(localStorage.getItem("view"));
+        this.viewCoordinates = JSON.parse(localStorage.getItem("view")) || { x: 0, y: 4, z: 5 };
         this.cam.rig.position.x = this.viewCoordinates.x;
         this.cam.rig.position.y = this.viewCoordinates.y;
         this.cam.rig.position.z = this.viewCoordinates.z;

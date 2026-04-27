@@ -6,6 +6,8 @@ import { playerCustomizationView } from "./playerCustomization.js";
 import { connectToPeersView } from "./connectToPeers.js";
 import { cameraPref } from "./cameraPref.js";
 import { achievementsView } from "./achievements.js";
+import { lobbyBrowserView } from "./lobbyBrowser.js";
+import { lobbyRoomView } from "./lobbyRoom.js";
 import { achievementManager } from "../achievements/achievementManager.js";
 import { terrainSelectionView } from "./terrainSwitcher.js";
 // a list of different views
@@ -17,14 +19,28 @@ class ViewStorage {
     zlowScreen;
     cameraPref;
     achievements;
+    lobbyBrowser;
+    lobbyRoom;
     terrainSelection;
 }
+
 export class ViewManager {
-    views = {changelog: "changelog", peerConnect: "peerConnect", mainMenu: "mainMenu", playerCustomization: "playerCustomization", mainZlow: "mainZlow", cameraPref: "cameraPref", achievements: "achievements", terrainSelect: "terrainSelect"};
+    views = {
+        changelog: "changelog",
+        peerConnect: "peerConnect",
+        mainMenu: "mainMenu",
+        playerCustomization: "playerCustomization",
+        mainZlow: "mainZlow",
+        cameraPref: "cameraPref",
+        achievements: "achievements",
+        lobbyBowser: "lobbyBrowser",
+        lobbyRoom: "lobbyRoom",
+        terrainSelect: "terrainSelect"
+    };
 
     viewStorage = new ViewStorage();
     currentView = this.views.mainMenu;
-    
+
     /**
     * Initializes different views
     */
@@ -50,6 +66,8 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
@@ -60,6 +78,8 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(true);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
@@ -70,6 +90,8 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(true);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
@@ -80,6 +102,8 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
@@ -88,7 +112,10 @@ export class ViewManager {
                 this.viewStorage.zlowScreen = new zlowScreen(true);
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.changelog = new achievementsView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
@@ -100,6 +127,32 @@ export class ViewManager {
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.achievements = new achievementsView(true);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
+            case this.views.lobbyBowser:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(true);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
+                this.viewStorage.terrainSelection=new terrainSelectionView(false);
+                this.viewStorage.cameraPref = new cameraPref(false);
+                break;
+            case this.views.lobbyRoom:
+                this.viewStorage.mainMenu = new mainMenuView(false);
+                this.viewStorage.zlowScreen = new zlowScreen(false);
+                this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
+                this.viewStorage.peerConnectScreen = new connectToPeersView(false);
+                this.viewStorage.achievements = new achievementsView(false);
+                this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(true);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
@@ -130,6 +183,8 @@ export class ViewManager {
                 this.viewStorage.playerCustomizationScreen=new playerCustomizationView(false);
                 this.viewStorage.peerConnectScreen = new connectToPeersView(false);
                 this.viewStorage.changelog = new changelogView(false);
+                this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
+                this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 this.currentView=this.views.mainMenu;
@@ -161,6 +216,12 @@ export class ViewManager {
                 break;
             case this.views.achievements:
                 this.viewStorage.achievements.reset();
+                break;
+            case this.views.lobbyBrowser:
+                this.viewStorage.lobbyBrowser.reset();
+                break;
+            case this.views.lobbyRoom:
+                this.viewStorage.lobbyRoom.reset();
                 break;
             case this.views.terrainSelect:
                 this.viewStorage.terrainSelection.reset();
@@ -200,6 +261,16 @@ export class ViewManager {
             case this.views.achievements:
                 if (this.viewStorage.achievements.ready) {
                     this.viewStorage.achievements.setPage();
+                }
+                break;
+            case this.views.lobbyBrowser:
+                if (this.viewStorage.lobbyBrowser.ready) {
+                    this.viewStorage.lobbyBrowser.setPage();
+                }
+                break;
+            case this.views.lobbyRoom:
+                if (this.viewStorage.lobbyRoom.ready) {
+                    this.viewStorage.lobbyRoom.setPage();
                 }
                 break;
             case this.views.terrainSelect:
