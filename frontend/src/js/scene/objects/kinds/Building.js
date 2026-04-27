@@ -1,6 +1,7 @@
 // Building.js
 import * as THREE from "three";
 import { loadModel } from "../../modelCache.js";
+import { terrainSwitcher } from "../../terrains/terrainSwitcher.js";
 import { constants } from "../../../constants.js";
 
 function sampleBuildingX() {
@@ -13,37 +14,16 @@ function sampleBuildingX() {
 export const BuildingKind = {
   name: 'building',
 
-  spawn(scene, z, policy = null) {
+  spawn(scene, z, idx) {
     const x = sampleBuildingX();
-    let y = 1.5;
 
     const group = new THREE.Group();
     group.userData.zlowKind = "building";
 
-    const subtypes = policy?.buildingSubtype?.() || {
-      tall: 0.33,
-      wide: 0.33,
-      house: 0.34
-    };
-
-    const roll = Math.random();
-
-    let modelId;
-    let scale;
-
-    if (roll < subtypes.house) {
-      modelId = "house";
-      scale = 6 + Math.random() * 2;
-      y = 1.5;
-    } else if (roll < subtypes.house + subtypes.wide) {
-      modelId = "wideBuilding";
-      scale = 8 + Math.random() * 5;
-      y = 0.5;
-    } else {
-      modelId = "tallBuilding";
-      scale = 6 + Math.random() * 3;
-      y = 0.5;
-    }
+    let values = terrainSwitcher.currentTerrain.buildingSelect(idx);
+    let modelId=values.modelId;
+    let y=values.y;
+    let scale=values.scale;
 
     group.userData.buildingType = modelId;
 
