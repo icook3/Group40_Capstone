@@ -154,9 +154,9 @@ export class Track {
             const rig = this._getCamera();
             if (rig) {
                 rig.position.set(
-                    avatar.position.x,
-                    avatar.position.y + 4,
-                    avatar.position.z + 8
+                    avatar.position.x + this.viewCoordinates.x + 0.5, // Add 0.5 to make up for spawn position
+                    avatar.position.y + this.viewCoordinates.y - 1, // Subtract 1 to make up for spawn position
+                    avatar.position.z + this.viewCoordinates.z
                 );
             }
         })
