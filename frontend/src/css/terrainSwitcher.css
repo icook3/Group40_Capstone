@@ -17,6 +17,7 @@ position: absolute;
   font-weight: bold;
   font-size: 60px;
   transition: 0.6s ease;
+  cursor: pointer;
 }
 
 .terrainNext {
@@ -30,6 +31,7 @@ position: absolute;
   font-weight: bold;
   font-size: 60px;
   transition: 0.6s ease;
+  cursor: pointer;
 }
 
 .terrainBottomDiv {
@@ -51,6 +53,6 @@ position: absolute;
   box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
 }
 
-.prev:hover, .next:hover, .bottomDiv:hover {
+.terrainPrev:hover, .terrainNext:hover, .terrainBottomDiv:hover {
   background-color: gray;
 }
