@@ -1,13 +1,16 @@
 import * as THREE from "three";
 import { loadModel } from "../../modelCache.js";
 import { terrainSwitcher } from "../../terrains/terrainSwitcher.js";
+import { constants } from "../../../constants.js";
 
 function sampleTreeX() {
   // original behavior: uniform [-20,20] but exclude path (-4..4)
+  const scale = constants.multiplayerTrackScale;
+  const exclusionZone = 4 * scale;
   let x;
   do {
-    x = -20 + Math.random() * 40;
-  } while (x > -4 && x < 4);
+    x = -20 * scale + Math.random() * 40 * scale;
+  } while (x > -exclusionZone && x < exclusionZone);
   return x;
 }
 
@@ -23,7 +26,7 @@ export const TreeKind = {
     let scale=values.scale;
     let y=values.y;
     let modelId=values.modelId;
-    
+
     // get glb model
     loadModel(modelId).then((model) => {
       group.userData.zlowKind = "tree";
