@@ -2,10 +2,13 @@
 import * as THREE from "three";
 import { loadModel } from "../../modelCache.js";
 import { terrainSwitcher } from "../../terrains/terrainSwitcher.js";
+import { constants } from "../../../constants.js";
+
 function sampleBuildingX() {
   // original behavior: ±(15..25)
+  const scale = constants.multiplayerTrackScale
   const sign = Math.random() < 0.5 ? -1 : 1;
-  return sign * (15 + Math.random() * 10);
+  return sign * (15 + Math.random() * 10) * scale;
 }
 
 export const BuildingKind = {
