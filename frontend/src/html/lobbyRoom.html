@@ -1,0 +1,37 @@
+<div id="sky-gradient"></div>
+
+<div id="lobby-room-screen">
+
+    <!-- Header -->
+    <div class="lobby-room-header">
+        <button class="menu-link" id="leave-lobby-btn" style="color:#1a3a2a;">Leave</button>
+        <div class="lobby-room-title-group">
+            <span class="lobby-room-name" id="lobby-room-name"></span>
+            <span class="lobby-room-meta" id="lobby-room-meta"></span>
+        </div>
+        <div class="lobby-player-badge">Playing as <span id="lobby-room-player-name"></span></div>
+    </div>
+
+    <!-- Player grid -->
+    <div class="lobby-room-body">
+        <div class="player-grid" id="player-grid"></div>
+
+        <!-- Host actions -->
+        <div class="lobby-room-actions">
+            <button class="lobby-btn-primary lobby-start-btn hidden" id="start-game-btn">Start Ride</button>
+            <p class="lobby-room-hint" id="lobby-room-hint"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Leave confirm overlay -->
+<div id="leave-confirm-overlay" class="lobby-overlay">
+    <div class="lobby-panel">
+        <p class="lobby-panel-title" id="leave-confirm-title">Leave lobby?</p>
+        <p class="leave-confirm-msg" id="leave-confirm-msg"></p>
+        <div class="lobby-overlay-actions">
+            <button class="lobby-btn-secondary" id="leave-cancel-btn">Cancel</button>
+            <button class="lobby-btn-danger" id="leave-confirm-btn">Leave</button>
+        </div>
+    </div>
+</div>

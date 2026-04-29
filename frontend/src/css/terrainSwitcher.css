@@ -1,0 +1,58 @@
+/* Slideshow container */
+.terrainSlideshowContainer {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Next & previous buttons */
+.terrainPrev {
+position: absolute;
+  top: 50%;
+  padding: 16px;
+  text-align: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 60px;
+  transition: 0.6s ease;
+  cursor: pointer;
+}
+
+.terrainNext {
+  position: absolute;
+  top: 50%;
+  padding: 16px;
+  right:0;
+  text-align: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 60px;
+  transition: 0.6s ease;
+  cursor: pointer;
+}
+
+.terrainBottomDiv {
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  width: 6%;
+  background: #1f6784;
+  border: none;
+  border-radius: 50px 18px 50px 18px;
+  padding: 20px clamp(32px, 6vw, 52px);
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  color: #e0f7ef;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(46, 139, 110, 0.25);
+}
+
+.terrainPrev:hover, .terrainNext:hover, .terrainBottomDiv:hover {
+  background-color: gray;
+}

@@ -23,9 +23,11 @@
 
         <div id="menu-links">
           <button id="peer-connect-btn" class="menu-link" data-workout="peerServer">Connect to Peer</button>
+          <button id="lobby-browser-btn" class="menu-link">Lobby Browser</button>
           <button id="connect-btn" class="menu-link">Connect Trainer</button>
           <button id="customize-btn" class="menu-link" onclick="viewManager.setView(viewManager.views.playerCustomization);">Customize Character</button>
           <button id="achievementsBtn" class="menu-link" onclick="viewManager.setView(viewManager.views.achievements);">Achievements</button>
+          <button id="camera-btn" class="menu-link" onclick="viewManager.setView(viewManager.views.cameraPref);">Set Camera Position</button>
           <button id="settings-btn" class="menu-link">Settings</button>
         </div>
       </div>
@@ -62,13 +64,16 @@
             <input type="checkbox" id="peer-toggle" />
             <span class="toggle-slider"></span>
           </label>
-        </span>
+          </span>
+
           <span id="peer-name" class="hud-btn">
             <label for="name-input">Host name: </label>
             <input id="name-input" />
           </span>
         </div>
-        
+        <button id="terrainSelect" class="hud-btn" onclick="viewManager.setView(viewManager.views.terrainSelect);">
+          Select Terrain
+        </button>
         <span id="pacer" class="hud-btn">
           <label for="pacer-speed">Pacer:</label>
           <input id="pacer-speed" type="number" min="1" max="99" value="20" step="0.1" />

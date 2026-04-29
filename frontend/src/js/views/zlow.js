@@ -24,6 +24,7 @@ import { update_pacer_animation } from "../scene/env/Track.js";
 import { TrainerCalibration } from "../trainerCalibration.js";
 import { initCalibration } from "../trainerCalibration.js";
 import { achievementManager } from "../achievements/achievementManager.js";
+import {MultiplayerManager} from "../multiplayer/multiplayerManager.js";
 
 export class zlowScreen {
     content;
@@ -117,6 +118,11 @@ export class zlowScreen {
      */
     conn;
 
+    /**
+     * @type {MultiplayerManager}
+     */
+    multiplayerManager = null;
+
     loopRunning=false;
 
     constructor(setWhenDone) {
@@ -160,6 +166,10 @@ export class zlowScreen {
         constants.riderTween = null;
         constants.pacerTween = null;
         constants.riderStart = 0;
+
+        constants.multiplayerTrackScale = 1;
+
+        this.cleanup();
     }
 
     activatePacer() {
@@ -442,19 +452,50 @@ export class zlowScreen {
     }
 
     initializePacerSpeedInput() {
-        if (localStorage.getItem("testMode") == "true") {
-            const pacerSpeedInput = document.getElementById("pacer-speed");
-            pacerSpeedInput.addEventListener("input", () => {
-                const val = Number(pacerSpeedInput.value);
-                this.setPacerSpeed(val);
-            });
-            this.setPacerSpeed(Number(pacerSpeedInput.value));
-        } else {
-            const val = localStorage.getItem("pacer-speed") !== null
-                ? Number(localStorage.getItem("pacer-speed"))
-                : 20;
-            this.setPacerSpeed(val);
+        if (!this.pacer) {
+            return;
         }
+
+        const pacerSpeedInput = document.getElementById("pacer-speed");
+        if (!pacerSpeedInput) return;
+
+        const savedSpeed = localStorage.getItem("pacer-speed");
+        if (savedSpeed !== null) {
+            pacerSpeedInput.value = savedSpeed;
+        }
+
+        const applySpeed = () => {
+            const val = Number(pacerSpeedInput.value);
+            if (isNaN(val)) return;
+
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
+            this.setPacerSpeed(val);
+        };
+
+        pacerSpeedInput.addEventListener("input", applySpeed);
+        pacerSpeedInput.addEventListener("change", applySpeed);
+
+        this.setPacerSpeed(Number(pacerSpeedInput.value) || 20);
+    }
+
+        initializeRiderWeightInput() {
+        const riderWeightInput = document.getElementById("rider-weight");
+        if (!riderWeightInput) return;
+
+        const savedWeight = localStorage.getItem("rider-weight");
+        if (savedWeight !== null) {
+            riderWeightInput.value = savedWeight;
+        }
+
+        const applyWeight = () => {
+            localStorage.setItem("rider-weight", riderWeightInput.value);
+            this.setRiderWeight();
+        };
+
+        riderWeightInput.addEventListener("input", applyWeight);
+        riderWeightInput.addEventListener("change", applyWeight);
+
+        this.setRiderWeight();
     }
 
     initializeWorkouts() {
@@ -518,8 +559,8 @@ export class zlowScreen {
       const pauseGame = () => {
         simulationState.isPaused = true;
         this.hud.pause();
-        constants.pacerTween.pause();
-        constants.riderTween.pause();
+        constants.pacerTween?.pause();
+        constants.riderTween?.pause();
         overlay.style.display = "flex";
         overlay.setAttribute("aria-hidden", "false");
         dialog.classList.remove("zoom-out");
@@ -541,8 +582,8 @@ export class zlowScreen {
         simulationState.isPaused = false;
         constants.lastTime = Date.now();
         this.hud.resume();
-        constants.pacerTween.resume();
-        constants.riderTween.resume();
+        constants.pacerTween?.resume();
+        constants.riderTween?.resume();
       };
 
       pauseBtn.addEventListener("click", () => {
@@ -598,10 +639,12 @@ export class zlowScreen {
             const pauseBtn = document.getElementById("pause-btn");
                 
             // Reset pacer
-            this.setPacerSpeed(0);
-            this.pacer.avatarEntity.position.set(0.5, 1, -2);
-            constants.pacerStarted = false;
-    
+            if (this.pacer) {
+                this.setPacerSpeed(0);
+                this.pacer.avatarEntity.position.set(0.5, 1, -2);
+                constants.pacerStarted = false;
+            }
+
             // Start a new session for next workout
             this.workoutSession.start();
             this.milestoneTracker.reset();
@@ -639,6 +682,10 @@ export class zlowScreen {
     setupPacerSyncButton() {
       const pacerSyncBtn = document.getElementById("pacer-sync-btn");
       pacerSyncBtn.addEventListener("click", () => {
+        if (!this.pacer) {
+            return;
+        }
+
         //Set pacer's z to rider's z
         if (this.scene && this.rider && this.pacer) {
     
@@ -652,6 +699,7 @@ export class zlowScreen {
           const pacerSpeedInput = document.getElementById("pacer-speed");
           if (pacerSpeedInput) {
             pacerSpeedInput.value = riderSpeed;
+            localStorage.setItem("pacer-speed", pacerSpeedInput.value);
           }
 
           update_pacer_animation(this.scene.scene, true);
@@ -794,7 +842,12 @@ export class zlowScreen {
       owner.rider.setPower(constants.riderState.power);
     
       owner.rider.update(dt);
-    
+
+      // Update other multiplayer players
+      if (owner.multiplayerManager) {
+        owner.multiplayerManager.update(dt);
+      }
+
       if (constants.pacerStarted&&owner.peerState==0) {
         //console.log("Inside if statement");
         // Start from whatever speed the pacer currently has
@@ -802,7 +855,7 @@ export class zlowScreen {
         if (owner.workoutController) {
           const targetWatts = owner.workoutController.getCurrentTargetWatts();
           owner.setPacerTargetWatts(targetWatts);
-          
+
           if (targetWatts == null) {
             // Warmup or finished:
             // Pacer exactly matches the rider so it stays beside you.
@@ -877,13 +930,6 @@ export class zlowScreen {
       this.peerState=0;
       this.loopRunning=false;
       this.connected=false;
-      /*AFRAME.registerComponent("no-cull", {
-        init() {
-          this.el.addEventListener("model-loaded", () => {
-            this.el.object3D.traverse((obj) => (obj.frustumCulled = false));
-          });
-        },
-      });*/
       
       window.__zlowInitCount = (window.__zlowInitCount || 0) + 1;
       console.log("initZlowApp count:", window.__zlowInitCount);
@@ -915,24 +961,63 @@ export class zlowScreen {
       this.workoutSummary = new WorkoutSummary({
         workoutStorage: this.workoutStorage,
         onClose: () => {
-          this.cleanup();
+          //this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
         },
       });
       
       this.workoutSession.start();
       this.milestoneTracker.reset();
-    
+
+      // Check if we're starting a multiplayer session
+      const gameStartingPayload = sessionStorage.getItem('gameStarting');
+      const isMultiplayer = !!gameStartingPayload;
+      const gameStartingParsed = gameStartingPayload ? JSON.parse(gameStartingPayload) : null;
+
+      if (gameStartingPayload) {
+          sessionStorage.removeItem('gameStarting');
+      }
+
+      if (gameStartingPayload) {
+          this.multiplayerManager = new MultiplayerManager({
+              onSessionEnd: (reason) => {
+                  const finalStats = this.workoutSession.end();
+                  this.isRecording = false;
+
+                  const {newRecords, streak} = this.workoutStorage.saveWorkout(finalStats);
+                  this.workoutSummary.show(finalStats, newRecords, streak);
+
+                  simulationState.isPaused = false;
+                  this.countdown.cancel();
+                  constants.riderState.power = 0;
+                  constants.riderState.distanceMeters = 0;
+                  this.rideElapsedMs = 0;
+                  this.physics.setSpeed(0);
+                  this.hud.resetWorkOut();
+
+                  this.workoutSession.start();
+                  this.milestoneTracker.reset();
+              }
+            });
+        }
+
+        if (isMultiplayer) {
+            const pauseBtn = document.getElementById("pause-btn");
+            const pacerSyncBtn = document.getElementById("pacer-sync-btn");
+            if (pauseBtn) pauseBtn.style.display = "none";
+            if (pacerSyncBtn) pacerSyncBtn.style.display = "none";
+        }
+
       if (localStorage.getItem("testMode") !== "true") {
         const trainer = new TrainerBluetooth();
       } else {
         if (sessionStorage.getItem("Trainer") !== null) {
-          try {
-            //HOPEFULLY this works
-            const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
-          } catch {
-            console.log("JSON trainer did not work. This will need reworking :(");
-          }
+            try {
+                //HOPEFULLY this works
+                const trainer = JSON.parse(sessionStorage.getItem("Trainer"));
+            } catch {
+                console.log("JSON trainer did not work. This will need reworking :(");
+            }
         }
       }
     
@@ -940,14 +1025,14 @@ export class zlowScreen {
 
       this.initializeScene();
 
-      this.rider = new AvatarMovement("rider", {
+        this.rider = new AvatarMovement("rider", {
         position: { x: -0.5, y: 1, z: 0 },
         isPacer: false,
         scene: this.scene.scene
       });
       this.physics = new PhysicsEngine();
-    
-      if (this.peerState == 0) {
+
+        if (this.peerState === 0 && !isMultiplayer) {
         this.pacer = new AvatarMovement("pacer-entity", {
           position: { x: 0.5, y: 1, z: -2 },
           isPacer: true,
@@ -958,7 +1043,7 @@ export class zlowScreen {
       }
       this.keyboardMode = new KeyboardMode();
       this.standardMode = new StandardMode();
-    
+
       // Show/hide dev hud based on testMode
       console.log("testMode value:", localStorage.getItem("testMode"));
       const devWrapper = getElement("dev-controls-wrapper");
@@ -974,13 +1059,21 @@ export class zlowScreen {
 
       const devToggleBtn = getElement("dev-toggle-btn");
       if (devToggleBtn && devHud) {
-        devToggleBtn.addEventListener("click", () => {
+          devToggleBtn.addEventListener("click", () => {
           devHud.hidden = !devHud.hidden;
         });
       }
       this.hud = new HUD({ getElement });
       this.hud.initTrainerToggle();
       this.initializePacerSpeedInput();
+      this.initializeRiderWeightInput();
+
+      if (isMultiplayer && gameStartingParsed) {
+          window.__multiplayerManager = this.multiplayerManager;
+          this.multiplayerManager.start(gameStartingParsed).catch(err => {
+              console.error('[Multiplayer] Failed to start:', err);
+          });
+      }
 
       // Dismiss trainer and dev menus when clicking outsideof their pop up
       document.addEventListener("click", (e) => {
@@ -1048,7 +1141,7 @@ export class zlowScreen {
       const menuBtn = getElement("menu-btn");
       menuBtn.addEventListener("click", () => {
         if (confirm("Return to Main Menu? Gameplay data will be lost.")) {
-          this.cleanup();
+          //this.cleanup();
           viewManager.setView(viewManager.views.mainMenu);
           }
         });
@@ -1117,9 +1210,13 @@ export class zlowScreen {
         this.workoutStorage = null;
         this.milestoneTracker = null;
         this.notificationManager = null;
-        this.keyboardMode = null;
         this.standardMode = null;
         this.countdown = null;
         this.workoutSummary = null;
+
+        // Multiplayer clean up
+        this.multiplayerManager?.cleanup();
+        this.multiplayerManager = null;
+        window.__multiplayerManager = null;
     }
 }

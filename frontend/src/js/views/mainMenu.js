@@ -37,6 +37,7 @@ export class mainMenuView {
             console.error("init Strava button failed");
         });
         this.initPeerButtons();
+        this.initLobbyButtons();
     }
 
     reset() {}
@@ -70,13 +71,20 @@ export class mainMenuView {
 
         // Pacer speed input
         const pacerSpeedInput = document.getElementById("pacer-speed");
+        const savedPacerSpeed = localStorage.getItem("pacer-speed");
+        if (savedPacerSpeed !== null) {
+            pacerSpeedInput.value = savedPacerSpeed;
+        }
         resizeInput(pacerSpeedInput);
-        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9);
-
+        restrictNumberInput(pacerSpeedInput, 2, 1, 99.9, { persist: true });
         // Weight input
         const riderWeightInput = document.getElementById("rider-weight");
-        resizeInput(riderWeightInput)
-        restrictNumberInput(riderWeightInput, 3, 1, 999.9);
+        const savedRiderWeight = localStorage.getItem("rider-weight");
+        if (savedRiderWeight !== null) {
+            riderWeightInput.value = savedRiderWeight;
+        }
+        resizeInput(riderWeightInput);
+        restrictNumberInput(riderWeightInput, 3, 1, 999.9, { persist: true });
 
         // Units input
         // Speed unit toggle
@@ -191,9 +199,23 @@ export class mainMenuView {
             }
         });
     }
+
+    initLobbyButtons() {
+        const lobbyBrowserBtn = document.getElementById("lobby-browser-btn");
+
+        // If lobby multiplayer not configured, hide it
+        if (!features.multiplayerEnabled) {
+            lobbyBrowserBtn.style.display = "none";
+            return;
+        }
+
+        lobbyBrowserBtn.addEventListener("click", () => {
+           viewManager.setView(viewManager.views.lobbyBrowser);
+        });
+    }
 }
 
-function restrictNumberInput(input, maxDigits, min, max) {
+function restrictNumberInput(input, maxDigits, min, max, { persist = false } = {}) {
     input.addEventListener("input", () => {
         const pattern = new RegExp(`^\\d{0,${maxDigits}}(\\.\\d{0,1})?$`);
 
@@ -204,18 +226,25 @@ function restrictNumberInput(input, maxDigits, min, max) {
 
         resizeInput(input);
 
-        localStorage.setItem(input.id, input.value);
+        if (persist) {
+            localStorage.setItem(input.id, input.value);
+        }
     });
 
     input.addEventListener("change", () => {
         let num = parseFloat(input.value);
         if (isNaN(num)) {
             input.value = min;
-            return;
+        } else {
+            num = Math.max(min, Math.min(max, num));
+            input.value = num;
         }
 
-        num = Math.max(min, Math.min(max, num));
-        input.value = num;
+        resizeInput(input);
+
+        if (persist) {
+            localStorage.setItem(input.id, input.value);
+        }
     });
 
     input.addEventListener("keydown", (e) => {

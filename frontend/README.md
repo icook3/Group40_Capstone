@@ -65,6 +65,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `Track.jpeg` — The image texture for the track.
 - `src` — Stores all source code for the project.
 	- `css` — Stores CSS source code.
+		- `cameraPref.css` — Handles CSS styles for the camera position selection page.
 		- `changelog.css` — Handles CSS styles for the changelog page.
 		- `generalCSS.css` — A set of useful CSS styles used throughout Zlow
 		- `hud.css` — Handles CSS styles for the modern HUD.
@@ -75,6 +76,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 		- `style.css` — Handles general CSS styles for the program.
 		- `workoutSummary.css` — Handles CSS styles for the workout summary popup.
 	- `html` — Stores HTML source code.
+		- `cameraPref.html` — Screen for selecting between camera views
 		- `changelog.html` — Screen for the Zlow changelog
 		- `connectToPeers.html` — Screen for connecting via the peer-to-peer network
 		- `index.html` — The page that is loaded, and is filled in by the other pages to create a Single-Page application. 
@@ -122,6 +124,7 @@ A modular, browser-based cycling simulator. Built with JavaScript, A-Frame, and 
 			- `units.md` — Documentation on different units.
 			- `W.js` — Handles unit conversions for Watts - the default power unit.
 		- `views` — Stores different views, and switching between them.
+			- `cameraPref.js` — Facilitates selecting one of seven camera positions.
 			- `changelog.js` — Stores the changelog, and handles setting it up. 
 			- `connectToPeers.js` — Stores the peer to peer connection menu, and handles setting it up. 
 			- `mainMenu.js` — Stores the main menu, and handles setting it up. 
