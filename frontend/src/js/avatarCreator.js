@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js'
 
 export class AvatarCreator {
-    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null, scene = null) {
+    constructor(id, position = {x:1, y:1, z:0}, rotation = {x:0, y:90, z:0}, onReady = null, scene = null, loadLocal = true, options) {
         this.id = id;
         this.scene = scene;
         this.position = position;
@@ -82,7 +82,15 @@ export class AvatarCreator {
         this.helmetColor = "#A7E800";
         this.helmetPaddingColor = "#333333";
 
-        this.loadPlayerData();
+        if (loadLocal) {
+            this.loadPlayerData();
+        }
+
+        // Allow initial model to be set before entity creation
+        if (options?.model) {
+            this.playerModel = options.model;
+        }
+
         this.avatarEntity = this.createEntity();
     }
 
@@ -499,8 +507,6 @@ async createHelmetModel() {
             return;
         }
 
-        this.playerModel = data.model || this.playerModel;
-
         const player = data.colors || {};
         this.skinColor = player.skin || this.skinColor;
         this.shirtColor = player.shirt || this.shirtColor;
@@ -518,6 +524,16 @@ async createHelmetModel() {
         const helmet = data.helmetColors || {};
         this.helmetColor = helmet.helmet || this.helmetColor;
         this.helmetPaddingColor = helmet.padding || this.helmetPaddingColor;
+
+        this.playerModel = data.model || this.playerModel;
+        if (this.avatarEntity) {
+            //Remove old model
+            if (this.personModel) {
+                this.avatarEntity.remove(this.avatarEntity.getObjectByName('Avatar'));
+            }
+            //Add new model
+            this.createPlayerModel(this.avatarEntity);
+        }
     }
 
     loadOtherData(json) {

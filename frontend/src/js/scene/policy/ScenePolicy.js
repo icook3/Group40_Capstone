@@ -1,5 +1,6 @@
 // src/scene/policy/ScenePolicy.js
 import { DefaultPolicy } from "./DefaultPolicy.js";
+import { constants } from "../../constants.js";
 
 export class ScenePolicy {
 // ScenePolicy.js — inside the class
@@ -13,10 +14,12 @@ constructor(cfg) {
 // Returns: { [bandName]: { left: number, right: number } }
 #computeLayout(cfg) {
   const globals = cfg.globals || {};
-  const innerStartX = globals.innerStartX ?? 30;
-  const laneGap     = globals.laneGap     ?? 0.6;
+  const scale = constants.multiplayerTrackScale || 1;
+
+  const innerStartX = (globals.innerStartX ?? 30) * scale;
+  const laneGap     = (globals.laneGap     ?? 0.6) * scale;
   const defaultHalf = globals.laneHalfWidth ?? 1.5;
-  const maxX        = globals.maxX ?? 9999;
+  const maxX        = (globals.maxX ?? 9999) * scale;
 
   // Sort bands by desired order (fallback to their index)
   const ordered = (cfg.bands || [])

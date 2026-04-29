@@ -1,5 +1,6 @@
 // js/scene/env/SceneryManager.js
-import cfg from '../policy/edge_default_cfg.js';
+//import cfg from '../policy/edge_default_cfg.js';
+import { terrainSwitcher } from '../terrains/terrainSwitcher.js';
 import { ScenePolicy } from '../policy/ScenePolicy.js';
 import { SceneryBand } from './SceneryBand.js';
 
@@ -11,7 +12,7 @@ import { SceneryBand } from './SceneryBand.js';
 export class SceneryManager {
   constructor({ scene }) {
     this.scene = scene;
-    this.scenePolicy = new ScenePolicy(cfg);
+    this.scenePolicy = new ScenePolicy(terrainSwitcher.currentTerrain.cfg);
 
     // ADDED: track lifecycle so we don't double-destroy
     this._destroyed = false; // ADDED
@@ -20,11 +21,12 @@ export class SceneryManager {
     const all = this.scenePolicy.bands;
 
     // Create SceneryBand instances for all of them
-    this.bands = all.map(bandPolicy => {
+    this.bands = all.map((bandPolicy,idx) => {
       const band = new SceneryBand({
         scene: this.scene,
         policy: bandPolicy,
         name: bandPolicy.name,
+        idx: idx
       });
       return band;
     });

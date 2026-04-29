@@ -6,8 +6,9 @@ import * as THREE from "three";
 //import {Tween} from 'https://unpkg.com/@tweenjs/tween.js@23.1.3/dist/tween.esm.js'
 import {Tween} from '@tweenjs/tween.js'
 import { constants } from "../../constants.js";
-import { getSign } from '../core/util.js';
-import  { activatePacer } from '../../main.js';
+import {getSign} from '../core/util.js';
+import  {activatePacer} from '../../main.js'
+import { terrainSwitcher } from "../terrains/terrainSwitcher.js";
 
 export class Track {
   constructor({ scene }) {
@@ -28,28 +29,18 @@ export class Track {
     }
     this.path_element = path_element;
 
-    this.trackTexture = new THREE.TextureLoader().load("../../resources/textures/Track.jpeg");
-
-    this.trackMaterial = new THREE.MeshStandardMaterial({
-        map: this.trackTexture,
-        color:0xc8c0b0,
-        roughness: 0.9
-    });
-
-    this.trackMaterialDouble = new THREE.MeshStandardMaterial({
-        map: this.trackTexture,
-        color: 0xc8c0b0,
-        roughness: 0.9,
-        side: THREE.DoubleSide
-    });
+    this.trackMaterial = terrainSwitcher.currentTerrain.trackMaterial;
+    this.trackMaterialDouble = terrainSwitcher.currentTerrain.trackMaterialDouble;
 
     this.update_rider_animation = this.update_rider_animation.bind(this);
     this.update_pacer_animation = update_pacer_animation.bind(this);
 
+    const scale = constants.multiplayerTrackScale;
+
     const geometry = new THREE.BoxGeometry(
-      constants.pathWidth,
+      constants.pathWidth * scale,
       constants.pathHeight,
-      15
+      15 * scale
     );
 
     const track = new THREE.Mesh(geometry, this.trackMaterial);
@@ -87,15 +78,23 @@ export class Track {
     const rider = this._getRider();
     const pacer = this._getPacer();
 
-    if (!rider || !pacer) {
+    if (!rider) {
       // Retry if avatars haven't loaded yet
       setTimeout(() => this.initialize_animation(), 1000);
       return;
     }
 
-    this.update_rider_animation();
-    update_pacer_animation(this.scene);
-    activatePacer();
+      // Only wait for pacer if not multiplayer
+      if (!pacer && !window.__multiplayerManager) {
+          setTimeout(() => this.initialize_animation(), 1000);
+          return;
+      }
+
+      this.update_rider_animation();
+      if (pacer) {
+          update_pacer_animation(this.scene);
+          activatePacer();
+      }
   }
 
   // Update animation speed and target based on current track piece
@@ -127,36 +126,41 @@ export class Track {
 
     // Increment current track piece, define start- and endpoints, and calculate rider's duration
     constants.currentTrackPiece += 1;
-    let coords = { x: -0.5, y: 0, z: 0 };
-    
+
+    const rider = this._getRider();
+    const slotX = rider?.userData?.slotX ?? -0.5;
+
+    let coords = { x: slotX, y: 0, z: 0 };
+
     if (constants.currentTrackPiece > 0) {
       const prev = constants.trackPoints[constants.currentTrackPiece - 1];
-      coords = { x: prev.x - 0.5, y: prev.y, z: prev.z };
+      coords = { x: prev.x + slotX, y: prev.y, z: prev.z };
     }
 
     const next = constants.trackPoints[constants.currentTrackPiece];
     if (!next) return;
 
-    const endpoint = { x: next.x - 0.5, y: next.y, z: next.z };
+    const endpoint = { x: next.x + slotX, y: next.y, z: next.z };
+
     const riderDuration = Math.round((next.length / constants.riderState.speed) * 1500);
 
     // If the rider tween has not been initialized, create it
     if (!constants.riderTween){
-      const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
-          avatar.position.set(coords.x, coords.y, coords.z);
+        const animateRider = new Tween(coords, false).to(endpoint, riderDuration).onUpdate(() => {
+            const avatar = this._getRider(); // re-fetch each frame instead of closing over it
+            if (!avatar) return; // scene was destroyed, stop updating
 
-          // Set camera position
-          const rig = this._getCamera();
-          if (rig) {
+            avatar.position.set(coords.x, coords.y, coords.z);
 
-              // Set rider coordinates
-              rig.position.set(
-                  avatar.position.x + this.viewCoordinates.x + 0.5, // Add 0.5 to make up for spawn position
-                  avatar.position.y + this.viewCoordinates.y - 1, // Subtract 1 to make up for spawn position
-                  avatar.position.z + this.viewCoordinates.z
-              );
-          }
-          })
+            const rig = this._getCamera();
+            if (rig) {
+                rig.position.set(
+                    avatar.position.x + this.viewCoordinates.x + 0.5, // Add 0.5 to make up for spawn position
+                    avatar.position.y + this.viewCoordinates.y - 1, // Subtract 1 to make up for spawn position
+                    avatar.position.z + this.viewCoordinates.z
+                );
+            }
+        })
           .onComplete(() => {
             this.update_rider_animation();
           }).start();
@@ -175,6 +179,7 @@ export class Track {
 
     // Helper function animating using time
     function animate(time) {
+      if (!window.__zlowTrackInstance) return; // stop if track was destroyed
       constants.riderTween.update(time);
       requestAnimationFrame(animate);
     }
@@ -202,26 +207,38 @@ export class Track {
 
 // Create and append a track piece curving to the right
 function curve_180_right(trackSystem) {
+  const scale = constants.multiplayerTrackScale;
+  const innerRadius = 25 * scale;
+  const outerRadius = 35 * scale;
+
   const path_element = trackSystem.path_element;
   const pointZ = -1 * (constants.farthestSpawn);
 
   // Add necessary points based on current farthest spawn
-  constants.trackPoints.push({x: 15, y: 1, z: pointZ-7, length: 16.55});
-  constants.trackPoints.push({x: 23, y: 1, z: pointZ-15, length: 11.31});
-  constants.trackPoints.push({x: 25, y: 1, z: pointZ-24, length: 9.22});
-  constants.trackPoints.push({x: 27, y: 1, z: pointZ-33, length: 9.22});
-  constants.trackPoints.push({x: 21, y: 1, z: pointZ-48, length: 16.16});
-  constants.trackPoints.push({x: 15, y: 1, z: pointZ-55, length: 9.22});
-  constants.trackPoints.push({x: 7, y: 1, z: pointZ-58, length: 8.54});
-  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.61});
+  constants.trackPoints.push({x: 8 * scale, y: 1, z: pointZ-3.5 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-7 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: 19 * scale, y: 1, z: pointZ-11 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: 23 * scale, y: 1, z: pointZ-15 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: 24 * scale, y: 1, z: pointZ-19.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 25 * scale, y: 1, z: pointZ-24 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 26 * scale, y: 1, z: pointZ-28.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 27 * scale, y: 1, z: pointZ-33 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 24 * scale, y: 1, z: pointZ-40.5 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: 21 * scale, y: 1, z: pointZ-48 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: 18 * scale, y: 1, z: pointZ-51.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 15 * scale, y: 1, z: pointZ-55 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: 11 * scale, y: 1, z: pointZ-56.5 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: 7 * scale, y: 1, z: pointZ-58 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: 3.5 * scale, y: 1, z: pointZ-59.5 * scale, length: 3.81 * scale});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 7.61 * scale});
 
   // Update farthestSpan
-  constants.farthestSpawn += 62;
+  constants.farthestSpawn += 62 * scale;
 
   // Add graphical track representation
   const geometry = new THREE.RingGeometry(
-    25,
-    35,
+    innerRadius,
+    outerRadius,
     32,
     1,
     THREE.MathUtils.degToRad(270),
@@ -230,7 +247,7 @@ function curve_180_right(trackSystem) {
 
   const track = new THREE.Mesh(geometry, trackSystem.trackMaterialDouble);
 
-  track.position.set(-3.5, constants.pathHeight, pointZ-30);
+  track.position.set(-3.5 * scale, constants.pathHeight, pointZ-30 * scale);
   track.rotation.x = -Math.PI/2;
 
   path_element.add(track);
@@ -238,26 +255,38 @@ function curve_180_right(trackSystem) {
 
 // Create and append a track piece curving to the left
 function curve_180_left(trackSystem) {
+  const scale = constants.multiplayerTrackScale;
+  const innerRadius = 25 * scale;
+  const outerRadius = 35 * scale;
+
   const path_element = trackSystem.path_element;
   const pointZ = -1 * (constants.farthestSpawn);
 
   // Add necessary points based on current farthest spawn
-  constants.trackPoints.push({x: -15, y: 1, z: pointZ-7, length: 16.55});
-  constants.trackPoints.push({x: -23, y: 1, z: pointZ-15, length: 11.31});
-  constants.trackPoints.push({x: -25, y: 1, z: pointZ-24, length: 9.22});
-  constants.trackPoints.push({x: -27, y: 1, z: pointZ-33, length: 9.22});
-  constants.trackPoints.push({x: -21, y: 1, z: pointZ-48, length: 16.16});
-  constants.trackPoints.push({x: -15, y: 1, z: pointZ-55, length: 9.22});
-  constants.trackPoints.push({x: -7, y: 1, z: pointZ-58, length: 8.54});
-  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61, length: 7.62});
+  constants.trackPoints.push({x: -8 * scale, y: 1, z: pointZ-3.5 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-7 * scale, length: 8.28 * scale});
+  constants.trackPoints.push({x: -19 * scale, y: 1, z: pointZ-11 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: -23 * scale, y: 1, z: pointZ-15 * scale, length: 5.66 * scale});
+  constants.trackPoints.push({x: -24 * scale, y: 1, z: pointZ-19.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -25 * scale, y: 1, z: pointZ-24 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -26 * scale, y: 1, z: pointZ-28.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -27 * scale, y: 1, z: pointZ-33 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -24 * scale, y: 1, z: pointZ-40.5 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: -21 * scale, y: 1, z: pointZ-48 * scale, length: 8.08 * scale});
+  constants.trackPoints.push({x: -18 * scale, y: 1, z: pointZ-51.5 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -15 * scale, y: 1, z: pointZ-55 * scale, length: 4.61 * scale});
+  constants.trackPoints.push({x: -11 * scale, y: 1, z: pointZ-56.5 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: -7 * scale, y: 1, z: pointZ-58 * scale, length: 4.27 * scale});
+  constants.trackPoints.push({x: -3.5 * scale, y: 1, z: pointZ-59.5 * scale, length: 3.81 * scale});
+  constants.trackPoints.push({x: 0, y: 1, z: pointZ-61 * scale, length: 3.81 * scale});
 
   // Update farthestSpan
-  constants.farthestSpawn += 62;
+  constants.farthestSpawn += 62 * scale;
 
   // Add graphical track representation
   const geometry = new THREE.RingGeometry(
-    25,
-    35,
+    innerRadius,
+    outerRadius,
     32,
     1,
     THREE.MathUtils.degToRad(90),
@@ -266,23 +295,27 @@ function curve_180_left(trackSystem) {
 
   const track = new THREE.Mesh(geometry, trackSystem.trackMaterialDouble);
 
-  track.position.set(3.5, constants.pathHeight, pointZ-30);
+  track.position.set(3.5 * scale, constants.pathHeight, pointZ-30 * scale);
   track.rotation.x = -Math.PI/2;
 
   path_element.add(track);
 }
 
 function straightPiece(trackSystem) {
+  const scale = constants.multiplayerTrackScale;
+  const scaledWidth = constants.pathWidth * scale
+  const scaledDepth = constants.pathDepth * scale;
+
   const path_element = trackSystem.path_element;
   const pointZ = -1 * (constants.farthestSpawn + 5);
-  const trackZ = (-1 * constants.farthestSpawn) - constants.pathDepth;
+  const trackZ = (-1 * constants.farthestSpawn) - scaledDepth;
   constants.farthestSpawn += 5;
   constants.trackPoints.push({ x: 0, y: 1, z: pointZ, length: 5 });
 
   const geometry = new THREE.BoxGeometry(
-    constants.pathWidth,
+    scaledWidth,
     constants.pathHeight,
-    constants.pathDepth
+    scaledDepth
   );
 
   const track = new THREE.Mesh(geometry, trackSystem.trackMaterial);
