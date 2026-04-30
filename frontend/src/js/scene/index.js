@@ -6,6 +6,7 @@ import { Cloud } from "./env/Cloud.js";
 import { SceneryManager } from "./env/SceneryManager.js";
 import { constants } from "../constants.js";
 import {GroundInstanced} from "./env/GroundInstanced.js";
+import { terrainSwitcher } from "./terrains/terrainSwitcher.js";
 
 export class ZlowScene {
     constructor() {
@@ -19,25 +20,7 @@ export class ZlowScene {
         this.objectsLoaded = false;
 
         // Sky
-        const canvas = document.createElement('canvas');
-        canvas.width = 1;
-        canvas.height = 256;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-
-        // This is the gradient that makes up the sky
-        // This can be used to play around with how the sky looks - possibly
-        // to add different effects and simulate day parts along with lighting
-
-        gradient.addColorStop(0, '#5bbde0');
-        gradient.addColorStop(0.85, '#c4eeff');
-        gradient.addColorStop(1, '#f0e8d8');
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, 1, 256);
-        const skyTexture = new THREE.CanvasTexture(canvas);
-        skyTexture.colorSpace = THREE.SRGBColorSpace;
-        this.scene.background = skyTexture;
+        this.scene.background = terrainSwitcher.currentTerrain.skyTexture;
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -54,7 +37,7 @@ export class ZlowScene {
         this.cam = new Camera(this.scene);
 
         // Set starting camera position
-        this.viewCoordinates = JSON.parse(localStorage.getItem("view"));
+        this.viewCoordinates = JSON.parse(localStorage.getItem("view")) || { x: 0, y: 4, z: 5 };
         this.cam.rig.position.x = this.viewCoordinates.x;
         this.cam.rig.position.y = this.viewCoordinates.y;
         this.cam.rig.position.z = this.viewCoordinates.z;

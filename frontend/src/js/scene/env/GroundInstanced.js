@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { constants } from "../../constants.js";
-
+import { terrainSwitcher } from "../terrains/terrainSwitcher.js";
 export class GroundInstanced {
     constructor(scene) {
         this.scene = scene;
@@ -14,12 +14,7 @@ export class GroundInstanced {
             constants.tileSize
         );
 
-        const texture = new THREE.TextureLoader().load("../../resources/textures/Grass.jpeg");
-        const mat = new THREE.MeshStandardMaterial({
-            map: texture,
-            color: 0x90b858,
-            roughness: 1
-        });
+        const mat = terrainSwitcher.currentTerrain.groundMaterial;
 
         this.mesh = new THREE.InstancedMesh(geom, mat, count);
 
