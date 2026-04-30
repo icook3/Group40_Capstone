@@ -139,6 +139,10 @@ class AchievementManager {
     obtainAchievement(achievement) {
         let thisAchievement=this.achievements.get(achievement)
         let notAlreadyObtained=thisAchievement.unlockAchievement();
+        //do not unlock the achievement if you are in testmode
+        if (localStorage.getItem("testMode")=="true") {
+            return;
+        }
         if (notAlreadyObtained) {
             this.storeAchievementsInLocalStorage();
             this.notificationManager.show("Achievement "+thisAchievement.name+" unlocked!",true);
