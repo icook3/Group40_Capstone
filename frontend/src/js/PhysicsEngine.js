@@ -22,8 +22,8 @@ export class PhysicsEngine {
         // Track animation samples a single speed to build movement.
         // Very low speeds from the new physics model make the start look like lag.
         // This provides a small floor for the track's sampling behavior.
-        if (this.speed !== 0 && this.speed < 1.5 && !this.isCoasting) {
-            return 1.5;
+         if (this.speed !== 0 && this.speed < 1.5 && !this.isCoasting) {
+             return 1.5;
         }
         return this.speed;
     }
@@ -46,7 +46,7 @@ function calculateAccelerationSpeed(currentSpeed, currentPower, dt) {
     const v_for_calc = Math.max(v_ms, 1);
 
     // Calculates driving force from power: F = P / v; avoids rocket speed from standstill
-    const drivingForce = Math.min(currentPower / v_for_calc, 120);
+    const drivingForce = currentPower / v_for_calc;
 
     // calculates forces against cyclist
     const airDragForce = constants.windResistance(v_ms);
