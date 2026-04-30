@@ -27,7 +27,7 @@ export class terrainSelectionView {
     /**
      * CHANGE THIS when adding new terrains
      */
-    terrains=["defaultTerrain","testTerrain"];
+    terrains=["defaultTerrain","SnowTerrain"];
     renderer=null;
     setPage() {
         document.getElementById("mainDiv").innerHTML=this.content;
