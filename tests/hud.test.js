@@ -1,5 +1,5 @@
 // hud.test.js: Basic tests for HUD logic
-import * as hud from '../js/hud.js';
+import * as hud from '../frontend/src/js/hud.js';
 
 describe('hud.js basic exports', () => {
   test('should export HUD class', () => {
