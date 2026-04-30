@@ -42,7 +42,7 @@ Some installations of python use a different name. If this is the case, you migh
 
 # Running the backend (Strava, Multiplayer, crashlogs)
 
-To run multiplayer, Strava, and crash logging, you need a custom server. You will also need your own Strava API application created.
+To run multiplayer, Strava, and crash logging, and to track the unlock percentages for achievements you have obtained, you need a custom server. You will also need your own Strava API application created.
 
 1. Go the the Zlow folder, and navigate to backend. 
 2. Under the peer_service folder is a file called .env.example. Copy it, and name it .env.
@@ -52,7 +52,7 @@ PATH=/peerServer
 PORT=9000
 ```
 4. Go to `frontend/src/js/config/config.js`, change the values of the variables PEER_HOST, PEER_PATH, and PEER_PORT to match what is in .env. 
-5. Do steps 2 and 3 in the strava_service folder and the crash_logging_service folder.
+5. Do steps 2 and 3 in the strava_service folder, the crash_logging_service folder, the multiplayer_services folder, and the achievements_service folder.
 6. Download and install Docker at https://www.docker.com/products/docker-desktop/
     - You can check that you have it installed by typing in ```docker -v```
     - To access the terminal/command line: 
