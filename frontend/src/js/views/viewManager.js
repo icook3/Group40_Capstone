@@ -117,7 +117,6 @@ export class ViewManager {
                 this.viewStorage.lobbyBrowser = new lobbyBrowserView(false);
                 this.viewStorage.lobbyRoom = new lobbyRoomView(false);
                 this.viewStorage.terrainSelection=new terrainSelectionView(false);
-                this.viewStorage.changelog = new achievementsView(false);
                 this.viewStorage.cameraPref = new cameraPref(false);
                 break;
             case this.views.achievements:
