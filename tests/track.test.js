@@ -35,6 +35,4 @@ describe('track generation and properties', () => {
       ])
     );
   });
-
-  // CHECK THAT TRACK IS POSITIONED PROPERLY
 });
