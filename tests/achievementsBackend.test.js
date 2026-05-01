@@ -1,4 +1,4 @@
-import { describe, expect, test, fn } from '@jest/globals';
+import { describe, expect, test } from '@jest/globals';
 import express from 'express';
 //focus of the tests
 import {checkRateLimit} from '../backend/achievements_service/src/services/rateLimitService.js'
