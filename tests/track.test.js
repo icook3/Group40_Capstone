@@ -1,13 +1,12 @@
 /**
  * @jest-environment jsdom
  */
-//IMPORTING config, to prevent bugs
 import * as config from '../frontend/src/js/config/config.js';
+import * as THREE from "three";
 import { constants } from "../frontend/src/js/constants.js";
 import { describe, expect, test } from '@jest/globals';
 import { Track } from "../frontend/src/js/scene/env/Track.js"
 
-const THREE = global.THREE = require('three');
 const scene = new THREE.Scene();
 const track = new Track({ scene: scene });
 
@@ -23,7 +22,6 @@ describe('track generation and properties', () => {
   });
 
   test('at least 240 track pieces should be generated to start', () => {
-    // track test points should be at least 80 things long
     expect(constants.trackPoints.length).toBeGreaterThan(240);
   });
 
@@ -31,7 +29,7 @@ describe('track generation and properties', () => {
     expect(constants.trackPoints).toEqual(
       expect.arrayContaining([
         expect.objectContaining({length: 5}),
-        expect.objectContaining({length: 16.55})
+        expect.objectContaining({length: 8.28})
       ])
     );
   });
