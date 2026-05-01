@@ -1,9 +1,8 @@
-const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX, 10);
-const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10);
-
 const ipMap = new Map();
 
 export function checkRateLimit(ip) {
+    const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX, 10);
+    const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10);
     const now = Date.now();
 
     if (!ipMap.has(ip)) {
@@ -12,7 +11,6 @@ export function checkRateLimit(ip) {
     }
 
     const entry = ipMap.get(ip);
-
     // Window expired so reset
     if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
         entry.count = 1;
