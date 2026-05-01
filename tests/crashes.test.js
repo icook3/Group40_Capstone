@@ -1,4 +1,4 @@
-import { describe, expect, test, fn } from '@jest/globals';
+import {describe, expect, jest, test} from '@jest/globals';
 import express from 'express';
 //focus of the tests
 import {buildCrashReport} from '../backend/crash_logging_service/src/models/crashModel.js';
