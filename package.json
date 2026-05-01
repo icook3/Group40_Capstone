@@ -8,7 +8,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:one": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
-    },
+  },
   "devDependencies": {
     "@babel/preset-env": "^7.28.0",
     "babel-jest": "^30.0.4",
@@ -18,6 +18,7 @@
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
     "expr-eval-fork": "^3.0.0",
+    "express": "^5.2.1",
     "selenium-webdriver": "^4.43.0",
     "three": "^0.183.2"
   }
