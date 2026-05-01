@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^25.0.0",
+    "canvas": "^3.2.3",
     "expr-eval-fork": "^3.0.0",
     "express": "^5.2.1",
     "selenium-webdriver": "^4.43.0",
